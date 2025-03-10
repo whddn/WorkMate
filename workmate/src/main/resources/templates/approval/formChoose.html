@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/default_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>결재 양식</title>
+</head>
+
+<body>
+	<h3>결재 양식</h3>
+	<select id="searchKeyword">
+		<option value="formName" selected>양식명</option>
+		<option value="dept">담당부서</option>
+		<option value="manager">담당자</option>
+	</select>
+	<input id="searchValue">
+	<button>찾기</button>
+	<table>
+		<thead>
+			<tr>
+				<th>No</th>
+				<th>양식명</th>
+				<th>담당부서</th>
+				<th>담당자</th>
+			</tr>
+		</thead>
+		<tbody id="formList">
+			<tr>
+				<td>0</td>
+				<td>테스트</td>
+				<td>테스트</td>
+				<td>테스트</td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+
+<script>
+	let base_url = 'http://127.0.0.1:8099/workmate';
+	let body = {
+		
+	}
+	
+	fetch(base_url + '/approval/formChoose', {
+		method: 'POST',
+		header
+	})
+	.then()
+</script>
+
+</html>

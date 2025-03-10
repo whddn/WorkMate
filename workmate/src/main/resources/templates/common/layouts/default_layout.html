@@ -6,14 +6,17 @@
 
 <head>
 	<meta charset="UTF-8">
-	<th:block th:replace="~{common/configs/default_config :: ServerInfo}"></th:block>
-	<th:block th:replace="~{common/configs/default_config :: BootstrapConfig}"></th:block>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>그룹웨어 시스템</title>
+	<th:block th:replace="~{common/configs/default_config :: CSSConfig}"></th:block>
 </head>
 
 <body>
 	<div class="container">
-		<header th:insert="~{common/fragments/default_header :: HeaderFrag}"></header>
+		<header class="header" th:insert="~{common/fragments/default_header :: HeaderFrag}"></header>
+		<aside class="sidebar" th:insert="~{common/fragments/default_sidebar :: SidebarFrag}"></aside>
 		<main layout:fragment="content"></main>
+		<footer class="footer" th:insert="~{common/fragments/default_footer :: FooterFrag}"></footer>
 	</div>
 </body>
 

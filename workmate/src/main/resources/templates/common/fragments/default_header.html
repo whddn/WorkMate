@@ -1,4 +1,22 @@
 <!DOCTYPE html>
 <div xmlns:th="https://www.thymeleaf.org" th:fragment="HeaderFrag">
-	<button>Header!</button>
+	<nav class="nav">
+		<label class="nav-item">전자메일</label>
+		<label class="nav-item">전자결재</label>
+		<label class="nav-item">근태관리</label>
+		<label class="nav-item">예약</label>
+		
+		<!-- 더보기 버튼 (토글 기능 포함) -->
+		<div class="more-container">
+			<input type="checkbox" id="toggle-more" hidden>
+			<label for="toggle-more" class="nav-item more-btn">더보기 +</label>
+			<div class="dropdown">
+				<button class="dropdown-btn">사원관리</button>
+				<button class="dropdown-btn">재정관리</button>
+				<button class="dropdown-btn">자료실</button>
+				<button class="dropdown-btn">거래처</button>
+				<button class="dropdown-btn">전자계약</button>
+			</div>
+		</div>
+	</nav>
 </div>
