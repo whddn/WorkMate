@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @MapperScan(basePackages = "com.yedam.app.**.mapper")
 public class Workmate {
-
+	//
 	public static void main(String[] args) {
 		SpringApplication.run(Workmate.class, args);
 	}
