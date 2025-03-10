@@ -12,12 +12,10 @@
 </head>
 
 <body>
-	<div class="container">
-		<header class="header" th:insert="~{common/fragments/default_header :: HeaderFrag}"></header>
-		<aside class="sidebar" th:insert="~{common/fragments/default_sidebar :: SidebarFrag}"></aside>
-		<main layout:fragment="content"></main>
-		<footer class="footer" th:insert="~{common/fragments/default_footer :: FooterFrag}"></footer>
-	</div>
+	<header class="header" th:insert="~{common/fragments/default_header :: HeaderFrag}"></header>
+	<aside class="sidebar" th:insert="~{common/fragments/default_sidebar :: SidebarFrag}"></aside>
+	<main class="main" layout:fragment="content"></main>
+	<footer class="footer" th:insert="~{common/fragments/default_footer :: FooterFrag}"></footer>
 </body>
 
 </html>
