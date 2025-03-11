@@ -14,9 +14,19 @@ public class ApprovalController {
 		return "base";
 	}
 	
-	@GetMapping("approval/formChoose")
-	public String formChoose(Model model) {
-		return "approval/formChoose";
+	@GetMapping("approval/waiting")
+	public String waiting(Model model) {
+		return "approval/waiting";
+	}
+	
+	@GetMapping("approval/complete")
+	public String complete(Model model) {
+		return "approval/complete";
+	}
+	
+	@GetMapping("approval/formList")
+	public String formList(Model model) {
+		return "approval/formList";
 	}
 	
 	@GetMapping("approval/formWrite")
@@ -26,7 +36,7 @@ public class ApprovalController {
 	
 	@PostMapping("approval/formWrite")
 	public String formWritePost(Model model) {
-		return "approval/formChoose";
+		return "approval/formList";
 	}
 	
 	@GetMapping("approval/formRead")
@@ -36,11 +46,11 @@ public class ApprovalController {
 	
 	@PutMapping("approval/formRead")
 	public String formReadPut(Model model) {
-		return "approval/formChoose";
+		return "approval/formList";
 	}
 	
 	@DeleteMapping("approval/formRead")
 	public String formReadDelete(Model model) {
-		return "approval/formChoose";
+		return "approval/formList";
 	}
 }
