@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @Controller
 public class ApprovalController {
+	@GetMapping("/")
+	public String base(Model model) {
+		return "base";
+	}
+	
 	@GetMapping("approval/formChoose")
 	public String formChoose(Model model) {
 		return "approval/formChoose";
