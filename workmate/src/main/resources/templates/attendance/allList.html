@@ -3,33 +3,94 @@
 		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		layout:decorate="~{common/layouts/default_layout}"
 		layout:fragment="content">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<head>
 <meta charset="UTF-8">
 <title>근태관리</title>
 <style>
     .side-box {
-        width: 250px;
+        width: 400px;
+        height: 800px;
         padding: 20px;
         border-right: 1px solid #ccc;
+    }
+	.date-box {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+	.time-box {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+     .content {
+        flex: 1;
+        padding: 20px;
+    }
+	table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        }
+        
+	 .table-container {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    	display: block;
     }
 </style>
 </head>
 <body>
-    <div class="side-box">
-        <h2>근태관리</h2>
-        <p class="time-box" id="current-date"></p>
+	<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">근태관리</h4>
+        <p class="date-box" id="current-date"></p>
         <p class="time-box" id="current-time"></p>
-        <p>출근시간: 08:42:20</p>
-        <p>퇴근시간: 미등록</p>
-        <button class="btn btn-info">출근하기</button>
-        <button class="btn btn-info">퇴근하기</button>
+        <p>출근시간 : <span id="start-time"> 출근버튼을 클릭해주세요.</span></p>
+        <p>퇴근시간 : <span id="end-time"> 퇴근버튼을 클릭해주세요.</span></p>
+        <button onclick="startWork()" class="btn btn-primary btn-fw">출근하기</button>
+        <button onclick="endWork()" class="btn btn-secondary btn-fw">퇴근하기</button>
+        
+     <div class="dropdown">            
+        <select id="work-type">
+            <option value="기본">근무타입선택</option>
+            <option value="재택">재택</option>
+            <option value="출장">출장</option>
+            <option value="반차">반차</option>
+            <option value="연차">연차</option>
+         </select>
+         <button onclick="applyWorkType()">신청하기</button>
+     </div>
+    </div>
     </div>
     <div class="content">
   		<input type="date" name="schedule" min="2022-04-01" max="2022-04-30" />
   		<input type="date" name="schedule" min="2022-04-01" max="2022-04-30" />
 		<button class="btn btn-info">검색</button>
+		
+		 <h2>근태 현황</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>출근시간</th>
+                        <th>퇴근시간</th>
+                        <th>총근무시간</th>
+                        <th>근무지</th>
+                        <th>근무상태</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2024/06/17</td>
+                        <td>08:55</td>
+                        <td>16:55</td>
+                        <td>9h</td>
+                        <td>기본</td>
+                        <td>정상근무</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 <script>
@@ -38,8 +99,16 @@ function currentDate() {
 	document.getElementById("current-date").innerText = now.toISOString().split('T')[0];
 	document.getElementById("current-time").innerText = now.toLocaleTimeString();
 }
-setInterval(updateTime, 1000);
-updateTime();
+setInterval(currentDate, 1000);
+currentDate();
+
+function startWork() {
+    document.getElementById("start-time").innerText = new Date().toLocaleTimeString();
+}
+
+function endWork() {
+    document.getElementById("end-time").innerText = new Date().toLocaleTimeString();
+}
 
 </script>
 </html>
