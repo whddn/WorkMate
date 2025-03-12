@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/default_layout}"
+	layout:fragment="content">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회의실 예약 시스템</title>
+ <link rel="stylesheet" href="style.css">
+<style>
+.card {
+	margin-top: 5%;
+}
+</style>
+</head>
+<body>
+
+	<div class="container full-screen-container">
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title text-center">예약 정보 입력</h4>
+				<form action="/reservations" method="GET">
+
+					<!-- 📌 품목 선택 + 날짜 선택 (한 줄 정렬) -->
+					<div class="mb-3 d-flex align-items-center gap-3">
+						<!-- 📌 품목 선택 -->
+						<div>
+							<label class="form-label">품목 선택</label>
+							 <select class="form-select" name="itemType" id="item-type"	onchange="toggleOptions()">
+								<option value="meeting-room">회의실</option>
+								<option value="car">차량</option>
+							</select>
+						</div>
+
+						<!-- 📆 날짜 선택 -->
+						<div>
+							<label class="form-label">날짜 선택</label>
+							 <input type="date"	class="form-control" name="reservationDate">
+						</div>
+					</div>
+
+					<!-- 📌 시간 선택 (오전/오후 나누기 & 오후 시간 4시간 단위 배치) -->
+					<div class="mb-3">
+						<label class="form-label">시간 선택 (다중 선택 가능)</label>
+						<div class="d-grid gap-2">
+							<!-- 오전 시간 -->
+							<div>
+								<strong>오전</strong>
+								<div class="d-flex flex-wrap gap-2">
+									<th:block th:each="hour : ${#numbers.sequence(9, 11)}">
+										<input type="checkbox" class="btn-check"
+										 name="timeSlot" th:id="'time'+${hour}" th:value="${hour + ':00 AM'}">
+										<label class="btn btn-outline-secondary"
+										 th:for="'time'+${hour}" th:text="${hour + ':00 AM'}"></label>
+									</th:block>
+								</div>
+							</div>
+
+							<!-- 오후 시간 -->
+							<div>
+								<strong>오후</strong>
+								<div class="d-grid gap-2">
+									<div class="d-flex flex-wrap gap-2">
+										<th:block th:each="hour : ${#numbers.sequence(12, 15)}">
+											<input type="checkbox" class="btn-check" name="timeSlot"
+												th:id="'time'+${hour}" th:value="${hour + ':00 PM'}">
+											<label class="btn btn-outline-secondary"
+												th:for="'time'+${hour}" th:text="${hour + ':00 PM'}">
+											</label>
+										</th:block>
+									</div>
+									<div class="d-flex flex-wrap gap-2">
+										<th:block th:each="hour : ${#numbers.sequence(16, 19)}">
+											<input type="checkbox" class="btn-check" name="timeSlot"
+												th:id="'time'+${hour}" th:value="${hour + ':00 PM'}">
+											<label class="btn btn-outline-secondary"
+												th:for="'time'+${hour}" th:text="${hour + ':00 PM'}">
+											</label>
+										</th:block>
+									</div>
+									<div class="d-flex flex-wrap gap-2">
+										<th:block th:each="hour : ${#numbers.sequence(20, 21)}">
+											<input type="checkbox" class="btn-check" name="timeSlot"
+												th:id="'time'+${hour}" th:value="${hour + ':00 PM'}">
+											<label class="btn btn-outline-secondary"
+												th:for="'time'+${hour}" th:text="${hour + ':00 PM'}">
+											</label>
+										</th:block>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-3" id="meeting-room-options">
+						<label class="form-label">회의실 선택</label>
+						<div class="btn-group">
+							<input type="radio" class="btn-check" name="room" id="room202" value="202">
+							 <label class="btn btn-outline-primary"	for="room202">202 회의실</label>
+							  <input type="radio" class="btn-check" name="room" id="room203" value="203">
+							<label class="btn btn-outline-primary" for="room203">203 회의실</label>
+							 <input type="radio" class="btn-check" name="room" id="room204" value="204">
+							  <label class="btn btn-outline-primary" for="room204">204 회의실</label>
+						</div>
+					</div>
+
+					<div class="mb-3" id="car-options" style="display: none;">
+						<label class="form-label">차량 선택</label>
+						<div class="btn-group">
+							<input type="radio" class="btn-check" name="car" id="carA"value="A">
+							 <label class="btn btn-outline-warning"	for="carA">A 차량</label>
+							  <input type="radio" class="btn-check"	name="car" id="carB" value="B">
+							   <label class="btn btn-outline-warning" for="carB">B 차량</label>
+								 <input	type="radio" class="btn-check" name="car" id="carC" value="C">
+							<label class="btn btn-outline-warning" for="carC">C 차량</label>
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">예약 내용</label>
+						<textarea class="form-control" rows="3" name="description">Ooo 프로젝트 일정으로 회의 신청합니다.</textarea>
+					</div>
+
+					<div class="d-flex justify-content-end">
+						<button type="submit" class="btn btn-success">저장</button>
+						<button type="reset" class="btn btn-secondary">취소</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		function toggleOptions() {
+			const itemType = document.getElementById("item-type").value;
+			const meetingRoomOptions = document.getElementById("meeting-room-options");
+			const carOptions = document.getElementById("car-options");
+
+			if (itemType === "meeting-room") {
+				meetingRoomOptions.style.display = "block";
+				carOptions.style.display = "none";
+			} else if (itemType === "car") {
+				meetingRoomOptions.style.display = "none";
+				carOptions.style.display = "block";
+			}
+		}
+	</script>
+
+</body>
+</html>
