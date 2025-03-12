@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/approval_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>전자 결재</title>
+</head>
+
+<body>
+	<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
+	<div>
+		<button>첨부</button>
+		<ul>
+			<li>홍길동.pdf<button>X</button></li>
+			<li>홍길동.pdf<button>X</button></li>
+		</ul>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>결재</th>
+					<th>결재자</th>
+					<th>결재부서</th>
+					<th>결재일시</th>
+					<th>의견</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>반려</td>
+					<td>김과장</td>
+					<td>개발부</td>
+					<td>2025-03-04</td>
+					<td>중요 회의 있음</td>
+				</tr>
+			</tbody>
+		</table>
+		<button>삭제</button>
+		<button>결재</button>
+		<button onclick="history.back();">취소</button>
+	</div>
+</body>

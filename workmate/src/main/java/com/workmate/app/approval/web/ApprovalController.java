@@ -31,7 +31,7 @@ public class ApprovalController {
 	
 	@GetMapping("approval/formWrite")
 	public String formWriteGet(Model model) {
-		return "approval/annualLeave";
+		return "approval/formWrite";
 	}
 	
 	@PostMapping("approval/formWrite")
@@ -41,7 +41,7 @@ public class ApprovalController {
 	
 	@GetMapping("approval/formRead")
 	public String formReadGet(Model model) {
-		return "approval/annualLeave";
+		return "approval/formRead";
 	}
 	
 	@PutMapping("approval/formRead")
