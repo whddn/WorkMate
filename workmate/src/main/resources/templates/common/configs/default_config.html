@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
 
-<th:block th:fragment="ServerInfo">
-	<!-- ContextPath Info -->
-	<meta name="contextPath" th:value="${contextPath}">
-</th:block>
-
 <th:block th:fragment="HeadConfig">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
-    	content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+      name="viewport"
     />
     <link
-    	rel="icon"
-    	th:href="@{/assets/img/kaiadmin/favicon.ico}"
-    	type="image/x-icon"
+      rel="icon"
+      th:href="@{/assets/img/kaiadmin/favicon.ico}"
+      type="image/x-icon"
     />
 
     <!-- Fonts and icons -->
@@ -74,9 +69,6 @@
     <!-- jQuery Vector Maps -->
     <script th:src="@{/assets/js/plugin/jsvectormap/jsvectormap.min.js}"></script>
     <script th:src="@{/assets/js/plugin/jsvectormap/world.js}"></script>
-
-    <!-- Google Maps Plugin -->
-    <script th:src="@{/assets/js/plugin/gmaps/gmaps.js}"></script>
 
     <!-- Sweet Alert -->
     <script th:src="@{/assets/js/plugin/sweetalert/sweetalert.min.js}"></script>

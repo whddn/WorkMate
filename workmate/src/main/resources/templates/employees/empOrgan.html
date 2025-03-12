@@ -1,149 +1,329 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/default_layout}"
-	layout:fragment="content">
-<script
-	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-	integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-	crossorigin="anonymous"></script>
-<script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-	integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-	crossorigin="anonymous"></script>
-<head>
-<meta charset="UTF-8">
-<title>조직도</title>
-<style>
+<html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layouts/default_layout}" layout:fragment="content">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
+  <head>
+    <meta charset="UTF-8">
+    <title>Organization</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-/* 조직도 */
-#organization {
-	width: 100%;
-}
+      #container {
+        display: flex;
+        flex-direction: column; /* 세로로 배치 */
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 50px;
+        width: 1000px;
+        height: 700px;
+        position: relative; /* 부모 컨테이너에 상대 위치 설정 */
+      }
 
-.tree {
-	margin-left: 260px;
-	margin-bottom: 100px;
-	width: 1400px;
-	height: 532px;
-}
+      .wrapper {
+        display: flex;
+        gap: 40px;
+        align-items: flex-start;
+        width: 100%; /* width 조정 */
+      }
 
-.org-ul {
-	padding-top: 70px;
-	position: relative;
-}
+      /* 조직도 스타일 */
+      ul {
+        list-style-type: none;
+        padding-left: 20px;
+        position: relative;
+        width: 300px; /* 조직도의 너비 설정 */
+      }
 
-.org-li {
-	float: left;
-	text-align: center;
-	list-style-type: none;
-	position: relative;
-	padding: 70px 50px 0 50px;
-}
+      ul::before {
+        content: '';
+        border-left: 1px solid #ccc;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+      }
 
-.li-left::before, .li-left::after {
-	right: 60%;
-}
+      li {
+        margin: 5px 0;
+        padding-left: 20px;
+        position: relative;
+        cursor: default;
+      }
 
-/* 아래 새로선 */
-.org-li::before, .org-li::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	right: 40%;
-	border-top: 1px solid #707070;
-	width: 170px;
-	height: 70px;
-}
+      li::before {
+        content: '';
+        border-top: 1px solid #ccc;
+        position: absolute;
+        top: 10px;
+        left: 0;
+        width: 20px;
+      }
 
-.org-li::after {
-	right: auto;
-	left: 50%;
-	border-left: 1px solid #707070;
-}
+      .node {
+        font-weight: bold;
+      }
 
-.org-li :first-child::after {
-	right: auto;
-	left: 40%;
-	border-left: 1px solid #707070;
-}
-/*We need to remove left-right connectors from elements without 
-any siblings*/
-.org-li:only-child::after, .org-li:only-child::before {
-	display: none;
-}
+      .person {
+        color: #0077cc;
+        cursor: pointer;
+      }
 
-/*Remove space from the top of single children*/
-.org-li:only-child {
-	padding-top: 0;
-}
+      .person:hover {
+        text-decoration: underline;
+      }
 
-/* 양쪽 선 제거 */
-.org-li:first-child::before, .org-li:last-child::after {
-	border: 0 none;
-}
+      .hidden {
+        display: none;
+      }
 
-/* 오른쪽 새로선 */
-.org-li:last-child::before {
-	border-right: 1px solid #707070;
-	border-radius: 0 5px 0 0;
-}
+      .details {
+        color: #666;
+        font-size: 14px;
+      }
 
-/* 위 새로선 */
-.org-ul::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 50%;
-	border-left: 1px solid #707070;
-	width: 0;
-	height: 70px;
-}
+      /* 사원상세 스타일 */
+      .information {
+        width: 400px;
+        border: 2px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        display: inline-block;
+        height: 50%; /* 상세정보 영역이 꽉 차도록 설정 */
+        overflow-y: auto; /* 스크롤 처리 */
+      }
 
-.tree li p {
-	line-height: 80px;
-	width: 194px;
-	height: 74px;
-	border: 3px solid #184B9F;
-	color: #1E1E1E;
-	font-size: 26px;
-	display: inline-block;
-	border-radius: 20px;
-}
+      .profile {
+        display: flex;
+        align-items: center;
+      }
 
-.org {
-	background-color: #184B9F;
-	color: #FFFFFF !important;
-}
+      .profile img {
+        width: 80px;
+        margin-right: 15px;
+      }
 
-.li-left {
-	padding-left: 0;
-}
+      .info {
+        margin-top: 10px;
+      }
 
-.li-right {
-	padding-right: 0;
-}
+      .icons {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+      }
 
-.work {
-	margin-top: 40px;
-	width: 200px;
-}
+      .label {
+        font-weight: bold;
+      }
 
-.work li {
-	list-style: none;
-	text-align: left;
-	font-size: 20px;
-	line-height: 38.4px;
-	letter-spacing: 0px;
-}
+      /* 줄 스타일 */
+      .divider {
+        border: 1px solid #ccc;
+        margin: 20px 0;
+      }
 
-</style>
-</head>
-<body>
-<h1>조직도</h1>
-	<div id="organization">
+      /* 신규 사원 등록 버튼 */
+      .register-btn-container {
+        position: absolute;
+        bottom: 20px; /* 버튼이 맨 아래에 배치되도록 설정 */
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 100%;
+      }
 
+      .register-btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .register-btn:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="wrapper">
+        <!-- 조직도 트리 -->
+        <div class="tree">
+          <ul>
+            <li><span class="node">홍길동 사장</span>
+              <ul>
+                <li><span class="node">경영지원부</span>
+                  <ul>
+                    <li>
+                      <span class="person" onclick="toggleSub(this)">노인자 이사</span>
+                      <ul class="hidden details">
+                        <li>연락처: 010-1111-2222</li>
+                        <li>이메일: noinja@company.com</li>
+                      </ul>
+                    </li>
+                    <li><span class="node">관리팀(서울)</span>
+                      <ul>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">정별이 대리</span>
+                          <ul class="hidden details">
+                            <li>프로젝트: 문서관리</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">장유란 사원</span>
+                          <ul class="hidden details">
+                            <li>담당: 회계 정리</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><span class="node">관리팀(부산영남)</span>
+                      <ul>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">신기훈 사원</span>
+                          <ul class="hidden details">
+                            <li>담당: 지역 총무</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+
+                <li><span class="node">그룹웨어 사업부</span>
+                  <ul>
+                    <li>
+                      <span class="person" onclick="toggleSub(this)">정세미 팀장</span>
+                      <ul class="hidden details">
+                        <li>담당: 사업 총괄</li>
+                      </ul>
+                    </li>
+                    <li><span class="node">컨설팅 리드팀</span>
+                      <ul>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">정세미 팀장</span>
+                          <ul class="hidden details">
+                            <li>중복: 팀장 겸 리드</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">김지수 주임</span>
+                          <ul class="hidden details">
+                            <li>담당: 요구사항 분석</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><span class="node">컨설팅 2팀</span>
+                      <ul>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">이정훈 사원</span>
+                          <ul class="hidden details">
+                            <li>담당: 시스템 구축</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">홍승지 사원</span>
+                          <ul class="hidden details">
+                            <li>담당: 고객 지원</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><span class="node">컨설팅 3팀</span>
+                      <ul>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">신기훈 사원</span>
+                          <ul class="hidden details">
+                            <li>겸직: 부산영남팀 소속</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><span class="node">컨설팅 4팀</span>
+                      <ul>
+                        <li>
+                          <span class="person" onclick="toggleSub(this)">—</span>
+                          <ul class="hidden details">
+                            <li>아직 인원 없음</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 사원 상세 -->
+        <div class="information">
+          <div class="profile">
+            <img src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" alt="프로필 이미지">
+            <div>
+              <div class="label">홍길동 사원</div>
+              <div>WorkMate 개발부</div>
+              <div>인사팀</div>
+              <div>사원</div>
+            </div>
+          </div>
+
+          <div class="icons">
+            <img src="https://img.icons8.com/ios/24/000000/email.png" alt="이메일">
+            <img src="https://img.icons8.com/ios/24/000000/calendar.png" alt="일정">
+            <img src="https://img.icons8.com/ios/24/000000/speech-bubble--v1.png" alt="채팅">
+            <img src="https://img.icons8.com/ios/24/000000/bookmark-ribbon--v1.png" alt="북마크">
+            <img src="https://img.icons8.com/ios/24/000000/sms.png" alt="SMS">
+          </div>
+
+          <div class="info">
+            <div><span class="label">사원번호:</span> 21621981</div>
+            <div><span class="label">아이디:</span> user_01</div>
+            <div><span class="label">입사일:</span> 2023-08-16</div>
+            <div><span class="label">퇴사일:</span> - </div>
+            <div><span class="label">전화번호:</span> 010-1111-1111</div>
+            <div><span class="label">집주소:</span> 대구광역시 중구 예담직업전문학교</div>
+          </div>
+
+          <!-- 줄 추가 -->
+          <hr class="divider">
+        </div>
+      </div>
+
+      <!-- 신규 사원 등록 버튼 추가 (관리자)-->
+      <div class="register-btn-container">
+        <button class="register-btn" th:onclick="|location.href='@{/newEmp}'|">신규 사원 등록</button>
+      </div>
+      <!-- 평가하기 버튼 -->
+      <div class="">
+        <button class="register-btn" th:onclick="|location.href='@{/evalu}'|">평가하기</button>
+      </div>
     </div>
-</body>
+    
+
+    <script>
+      function toggleSub(element) {
+        const subList = element.nextElementSibling;
+        if (subList && subList.tagName.toLowerCase() === 'ul') {
+          subList.classList.toggle('hidden');
+        }
+      }
+    </script>
+  </body>
 </html>

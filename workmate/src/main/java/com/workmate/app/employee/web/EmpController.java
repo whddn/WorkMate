@@ -20,4 +20,10 @@ public class EmpController {
 	public String empEvaluPage(Model model) {
 		return "employees/evalumain";
 	}
+	
+	@GetMapping("newEmp") // 사원 등록
+	public String empNewInsertPage(Model model) {
+		return "employees/newEmp";
+	}
+	
 }

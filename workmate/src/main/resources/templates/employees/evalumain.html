@@ -4,13 +4,15 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>다면평가 양식</title>
+  <title>평가</title>
   <style>
     #container {
-      width: 1000px;
+      width: 700px;
+      height : 750px;
       margin: 0 auto;
       border: 1px solid black;
       padding: 10px;
+      margin-top : 30px;
     }
 
     table,
@@ -33,7 +35,7 @@
 
     .ver2 {
       border : 1px solid black;
-      width: 60%;
+      width: 500px;
     }
   </style>
 </head>
@@ -45,7 +47,7 @@
     <form id="evaluationForm">
       <!-- 1. 평가자 정보 -->
 
-      <h3>1. 평가자 정보</h3>
+      <h4>1. 평가자 정보</h4>
       <table>
         <tr>
           <th>피평가자</th>
@@ -68,60 +70,109 @@
       </table>
 
       <!-- 2. 평가 안내-->
-      <h3>2. 평가 설명</h3>
+      <h4>2. 평가 설명</h4>
       <div class="ver2">
         <p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
         <p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
       </div>
 
       <!-- 3. 평가항목 -->
-      <h3>3. 평가항목 및 채점표</h3>
+      <h4>3. 평가항목 및 채점표</h4>
       <table>
         <tr>
           <th>평가분야</th>
           <th>평가항목</th>
-          <th colspan="5">평가점수 (1~5)</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
         </tr>
 
         <!-- 핵심가치 -->
         <tr>
           <td rowspan="3">핵심가치</td>
           <td>조직의 핵심가치인 ‘000’을 존중하고, 이를 실천한다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
         <tr>
           <td>조직의 비전과 미션을 명확히 인식하고 있다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
         <tr>
           <td>고객의 요구를 신속히 파악한다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
 
@@ -129,41 +180,86 @@
         <tr>
           <td rowspan="3">업무역량</td>
           <td>과제 해결을 위한 다양한 아이디어를 제시한다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
         <tr>
           <td>새로운 업무에 대한 학습 속도가 빠르다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
         <tr>
           <td>스스로 성장할 수 있는 기회를 찾아 추가 업무를 수행한다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
 
@@ -171,46 +267,91 @@
         <tr>
           <td rowspan="3">팀워크</td>
           <td>정보와 피드백을 동료들과 투명하게 공유한다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
         <tr>
           <td>팀 내에서 갈등이 생길 때 이를 중재한다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
         <tr>
           <td>개인의 성취보다 팀 전체의 목표를 우선시 한다.</td>
-          <td colspan="5">
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 10px;">
+              <input type="radio" name="option" id="option1">
+            </div>
           </td>
         </tr>
       </table>
 
-
+	  <br>
       <button type="submit">제출</button>
     </form>
 
