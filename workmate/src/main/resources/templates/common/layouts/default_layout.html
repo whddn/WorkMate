@@ -1,35 +1,31 @@
 <!DOCTYPE html>
 <html 
-	xmlns:th="https://www.thymeleaf.org" 
+	lang="ko"
+	xmlns:th="https://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 >
 
 <head>
-	<!-- Required meta tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>그룹웨어 시스템</title>
-	<th:block th:replace="~{common/configs/default_config :: ServerInfo}"></th:block>
-	<th:block th:replace="~{common/configs/default_config :: BootstrapConfig}"></th:block>
+    <th:block th:replace="~{common/configs/default_config :: HeadConfig}"></th:block>
 </head>
 
 <body>
-	<div class="container-scroller">
-    	<!-- partial:partials/_sidebar.html -->
-    	<header th:replace="~{partials/_sidebar :: SidebarFrag}"></header>
-    	<!-- partial -->
-		<div class="container-fluid page-body-wrapper">
-			<!-- partial:partials/_navbar.html -->
-			<nav th:replace="~{partials/_header :: HeaderFrag}"></nav>
-			<!-- partial -->
-			<div class="main-panel">
-				<div class="content-wrapper" layout:fragment="content"></div>
-				<!-- content-wrapper ends -->
-				<!-- partial:partials/_footer.html -->
-				<footer th:replace="~{partials/_footer :: FooterFrag}"></footer>
-			</div>
-		</div>
-	</div>
+    <div class="wrapper">
+	    <!-- Sidebar -->
+	    <aside th:insert="~{common/fragments/default_sidebar :: SidebarFrag}"></aside>
+	    <!-- End Sidebar -->
+
+      <div class="main-panel">
+      	<div class="main-header" th:insert="~{common/fragments/default_header :: HeaderFrag}"></div>
+      	
+        <div class="container">
+          <div class="page-inner" layout:fragment="content"></div>
+        </div>
+
+		<footer class="footer" th:insert="~{common/fragments/default_footer :: FooterFrag}"></footer>
+      </div>
+    </div>
+    <th:block th:replace="~{common/configs/default_config :: BodyConfig}"></th:block>
 </body>
 
 </html>
