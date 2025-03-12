@@ -1,5 +1,11 @@
 package com.workmate.app.attendance.service;
 
-public class AttendanceVO {
+import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+public class AttendanceVO {
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date hireDate;
 }
