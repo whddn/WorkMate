@@ -51,28 +51,31 @@
 		<button onclick="history.back();">취소</button>
 	</div>
 	
+	<!-- 모달 창 -->
 	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">New message</h5>
+					<h5 class="modal-title" id="exampleModalLabel">결재 처리</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
 					<form>
 						<div class="mb-3">
-							<label for="recipient-name" class="col-form-label">Recipient:</label>
-							<input type="text" class="form-control" id="recipient-name">
+							<label for="recipient-name" class="col-form-label">결재처리</label>
+							<!-- input type="text" class="form-control" id="recipient-name" -->
+							<input type="radio" name="isApproved" value="yes">승인
+							<input type="radio" name="isApproved" value="no">반려
 						</div>
 						<div class="mb-3">
-							<label for="message-text" class="col-form-label">Message:</label>
+							<label for="message-text" class="col-form-label">결재의견</label>
 							<textarea class="form-control" id="message-text"></textarea>
 						</div>
 					</form>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Send message</button>
+					<button type="button" class="btn btn-primary">결재</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
 		</div>
