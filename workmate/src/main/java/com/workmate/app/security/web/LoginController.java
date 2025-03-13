@@ -1,3 +1,4 @@
+/*
 package com.workmate.app.security.web;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,3 +16,4 @@ public class LoginController {
 	
 	
 }
+*/

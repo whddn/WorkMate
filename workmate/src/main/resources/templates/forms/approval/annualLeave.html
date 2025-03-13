@@ -109,8 +109,20 @@
 					<li>개발부 > 팀장 > 김나나</li>
 				</ul>
 				<span unselectable="on" contenteditable="false" class="comp_wrap" data-cid="6" data-dsl="{{textarea:description}}" data-wrapper="" style="width: 100%;" data-value="" data-autotype="">
-					<button>결재선 지정</button>
-					<button>삭제</button>
+					<button 
+						type="button" 
+						class="btn btn-primary" 
+						data-bs-toggle="modal" 
+						data-bs-target="#addApprLineModal" 
+						data-bs-whatever="@mdo">
+						결재선 지정
+					</button>
+					<button
+						type="button"
+						class="btn btn-primary"
+						>
+						삭제
+					</button>	
 				</span> 
 			</td>
 		</tr>
@@ -132,3 +144,5 @@
 		</tr>
 	</tbody>
 </table>
+
+</div>

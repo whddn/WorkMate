@@ -22,7 +22,7 @@
 		<input>
 		<button><i class="fas fa-search"></i></button>
 	</span>
-	<table class="table">
+	<table id="FormsTable" class="display">
 		<thead>
 			<tr>
 				<th>NO</th>
@@ -31,7 +31,7 @@
 				<th>담당자</th>
 			</tr>
 		</thead>
-		<tbody id="ListOfForm">
+		<tbody>
 			<tr>
 				<td>4</td>
 				<td>연차/휴가</td>
@@ -68,16 +68,9 @@
 </body>
 
 <script>
-	/*
-	let trList = Array.from(document.querySelector('#ListOfForm').children);
-	//console.log(trList);
-	trList.forEach((elements) => {
-		console.log(elements);
-		elements.addEventListener('click', (event) => {
-			location.href = '[[@{formWrite?formNo=1}]]';
-		})
+	$(document).ready(function() {
+		$('#FormsTable').DataTable();
 	});
-	*/
 </script>
 
 </html>
