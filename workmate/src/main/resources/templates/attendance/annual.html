@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/default_layout}"
+	layout:fragment="content">
+<meta charset="UTF-8">
+<title>근태관리</title>
+<style>
+/* 전체 컨테이너를 세로 배치 */
+.main-container {
+	display: flex;
+	width: 100%;
+}
+
+#card-left {
+	width: 400px;
+	height: 100vh;
+	padding: 40px;
+	margin: 30px;
+	position: sticky;
+	top: 0;
+	flex-shrink: 0; 
+}
+
+/* 오른쪽 컨테이너 (카드들을 세로 정렬) */
+.right-container {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	padding: 20px;
+}
+
+
+.date-box {
+	font-size: 20px;
+	margin-bottom: 10px;
+}
+
+.time-box {
+	font-size: 40px;
+	margin-bottom: 10px;
+}
+
+.content {
+	flex: 1;
+	padding: 20px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+.table-container {
+	max-height: 300px;
+	overflow-y: auto;
+	border: 1px solid #ccc;
+	display: block;
+}
+</style>
+</head>
+<body>
+	<div class="main-container" >
+		<div class="card" id="card-left">
+			<div class="card-body">
+				<h4 class="card-title">근태관리</h4>
+				<p class="date-box" id="current-date"></p>
+				<p class="time-box" id="current-time"></p>
+				<p>
+					출근시간 : <span id="start-time"> 미등록</span>
+				</p>
+				<p>
+					퇴근시간 : <span id="end-time"> 미등록</span>
+				</p>
+				<button onclick="startWork()" class="btn btn-primary btn-fw">출근하기</button>
+				<button onclick="endWork()" class="btn btn-secondary btn-fw">퇴근하기</button>
+	
+				<div class="dropdown">
+					<select id="work-type" class="form-select input-fixed">
+						<option value="기본">근무타입선택</option>
+						<option value="재택">재택</option>
+						<option value="출장">출장</option>
+						<option value="연차">연차</option>
+					</select>
+					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청하기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="right-container">
+		
+	</div>
+</body>
+<script>
+	function currentDate() {
+		const now = new Date();
+		document.getElementById("current-date").innerText = now.toISOString()
+				.split('T')[0];
+		document.getElementById("current-time").innerText = now
+				.toLocaleTimeString();
+	}
+	setInterval(currentDate, 1000);
+	currentDate();
+
+	function startWork() {
+		document.getElementById("start-time").innerText = new Date()
+				.toLocaleTimeString();
+	}
+
+	function endWork() {
+		document.getElementById("end-time").innerText = new Date()
+				.toLocaleTimeString();
+	}
+</script>
+</html>

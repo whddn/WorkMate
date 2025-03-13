@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workmate.app.attendance.mapper.AttendMapper">
+
+	<!-- 전체조회 -->	
+	<select id="selectWorkList" resultType="WorkVO">
+		SELECT start_work
+		    , after_work
+		    , work_time
+		    , work_status
+		FROM work
+	</select>
+</mapper>

@@ -9,11 +9,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @Controller
 public class ApprovalController {
-	@GetMapping("/")
-	public String base(Model model) {
-		return "base";
-	}
-	
 	@GetMapping("approval/waiting")
 	public String waiting(Model model) {
 		return "approval/waiting";
@@ -52,5 +47,10 @@ public class ApprovalController {
 	@DeleteMapping("approval/formRead")
 	public String formReadDelete(Model model) {
 		return "approval/formList";
+	}
+	
+	@GetMapping("approval/manage")
+	public String manage(Model model) {
+		return "approval/manage";
 	}
 }
