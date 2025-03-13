@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layouts/commonItem_layout}"
+	  layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>공용품 관리 등록</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 50%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top:100px;
+        }
+        h2 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        select, input, button {
+            padding: 8px;
+            margin-top: 5px;
+        }
+        .time-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-save {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-cancel {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>공용품 관리 등록</h2>
+        <form id="itemForm" th:action="@{/}" method="post">
+            <div class="form-group">
+                <label>공용품 종류</label>
+                <select name="itemType" id="item-type">
+                    <option value="회의실">회의실</option>
+                    <option value="차량">차량</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>이름</label>
+                <input type="text" name="itemName" id="item-name" placeholder="항목 입력">
+            </div>
+
+            <div class="form-group">
+                <label>시간 추가</label>
+                <div class="time-group">
+                    <input type="time" name="startTime" id="start-time">
+                    ~
+                    <input type="time" name="endTime" id="end-time">
+                    <button type="button" class="btn btn-save" onclick="addTime()">+</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>이미지 추가</label>
+                <input type="file" name="itemImage" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-save">저장</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelForm()">취소</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function addItem() {
+            let itemName = document.getElementById("item-name").value;
+            if (itemName.trim() === "") {
+                alert("항목을 입력하세요.");
+                return;
+            }
+            let list = document.getElementById("item-list");
+            let div = document.createElement("div");
+            div.innerHTML = `<input type='hidden' name='items' value='${itemName}'> ${itemName}`;
+            list.appendChild(div);
+            document.getElementById("item-name").value = "";
+        }
+
+        function addTime() {
+            let startTime = document.getElementById("start-time").value;
+            let endTime = document.getElementById("end-time").value;
+            if (startTime === "" || endTime === "") {
+                alert("시간을 입력하세요.");
+                return;
+            }
+            if (startTime >= endTime) {
+                alert("올바른 시간 범위를 입력하세요.");
+                return;
+            }
+            let list = document.getElementById("time-list");
+            let div = document.createElement("div");
+            div.innerHTML = `<input type='hidden' name='times' value='${startTime} ~ ${endTime}'> ${startTime} ~ ${endTime}`;
+            list.appendChild(div);
+        }
+
+        function cancelForm() {
+            if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
+                document.getElementById("itemForm").reset();
+                document.getElementById("item-list").innerHTML = "";
+                document.getElementById("time-list").innerHTML = "";
+            }
+        }
+    </script>
+</body>
+</html>

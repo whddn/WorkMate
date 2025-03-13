@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workmate.app.employee.mapper.EmpMapper">
+	<!--/* 사원 상세 조회 */-->
+	<select id="selectOneEmp" resultType="EmpVO">
+		SELECT u.user_name
+		        , d.department_name
+		        , t.team_name
+		        , u.user_position
+		        , u.user_no
+		        , u.user_id
+		        , u.hire_date
+		        , u.resign_date
+		        , u.user_phone
+		        , u.address
+		        , u.user_ip
+		        , u.common_ip
+		FROM employee u 
+		JOIN  department d 
+		ON u.user_no = d.department_head
+		JOIN team t 
+		ON d.department_id = t.department_id 
+		WHERE u.user_no = 21621981
+	</select>
+	
+	<!-- 팀명 조회 -->
+	<select id="selectAllEmpTeam" resultType="EmpVO">
+		SELECT   team_no 
+        	   , team_name
+		FROM team
+		ORDER BY team_no
+	</select>
+	
+	<!-- 직급 조회 -->
+	<select id="selectAllPosition" resultType="EmpVO">
+		SELECT user_position
+		FROM employee
+	</select>
+	
+	<!-- 사원 등록 --> 
+	<insert id="insertOneEmp" parameterType="EmpVO">
+		<selectKey keyProperty="userNo"
+				   resultType="Integer"
+				   order="BEFORE">
+		 SELECT MAX(USER_NO) + 1
+         FROM EMPLOYEE
+         WHERE USER_NO BETWEEN 200 AND 700
+		</selectKey>
+		INSERT INTO employee 
+					(
+    					 USER_NO
+                       , USER_NAME
+    				   , TEAM_NO
+    				   , USER_POSITION
+    				   , USER_ID
+    				   , USER_PWD
+    				   , USER_PHONE
+    				   , ADDRESS
+					) 
+		VALUES 		
+					(
+						#{userNo}
+                      , #{userName}
+					  , #{teamNo}
+					  , #{userPosition}
+					  , 'user' || #{userNo}
+					  , DBMS_RANDOM.STRING('X', 10) 
+					  , #{userPhone}
+					  , #{address}
+					)
+	</insert>
+</mapper>
