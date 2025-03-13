@@ -34,7 +34,7 @@
 				<th>PDF</th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody id="listOfComplete">
 			<tr>
 				<td>3</td>
 				<td>YD001</td>
@@ -78,5 +78,15 @@
 	    <li class="page-item"><a class="page-link" href="#">Next</a></li>
 	</ul>
 </body>
+
+<script>
+	let trList = Array.from(document.querySelectorAll('#listOfComplete > tr'));
+	trList.forEach((elements) => {
+		console.log(elements);
+		elements.addEventListener('click', (event) => {
+			location.href = '[[@{formRead?formNo=1}]]';
+		});
+	});
+</script>
 
 </html>

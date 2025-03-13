@@ -22,6 +22,88 @@
 		<button>결재요청</button>
 		<button th:onclick="| location.href = '@{formList}' |">취소</button>
 	</div>
+	
+	<!-- 모달 창 -->
+	<div class="modal fade" id="addApprLineModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">결재 처리</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form>
+						<table><tbody>
+							<tr>
+								<td>
+									<h5>내 결재선</h5>
+									<ul>
+										<li>휴가 결재선</li>
+										<li>연장근무 결재선</li>
+									</ul>
+								</td>
+								<td>
+									<button>결재선 추가</button>
+									<button>결재선 제거</button>
+								</td>
+								<td>
+									<table class="table">
+										<thead>
+											<tr>
+												<th>결재 순서</th>
+												<th>이름</th>
+												<th>직책</th>
+												<th>부서</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<th>1</th>
+												<th>홍길동</th>
+												<th>팀장</th>
+												<th>개발부</th>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<h5>조직도</h5>
+								</td>
+								<td>
+									<button>참조자 추가</button>
+									<button>참조자 제거</button>
+								</td>
+								<td>
+									<table class="table">
+										<thead>
+											<tr>
+												<th>이름</th>
+												<th>직책</th>
+												<th>부서</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>고길동</td>
+												<td>사원</td>
+												<td>개발부</td>
+											</tr>
+										</tbody>
+									</table>
+								<td>
+							</tr>
+						</tbody></table>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary">저장</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>

@@ -53,4 +53,9 @@ public class ApprovalController {
 	public String formReadDelete(Model model) {
 		return "approval/formList";
 	}
+	
+	@GetMapping("approval/manage")
+	public String manage(Model model) {
+		return "approval/manage";
+	}
 }

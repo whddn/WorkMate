@@ -31,7 +31,7 @@
 				<th>담당자</th>
 			</tr>
 		</thead>
-		<tbody id="ListOfForm">
+		<tbody id="listOfForm">
 			<tr>
 				<td>4</td>
 				<td>연차/휴가</td>
@@ -68,16 +68,13 @@
 </body>
 
 <script>
-	/*
-	let trList = Array.from(document.querySelector('#ListOfForm').children);
-	//console.log(trList);
+	let trList = Array.from(document.querySelectorAll('#listOfForm > tr'));
 	trList.forEach((elements) => {
 		console.log(elements);
 		elements.addEventListener('click', (event) => {
 			location.href = '[[@{formWrite?formNo=1}]]';
-		})
+		});
 	});
-	*/
 </script>
 
 </html>
