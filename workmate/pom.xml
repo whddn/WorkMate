@@ -85,7 +85,9 @@
 			<scope>test</scope>
 		</dependency>
 
+
 		<!-- https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6 -->
+
 		<dependency>
 
 			<groupId>org.springframework.boot</groupId>
