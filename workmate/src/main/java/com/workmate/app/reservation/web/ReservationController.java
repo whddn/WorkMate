@@ -11,4 +11,10 @@ public class ReservationController {
 	public String reservation(Model model) {
 		return "reservation/reservation";
 	}
+	
+	@GetMapping("reservationList")
+	public String reservationList(Model model) {
+		return "reservation/reservationList";
+	}
+	
 }

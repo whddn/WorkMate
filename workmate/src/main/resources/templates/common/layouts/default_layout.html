@@ -6,13 +6,13 @@
 >
 
 <head>
-    <th:block th:replace="~{common/configs/default_config :: HeadConfig}"></th:block>
+    <th:block th:replace="~{common/configs/default_config :: DefaultConfig}"></th:block>
 </head>
 
 <body>
     <div class="wrapper">
 	    <!-- Sidebar -->
-	    <aside th:insert="~{common/fragments/default_sidebar :: SidebarFrag}"></aside>
+	    <aside th:insert="~{common/fragments/attendance_sidebar :: SidebarFrag}"></aside>
 	    <!-- End Sidebar -->
 
       <div class="main-panel">
@@ -25,7 +25,6 @@
 		<footer class="footer" th:insert="~{common/fragments/default_footer :: FooterFrag}"></footer>
       </div>
     </div>
-    <th:block th:replace="~{common/configs/default_config :: BodyConfig}"></th:block>
 </body>
 
 </html>

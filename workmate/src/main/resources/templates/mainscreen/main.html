@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/default_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>WorkMate</title>
+</head>
+
+<body>
+	<!-- 메인 컨텐츠 -->
+	<main>
+	    <h2>근태 관리</h2>
+	    <div class="container card p-3">
+	    	<div class="row">
+	    		<div class="col">
+	    			<div class="row"><div class="col"><h4>현재 시간</h4></div></div>
+			        <div class="row"><div class="col"><h1>2025년 3월 13일</h1></div></div>
+			        <div class="row"><div class="col"><h1 id="current-time">08:45:24</h1></div></div>
+	    		</div>
+	    		<div class="col">
+	    			<div class="row"><div class="col"><button class="btn btn-primary">출근하기</button></div></div>
+			        <div class="row"><div class="col"><button class="btn btn-secondary">퇴근하기</button></div></div>
+	    		</div>
+	    		<div class="col">
+	    			<div class="row"><div class="col">근무타입 신청</div></div>
+	    		</div>
+	    	</div>
+	    </div>
+	
+	    <div class="row mt-4">
+	        <!-- 할 일 목록 -->
+	        <div class="col-md-3">
+	            <div class="card p-3">
+	                <h5>오늘의 할 일</h5>
+	                <ul class="list-group">
+						<li class="list-group-item">업무 확인</li>
+						<li class="list-group-item">회의 준비</li>
+					</ul>
+	            </div>
+	        </div>
+	
+	        <!-- 메일 목록 -->
+	        <div class="col-md-3">
+	            <div class="card p-3">
+	                <h5>메일 목록</h5>
+	                <ul class="list-group">
+						<li class="list-group-item">보고서 확인</li>
+						<li class="list-group-item">회의 일정 조율</li>
+					</ul>
+	            </div>
+	        </div>
+	
+	        <!-- 결재 목록 -->
+	        <div class="col-md-3">
+	            <div class="card p-3">
+	                <h5>결재 목록</h5>
+	                <ul class="list-group">
+						<li class="list-group-item">결재 승인</li>
+						<li class="list-group-item">서류 검토</li>
+					</ul>
+	            </div>
+	        </div>
+	
+	        <!-- 커뮤니티 -->
+	        <div class="col-md-3">
+	            <div class="card p-3">
+	                <h5>커뮤니티</h5>
+	                <ul class="list-group">
+						<li class="list-group-item">프로젝트 공유</li>
+						<li class="list-group-item">업무 개선 논의</li>
+					</ul>
+	            </div>
+	        </div>
+	    </div>
+	</main>
+	
+	<script>
+	    function updateTime() {
+	        let now = new Date();
+	        document.getElementById("current-time").innerText = now.toLocaleTimeString();
+	    }
+	    setInterval(updateTime, 1000);
+	</script>
+	
+</body>
+
+</html>

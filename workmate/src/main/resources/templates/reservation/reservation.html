@@ -1,151 +1,235 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/default_layout}"
-	layout:fragment="content">
+<html xmlns:th=xmlns:th="https://www.thymeleaf.org/"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layouts/reservation_layout}"
+	  layout:fragment="content">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>회의실 예약 시스템</title>
- <link rel="stylesheet" href="style.css">
-<style>
-.card {
-	margin-top: 5%;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 시스템</title>
+
+    <!-- KaiAdmin Theme CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .equal-height {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .equal-height > div {
+            display: flex;
+            flex-direction: column;
+        }
+        .card {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .card-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reservation-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .time-table {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .time-slot {
+            padding: 10px;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f8f9fa;
+        }
+        .time-slot.selected {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
-	<div class="container full-screen-container">
-		<div class="card">
-			<div class="card-body">
-				<h4 class="card-title text-center">예약 정보 입력</h4>
-				<form action="/reservations" method="GET">
+<div class="container mt-5">
+    <div class="row equal-height">
+        <!-- 캘린더 영역 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">예약 진행 중</div>
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
 
-					<!-- 📌 품목 선택 + 날짜 선택 (한 줄 정렬) -->
-					<div class="mb-3 d-flex align-items-center gap-3">
-						<!-- 📌 품목 선택 -->
-						<div>
-							<label class="form-label">품목 선택</label>
-							 <select class="form-select" name="itemType" id="item-type"	onchange="toggleOptions()">
-								<option value="meeting-room">회의실</option>
-								<option value="car">차량</option>
-							</select>
-						</div>
+        <!-- 시간 선택 영역 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">시간 선택</div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-3" onclick="toggleAllTimes()">전체 선택</button>
+                    <div class="time-table">
+                        <th:block th:each="hour : ${#numbers.sequence(6, 23)}">
+                            <div class="time-slot" 
+                                 th:id="'time'+${hour}" 
+                                 th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}" 
+                                 onclick="toggleTime(this)">
+                                <span th:text="${hour + ':00 - ' + (hour+1) + ':00'}"></span>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row equal-height mt-3">
+        <!-- 이미지 영역 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <img src="assets/img/reservation/meetingroom1.jpg" alt="회의실1" class="reservation-image">
+                </div>
+            </div>
+        </div>
 
-						<!-- 📆 날짜 선택 -->
-						<div>
-							<label class="form-label">날짜 선택</label>
-							 <input type="date"	class="form-control" name="reservationDate">
-						</div>
-					</div>
+        <!-- 예약 정보 입력 영역 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white text-center">예약 정보 입력</div>
+                <div class="card-body">
+                    <form action="/reservations" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">공용품 종류</label>
+                            <select class="form-control" id="itemType" name="itemType" onchange="updateOptions()">
+                                <option value="meeting-room">회의실</option>
+                                <option value="car">차량</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">선택 항목</label>
+                            <select class="form-control" id="itemSelection" name="itemSelection">
+                                <!-- JavaScript에서 동적으로 변경됨 -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">이용 날짜</label>
+                            <input type="date" class="form-control" name="reservationDate">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">예약 내용</label>
+                            <textarea class="form-control" name="reservationDetails" rows="3" placeholder="예약 목적을 입력하세요"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">예약자 정보</label>
+                            <input type="text" class="form-control" name="userName" placeholder="예약자명">
+                            <input type="text" class="form-control" name="userPhone" placeholder="연락처">
+                            <input type="email" class="form-control" name="userEmail" placeholder="이메일">
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">예약하기</button>
+                            <button type="reset" class="btn btn-danger">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
 
-					<!-- 📌 시간 선택 (오전/오후 나누기 & 오후 시간 4시간 단위 배치) -->
-					<div class="mb-3">
-						<label class="form-label">시간 선택 (다중 선택 가능)</label>
-						<div class="d-grid gap-2">
-							<!-- 오전 시간 -->
-							<div>
-								<strong>오전</strong>
-								<div class="d-flex flex-wrap gap-2">
-									<th:block th:each="hour : ${#numbers.sequence(9, 11)}">
-										<input type="checkbox" class="btn-check"
-										 name="timeSlot" th:id="'time'+${hour}" th:value="${hour + ':00 AM'}">
-										<label class="btn btn-outline-secondary"
-										 th:for="'time'+${hour}" th:text="${hour + ':00 AM'}"></label>
-									</th:block>
-								</div>
-							</div>
+<!-- KaiAdmin & FullCalendar Scripts -->
+<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
 
-							<!-- 오후 시간 -->
-							<div>
-								<strong>오후</strong>
-								<div class="d-grid gap-2">
-									<div class="d-flex flex-wrap gap-2">
-										<th:block th:each="hour : ${#numbers.sequence(12, 15)}">
-											<input type="checkbox" class="btn-check" name="timeSlot"
-												th:id="'time'+${hour}" th:value="${hour + ':00 PM'}">
-											<label class="btn btn-outline-secondary"
-												th:for="'time'+${hour}" th:text="${hour + ':00 PM'}">
-											</label>
-										</th:block>
-									</div>
-									<div class="d-flex flex-wrap gap-2">
-										<th:block th:each="hour : ${#numbers.sequence(16, 19)}">
-											<input type="checkbox" class="btn-check" name="timeSlot"
-												th:id="'time'+${hour}" th:value="${hour + ':00 PM'}">
-											<label class="btn btn-outline-secondary"
-												th:for="'time'+${hour}" th:text="${hour + ':00 PM'}">
-											</label>
-										</th:block>
-									</div>
-									<div class="d-flex flex-wrap gap-2">
-										<th:block th:each="hour : ${#numbers.sequence(20, 21)}">
-											<input type="checkbox" class="btn-check" name="timeSlot"
-												th:id="'time'+${hour}" th:value="${hour + ':00 PM'}">
-											<label class="btn btn-outline-secondary"
-												th:for="'time'+${hour}" th:text="${hour + ':00 PM'}">
-											</label>
-										</th:block>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+<script>
+	/* 캘린더 추가 */
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'ko',
+            initialView: 'dayGridMonth',
+            selectable: true,
+            editable: false,
+            height: 350,
+            events: function(fetchInfo, successCallback, failureCallback) {
+                fetch('/api/reservations')
+                    .then(response => response.json())
+                    .then(data => {
+                        let events = data.map(reservation => ({
+                            title: reservation.title,
+                            start: reservation.start,
+                            backgroundColor: '#28a745',
+                            borderColor: '#28a745'
+                        }));
+                        successCallback(events);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching reservations:', error);
+                        failureCallback(error);
+                    });
+            },
+            dateClick: function(info) {
+                document.querySelector('input[name="reservationDate"]').value = info.dateStr;
+            }
+        });
+        calendar.render();
+    });
+    /* 회의실,차량 예약  */
+    function updateOptions() {
+        const itemType = document.getElementById("itemType").value;
+        const itemSelection = document.getElementById("itemSelection");
+        itemSelection.innerHTML = "";
 
-					<div class="mb-3" id="meeting-room-options">
-						<label class="form-label">회의실 선택</label>
-						<div class="btn-group">
-							<input type="radio" class="btn-check" name="room" id="room202" value="202">
-							 <label class="btn btn-outline-primary"	for="room202">202 회의실</label>
-							  <input type="radio" class="btn-check" name="room" id="room203" value="203">
-							<label class="btn btn-outline-primary" for="room203">203 회의실</label>
-							 <input type="radio" class="btn-check" name="room" id="room204" value="204">
-							  <label class="btn btn-outline-primary" for="room204">204 회의실</label>
-						</div>
-					</div>
+        let options = [];
+        if (itemType === "meeting-room") {
+            options = ["회의실 201호", "회의실 202호", "회의실 203호", "대회의실"];
+        } else if (itemType === "car") {
+            options = ["K5 20머 2565", "BMW 20여 2544", "GV70 31가 3341"];
+        }
 
-					<div class="mb-3" id="car-options" style="display: none;">
-						<label class="form-label">차량 선택</label>
-						<div class="btn-group">
-							<input type="radio" class="btn-check" name="car" id="carA"value="A">
-							 <label class="btn btn-outline-warning"	for="carA">A 차량</label>
-							  <input type="radio" class="btn-check"	name="car" id="carB" value="B">
-							   <label class="btn btn-outline-warning" for="carB">B 차량</label>
-								 <input	type="radio" class="btn-check" name="car" id="carC" value="C">
-							<label class="btn btn-outline-warning" for="carC">C 차량</label>
-						</div>
-					</div>
+        options.forEach(option => {
+            let opt = document.createElement("option");
+            opt.value = option;
+            opt.innerHTML = option;
+            itemSelection.appendChild(opt);
+        });
+    }
+    document.addEventListener("DOMContentLoaded", updateOptions);
+    
+    /* 시간선택 */
+    function toggleTime(element) {
+        element.classList.toggle("selected");
+    }
 
-					<div class="mb-3">
-						<label class="form-label">예약 내용</label>
-						<textarea class="form-control" rows="3" name="description">Ooo 프로젝트 일정으로 회의 신청합니다.</textarea>
-					</div>
-
-					<div class="d-flex justify-content-end">
-						<button type="submit" class="btn btn-success">저장</button>
-						<button type="reset" class="btn btn-secondary">취소</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-	<script>
-		function toggleOptions() {
-			const itemType = document.getElementById("item-type").value;
-			const meetingRoomOptions = document.getElementById("meeting-room-options");
-			const carOptions = document.getElementById("car-options");
-
-			if (itemType === "meeting-room") {
-				meetingRoomOptions.style.display = "block";
-				carOptions.style.display = "none";
-			} else if (itemType === "car") {
-				meetingRoomOptions.style.display = "none";
-				carOptions.style.display = "block";
-			}
-		}
-	</script>
+    function toggleAllTimes() {
+        const timeSlots = document.querySelectorAll(".time-slot");
+        const allSelected = Array.from(timeSlots).every(slot => slot.classList.contains("selected"));
+        timeSlots.forEach(slot => {
+            if (allSelected) {
+                slot.classList.remove("selected");
+            } else {
+                slot.classList.add("selected");
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
