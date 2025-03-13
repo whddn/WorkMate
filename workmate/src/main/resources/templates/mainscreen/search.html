@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/default_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>WorkMate</title>
+</head>
+
+<body>
+	<h3>검색</h3>
+	<form>
+		<span>
+			<input type="text" value="전자">
+			<button class="btn primary-btn"><i></i>검색</button>
+		</span>
+		<table class="table" id="searchResult">
+			<tbody>
+				<tr><td>전자메일</td></tr>
+				<tr><td>전자결재</td></tr>
+			</tbody>
+		</table>
+	</form>
+	<script>
+	</script>
+</body>
+
+</html>
