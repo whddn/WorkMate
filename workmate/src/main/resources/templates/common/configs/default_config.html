@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
 
-<th:block th:fragment="ServerInfo">
-	<!-- ContextPath Info -->
-	<meta name="contextPath" th:value="${contextPath}">
-</th:block>
-
-<th:block th:fragment="HeadConfig">
+<th:block th:fragment="DefaultConfig">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
-    	content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+      name="viewport"
     />
     <link
-    	rel="icon"
-    	th:href="@{/assets/img/kaiadmin/favicon.ico}"
-    	type="image/x-icon"
+      rel="icon"
+      th:href="@{/assets/img/kaiadmin/favicon.ico}"
+      type="image/x-icon"
     />
 
+	<!-- CSS Files -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/plugins.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/kaiadmin.min.css}" />
+	
+	<!-- Datatables(1.10.16) -->
+	<link rel="stylesheet" href="//cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+	
     <!-- Fonts and icons -->
     <script th:src="@{/assets/js/plugin/webfont/webfont.min.js}"></script>
     <script>
@@ -37,18 +40,8 @@
         },
       });
     </script>
-
-    <!-- CSS Files -->
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/plugins.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/kaiadmin.min.css}" />
-
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
-</th:block>
-
-<th:block th:fragment="BodyConfig">
-	<!--   Core JS Files   -->
+    
+    <!--   Core JS Files   -->
     <script th:src="@{/assets/js/core/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/assets/js/core/popper.min.js}"></script>
     <script th:src="@{/assets/js/core/bootstrap.min.js}"></script>
@@ -65,7 +58,7 @@
     <!-- Chart Circle -->
     <script th:src="@{/assets/js/plugin/chart-circle/circles.min.js}"></script>
 
-    <!-- Datatables -->
+    <!-- Datatables(1.10.16) -->
     <script th:src="@{/assets/js/plugin/datatables/datatables.min.js}"></script>
 
     <!-- Bootstrap Notify -->
@@ -75,14 +68,13 @@
     <script th:src="@{/assets/js/plugin/jsvectormap/jsvectormap.min.js}"></script>
     <script th:src="@{/assets/js/plugin/jsvectormap/world.js}"></script>
 
-    <!-- Google Maps Plugin -->
-    <script th:src="@{/assets/js/plugin/gmaps/gmaps.js}"></script>
-
     <!-- Sweet Alert -->
     <script th:src="@{/assets/js/plugin/sweetalert/sweetalert.min.js}"></script>
 
     <!-- Kaiadmin JS -->
     <script th:src="@{/assets/js/kaiadmin.min.js}"></script>
+    
+    <div class="jvm-tooltip"></div>
 </th:block>
 
 </html>

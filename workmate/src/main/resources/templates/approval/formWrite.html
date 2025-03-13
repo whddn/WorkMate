@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/approval_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>전자 결재</title>
+</head>
+
+<body>
+	<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
+	<div>
+		<button>첨부</button>
+		<ul>
+			<li>홍길동.pdf<button>X</button></li>
+			<li>홍길동.pdf<button>X</button></li>
+		</ul>
+		<button
+			type="button" 
+			class="btn btn-secondary">
+			결재요청
+		</button>
+		<button
+			type="button" 
+			class="btn btn-primary"
+			th:onclick="| location.href = '@{formList}' |">
+			취소
+		</button>
+	</div>
+	
+	<!-- 모달 창 -->
+	<div class="modal fade" id="addApprLineModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-scrollable modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">결재 처리</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form>
+						<table class="table mt-3">
+							<tbody>
+								<tr>
+									<td>
+										<table id="ApprLines" class="cell-border">
+											<thead>
+												<tr><th>내 결재선</th></tr>
+											</thead>
+											<tbody>
+												<tr><td>휴가 결재선</td></tr>
+												<tr><td>연장근무 결재선</td></tr>
+											</tbody>
+											<tfoot>
+												<tr><td></td></tr>
+											</tfoot>
+										</table>
+									</td>
+									<td>
+										<ul class="list-group">
+											<li class="list-group-item">결재선 추가</li>
+											<li class="list-group-item">결재선 제거</li>
+										</ul>
+									</td>
+									<td>
+										<table id="ApprovalTable" class="display">
+											<thead>
+												<tr>
+													<th>결재 순서</th>
+													<th>이름</th>
+													<th>직책</th>
+													<th>부서</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<th>1</th>
+													<th>홍길동</th>
+													<th>팀장</th>
+													<th>개발부</th>
+												</tr>
+											</tbody>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<h5>조직도</h5>
+									</td>
+									<td>
+										<ul class="list-group">
+											<li class="list-group-item">참조자 추가</li>
+											<li class="list-group-item">참조자 제거</li>
+										</ul>
+									</td>
+									<td>
+										<table id="ReferrersTable" class="display">
+											<thead>
+												<tr>
+													<th>이름</th>
+													<th>직책</th>
+													<th>부서</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>고길동</td>
+													<td>사원</td>
+													<td>개발부</td>
+												</tr>
+											</tbody>
+										</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary">저장</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script>
+	$(document).ready(function() {
+		$('#ApprLines').DataTable({
+			// 표시 건수기능 숨기기
+		    lengthChange: false,
+		    // 검색 기능 숨기기
+		    searching: false,
+		    // 정렬 기능 숨기기
+		    ordering: false,
+		    // 정보 표시 숨기기
+		    info: false,
+		    // 페이징 기능 숨기기
+		    paging: false
+		});
+		$('#ApprovalTable').DataTable({
+		    lengthChange: false,
+		    searching: false,
+		    ordering: false,
+		    info: false,
+		    paging: false
+		});
+		$('#ReferrersTable').DataTable({
+		    lengthChange: false,
+		    searching: false,
+		    ordering: false,
+		    info: false,
+		    paging: false
+		});
+	});
+</script>
+
+</html>

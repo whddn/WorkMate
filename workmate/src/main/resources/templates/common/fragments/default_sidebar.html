@@ -7,7 +7,7 @@
           <div class="logo-header" data-background-color="dark">
             <a href="index.html" class="logo">
               <img
-                src="assets/img/kaiadmin/logo_light.svg"
+                th:src="@{/assets/img/kaiadmin/logo_light.svg}"
                 alt="navbar brand"
                 class="navbar-brand"
                 height="20"
@@ -32,13 +32,13 @@
             <ul class="nav nav-secondary">
               <!-- 고정 메뉴 -->
               <li class="nav-item">
-                <a href="#dashboard">
+                <a th:href="@{/}">
                   <i class="fas fa-home"></i>
                   <p>메인화면</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#dashboard">
+                <a th:href="@{/search}">
                   <i class="fas fa-search"></i>
                   <p>검색</p>
                 </a>
@@ -49,7 +49,7 @@
                   href="#dashboard"
                   class="collapsed"
                   aria-expanded="false"
-                >
+                  >
                   <i class="fas fa-star"></i>
                   <p>즐겨찾기</p>
                   <span class="caret"></span>
@@ -58,17 +58,17 @@
                   <ul class="nav nav-collapse">
                     <li>
                       <a href="">
-                        <span class="sub-item">메인화면</span>
+                        <span class="sub-item">즐겨찾기 설정</span>
                       </a>
                     </li>
                     <li>
                       <a href="">
-                        <span class="sub-item">검색</span>
+                        <span class="sub-item">즐겨찾기1</span>
                       </a>
                     </li>
                     <li>
                       <a href="">
-                        <span class="sub-item">즐겨찾기</span>
+                        <span class="sub-item">즐겨찾기2</span>
                       </a>
                     </li>
                   </ul>
