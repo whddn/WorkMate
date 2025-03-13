@@ -14,24 +14,18 @@
 <body>
 	<h3>검색</h3>
 	<form>
-		<table id="searchResult" class="cell-border">
-			<thead>
-				<input type="text" value="전자">
-				<button class="btn primary-btn"><i></i>검색</button>
-			</thead>
+		<span>
+			<input type="text" value="전자">
+			<button class="btn primary-btn"><i></i>검색</button>
+		</span>
+		<table class="table" id="searchResult">
 			<tbody>
 				<tr><td>전자메일</td></tr>
 				<tr><td>전자결재</td></tr>
 			</tbody>
-			<tfoot>
-				<tr><td></td></tr>
-			</tfoot>
 		</table>
 	</form>
 	<script>
-		$(document).ready(function() {
-			$('#searchResult').DataTable();
-		});
 	</script>
 </body>
 

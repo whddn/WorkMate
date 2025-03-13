@@ -19,7 +19,7 @@
 		<li>문서번호<input></li>
 		<li><button><i class="fas fa-search"></i>검색</button></li>
 	</ul>
-	<table class="table">
+	<table id="WaitingsTable" class="display">
 		<thead>
 			<tr>
 				<th>NO</th>
@@ -32,7 +32,7 @@
 				<th>승인상태</th>
 			</tr>
 		</thead>
-		<tbody id="listOfWaiting">
+		<tbody>
 			<tr>
 				<td>3</td>
 				<td>YD001</td>
@@ -65,21 +65,12 @@
 			</tr>
 		</tbody>
 	</table>
-	<ul class="pagination">
-	    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-	    <li class="page-item"><a class="page-link" href="#">1</a></li>
-	    <li class="page-item"><a class="page-link" href="#">2</a></li>
-	    <li class="page-item"><a class="page-link" href="#">3</a></li>
-	    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-	</ul>
 </body>
 
 <script>
-	let trList = Array.from(document.querySelectorAll('#listOfWaiting > tr'));
-	trList.forEach((elements) => {
-		console.log(elements);
-		elements.addEventListener('click', (event) => {
-			location.href = '[[@{formRead?formNo=1}]]';
+	$(document).ready(function() {
+		$('#WaitingsTable').DataTable({
+			searching: false
 		});
 	});
 </script>

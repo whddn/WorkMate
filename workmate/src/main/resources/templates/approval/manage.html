@@ -15,7 +15,7 @@
 	<div>
 		<h3>서명 이미지 관리</h3>
 		<button>파일 첨부</button>
-		<table class="table">
+		<table id="SignsTable" class="display">
 			<thead>
 				<tr>
 					<th><input type="checkbox"></th>
@@ -42,7 +42,7 @@
 	<div>
 		<h3>결재선 리스트</h3>
 		<button>추가</button>
-		<table class="table">
+		<table id="ApprLines" class="display">
 			<thead>
 				<tr>
 					<th><input type="checkbox"></th>
@@ -64,7 +64,10 @@
 </body>
 
 <script>
-
+	$(document).ready(function() {
+		$('#SignsTable').DataTable();
+		$('#ApprLines').DataTable();
+	});
 </script>
 
 </html>
