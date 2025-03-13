@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class MainscreenController {
+	@GetMapping("/")
+	public String base(Model model) {
+		return "mainscreen/main";
+	}
+	
 	@GetMapping("/search")
 	public String search(Model model) {
 		return "mainscreen/search";

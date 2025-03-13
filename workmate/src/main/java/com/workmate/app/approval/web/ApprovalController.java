@@ -9,11 +9,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @Controller
 public class ApprovalController {
-	@GetMapping("/")
-	public String base(Model model) {
-		return "base";
-	}
-	
 	@GetMapping("approval/waiting")
 	public String waiting(Model model) {
 		return "approval/waiting";
