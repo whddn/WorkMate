@@ -84,8 +84,10 @@
 			<version>3.0.4</version>
 			<scope>test</scope>
 		</dependency>
-		
-		<!--<dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6 -->
+		<dependency>
+
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
@@ -94,9 +96,6 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-		 https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6 
-		
 		<dependency>
     		<groupId>org.thymeleaf.extras</groupId>
     		<artifactId>thymeleaf-extras-springsecurity6</artifactId>    
