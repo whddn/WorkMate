@@ -12,19 +12,41 @@
 	width: 100%;
 }
 
+#card-left {
+	width: 400px;
+	height: 100vh;
+	padding: 30px;
+	margin: 30px;
+	position: sticky;
+	top: 0;
+	flex-shrink: 0;
+}
+
 /* 오른쪽 컨테이너 (카드들을 세로 정렬) */
-.container {
+.right-container {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
+	padding: 20px;
 }
 
-#card-top, #card-bottom {
+#card-center, #card-right {
 	width: 100%;
 	padding: 30px;
 	margin: 10px 0; /* 상하 간격 추가 */
 	flex-grow: 1;
 }
+
+.date-box {
+	font-size: 20px;
+	margin-bottom: 10px;
+}
+
+.time-box {
+	font-size: 40px;
+	margin-bottom: 10px;
+}
+
 .content {
 	flex: 1;
 	padding: 20px;
@@ -43,6 +65,11 @@ table {
 	display: block;
 }
 
+.dropdown-work {
+
+	margin-top: 80px; 
+}
+
 .table-responsive {
 	max-height: 400px; 
 	overflow-y: auto;
@@ -50,11 +77,37 @@ table {
 </style>
 </head>
 <body>
-	<div class="main-container">		
+	<div class="main-container">
+		<div class="card" id="card-left">
+			<div class="card-body">
+				<h4 class="card-title">내 근태 현황</h4>
+				<p class="date-box" id="current-date"></p>
+				<p class="time-box" id="current-time"></p>				
+				<p>	출근시간 : <span id="start-time" >[[${attend} != null ? ${#dates.format(attend.startWork, 'HH:mm')} : 미등록 ]]</span> </p>
+				<p>	퇴근시간 : <span id="end-time">[[${attend} != null ? ${#dates.format(attend.afterWork, 'HH:mm')} : 미등록 ]]</span> </p>
+				
+				<form action="startWork" th:if ="${attend}== null">
+					<button class="btn btn-primary btn-fw" id="workStart">출근하기</button>
+				</form>
+				<form action="afterWork" th:if="${attend} != null and ${attend.afterWork} == null">
+					<input type="hidden" name="workNo" th:value="${attend.workNo}">
+					<button class="btn btn-secondary btn-fw">퇴근하기</button>
+				</form>
+				<div class="dropdown-work" style="display: inline-flex; align-items: center; gap: 10px;">				
+					<select id="work-type" class="form-select input-fixed">
+						<option value="기본">근무타입선택</option>
+						<option value="재택">재택</option>
+						<option value="출장">출장</option>
+						<option value="연차">연차</option>
+					</select>
+					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청</button>				
+				</div>
+			</div>
+		</div>
 
 		<!-- 오른쪽 컨테이너 -->
-		<div class="container">
-			<div class="card" id="card-top">
+		<div class="right-container">
+			<div class="card" id="card-center">
 				<div class="card-body">
 					<!-- 내용 추가 -->
 					<div class="col-12 col-sm-6 col-md-6 col-xl-3">
@@ -79,23 +132,12 @@ table {
               </div>
 				</div>
 			</div>
-			<div class="card" id="card-bottom">
+			<div class="card" id="card-right">
 				<div class="card-body">
 					<!-- 내용 추가 -->
 					<div class="content">
-						<h4 class="card-title">내 근태 조회</h4>	
-						
-						<!-- 년도 월별 조회 기능 -->					
-						 <input type="date" name="schedule" min="2022-04-01"	max="2022-04-30" />
-						<input type="date" name="schedule" min="2022-04-01" max="2022-04-30" />
-						<button class="btn btn-info">검색</button>
-						
-					<!--<div class="selectym">
-						<select id ="selectYear"  class="form-select input-fixed"></select>		
-						<select id ="selectMonth"  class="form-select input-fixed"></select>
-						<button class="btn btn-info" onclick="searchByYearMonth()">검색</button>	 -->	
-					</div>
-						
+					<h4 class="card-title">이번달 근태 현황</h4>							
+					</div>						
 						<div class="table-responsive">
 							<table class="table">
 								<thead>
@@ -105,8 +147,6 @@ table {
 										<th>퇴근시간</th>
 										<th>근무시간</th>
 										<th>근무상태</th>
-										<th>근무유형</th>
-										<th>연장근무시간</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -116,8 +156,6 @@ table {
 										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
 										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
 										<td>[[ ${work.workTime} ]]</td>
-										<td>[[ ${work.workStatus} ]]</td>
-										<td>[[ ${work.workStatus} ]]</td>
 										<td>[[ ${work.workStatus} ]]</td>
 									</tr>
 								</tbody>
@@ -130,6 +168,16 @@ table {
 	</div>
 </body>
 <script>
+ 	//현재 시간 출력
+	function currentDate() {
+		const now = new Date();
+		document.getElementById("current-date").innerText = now.toISOString()
+				.split('T')[0];
+		document.getElementById("current-time").innerText = now
+				.toLocaleTimeString();
+	}
+	setInterval(currentDate, 1000);
+	currentDate();
 	
 </script>
 </html>
