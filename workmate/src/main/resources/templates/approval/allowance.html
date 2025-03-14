@@ -20,7 +20,7 @@
 		<li>결재일<input type="date">~<input type="date"></li>
 		<li><button><i class="fas fa-search"></i>검색</button></li>
 	</ul>
-	<table id="CompletionsTable" class="display">
+	<table id="AllowancesTable" class="display">
 		<thead>
 			<tr>
 				<th>NO</th>
@@ -35,46 +35,26 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>3</td>
-				<td>YD001</td>
-				<td>휴가</td>
-				<td>휴가 신청합니다</td>
-				<td>홍길동</td>
-				<td>개발부</td>
-				<td>2022-01-20</td>
-				<td>진행중</td>
-				<td><button>다운받기</button></td>
-			</tr>
-			<tr>
-				<td>2</td>
-				<td>YD003</td>
-				<td>휴가</td>
-				<td>휴가 신청합니다</td>
-				<td>홍길동</td>
-				<td>개발부</td>
-				<td>2022-02-01</td>
-				<td>진행중</td>
-				<td><button>다운받기</button></td>
-			</tr>
-			<tr>
-				<td>1</td>
-				<td>YD005</td>
-				<td>회의</td>
-				<td>회의 신청합니다</td>
-				<td>홍길동</td>
-				<td>개발부</td>
-				<td>2022-03-10</td>
-				<td>대기중</td>
-				<td><button>다운받기</button></td>
-			</tr>
+			<th:block th:each="allowance, sts : ${allowanceList}">
+				<tr th:onclick="| location.href = '@{/formRead(formId=${allowance.apprNo})}' |">
+					<td>[[ ${sts.count} ]]</td>
+					<td>[[ ${allowance.apprNo} ]]</td>
+					<td>[[ ${allowance.formName} ]]</td>
+					<td>[[ ${allowance.apprTitle} ]]</td>
+					<td>[[ ${allowance.userName} ]]</td>
+					<td>[[ ${allowance.departmentName} ]]</td>
+					<td>[[ ${allowance.createDate} ]]</td>
+					<td>결재 승인</td>
+					<td><button>다운받기</button></td>
+				</tr>
+			</th:block>
 		</tbody>
 	</table>
 </body>
 
 <script>
 	$(document).ready(function() {
-		$('#CompletionsTable').DataTable();
+		$('#AllowancesTable').DataTable();
 	});
 </script>
 
