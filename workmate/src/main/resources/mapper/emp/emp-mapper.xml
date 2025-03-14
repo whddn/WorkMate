@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.employee.mapper.EmpMapper">
+	<!-- 사원 전체 조회 (조직도/사원이름/부서명) -->
+	<select id="selectAllName" resultType="EmpVO">
+ 		SELECT u.user_name
+ 				, u.user_no
+		        , d.department_name
+		FROM employee u 
+		JOIN  team t 
+		ON u.team_no = t.team_no
+		JOIN department d 
+		ON d.department_id = t.department_id 
+	</select>
 	<!--/* 사원 상세 조회 */-->
 	<select id="selectOneEmp" resultType="EmpVO">
 		SELECT u.user_name
 		        , d.department_name
 		        , t.team_name
+                , u.team_no
 		        , u.user_position
 		        , u.user_no
 		        , u.user_id
@@ -16,11 +28,12 @@
 		        , u.user_ip
 		        , u.common_ip
 		FROM employee u 
-		JOIN  department d 
-		ON u.user_no = d.department_head
 		JOIN team t 
-		ON d.department_id = t.department_id 
-		WHERE u.user_no = 21621981
+		ON u.team_no = t.team_no
+        JOIN department d 
+		ON t.department_id = d.department_id
+		WHERE u.user_no = #{userNo}
+		AND u.user_no between 100 AND 300
 	</select>
 	
 	<!-- 팀명 조회 -->
@@ -33,8 +46,11 @@
 	
 	<!-- 직급 조회 -->
 	<select id="selectAllPosition" resultType="EmpVO">
-		SELECT user_position
-		FROM employee
+		SELECT code_name
+			, code
+		FROM common_code
+		WHERE group_code = '0Q' 
+		AND code IS NOT NULL
 	</select>
 	
 	<!-- 사원 등록 --> 

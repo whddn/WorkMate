@@ -73,35 +73,35 @@ body {
     <div class="container">
         <h3>신규 사원 등록</h3>
         <!--/* 신규 사원 등록을 하면 아이디와 비밀번호 자동 발급 */-->
-        <form action="emp/newemp" method="POST">
+        <form>
             <div class="form-group">
                 <label>사원명</label>
                 <input type="text" name="userName">
             </div>
             <div class="form-group">
                 <label>팀</label>
-                <select name="teamNo">
+                <select name="teamName">
                     <option th:value="${team.teamNo}" th:each="team : ${teams}">[[ ${team.teamName} ]]</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>직급</label>
-                <select>
-                    <option value="${post.userPosition}" th:each="post : ${rank}">[[ ${post.userPosition} ]]</option>
+                <select name="userPosition">
+                    <option th:value="${post.code}" th:each="post : ${rank}">[[ ${post.codeName} ]]</option>
                 </select>
             </div>
             <div class="form-group contact">
                 <label>연락처</label>
-                <input type="password" maxlength="11" name="userPhone"> 
+                <input type="text" maxlength="13" name="userPhone"> 
             </div>
             <div class="form-group contact">
                 <label>집주소</label>
-                <input type="text" maxlength="11" class="addresshome" name="address">
+                <input type="text" maxlength="50" class="addresshome" name="address">
                 <span id="search_icon">
                     <i class="fa fa-search"></i>
                 </span>
             </div>
-            <button class="btn-submit">등록</button>
+            <button type="button" class="btn-submit">등록</button>
         </form>
     </div>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -170,23 +170,42 @@ function homeAddCode() {
         }).open();
 }
 
-// AJAX로 값 전송
+// AJAX로 사원 등록
 
-
-
-		  fetch('http://localhost:8099/workmate/emp/newemp', {
-	      method : "post",
-	      headers : {
+	
+	document.querySelector('.btn-submit').addEventListener('click', e => {
+		inputEmp();
+	})
+	
+	function inputEmp() {
+	let userName = document.getElementsByName('userName')[0].value;
+	let userTeam = document.querySelector('[name=teamName]').value;
+	let userPosition = document.querySelector('[name=userPosition]').value;
+	let userPhone =  document.getElementsByName('userPhone')[0].value;
+	let userAddress =  document.getElementsByName('address')[0].value;
+	
+	let newEmpData = {
+		'userName' : userName,
+		'teamNo' : userTeam,
+		'userPosition' : userPosition,
+		'userPhone' : userPhone,
+		'address' : userAddress
+		};
+	
+		fetch('/workmate/emp/newemp', {
+	    method : "post",
+	    headers : {
 	        'Content-type' : "application/json"
 	      },
-	      body : JSON.stringify()
+	      body : JSON.stringify(newEmpData),
 	    })
 	    .then(res => res.json())
 	    .then(result => {
-	      console.log('-----등록 완료----')
 	      console.log(result);
 	    })
 	    .catch(err => console.log(err));
+}
+	
 
 </script>
 </body>

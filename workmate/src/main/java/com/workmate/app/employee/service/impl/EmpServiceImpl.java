@@ -29,13 +29,26 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.insertOneEmp(empVO);
 	}
 	
+	// 팀명 조회
 	@Override
 	public List<EmpVO> selectAllTeam() {
 		return empMapper.selectAllEmpTeam();
 	}
 	
+	// 직급 조회
 	@Override
 	public List<EmpVO> selectAllPosition(){
 		return empMapper.selectAllPosition();
+	}
+
+	@Override
+	public List<EmpVO> empNameList() {
+		return empMapper.selectAllName();
+	}
+
+
+	@Override
+	public EmpVO findOrganPage(EmpVO empVO) {
+		return null;
 	}
 }

@@ -6,7 +6,8 @@
 >
 
 <head>
-    <th:block th:replace="~{common/configs/default_config :: HeadConfig}"></th:block>
+    <th:block th:replace="~{common/configs/default_config :: DefaultConfig}"></th:block>
+    <link rel="stylesheet" th:href="@{/assets/css/empOrgan.css}">
 </head>
 
 <body>
@@ -25,7 +26,6 @@
 		<footer class="footer" th:insert="~{common/fragments/default_footer :: FooterFrag}"></footer>
       </div>
     </div>
-    <th:block th:replace="~{common/configs/default_config :: BodyConfig}"></th:block>
 </body>
 
 </html>
