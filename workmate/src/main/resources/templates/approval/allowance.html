@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/approval_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>전자 결재</title>
+</head>
+
+<body>
+	<h3>결재 진행</h3>
+	<ul class="list">
+		<li>기안자<input></li>
+		<li>양식명<input></li>
+		<li>문서번호<input></li>
+		<li>결재일<input type="date">~<input type="date"></li>
+		<li><button><i class="fas fa-search"></i>검색</button></li>
+	</ul>
+	<table id="AllowancesTable" class="display">
+		<thead>
+			<tr>
+				<th>NO</th>
+				<th>결재문서번호</th>
+				<th>양식명</th>
+				<th>제목</th>
+				<th>기안자</th>
+				<th>기안부서</th>
+				<th>기안일</th>
+				<th>승인상태</th>
+				<th>PDF</th>
+			</tr>
+		</thead>
+		<tbody>
+			<th:block th:each="allowance, sts : ${allowanceList}">
+				<tr th:onclick="| location.href = '@{/formRead(formId=${allowance.apprNo})}' |">
+					<td>[[ ${sts.count} ]]</td>
+					<td>[[ ${allowance.apprNo} ]]</td>
+					<td>[[ ${allowance.formName} ]]</td>
+					<td>[[ ${allowance.apprTitle} ]]</td>
+					<td>[[ ${allowance.userName} ]]</td>
+					<td>[[ ${allowance.departmentName} ]]</td>
+					<td>[[ ${allowance.createDate} ]]</td>
+					<td>결재 승인</td>
+					<td><button>다운받기</button></td>
+				</tr>
+			</th:block>
+		</tbody>
+	</table>
+</body>
+
+<script>
+	$(document).ready(function() {
+		$('#AllowancesTable').DataTable();
+	});
+</script>
+
+</html>

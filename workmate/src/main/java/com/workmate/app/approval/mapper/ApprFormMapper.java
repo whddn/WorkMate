@@ -9,5 +9,5 @@ public interface ApprFormMapper {
 	public ApprFormVO selectApprForm(ApprFormVO apprFormVO);
 	public int insertApprForm(ApprFormVO apprFormVO);
 	public int updateApprForm(ApprFormVO apprFormVO);
-	public int deleteApprForm(String apprTitle);
+	public int deleteApprForm(String apprType);
 }

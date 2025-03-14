@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/approval_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>전자 결재</title>
+</head>
+
+<body>
+	<div th:insert="~{|forms/approval/${approval.formPath}| :: FormFrag}"></div>
+	<div>
+		<table id="AttachTable" class="display>">
+			<thead>
+				<tr>
+					<th>파일명</th>
+					<th>삭제</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<button class="btn btn-primary">첨부</button>
+		<table id="ApprovalsTable" class="display">
+			<thead>
+				<tr>
+					<th>결재</th>
+					<th>결재자</th>
+					<th>결재부서</th>
+					<th>결재일시</th>
+					<th>의견</th>
+				</tr>
+			</thead>
+			<tbody>
+				<th:block th:each="apprElmnt, sts : ${apprLine}">
+					<tr>
+						<td>[[ ${apprElmnt.apprResult} ]]</td>
+						<td>[[ ${apprElmnt.userName} ]]</td>
+						<td>[[ ${apprElmnt.departmentName} ]]</td>
+						<td>[[ ${apprElmnt.apprDate} ]]</td>
+						<td>[[ ${apprElmnt.apprReason} ]]</td>
+					</tr>
+				</th:block>
+			</tbody>
+		</table>
+		<button
+			type="button" 
+			class="btn btn-secondary">
+			삭제
+		</button>
+		<button 
+			type="button" 
+			class="btn btn-primary" 
+			data-bs-toggle="modal" 
+			data-bs-target="#approveModal" 
+			data-bs-whatever="@mdo">
+			결재
+		</button>
+		<button
+			type="button"
+			class="btn btn-primary"
+			onclick="history.back();">
+			취소
+		</button>
+	</div>
+	
+	<!-- 모달 창 -->
+	<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">결재 처리</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="mb-3">
+							<label for="recipient-name" class="col-form-label">결재처리</label>
+							<!-- input type="text" class="form-control" id="recipient-name" -->
+							<input type="radio" name="isApproved" value="yes">승인
+							<input type="radio" name="isApproved" value="no">반려
+						</div>
+						<div class="mb-3">
+							<label for="message-text" class="col-form-label">결재의견</label>
+							<textarea class="form-control" id="message-text"></textarea>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary">결재</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+<script th:inline="javascript">
+	$(document).ready(function() {
+		$('#ApprovalsTable').DataTable();
+		$('#AttachTable').DataTable();
+		
+		$('#apprNo').text('[[ ${approval.apprNo} ]]');
+		$('#apprTitle').text('[[ ${approval.apprTitle} ]]');
+		$('#apprContent').text('[[ ${approval.apprContent} ]]').attr("readonly", true);
+		$('#addLineBtn').remove();
+		$('#delLineBtn').remove();
+		$('#createDate').text('[[ ${approval.createDate} ]]');
+		$('#departmentName').text('[[ ${approval.departmentName} ]]');
+		$('#userName').text('[[ ${approval.userName} ]]');
+		
+		[[ ${apprLine} ]].forEach(function(element) {
+			let liTag = $('<li>' + element.departmentName + 
+				' - ' + element.teamName + 
+				' - ' + element.userName +
+				'</li>');
+			$('#apprLine').append(liTag);
+		});
+	});
+</script>
+
+</html>

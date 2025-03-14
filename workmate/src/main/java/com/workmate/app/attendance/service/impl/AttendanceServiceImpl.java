@@ -1,7 +1,54 @@
 package com.workmate.app.attendance.service.impl;
 
-import com.workmate.app.attendance.service.AttendanceService;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.workmate.app.attendance.mapper.AttendMapper;
+import com.workmate.app.attendance.service.AttendanceService;
+import com.workmate.app.attendance.service.WorkVO;
+
+@Service
 public class AttendanceServiceImpl implements AttendanceService {
+	
+	private AttendMapper attendMapper;
+	
+	AttendanceServiceImpl(AttendMapper attendMapper){
+		this.attendMapper = attendMapper;
+	}
+	//월별
+	@Override
+	public List<WorkVO> findMonthWork() {
+		return attendMapper.selectWorkList();
+	}
+	//전체
+	@Override
+	public List<WorkVO> findAllWork() {	
+		return attendMapper.allWorkList();
+	}
+	//출근여부
+	@Override
+	public WorkVO attendanceStatus(int userNo) {
+		return attendMapper.attendanceStatus(userNo);
+	}
+	
+	//출근
+	@Override
+	public int startWork(WorkVO workVO) {
+		int result = attendMapper.insertStartInfo(workVO);
+		
+		return result;
+	};
+	
+	//퇴근
+	@Override
+	public int afterWork(WorkVO workVO) {
+		int result = attendMapper.insertAfterInfo(workVO);
+		
+		return result;
+	};
+	
+	
 
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.workmate.app.approval.mapper.ApprovalMapper">
+	<select id="selectApprovalList" parameterType="ApprovalVO" resultType="ApprovalVO">
+		SELECT appr_no
+		    , form_name
+		    , appr_title
+		    , user_name
+		    , department_name
+		    , create_date
+		FROM approval
+		    JOIN appr_form
+		    ON approval.appr_type=appr_form.appr_type
+		    JOIN employee
+		    ON approval.user_no=employee.user_no
+		    LEFT JOIN department
+		    ON approval.dept_no=department.department_id
+		WHERE appr_status=#{apprStatus}
+	</select>
+	<select id="selectApproval" parameterType="ApprovalVO" resultType="ApprovalVO">
+		SELECT appr_no
+			, appr_title
+			, appr_content
+			, create_date
+			, department_name
+			, user_name
+			, form_name
+			, form_path
+		FROM approval
+		    JOIN appr_form
+		    ON approval.appr_type=appr_form.appr_type
+		    JOIN employee
+		    ON approval.user_no=employee.user_no
+		    LEFT JOIN department
+		    ON approval.dept_no=department.department_id
+		WHERE appr_no=#{apprNo}
+	</select>
+</mapper>

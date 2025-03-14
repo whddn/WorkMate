@@ -33,36 +33,18 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>3</td>
-				<td>YD001</td>
-				<td>휴가</td>
-				<td>휴가 신청합니다</td>
-				<td>홍길동</td>
-				<td>개발부</td>
-				<td>2022-01-20</td>
-				<td>진행중</td>
-			</tr>
-			<tr>
-				<td>2</td>
-				<td>YD003</td>
-				<td>휴가</td>
-				<td>휴가 신청합니다</td>
-				<td>홍길동</td>
-				<td>개발부</td>
-				<td>2022-02-01</td>
-				<td>진행중</td>
-			</tr>
-			<tr>
-				<td>1</td>
-				<td>YD005</td>
-				<td>회의</td>
-				<td>회의 신청합니다</td>
-				<td>홍길동</td>
-				<td>개발부</td>
-				<td>2022-03-10</td>
-				<td>대기중</td>
-			</tr>
+			<th:block th:each="waiting, sts : ${waitingList}">
+				<tr th:onclick="| location.href = '@{/approval/read(apprNo=${waiting.apprNo})}' |">
+					<td>[[ ${sts.count} ]]</td>
+					<td>[[ ${waiting.apprNo} ]]</td>
+					<td>[[ ${waiting.formName} ]]</td>
+					<td>[[ ${waiting.apprTitle} ]]</td>
+					<td>[[ ${waiting.userName} ]]</td>
+					<td>[[ ${waiting.departmentName} ]]</td>
+					<td>[[ ${waiting.createDate} ]]</td>
+					<td>결재 중</td>
+				</tr>
+			</th:block>
 		</tbody>
 	</table>
 </body>

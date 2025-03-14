@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html 
+	lang="ko"
+	xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+
+<head>
+    <th:block th:replace="~{common/configs/default_config :: HeadConfig}"></th:block>
+</head>
+
+<body>
+    <div class="wrapper">
+	    <!-- Sidebar -->
+	    <aside th:insert="~{common/fragments/default_sidebar :: SidebarFrag}"></aside>
+	    <!-- End Sidebar -->
+
+      <div class="main-panel">
+      	<div class="main-header" th:insert="~{common/fragments/default_header :: HeaderFrag}"></div>
+      	
+        <div class="container">
+          <div class="page-inner" layout:fragment="content"></div>
+        </div>
+
+		<footer class="footer" th:insert="~{common/fragments/default_footer :: FooterFrag}"></footer>
+      </div>
+    </div>
+    <th:block th:replace="~{common/configs/default_config :: BodyConfig}"></th:block>
+</body>
+
+</html>

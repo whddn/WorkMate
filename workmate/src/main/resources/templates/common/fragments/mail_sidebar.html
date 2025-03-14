@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<div xmlns:th="https://www.thymeleaf.org" th:fragment="SidebarFrag">
+
+	<div class="sidebar" data-background-color="dark">
+		<div class="sidebar-logo">
+			<!-- Logo Header -->
+			<div class="logo-header" data-background-color="dark">
+				<a href="index.html" class="logo"> <img
+					th:src="@{/assets/img/kaiadmin/logo_light.svg}" alt="navbar brand"
+					class="navbar-brand" height="20" />
+				</a>
+				<div class="nav-toggle">
+					<button class="btn btn-toggle toggle-sidebar">
+						<i class="gg-menu-right"></i>
+					</button>
+					<button class="btn btn-toggle sidenav-toggler">
+						<i class="gg-menu-left"></i>
+					</button>
+				</div>
+				<button class="topbar-toggler more">
+					<i class="gg-more-vertical-alt"></i>
+				</button>
+			</div>
+			<!-- End Logo Header -->
+		</div>
+		<div class="sidebar-wrapper scrollbar scrollbar-inner">
+			<div class="sidebar-content">
+				<ul class="nav nav-secondary">
+					<!-- 고정 메뉴 -->
+					<li class="nav-item"><a th:href="@{/}"> <i
+							class="fas fa-home"></i>
+							<p>메인화면</p>
+					</a></li>
+					<li class="nav-item"><a th:href="@{/search}"> <i
+							class="fas fa-search"></i>
+							<p>검색</p>
+					</a></li>
+					<li class="nav-item"><a data-bs-toggle="collapse"
+						href="#dashboard" class="collapsed" aria-expanded="false">
+							<i class="fas fa-star"></i>
+							<p>즐겨찾기</p> <span class="caret"></span>
+					</a>
+						<div class="collapse" id="dashboard">
+							<ul class="nav nav-collapse">
+								<li><a href=""> <span class="sub-item">즐겨찾기 설정</span>
+								</a></li>
+								<li><a href=""> <span class="sub-item">즐겨찾기1</span>
+								</a></li>
+								<li><a href=""> <span class="sub-item">즐겨찾기2</span>
+								</a></li>
+							</ul>
+						</div></li>
+					<!-- 가변 메뉴 -->
+					<li class="nav-section"><span class="sidebar-mini-icon">
+							<i class="fa fa-ellipsis-h"></i>
+					</span>
+						<h4 class="text-section">메일함</h4></li>
+					<li class="nav-item"><a th:href="@{/mail/inbox}"> <i
+							class="fas fa-layer-group"></i>
+							<p>받은 메일함</p>
+					</a></li>
+					<li class="nav-item"><a th:href="@{/mail/sent}"> <i
+							class="fas fa-th-list"></i>
+							<p>보낸 메일함</p>
+					</a></li>
+					<li class="nav-item"><a th:href="@{/mail/draft}"> <i
+							class="fas fa-pen-square"></i>
+							<p>임시 보관함</p>
+					</a></li>
+					<li class="nav-item"><a th:href="@{/mail/spam}"> <i
+							class="fas fa-ban"></i>
+							<p>스팸 메일함</p>
+					</a></li>
+					<li class="nav-item"><a th:href="@{/mail/archived}"> <i
+							class="fas fa-folder"></i>
+							<p>보관함</p>
+					</a></li>
+					<li class="nav-item"><a th:href="@{/mail/trash}"> <i
+							class="fas fa-trash"></i>
+							<p>휴지통</p>
+					</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+</div>

@@ -11,8 +11,6 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
         }
         .container {
             width: 50%;
@@ -58,10 +56,10 @@
 <body>
     <div class="container">
         <h2>공용품 관리 등록</h2>
-        <form id="itemForm" th:action="@{/}" method="post">
+        <form id="itemForm" th:action="@{/admin/commonItem}" method="post">
             <div class="form-group">
                 <label>공용품 종류</label>
-                <select name="itemType" id="item-type">
+                <select name="commonKind" id="item-type">
                     <option value="회의실">회의실</option>
                     <option value="차량">차량</option>
                 </select>
@@ -69,15 +67,20 @@
 
             <div class="form-group">
                 <label>이름</label>
-                <input type="text" name="itemName" id="item-name" placeholder="항목 입력">
+                <input type="text" name="name" id="item-name" placeholder="이름 입력">
+            </div>
+            
+             <div class="form-group">
+                <label>설명</label>
+                <textarea name="content" id="item-content" placeholder="항목 입력" rows="4"></textarea>
             </div>
 
             <div class="form-group">
                 <label>시간 추가</label>
                 <div class="time-group">
-                    <input type="time" name="startTime" id="start-time">
+                    <input type="time" name="reservationStartTime" id="start-time">
                     ~
-                    <input type="time" name="endTime" id="end-time">
+                    <input type="time" name="reservationEndTime" id="end-time">
                     <button type="button" class="btn btn-save" onclick="addTime()">+</button>
                 </div>
             </div>

@@ -1,13 +1,56 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{common/layouts/default_layout}"
-	  layout:fragment="content">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/mail_layout}"
+	layout:fragment="content">
 <head>
 <meta charset="UTF-8">
-<title></title>
-</head>
-<body>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메일함 | KaiAdmin Lite</title>
+<style>
+.w-25 {
+	margin-left: 70%;
+	padding-bottom: 10px;
+}
 
+.asd {
+	padding-bottom: 10px;
+}
+</style>
+</head>
+
+<body>
+	<div class="container mt-4">
+		<h2 class="mb-4">받은 메일함</h2>
+		<div class="input-group w-25">
+			<input type="text" id="searchBox" class="form-control"
+				placeholder="검색...">
+			<button class="btn btn-secondary" onclick="searchTable()">검색</button>
+		</div>
+		<div class="card">
+
+			<div class="card-body">
+				<div class="asd">
+					<button class="btn btn-danger btn-sm">삭제</button>
+					<button class="btn btn-secondary btn-sm">이동</button>
+				</div>
+				<table id="mailTable" class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th><input type="checkbox" id="selectAll"></th>
+							<th>보낸 사람</th>
+							<th>제목</th>
+							<th>첨부</th>
+							<th>날짜</th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </body>
-</html>
+
+</html>	
