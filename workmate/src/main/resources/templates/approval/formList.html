@@ -32,39 +32,16 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>4</td>
-				<td>연차/휴가</td>
-				<td>부서1</td>
-				<td>사원1</td>
-			</tr>
-			<tr>
-				<td>3</td>
-				<td>출장/외근</td>
-				<td>부서2</td>
-				<td>사원2</td>
-			</tr>
-			<tr>
-				<td>2</td>
-				<td>경비/비품</td>
-				<td>부서3</td>
-				<td>사원3</td>
-			</tr>
-			<tr>
-				<td>1</td>
-				<td>미팅/회의</td>
-				<td>Ex)총무부</td>
-				<td>Ex)홍길동</td>
-			</tr>
+			<th:block th:each="form, sts : ${formList}">
+				<tr th:onclick="| location.href = '@{/formWrite(formId=${form.apprType})}' |">
+					<td>[[ ${sts.count} ]]</td>
+					<td>[[ ${form.formName} ]]</td>
+					<td>[[ ${form.departmentName} ]]</td>
+					<td>[[ ${form.userName} ]]</td>
+				</tr>
+			</th:block>
 		</tbody>
 	</table>
-	<ul class="pagination">
-	    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-	    <li class="page-item"><a class="page-link" href="#">1</a></li>
-	    <li class="page-item"><a class="page-link" href="#">2</a></li>
-	    <li class="page-item"><a class="page-link" href="#">3</a></li>
-	    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-	</ul>
 </body>
 
 <script>
