@@ -2,12 +2,69 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.attendance.mapper.AttendMapper">
 
-	<!-- 전체조회 -->	
+	<!-- 월별조회 -->	
 	<select id="selectWorkList" resultType="WorkVO">
 		SELECT start_work
-		    , after_work
-		    , work_time
-		    , work_status
+		     , after_work
+		     , work_time
+		     , work_status
 		FROM work
+		WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+		 AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+		 ORDER BY start_work DESC
 	</select>
+	
+	<!-- 전체조회 -->
+	<select id="allWorkList" resultType="WorkVO">
+		SELECT start_work
+		     , after_work
+		     , work_time
+		     , work_status
+		FROM work
+		ORDER BY start_work DESC	
+	</select>
+	
+	<!-- 출퇴근여부 -->
+	<select id="attendanceStatus" resultType="workVO">
+	    SELECT start_work, after_work, work_no
+	    FROM WORK
+	    WHERE TRUNC(start_work) = TRUNC(sysdate)
+	    AND user_no = #{userNo}
+	</select>
+	
+	<!-- 출근 등록 -->
+	<insert id="insertStartInfo" parameterType="WorkVO">
+		<selectKey keyProperty="workNo"  resultType="Integer" order="BEFORE">
+			 SELECT MAX(WORK_NO) + 1
+	         FROM WORK
+		</selectKey>
+		INSERT INTO WORK 
+		(
+    		work_status
+    		, start_work
+    		, work_no
+     		, user_no
+		) VALUES 
+		(
+			CASE 
+       			 WHEN TO_CHAR(SYSDATE, 'HH24:MI') <![CDATA[<]]> '09:01' THEN '정상'
+			     ELSE '지각' 
+			  END
+			, SYSDATE
+			, #{workNo}
+			, #{userNo}
+		)
+	</insert>
+	
+	<!-- 퇴근 등록  -->
+	<update id="insertAfterInfo" parameterType="WorkVO">
+		UPDATE WORK
+		SET 
+		    after_work = SYSDATE,
+		    work_time = ROUND(
+		        ((SYSDATE - start_work) * 24 * 60 * 60 / 3600) - 1, 2
+		    )
+		WHERE work_no = #{workNo}
+	</update>
+	
 </mapper>

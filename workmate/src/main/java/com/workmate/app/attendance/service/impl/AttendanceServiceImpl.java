@@ -14,14 +14,41 @@ public class AttendanceServiceImpl implements AttendanceService {
 	
 	private AttendMapper attendMapper;
 	
-	@Autowired
 	AttendanceServiceImpl(AttendMapper attendMapper){
 		this.attendMapper = attendMapper;
 	}
-	
+	//월별
 	@Override
-	public List<WorkVO> findAllWork() {
+	public List<WorkVO> findMonthWork() {
 		return attendMapper.selectWorkList();
 	}
+	//전체
+	@Override
+	public List<WorkVO> findAllWork() {	
+		return attendMapper.allWorkList();
+	}
+	//출근여부
+	@Override
+	public WorkVO attendanceStatus(int userNo) {
+		return attendMapper.attendanceStatus(userNo);
+	}
+	
+	//출근
+	@Override
+	public int startWork(WorkVO workVO) {
+		int result = attendMapper.insertStartInfo(workVO);
+		
+		return result;
+	};
+	
+	//퇴근
+	@Override
+	public int afterWork(WorkVO workVO) {
+		int result = attendMapper.insertAfterInfo(workVO);
+		
+		return result;
+	};
+	
+	
 
 }
