@@ -9,12 +9,6 @@ public interface ReservationMapper {
 	// 전체조회
 	public List<ReservationVO> selectReservationList();
 	
-	// 관리자 - 공용품등록
-	public int insertCommonItemInfo(CommonItemVO commonitemVO);
-	
-	// 관리자 - 삭제
-	public int deleteCommonItemInfo(CommonItemVO commonitemVO);
-	
 	// 예약신청
 	public int insertReservationInfo(ReservationVO reservationVO);
 	

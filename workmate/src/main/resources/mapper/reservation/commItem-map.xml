@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.workmate.app.reservation.mapper.CommonItemMapper">
+	<!-- 공용품 전체조회 -->
+	<select id="selectItemList" resultType="CommonItemVO">
+		select common_kind
+	      ,name
+	      ,content
+	      ,reservation_start_time
+	      ,reservation_end_time
+		from common_Item
+		order by common_no
+	</select>
+	<!-- 공용품 단건조회 -->
+	<select id="selectItemInfo" resultType="CommonItemVO" parameterType="CommonItemVO">
+		select common_kind
+	      ,name
+	      ,content
+	      ,reservation_start_time
+	      ,reservation_end_time
+		from common_Item
+		where common_no=#{commonNO}
+	</select>
+	
+	<!-- 공용품 등록 -->
+	<insert id="insertCommonItemInfo" parameterType="CommonItemVO">
+		<selectKey keyProperty="commonNo" resultType="Integer" order="BEFORE">
+			<!-- keyProperty는 결과를 담을 필드/변수를 뜻한다 -->
+			SELECT common_no_seq.NEXTVAL
+			FROM dual
+		</selectKey>
+		INSERT INTO common_Item (
+			common_no
+			,name
+			,reservation_start_time
+			,reservation_end_time
+			,date_select
+			,common_kind
+			,image
+			,content
+			)
+		VALUES (
+			#{commonNo}
+			,#{name}
+			,#{reservationStartTime} 
+			,#{reservationEndTime}
+			,SYSDATE
+			,#{commonKind}
+			,#{image}
+			,#{content}
+		)
+	</insert>
+	
+	<!-- 공용품 수정 -->
+	<update id="updateItemInfo" parameterType="CommonItemVO">
+		update common_Item
+		set
+			   name = #{name}
+			  ,reservation_start_time = #{reservationStartTime}
+			  ,reservation_end_time = #{reservationEndTime}
+			  ,common_kind = #{commonKind}
+			  ,image = #{image}
+			  ,content = #{content}
+		where common_no = #{commonNo}
+	</update>
+	
+	<!-- 공용품 삭제 -->
+	<delete id="deleteItemInfo" parameterType="CommonItemVO">
+		delete from common_Item
+		where common_no = #{commonNo}
+	</delete>
+	
+</mapper>
