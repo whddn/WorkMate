@@ -11,9 +11,9 @@
 		FROM appr_form
 		    JOIN employee
 		    ON appr_form.contact_no=employee.user_no
-		    JOIN team
+		    LEFT JOIN team
 		    ON employee.team_no=team.team_no
-		    JOIN department
+		    LEFT JOIN department
 		    ON team.department_id=department.department_id
 	</select>
 </mapper>

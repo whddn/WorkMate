@@ -9,7 +9,6 @@
 		    , user_name
 		    , department_name
 		    , create_date
-		    , appr_status
 		FROM approval
 		    JOIN appr_form
 		    ON approval.appr_type=appr_form.appr_type
@@ -24,14 +23,10 @@
 			, appr_title
 			, appr_content
 			, create_date
-			, expire_date
-			, appr_status
 			, department_name
-			, appr_date
-			, report_no
 			, user_name
-			, reser_no
 			, form_name
+			, form_path
 		FROM approval
 		    JOIN appr_form
 		    ON approval.appr_type=appr_form.appr_type

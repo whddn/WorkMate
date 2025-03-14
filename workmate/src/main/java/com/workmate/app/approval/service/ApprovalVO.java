@@ -25,6 +25,7 @@ public class ApprovalVO {
 	private String apprType;	// 결재유형
 	
 	private String formName;		// 결재양식 이름 FK
+	private String formPath;		// 결재양식 경로 FK
 	private String userName;		// 결재자 이름 FK
 	private String departmentName;	// 결재 부서 이름 FK
 }

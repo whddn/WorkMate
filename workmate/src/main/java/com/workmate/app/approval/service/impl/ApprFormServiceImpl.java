@@ -6,20 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.approval.mapper.ApprFormMapper;
+import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.approval.service.ApprFormVO;
-import com.workmate.app.approval.service.FormListService;
 
 @Service
-public class FormListServiceImpl implements FormListService {
+public class ApprFormServiceImpl implements ApprFormService {
 	private ApprFormMapper apprFormMapper;
 	
 	@Autowired
-	FormListServiceImpl(ApprFormMapper apprFormMapper) {
+	ApprFormServiceImpl(ApprFormMapper apprFormMapper) {
 		this.apprFormMapper = apprFormMapper;
 	}
 	
 	@Override
-	public List<ApprFormVO> loadFormList() {
+	public List<ApprFormVO> selectFormList() {
 		// TODO Auto-generated method stub
 		return apprFormMapper.selectApprFormList();
 	}

@@ -34,7 +34,7 @@
 		</thead>
 		<tbody>
 			<th:block th:each="waiting, sts : ${waitingList}">
-				<tr th:onclick="| location.href = '@{/formRead(formId=${waiting.apprNo})}' |">
+				<tr th:onclick="| location.href = '@{/approval/read(apprNo=${waiting.apprNo})}' |">
 					<td>[[ ${sts.count} ]]</td>
 					<td>[[ ${waiting.apprNo} ]]</td>
 					<td>[[ ${waiting.formName} ]]</td>
@@ -42,7 +42,7 @@
 					<td>[[ ${waiting.userName} ]]</td>
 					<td>[[ ${waiting.departmentName} ]]</td>
 					<td>[[ ${waiting.createDate} ]]</td>
-					<td>[[ ${waiting.apprStatus} ]]</td>
+					<td>결재 중</td>
 				</tr>
 			</th:block>
 		</tbody>
