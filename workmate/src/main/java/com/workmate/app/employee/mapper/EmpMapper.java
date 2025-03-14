@@ -8,6 +8,9 @@ public interface EmpMapper {
 	// 단건 조회 
 	public EmpVO selectOneEmp(EmpVO empVO);
 	
+	// 전체 조회 (사원명과 부서명)
+	public List<EmpVO> selectAllName(); 
+	
 	// 등록 
 	public int insertOneEmp(EmpVO empVO);
 	
