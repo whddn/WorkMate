@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class MailController {
-	@GetMapping("mailmain")
+	@GetMapping("mail/mailmain")
 	public String mailmain() {
 		return "mail/mailmain";
 	}
