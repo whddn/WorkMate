@@ -31,7 +31,7 @@
   class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"
 	>
   <div class="container-fluid col-md-4">
-  	<button class="btn btn-primary" th:onclick="| location.href = '@{/mailmain}' |">	<!-- 나중에 수정 -->
+  	<button class="btn btn-primary" th:onclick="| location.href = '@{/mail/mailmain}' |">	<!-- 나중에 수정 -->
   		전자메일
   	</button>
   	<button class="btn btn-primary" th:onclick="| location.href = '@{/approval/waiting}' |">
@@ -57,6 +57,9 @@
        </ul>
       </div>
   </div>
+  <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" class="btn btn-danger">로그아웃</button>
+</form>
 </nav>
 <!-- End Navbar -->
 </div>

@@ -16,21 +16,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
-	
+
 	@Bean // 비밀번호 암호화
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http //	보호된 리소스 URI에 접근할 수 있는 권한을 설정
 			.authorizeHttpRequests((authrize)  
 				-> authrize
-					.requestMatchers("/", "/workmate").permitAll()	// 전체 접근 허용
-					
-					.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") // USER, ADMIN이라는 롤을	가진 사용자만 접근 허용
-					.requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN") // ROLE_ADMIN이라는 롤을	가진 사용자만 접근 허용
+					//.requestMatchers("/", "/workmate").permitAll()	// 전체 접근 허용
+				.requestMatchers("/header").authenticated()
+					.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
+					.requestMatchers("/admin/**").hasAuthority("") // 권한있는 사용자,관리자 접근 허용
 					.anyRequest().authenticated() // 권한 상관없이 인증받은 사용자만 접근 허용
 			)
 			.formLogin(login -> login
@@ -39,34 +39,28 @@ public class SpringSecurityConfig {
 					.defaultSuccessUrl("/", true)
 					.permitAll())
 			.logout(logout -> logout
-					.logoutSuccessUrl("/workmate")
-					.invalidateHttpSession(true));
+					.logoutSuccessUrl("/login")
+					.invalidateHttpSession(true)
+		            .deleteCookies("JSESSIONID")  // 쿠키 삭제
+						.permitAll());
 		http.csrf(csrf -> csrf.disable());
 		return http.build();
 	}
-	
-	
- @Bean 
- WebSecurityCustomizer webSecurityCustomizer() {
-	 return (web) -> web.ignoring().requestMatchers("/assets/**", "/images/**", "/js/**", "/css/**"); // 예외처리하고 싶은 url
- }
- @Bean
-	public UserDetailsService userDetailsService() {
-	 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		UserDetails user =
-				User.builder()
-				.username("user")
-				.password(passwordEncoder.encode("1111"))
-				.roles("USER")
-				.build();
-		UserDetails admin =
-				User.builder()
-					.username("admin")
-					.password(passwordEncoder.encode("1111"))
-					.roles("ADMIN")
-					.build();
 
-		return new InMemoryUserDetailsManager(user,admin);
+	@Bean
+	WebSecurityCustomizer webSecurityCustomizer() {
+		return (web) -> web.ignoring().requestMatchers("/assets/**", "/images/**", "/js/**", "/css/**"); // 예외처리하고 싶은
+																											// url
 	}
- 
+	/*
+	 * @Bean public UserDetailsService userDetailsService() { PasswordEncoder
+	 * passwordEncoder = new BCryptPasswordEncoder(); UserDetails user =
+	 * User.builder() .username("user") .password(passwordEncoder.encode("1111"))
+	 * .roles("USER") .build(); UserDetails admin = User.builder()
+	 * .username("admin") .password(passwordEncoder.encode("1111")) .roles("ADMIN")
+	 * .build();
+	 * 
+	 * return new InMemoryUserDetailsManager(user,admin); }
+	 */
+
 }
