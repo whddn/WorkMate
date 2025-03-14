@@ -55,8 +55,8 @@
 </head>
 <body>
     <div class="container">
-        <h2>공용품 관리 등록</h2>
-        <form id="itemForm" th:action="@{/admin/commonItem}" method="post">
+        <h2>공용품 관리 수정</h2>
+        <form id="itemForm" th:action="@{/admin/commonItemUpdate}" method="post">
             <div class="form-group">
                 <label>공용품 종류</label>
                 <select name="commonKind" id="item-type">
@@ -87,52 +87,20 @@
             
             <div class="form-group">
                 <label>이미지 추가</label>
-                <input type="file" name="itemImage" accept="image/*">
+                <input type="file" name="itemImage" accept="image/*" id="item-image">
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-save">저장</button>
+                <button type="submit" class="btn btn-save">수정</button>
                 <button type="button" class="btn btn-cancel" onclick="cancelForm()">취소</button>
             </div>
         </form>
     </div>
 
     <script>
-        function addItem() {
-            let itemName = document.getElementById("item-name").value;
-            if (itemName.trim() === "") {
-                alert("항목을 입력하세요.");
-                return;
-            }
-            let list = document.getElementById("item-list");
-            let div = document.createElement("div");
-            div.innerHTML = `<input type='hidden' name='items' value='${itemName}'> ${itemName}`;
-            list.appendChild(div);
-            document.getElementById("item-name").value = "";
-        }
-
-        function addTime() {
-            let startTime = document.getElementById("start-time").value;
-            let endTime = document.getElementById("end-time").value;
-            if (startTime === "" || endTime === "") {
-                alert("시간을 입력하세요.");
-                return;
-            }
-            if (startTime >= endTime) {
-                alert("올바른 시간 범위를 입력하세요.");
-                return;
-            }
-            let list = document.getElementById("time-list");
-            let div = document.createElement("div");
-            div.innerHTML = `<input type='hidden' name='times' value='${startTime} ~ ${endTime}'> ${startTime} ~ ${endTime}`;
-            list.appendChild(div);
-        }
-
         function cancelForm() {
             if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
-                document.getElementById("itemForm").reset();
-                document.getElementById("item-list").innerHTML = "";
-                document.getElementById("time-list").innerHTML = "";
+                window.location.href = "/admin/commonItemList"; // 공용품 목록 페이지로 이동
             }
         }
     </script>
