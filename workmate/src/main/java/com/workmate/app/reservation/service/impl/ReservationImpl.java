@@ -16,12 +16,5 @@ public class ReservationImpl implements ReservationService {
 	ReservationImpl(ReservationMapper reservationMapper){
 		this.reservationMapper = reservationMapper;
 	}
-	
-	@Override
-	public int createCommonInfo(CommonItemVO commonitemVO) {
-		int result = reservationMapper.insertCommonItemInfo(commonitemVO);
 
-		return result == 1 ? commonitemVO.getCommonNo() : -1;
-	}
-	
 }
