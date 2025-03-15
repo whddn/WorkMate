@@ -9,14 +9,14 @@ import lombok.Data;
 @Data
 public class ApprElmntVO {
 	private Integer apprelmntNo;
-	private Integer apprlineNo;
-	private Integer approver;
 	private String apprResult;
 	private String apprReason;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date apprDate;
 	private Integer signNo;
+	private Integer approver;
 	private String deptNo;
+	private Integer apprNo;
 	
 	private String userName;		// 결재자 이름
 	private String teamName;		// 팀명

@@ -1,5 +1,7 @@
 package com.workmate.app.approval.web;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,21 +10,28 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.workmate.app.approval.service.ApprElmntService;
 import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.approval.service.ApprFormVO;
 import com.workmate.app.approval.service.ApprLineService;
 import com.workmate.app.approval.service.ApprLineVO;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.employee.service.EmpService;
+import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.security.service.LoginUserVO;
+import com.workmate.app.security.service.UserVO;
 
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class ApprovalController {
-	private final ApprFormService apprFormService;
 	private final ApprovalService approvalService;
+	private final ApprFormService apprFormService;
 	private final ApprLineService apprLineService;
+	private final ApprElmntService apprElmntService;
+	private final EmpService empService;
 	
 	@GetMapping("approval/waiting")
 	public String waiting(Model model, ApprovalVO approvalVO) {
@@ -55,14 +64,14 @@ public class ApprovalController {
 	public String writeGet(Model model, @RequestParam String apprType) {
 		ApprFormVO apprFormVO = new ApprFormVO();
 		apprFormVO.setApprType(apprType);
-		apprFormVO = apprFormService.selectForm(apprFormVO);
-		model.addAttribute("apprForm", apprFormVO);
+		model.addAttribute("apprForm", apprFormService.selectForm(apprFormVO));
 		
-		//System.out.println(apprFormService.selectForm(apprFormVO));
+		LoginUserVO loginUserVO = (LoginUserVO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmpVO empVO = new EmpVO();
+		empVO.setUserNo(Integer.parseInt(loginUserVO.getUserVO().getUserNo()));
+		model.addAttribute("creator", empService.findEmpByEmpNo(empVO));
 		
-		현재사용자VO 현재사용자 = new 현재사용자VO();
-		현재사용자.setUserNo()
-		model.addAttribute("creator", 현재사용자);
+		model.addAttribute("apprLineList", apprLineService.selectApprLineList(empVO));
 		
 		return "approval/write";
 	}
@@ -79,14 +88,7 @@ public class ApprovalController {
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
 		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
-		
-		//System.out.println(approvalService.selectApproval(approvalVO).getFormPath());
-		
-		ApprLineVO apprLineVO = new ApprLineVO();
-		apprLineVO.setApprNo(apprNo);
-		model.addAttribute("apprLine", apprLineService.selectApprLine(apprLineVO));
-		
-		//System.out.println(apprLineService.selectApprLine(apprLineVO));
+		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
 		
 		return "approval/read";
 	}

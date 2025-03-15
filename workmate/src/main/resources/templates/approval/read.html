@@ -119,7 +119,9 @@
 		$('#userNo').text(approval.userNo);
 		$('#userName').text(approval.userName);
 		
+		console.log(apprLine);
 		apprLine.forEach(function(element) {
+			console.log(element);	
 			let liTag = $('<li>' + element.departmentName + 
 				' - ' + element.teamName + 
 				' - ' + element.userName +

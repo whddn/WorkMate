@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yedam.app.approval.mapper.SignMapper">
+	<select id="selectSignList" parameterType="EmpVO" resultType="SignVO">
+		SELECT sign_no
+		    , sign_title
+		    , sign_path
+		    , insert_date
+		    , user_name
+		    , team_name
+		    , department_name
+		FROM sign
+		    JOIN employee
+		    ON sign.user_no=employee.user_no
+		    LEFT JOIN team
+		    ON employee.team_no=team.team_no
+		    LEFT JOIN department
+		    ON team.department_id=department.department_id
+		WHERE sign.user_no=#{userNo}
+	</select>
+</mapper>

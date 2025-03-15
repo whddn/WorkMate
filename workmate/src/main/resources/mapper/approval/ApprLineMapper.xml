@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.workmate.app.approval.mapper.ApprLineMapper">
-	<select id="selectApprLine" parameterType="ApprLineVO" resultType="ApprElmntVO">
+	<select id="selectApprLineList" parameterType="EmpVO" resultType="ApprListVO">
 		SELECT apprelmnt_no
 		    , appr_elmnt.apprline_no
 		    , user_name

@@ -14,7 +14,7 @@
 <body>
 	<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
 	<div>
-		<table id="AttachTable" class="display>">
+		<table id="AttachTable" class="display">
 			<thead>
 				<tr>
 					<th>파일명</th>
@@ -52,18 +52,12 @@
 							<tbody>
 								<tr>
 									<td>
-										<table id="ApprLines" class="cell-border">
-											<thead>
-												<tr><th>내 결재선</th></tr>
-											</thead>
-											<tbody>
-												<tr><td>휴가 결재선</td></tr>
-												<tr><td>연장근무 결재선</td></tr>
-											</tbody>
-											<tfoot>
-												<tr><td></td></tr>
-											</tfoot>
-										</table>
+										<h5>내 결재선</h5>										
+										<ul class="list-group">
+											<th:block th:each="apprLine, sts : ${apprLineList}">
+												<li class="list-group-item"> </li>
+											</th:block>
+										</ul>
 									</td>
 									<td>
 										<ul class="list-group">
@@ -82,12 +76,6 @@
 												</tr>
 											</thead>
 											<tbody>
-												<tr>
-													<th>1</th>
-													<th>홍길동</th>
-													<th>팀장</th>
-													<th>개발부</th>
-												</tr>
 											</tbody>
 										</table>
 									</td>
@@ -134,23 +122,22 @@
 	</div>
 </body>
 
-<script>
+<script th:inline="javascript">
 	$(document).ready(function() {
+		// 현재 이 문서를 작성하는 사람의 정보
+		let creator = [[ ${creator} ]];
+		// 오늘 날짜
+		const today = new Date();
+		// 년도
+		const year = today.getFullYear();
+		// 월
+		const month = (today.getMonth() + 1).toString().padStart(2, '0');
+		// 일
+		const day = today.getDate().toString().padStart(2, '0');
+		
 		$('#ApprovalsTable').DataTable();
 		$('#AttachTable').DataTable();
 		
-		$('#ApprLines').DataTable({
-			// 표시 건수기능 숨기기
-		    lengthChange: false,
-		    // 검색 기능 숨기기
-		    searching: false,
-		    // 정렬 기능 숨기기
-		    ordering: false,
-		    // 정보 표시 숨기기
-		    info: false,
-		    // 페이징 기능 숨기기
-		    paging: false
-		});
 		$('#ApprovalTable').DataTable({
 		    lengthChange: false,
 		    searching: false,
@@ -166,10 +153,12 @@
 		    paging: false
 		});
 		
-		$('#createDate').text(approval.createDate).attr("readOnly", true);
-		$('#departmentName').text(approval.departmentName);
-		$('#userNo').text(approval.userNo);
-		$('#userName').text(approval.userName);
+		console.log(creator.userName);
+		
+		$('#createDate').text(`${year}-${month}-${day}`);
+		$('#departmentName').text(creator.departmentName);
+		$('#userNo').text(creator.userNo);
+		$('#userName').text(creator.userName);
 		
 		$('#insertApproval').on("click", function(event) {
 			let data = {
