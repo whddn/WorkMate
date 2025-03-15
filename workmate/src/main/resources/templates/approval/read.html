@@ -105,14 +105,15 @@
 		$('#ApprovalsTable').DataTable();
 		$('#AttachTable').DataTable();
 		
-		$('#apprNo').text('[[ ${approval.apprNo} ]]');
-		$('#apprTitle').text('[[ ${approval.apprTitle} ]]');
-		$('#apprContent').text('[[ ${approval.apprContent} ]]').attr("readonly", true);
+		$('#apprNo').text([[ ${approval.apprNo} ]]);
+		$('#apprTitle').text([[ ${approval.apprTitle} ]]);
+		$('#apprContent').text([[ ${approval.apprContent} ]]).attr("readonly", true);
 		$('#addLineBtn').remove();
 		$('#delLineBtn').remove();
 		$('#createDate').text('[[ ${approval.createDate} ]]');
-		$('#departmentName').text('[[ ${approval.departmentName} ]]');
-		$('#userName').text('[[ ${approval.userName} ]]');
+		$('#expireDate').text('[[ ${approval.expireDate} ]]');
+		$('#departmentName').text([[ ${approval.departmentName} ]]);
+		$('#userName').text([[ ${approval.userName} ]]);
 		
 		[[ ${apprLine} ]].forEach(function(element) {
 			let liTag = $('<li>' + element.departmentName + 

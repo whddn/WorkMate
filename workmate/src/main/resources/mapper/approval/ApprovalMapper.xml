@@ -23,6 +23,7 @@
 			, appr_title
 			, appr_content
 			, create_date
+		    , expire_date
 			, department_name
 			, user_name
 			, form_name

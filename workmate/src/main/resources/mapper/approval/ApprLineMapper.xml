@@ -4,7 +4,7 @@
 <mapper namespace="com.workmate.app.approval.mapper.ApprLineMapper">
 	<select id="selectApprLine" parameterType="ApprLineVO" resultType="ApprElmntVO">
 		SELECT apprelmnt_no
-		    , apprline_no
+		    , appr_elmnt.apprline_no
 		    , user_name
 		    , appr_result
 		    , appr_reason
@@ -18,5 +18,8 @@
 		    ON employee.team_no=team.team_no
 		    LEFT JOIN department
 		    ON appr_elmnt.dept_no=department.department_id
+		    JOIN appr_line
+		    ON appr_elmnt.apprline_no=appr_line.apprline_no
+		WHERE appr_no=#{apprNo}
 	</select>
 </mapper>

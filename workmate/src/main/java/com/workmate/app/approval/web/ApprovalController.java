@@ -66,9 +66,13 @@ public class ApprovalController {
 		approvalVO.setApprNo(apprNo);
 		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
 		
+		System.out.println(approvalService.selectApproval(approvalVO).getFormPath());
+		
 		ApprLineVO apprLineVO = new ApprLineVO();
 		apprLineVO.setApprNo(apprNo);
 		model.addAttribute("apprLine", apprLineService.selectApprLine(apprLineVO));
+		
+		System.out.println(apprLineService.selectApprLine(apprLineVO));
 		
 		return "approval/read";
 	}
