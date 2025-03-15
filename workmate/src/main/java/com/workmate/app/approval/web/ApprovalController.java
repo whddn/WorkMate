@@ -2,9 +2,10 @@ package com.workmate.app.approval.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.workmate.app.approval.service.ApprFormService;
@@ -51,35 +52,48 @@ public class ApprovalController {
 	}
 	
 	@GetMapping("approval/write")
-	public String formWriteGet(Model model) {
+	public String writeGet(Model model, @RequestParam String apprType) {
+		ApprFormVO apprFormVO = new ApprFormVO();
+		apprFormVO.setApprType(apprType);
+		apprFormVO = apprFormService.selectForm(apprFormVO);
+		model.addAttribute("apprForm", apprFormVO);
+		
+		//System.out.println(apprFormService.selectForm(apprFormVO));
+		
+		현재사용자VO 현재사용자 = new 현재사용자VO();
+		현재사용자.setUserNo()
+		model.addAttribute("creator", 현재사용자);
+		
 		return "approval/write";
 	}
 	
 	@PostMapping("approval/write")
-	public String formWritePost(Model model) {
-		return "approval/formList";
+	public Integer writePost(@RequestBody ApprovalVO approvalVO) {
+		System.out.println(approvalVO);
+		//int result = approvalService.insertApproval(approvalVO);
+		return 0;
 	}
 	
 	@GetMapping("approval/read")
-	public String formReadGet(Model model, @RequestParam String apprNo) {
+	public String readGet(Model model, @RequestParam String apprNo) {
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
 		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
 		
-		System.out.println(approvalService.selectApproval(approvalVO).getFormPath());
+		//System.out.println(approvalService.selectApproval(approvalVO).getFormPath());
 		
 		ApprLineVO apprLineVO = new ApprLineVO();
 		apprLineVO.setApprNo(apprNo);
 		model.addAttribute("apprLine", apprLineService.selectApprLine(apprLineVO));
 		
-		System.out.println(apprLineService.selectApprLine(apprLineVO));
+		//System.out.println(apprLineService.selectApprLine(apprLineVO));
 		
 		return "approval/read";
 	}
 	
-	@DeleteMapping("approval/read")
-	public String formReadDelete(Model model) {
-		return "approval/formList";
+	@PutMapping("approval/read")
+	public String readPut(Model model) {
+		return "approval/read";
 	}
 	
 	@GetMapping("approval/manage")

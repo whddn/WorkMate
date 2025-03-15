@@ -7,4 +7,5 @@ import org.springframework.stereotype.Service;
 
 public interface ApprFormService {
 	public List<ApprFormVO> selectFormList();
+	public ApprFormVO selectForm(ApprFormVO apprFormVO);
 }

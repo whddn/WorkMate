@@ -12,7 +12,7 @@
 </head>
 
 <body>
-	<div th:insert="~{|forms/approval/${approval.formPath}| :: FormFrag}"></div>
+	<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
 	<div>
 		<table id="AttachTable" class="display>">
 			<thead>
@@ -102,25 +102,33 @@
 
 <script th:inline="javascript">
 	$(document).ready(function() {
+		let approval = [[ ${approval} ]];
+		let apprLine = [[ ${apprLine} ]];
+		
 		$('#ApprovalsTable').DataTable();
 		$('#AttachTable').DataTable();
 		
-		$('#apprNo').text([[ ${approval.apprNo} ]]);
-		$('#apprTitle').text([[ ${approval.apprTitle} ]]);
-		$('#apprContent').text([[ ${approval.apprContent} ]]).attr("readonly", true);
+		$('#apprNo').text(approval.apprNo);
+		$('#apprTitle').text(approval.apprTitle).attr("readOnly", true);
+		$('#apprContent').text(approval.apprContent).attr("readOnly", true);
 		$('#addLineBtn').remove();
 		$('#delLineBtn').remove();
-		$('#createDate').text('[[ ${approval.createDate} ]]');
-		$('#expireDate').text('[[ ${approval.expireDate} ]]');
-		$('#departmentName').text([[ ${approval.departmentName} ]]);
-		$('#userName').text([[ ${approval.userName} ]]);
+		$('#createDate').text(approval.createDate).attr("readOnly", true);
+		$('#expireDate').text(approval.expireDate).attr("readOnly", true);
+		$('#departmentName').text(approval.departmentName);
+		$('#userNo').text(approval.userNo);
+		$('#userName').text(approval.userName);
 		
-		[[ ${apprLine} ]].forEach(function(element) {
+		apprLine.forEach(function(element) {
 			let liTag = $('<li>' + element.departmentName + 
 				' - ' + element.teamName + 
 				' - ' + element.userName +
 				'</li>');
 			$('#apprLine').append(liTag);
+		});
+		
+		$('.ipt_editor').each(function(index, element) {
+			$(element).attr("readOnly", true);
 		});
 	});
 </script>

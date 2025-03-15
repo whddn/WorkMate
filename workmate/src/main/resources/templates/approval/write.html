@@ -14,11 +14,17 @@
 <body>
 	<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
 	<div>
-		<button>첨부</button>
-		<ul>
-			<li>홍길동.pdf<button>X</button></li>
-			<li>홍길동.pdf<button>X</button></li>
-		</ul>
+		<table id="AttachTable" class="display>">
+			<thead>
+				<tr>
+					<th>파일명</th>
+					<th>삭제</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<button class="btn btn-primary">첨부</button>
 		<button
 			type="button" 
 			class="btn btn-secondary">
@@ -120,7 +126,7 @@
 					</form>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary">저장</button>
+					<button type="button" class="btn btn-primary" id="insertApproval">저장</button>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
@@ -130,6 +136,9 @@
 
 <script>
 	$(document).ready(function() {
+		$('#ApprovalsTable').DataTable();
+		$('#AttachTable').DataTable();
+		
 		$('#ApprLines').DataTable({
 			// 표시 건수기능 숨기기
 		    lengthChange: false,
@@ -156,6 +165,42 @@
 		    info: false,
 		    paging: false
 		});
+		
+		$('#createDate').text(approval.createDate).attr("readOnly", true);
+		$('#departmentName').text(approval.departmentName);
+		$('#userNo').text(approval.userNo);
+		$('#userName').text(approval.userName);
+		
+		$('#insertApproval').on("click", function(event) {
+			let data = {
+				apprTitle: $('#apprTitle').text(),
+				apprContent: $('#apprContent').text(),
+				createDate: $('#createDate').text(),
+				expireDate: $('#expireDate').text(),
+				apprStatus: 'a1',
+				deptNo: null,
+				apprDate: null,
+				reportNo: $('#reportNo').text(),
+				userNo: $('userNo').text(),
+				reserNo: $('reserNo').text(),
+				apprType: $('apprType').text()
+			}
+			fetch('[[ @{/approval/write} ]]', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringfy(data)
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log(data);
+				if(data.result > 0) {
+					alert('결재서가 새롭게 등록되었습니다.');
+					location.href = '[[ @{/approval/waiting} ]]';
+				}
+			});
+		})
 	});
 </script>
 

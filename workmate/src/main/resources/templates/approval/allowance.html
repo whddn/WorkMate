@@ -36,7 +36,7 @@
 		</thead>
 		<tbody>
 			<th:block th:each="allowance, sts : ${allowanceList}">
-				<tr th:onclick="| location.href = '@{/formRead(formId=${allowance.apprNo})}' |">
+				<tr th:onclick="| location.href = '@{/approval/read(apprNo=${allowance.apprNo})}' |">
 					<td>[[ ${sts.count} ]]</td>
 					<td>[[ ${allowance.apprNo} ]]</td>
 					<td>[[ ${allowance.formName} ]]</td>
