@@ -17,6 +17,7 @@ import com.workmate.app.approval.service.ApprLineService;
 import com.workmate.app.approval.service.ApprLineVO;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.approval.service.SignService;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.security.service.LoginUserVO;
@@ -31,7 +32,17 @@ public class ApprovalController {
 	private final ApprFormService apprFormService;
 	private final ApprLineService apprLineService;
 	private final ApprElmntService apprElmntService;
+	private final SignService signService;
 	private final EmpService empService;
+	
+	private EmpVO whoAmI() {
+		LoginUserVO loginUserVO = (LoginUserVO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Integer currUserNo =  Integer.parseInt(loginUserVO.getUserVO().getUserNo());
+		
+		EmpVO empVO = new EmpVO();
+		empVO.setUserNo(currUserNo);
+		return empVO;
+	}
 	
 	@GetMapping("approval/waiting")
 	public String waiting(Model model, ApprovalVO approvalVO) {
@@ -66,12 +77,9 @@ public class ApprovalController {
 		apprFormVO.setApprType(apprType);
 		model.addAttribute("apprForm", apprFormService.selectForm(apprFormVO));
 		
-		LoginUserVO loginUserVO = (LoginUserVO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		EmpVO empVO = new EmpVO();
-		empVO.setUserNo(Integer.parseInt(loginUserVO.getUserVO().getUserNo()));
-		model.addAttribute("creator", empService.findEmpByEmpNo(empVO));
-		
-		model.addAttribute("apprLineList", apprLineService.selectApprLineList(empVO));
+		EmpVO myself = whoAmI();
+		model.addAttribute("creator", empService.findEmpByEmpNo(myself));
+		model.addAttribute("apprLineList", apprLineService.selectApprLineList(myself));
 		
 		return "approval/write";
 	}
@@ -100,6 +108,11 @@ public class ApprovalController {
 	
 	@GetMapping("approval/manage")
 	public String manage(Model model) {
+		EmpVO myself = whoAmI();
+		model.addAttribute("signs", signService.selectSignList(myself));
+		model.addAttribute("apprLines", apprLineService.selectApprLineList(myself));
+		
 		return "approval/manage";
 	}
+
 }
