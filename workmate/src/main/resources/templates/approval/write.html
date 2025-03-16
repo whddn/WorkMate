@@ -12,8 +12,8 @@
 </head>
 
 <body>
-	<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
-	<div>
+	<form th:action="@{/approval/write}" method="POST">
+		<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
 		<table id="AttachTable" class="display">
 			<thead>
 				<tr>
@@ -26,7 +26,7 @@
 		</table>
 		<button class="btn btn-primary">첨부</button>
 		<button
-			type="button" 
+			type="submit" 
 			class="btn btn-secondary">
 			결재요청
 		</button>
@@ -36,7 +36,7 @@
 			th:onclick="| location.href = '@{formList}' |">
 			취소
 		</button>
-	</div>
+	</form>
 	
 	<!-- 모달 창 -->
 	<div class="modal fade" id="addApprLineModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -54,9 +54,6 @@
 									<td>
 										<h5>내 결재선</h5>										
 										<ul class="list-group">
-											<th:block th:each="apprLine, sts : ${apprLineList}">
-												<li class="list-group-item"> </li>
-											</th:block>
 										</ul>
 									</td>
 									<td>
@@ -114,7 +111,7 @@
 					</form>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" id="insertApproval">저장</button>
+					<button type="button" class="btn btn-primary">저장</button>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
@@ -124,20 +121,16 @@
 
 <script th:inline="javascript">
 	$(document).ready(function() {
-		// 현재 이 문서를 작성하는 사람의 정보
+		let apprForm = [[ ${apprForm} ]];
 		let creator = [[ ${creator} ]];
-		// 오늘 날짜
+
 		const today = new Date();
-		// 년도
 		const year = today.getFullYear();
-		// 월
 		const month = (today.getMonth() + 1).toString().padStart(2, '0');
-		// 일
 		const day = today.getDate().toString().padStart(2, '0');
 		
 		$('#ApprovalsTable').DataTable();
 		$('#AttachTable').DataTable();
-		
 		$('#ApprovalTable').DataTable({
 		    lengthChange: false,
 		    searching: false,
@@ -153,43 +146,10 @@
 		    paging: false
 		});
 		
-		console.log(creator.userName);
-		
 		$('#createDate').text(`${year}-${month}-${day}`);
 		$('#departmentName').text(creator.departmentName);
 		$('#userNo').text(creator.userNo);
 		$('#userName').text(creator.userName);
-		
-		$('#insertApproval').on("click", function(event) {
-			let data = {
-				apprTitle: $('#apprTitle').text(),
-				apprContent: $('#apprContent').text(),
-				createDate: $('#createDate').text(),
-				expireDate: $('#expireDate').text(),
-				apprStatus: 'a1',
-				deptNo: null,
-				apprDate: null,
-				reportNo: $('#reportNo').text(),
-				userNo: $('userNo').text(),
-				reserNo: $('reserNo').text(),
-				apprType: $('apprType').text()
-			}
-			fetch('[[ @{/approval/write} ]]', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringfy(data)
-			})
-			.then(response => response.json())
-			.then(data => {
-				console.log(data);
-				if(data.result > 0) {
-					alert('결재서가 새롭게 등록되었습니다.');
-					location.href = '[[ @{/approval/waiting} ]]';
-				}
-			});
-		})
 	});
 </script>
 

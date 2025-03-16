@@ -1,28 +1,30 @@
 package com.workmate.app.approval.web;
 
-import org.springframework.security.core.Authentication;
+import java.util.Map;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.workmate.app.approval.service.ApprElmntService;
 import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.approval.service.ApprFormVO;
 import com.workmate.app.approval.service.ApprLineService;
-import com.workmate.app.approval.service.ApprLineVO;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.approval.service.SignService;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.security.service.LoginUserVO;
-import com.workmate.app.security.service.UserVO;
-
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -85,10 +87,40 @@ public class ApprovalController {
 	}
 	
 	@PostMapping("approval/write")
-	public Integer writePost(@RequestBody ApprovalVO approvalVO) {
+	public String writePost(@RequestParam Map<String, Object> map, @RequestPart(value="files", required=false) MultipartFile[] files) {
+		System.out.println("map is :");
+		System.out.println(map);
+		
+		ApprovalVO approvalVO = new ApprovalVO();
+		BeanUtils.copyProperties(map, approvalVO);
+		
+		EmpVO myself = whoAmI();
+		approvalVO.setUserNo(myself.getUserNo());
+		approvalVO.setDeptNo(myself.getDepartmentId());
+		
+		System.out.println("approvalVO is :");
 		System.out.println(approvalVO);
-		//int result = approvalService.insertApproval(approvalVO);
-		return 0;
+        //int result = approvalService.insertApproval(approvalVO);
+
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+            	/*
+                if (!file.isEmpty()) {
+                    byte[] bytes = file.getBytes();
+                    Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
+                    Files.write(path, bytes);
+                    System.out.println("File uploaded: " + file.getOriginalFilename());
+                }
+                */
+            }
+        }
+
+        if (/*result > 0*/false) {
+            return "approval/waiting";
+        }
+        else {
+            return "approval/write";
+        }
 	}
 	
 	@GetMapping("approval/read")
