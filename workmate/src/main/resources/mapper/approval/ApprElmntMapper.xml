@@ -19,4 +19,20 @@
 		    ON appr_elmnt.dept_no=department.department_id
 		WHERE appr_no=#{apprNo}
 	</select>
+	<insert id="insertApprElmnt" parameterType="ApprElmntVO">
+		<selectKey keyProperty="apprelmntNo" resultType="Integer" order="BEFORE">
+			SELECT COUNT(appr_no) + 1
+			FROM approval
+		</selectKey>
+		INSERT INTO appr_elmnt
+		VALUES(#{apprelmntNo}
+			, 'a1'
+			, null
+			, null
+			, null
+			, #{approver}
+			, #{deptNo}
+			, #{apprNo}
+		)
+	</insert>
 </mapper>

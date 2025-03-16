@@ -39,23 +39,30 @@
 		WHERE appr_no=#{apprNo}
 	</select>
 	<insert id="insertApproval" parameterType="ApprovalVO">
-		<selectKey keyProperty="apprNo" resultType="String" order="BEFORE">
-			SELECT 'YD' || LPAD(COUNT(appr_no) + 1, 3, '0')
-			FROM approval
-		</selectKey>
-		INSERT INTO approval
-		VALUES(#{apprNo}
-		    , #{apprTitle}
-		    , #{apprContent}
-		    , #{createDate}
-		    , #{expireDate}
-		    , #{apprStatus}
-		    , #{deptNo}
-		    , null
-		    , #{reportNO}
-		    , #{userNO}
-		    , #{reserNO}
-		    , #{apprType}
-		;
+	    <!-- INSERT 전 새 apprNo 생성 -->
+	    <selectKey keyProperty="apprNo" resultType="String" order="BEFORE">
+	        SELECT 'YD' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(appr_no, 3))), 0) + 1, 3, '0')
+	        FROM approval
+	    </selectKey>
+	    INSERT INTO approval
+	    VALUES(#{apprNo}
+	    	, #{apprTitle}
+	    	, #{apprContent}
+	    	, SYSDATE
+	    	, SYSDATE + INTERVAL '1' YEAR
+	    	, 'a1'
+	    	, #{deptNo}
+	    	, null
+	    	, #{reportNo}
+	    	, #{userNo}
+	    	, #{reserNo}
+	    	, #{apprType}
+	    )
+	    <!-- INSERT 후 실제 추가된 행의 apprNo를 가져오기 -->
+	    <selectKey keyProperty="apprNo" resultType="String" order="AFTER">
+	        SELECT appr_no 
+	        FROM approval 
+	        WHERE appr_no = #{apprNo}
+	    </selectKey>
 	</insert>
 </mapper>

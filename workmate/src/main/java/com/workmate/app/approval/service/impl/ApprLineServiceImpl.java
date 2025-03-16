@@ -26,6 +26,12 @@ public class ApprLineServiceImpl implements ApprLineService {
 	}
 	
 	@Override
+	public ApprLineVO selectApprLine(ApprLineVO apprLineVO) {
+		// TODO Auto-generated method stub
+		return apprLineMapper.selectApprLine(apprLineVO);
+	}
+	
+	@Override
 	public int insertApprLine(ApprLineVO apprLineVO) {
 		// TODO Auto-generated method stub
 		return 0;

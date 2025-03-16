@@ -13,4 +13,16 @@
 		    ON appr_line.inserter=employee.user_no
 		WHERE inserter=#{userNo}
 	</select>
+	<select id="selectApprLine" parameterType="ApprLineVO" resultType="ApprLineVO">
+		SELECT apprline_no
+		    , insert_title
+		    , insert_date
+		    , inserter
+		    , components
+		    , user_name
+		FROM appr_line
+		    JOIN employee
+		    ON appr_line.inserter=employee.user_no
+		WHERE apprline_no=#{apprlineNo}
+	</select>
 </mapper>

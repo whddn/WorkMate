@@ -12,31 +12,28 @@
 </head>
 
 <body>
-	<form th:action="@{/approval/write}" method="POST">
-		<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
-		<table id="AttachTable" class="display">
-			<thead>
-				<tr>
-					<th>파일명</th>
-					<th>삭제</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		<button class="btn btn-primary">첨부</button>
-		<button
-			type="submit" 
-			class="btn btn-secondary">
-			결재요청
-		</button>
-		<button
-			type="button" 
-			class="btn btn-primary"
-			th:onclick="| location.href = '@{formList}' |">
-			취소
-		</button>
-	</form>
+	<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
+	<table id="AttachTable" class="display">
+		<thead>
+			<tr>
+				<th>파일명</th>
+				<th>삭제</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	<button class="btn btn-primary">첨부</button>
+	<button
+		id="submitBtn"
+		class="btn btn-secondary">
+		결재요청
+	</button>
+	<button
+		id="cancelBtn"
+		class="btn btn-primary">
+		취소
+	</button>
 	
 	<!-- 모달 창 -->
 	<div class="modal fade" id="addApprLineModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -47,71 +44,72 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<form>
-						<table class="table mt-3">
-							<tbody>
-								<tr>
-									<td>
-										<h5>내 결재선</h5>										
-										<ul class="list-group">
-										</ul>
-									</td>
-									<td>
-										<ul class="list-group">
-											<li class="list-group-item">결재선 추가</li>
-											<li class="list-group-item">결재선 제거</li>
-										</ul>
-									</td>
-									<td>
-										<table id="ApprovalTable" class="display">
-											<thead>
-												<tr>
-													<th>결재 순서</th>
-													<th>이름</th>
-													<th>직책</th>
-													<th>부서</th>
-												</tr>
-											</thead>
-											<tbody>
-											</tbody>
-										</table>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<h5>조직도</h5>
-									</td>
-									<td>
-										<ul class="list-group">
-											<li class="list-group-item">참조자 추가</li>
-											<li class="list-group-item">참조자 제거</li>
-										</ul>
-									</td>
-									<td>
-										<table id="ReferrersTable" class="display">
-											<thead>
-												<tr>
-													<th>이름</th>
-													<th>직책</th>
-													<th>부서</th>
-												</tr>
-											</thead>
-											<tbody>
-												<tr>
-													<td>고길동</td>
-													<td>사원</td>
-													<td>개발부</td>
-												</tr>
-											</tbody>
-										</table>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</form>
+					<table class="table mt-3">
+						<tbody>
+							<tr>
+								<td>
+									<h5>내 결재선</h5>										
+									<ul class="list-group">
+										<th:block th:each="apprLine : ${apprLineList}">
+											<li class="list-group-item" th:onclick="|summonApprElmnts(${apprLine.apprlineNo})|">[[ ${apprLine.insertTitle} ]]</li>
+										</th:block>
+									</ul>
+								</td>
+								<td>
+									<ul class="list-group">
+										<li class="list-group-item">결재선 추가</li>
+										<li class="list-group-item" th:onclick="|delApprElmnt()|">결재선 제거</li>
+									</ul>
+								</td>
+								<td>
+									<table id="ApprovalTable" class="display">
+										<thead>
+											<tr>
+												<th>결재 순서</th>
+												<th>이름</th>
+												<th>직책</th>
+												<th>부서</th>
+											</tr>
+										</thead>
+										<tbody>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<h5>조직도</h5>
+								</td>
+								<td>
+									<ul class="list-group">
+										<li class="list-group-item">참조자 추가</li>
+										<li class="list-group-item">참조자 제거</li>
+									</ul>
+								</td>
+								<td>
+									<table id="ReferrersTable" class="display">
+										<thead>
+											<tr>
+												<th>이름</th>
+												<th>직책</th>
+												<th>부서</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>고길동</td>
+												<td>사원</td>
+												<td>개발부</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary">저장</button>
+					<button type="button" class="btn btn-primary" th:onclick="|saveApprLine()|">저장</button>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
@@ -120,6 +118,80 @@
 </body>
 
 <script th:inline="javascript">
+	let apprElmntList;
+
+	function loadApprElmnts() {
+	    let tbodyTag = $('#ApprovalTable > tbody');
+	    tbodyTag.empty();
+
+	    if (!Array.isArray(apprElmntList) || apprElmntList.length === 0) {
+	        return;
+	    }
+
+	    apprElmntList.sort((a, b) => a.order - b.order); // 정렬 (order 속성이 있다고 가정)
+
+	    apprElmntList.forEach(function(element, index) {
+	        let trTag = $(`
+	        	<tr>
+	        		<td>${index + 1}</td>
+	        		<td>${element.userName}</td>
+	        		<td>${element.teamName}</td>
+	        		<td>${element.departmentName}</td>
+	        	</tr>
+	        `);
+			tbodyTag.append(trTag);
+	    });
+	}
+	
+	function summonApprElmnts(apprLineNo) {
+		fetch([[ @{/approval/summonApprElmnts} ]], {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				'apprLineNo': apprLineNo
+			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (!Array.isArray(data)) {
+	            return;
+	        }
+			
+			apprElmntList = data;
+			loadApprElmnts();
+		});
+	}
+	
+	function insertApprElmnt(userNo) {
+		
+	}
+	
+	function deleteApprElmnt() {
+		apprElmntList.pop();
+		loadApprElmnts();
+	}
+	
+	// 모달창의 결재선을 결재문서로 복사한다
+	function saveApprLine() {
+		let ulTag = $('#apprLine');
+		ulTag.empty();
+		
+		if (!Array.isArray(apprElmntList) || apprElmntList.length === 0) {
+	        return;
+	    }
+		
+		apprElmntList.forEach(function(element) {
+			let liTag = $(`
+				<li>
+					${element.departmentName} - ${element.teamName} - ${element.userName}
+				</li>
+	        `);
+			ulTag.append(liTag);
+		})
+	}
+	
 	$(document).ready(function() {
 		let apprForm = [[ ${apprForm} ]];
 		let creator = [[ ${creator} ]];
@@ -150,6 +222,51 @@
 		$('#departmentName').text(creator.departmentName);
 		$('#userNo').text(creator.userNo);
 		$('#userName').text(creator.userName);
+		
+		$('#submitBtn').on('click', function(event) {
+			let request = {};
+			
+			$('input[name], select[name], textarea[name], button[name]').each(function() {
+				let name = $(this).attr('name');
+				let value = $(this).val();
+				request[name] = value;
+			})
+			
+			if (!Array.isArray(apprElmntList) || apprElmntList.length < 2) {
+				alert('결재선을 2명 이상으로 설정해 주세요!');
+	        	return;
+	    	}
+			
+			let approverList = [];
+			apprElmntList.forEach(function(element) {
+				approverList.push(element.userNo);
+			});
+			request['approverList'] = approverList;
+			
+			fetch([[ @{/approval/write} ]], {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(request)
+			})
+			.then(response => response.json())
+			.then(result => {
+				if(result.success) {
+					location.href = [[ @{/approval/waiting} ]];
+				}
+				else {
+					alert('결재등록에 실패하였습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('서버 요청 중 오류가 발생했습니다.');
+			});
+		});
+		$('#cancelBtn').on('click', function(event) {
+			 location.href = [[ @{/approval/formList} ]]; 
+		})
 	});
 </script>
 

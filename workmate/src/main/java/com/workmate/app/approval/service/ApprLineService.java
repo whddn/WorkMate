@@ -6,5 +6,6 @@ import com.workmate.app.employee.service.EmpVO;
 
 public interface ApprLineService {
 	public List<ApprLineVO> selectApprLineList(EmpVO empVO);
+	public ApprLineVO selectApprLine(ApprLineVO apprLineVO);
 	public int insertApprLine(ApprLineVO apprLineVO);
 }
