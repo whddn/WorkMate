@@ -36,16 +36,16 @@
 		</thead>
 		<tbody>
 			<th:block th:each="allowance, sts : ${allowanceList}">
-				<tr th:onclick="| location.href = '@{/formRead(formId=${allowance.apprNo})}' |">
+				<tr th:onclick="| location.href = '@{/approval/read(apprNo=${allowance.apprNo})}' |">
 					<td>[[ ${sts.count} ]]</td>
 					<td>[[ ${allowance.apprNo} ]]</td>
 					<td>[[ ${allowance.formName} ]]</td>
 					<td>[[ ${allowance.apprTitle} ]]</td>
 					<td>[[ ${allowance.userName} ]]</td>
 					<td>[[ ${allowance.departmentName} ]]</td>
-					<td>[[ ${allowance.createDate} ]]</td>
+					<td th:text="${#dates.format(allowance.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
 					<td>결재 승인</td>
-					<td><button>다운받기</button></td>
+					<td><a download><button>다운받기</button></a></td>
 				</tr>
 			</th:block>
 		</tbody>

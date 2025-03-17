@@ -24,4 +24,10 @@ public class ApprFormServiceImpl implements ApprFormService {
 		return apprFormMapper.selectApprFormList();
 	}
 
+	@Override
+	public ApprFormVO selectForm(ApprFormVO apprFormVO) {
+		// TODO Auto-generated method stub
+		return apprFormMapper.selectApprForm(apprFormVO);
+	}
+
 }

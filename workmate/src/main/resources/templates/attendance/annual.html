@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/default_layout}"
+	layout:decorate="~{common/layouts/attendance_layout}"
 	layout:fragment="content">
+<head>
 <meta charset="UTF-8">
 <title>근태관리</title>
 <style>
@@ -12,35 +13,19 @@
 	width: 100%;
 }
 
-#card-left {
-	width: 400px;
-	height: 100vh;
-	padding: 40px;
-	margin: 30px;
-	position: sticky;
-	top: 0;
-	flex-shrink: 0; 
-}
-
 /* 오른쪽 컨테이너 (카드들을 세로 정렬) */
-.right-container {
+.container {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	padding: 20px;
 }
 
-
-.date-box {
-	font-size: 20px;
-	margin-bottom: 10px;
+#card-top, #card-bottom {
+	width: 100%;
+	padding: 30px;
+	margin: 10px 0; /* 상하 간격 추가 */
+	flex-grow: 1;
 }
-
-.time-box {
-	font-size: 40px;
-	margin-bottom: 10px;
-}
-
 .content {
 	flex: 1;
 	padding: 20px;
@@ -58,59 +43,90 @@ table {
 	border: 1px solid #ccc;
 	display: block;
 }
+
+.table-responsive {
+	max-height: 400px; 
+	overflow-y: auto;
+}
 </style>
 </head>
 <body>
-	<div class="main-container" >
-		<div class="card" id="card-left">
-			<div class="card-body">
-				<h4 class="card-title">근태관리</h4>
-				<p class="date-box" id="current-date"></p>
-				<p class="time-box" id="current-time"></p>
-				<p>
-					출근시간 : <span id="start-time"> 미등록</span>
-				</p>
-				<p>
-					퇴근시간 : <span id="end-time"> 미등록</span>
-				</p>
-				<button onclick="startWork()" class="btn btn-primary btn-fw">출근하기</button>
-				<button onclick="endWork()" class="btn btn-secondary btn-fw">퇴근하기</button>
-	
-				<div class="dropdown">
-					<select id="work-type" class="form-select input-fixed">
-						<option value="기본">근무타입선택</option>
-						<option value="재택">재택</option>
-						<option value="출장">출장</option>
-						<option value="연차">연차</option>
-					</select>
-					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청하기</button>
+	<div class="main-container">		
+
+		<!-- 오른쪽 컨테이너 -->
+		<div class="container">
+			<div class="card" id="card-top">
+				<div class="card-body">
+					<!-- 내용 추가 -->
+					<h3 class="card-title">올해 연차</h3>
+					<p>연차 기준 : 1월 ~ 12월</p>
+					<table class="table table-head-bg-primary mt-4">
+                      <thead>
+                        <tr>
+                          <th scope="col">총연차</th>
+                          <th scope="col">올해발생연차</th>
+                          <th scope="col">사용연차</th>
+                          <th scope="col">잔여연차</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>15</td>
+                          <td>15</td>
+                          <td>2</td>
+                          <td>13</td>
+                        </tr>
+                      </tbody>
+                    </table>
+				</div>
+			</div>
+			<div class="card" id="card-bottom">
+				<div class="card-body">
+					<!-- 내용 추가 -->
+					<div class="content">
+						<h4 class="card-title">내 연차 사용내역 조회</h4>	
+						
+						<!-- 년도 월별 조회 기능 -->					
+						 <input type="date" name="schedule" min="2022-04-01"	max="2022-04-30" />
+						<input type="date" name="schedule" min="2022-04-01" max="2022-04-30" />
+						<button class="btn btn-info">검색</button>
+						
+					<!--<div class="selectym">
+						<select id ="selectYear"  class="form-select input-fixed"></select>		
+						<select id ="selectMonth"  class="form-select input-fixed"></select>
+						<button class="btn btn-info" onclick="searchByYearMonth()">검색</button>	 -->	
+					</div>
+						
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>등록일</th>
+										<th>사용일</th>
+										<th>발생기간</th>
+										<th>유형</th>
+										<th>내용</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- 단건 : 배열 -->
+									<tr th:each="work : ${works}">
+										<td>[[ ${#dates.format(work.startWork, 'yyyy/MM/dd')} ]]</td>
+										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
+										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
+										<td>[[ ${work.workTime} ]]</td>
+										<td>[[ ${work.workStatus} ]]</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="right-container">
-		
-	</div>
 </body>
 <script>
-	function currentDate() {
-		const now = new Date();
-		document.getElementById("current-date").innerText = now.toISOString()
-				.split('T')[0];
-		document.getElementById("current-time").innerText = now
-				.toLocaleTimeString();
-	}
-	setInterval(currentDate, 1000);
-	currentDate();
-
-	function startWork() {
-		document.getElementById("start-time").innerText = new Date()
-				.toLocaleTimeString();
-	}
-
-	function endWork() {
-		document.getElementById("end-time").innerText = new Date()
-				.toLocaleTimeString();
-	}
+	
 </script>
 </html>

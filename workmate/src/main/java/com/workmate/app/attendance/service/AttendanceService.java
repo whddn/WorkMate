@@ -8,7 +8,7 @@ public interface AttendanceService {
 	public List<WorkVO> findMonthWork();
 	
 	//전체조회
-	public List<WorkVO> findAllWork();
+	public List<WorkVO> findAllWork(WorkVO workVO);
 	
 	//출근등록
 	public int startWork(WorkVO workVO);

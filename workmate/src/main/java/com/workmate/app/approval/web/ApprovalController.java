@@ -1,27 +1,78 @@
 package com.workmate.app.approval.web;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lowagie.text.DocumentException;
+import com.workmate.app.approval.service.ApprElmntService;
+import com.workmate.app.approval.service.ApprElmntVO;
 import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.approval.service.ApprFormVO;
 import com.workmate.app.approval.service.ApprLineService;
 import com.workmate.app.approval.service.ApprLineVO;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.approval.service.SignService;
+import com.workmate.app.employee.service.EmpService;
+import com.workmate.app.employee.service.EmpVO;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class ApprovalController {
-	private final ApprFormService apprFormService;
+	private final static String UPLOAD_FOLDER = "classpath://static/attachFiles";
 	private final ApprovalService approvalService;
+	private final ApprFormService apprFormService;
 	private final ApprLineService apprLineService;
+	private final ApprElmntService apprElmntService;
+	private final SignService signService;
+	private final EmpService empService;
+	private final ObjectMapper objectMapper;
+	private final TemplateEngine templateEngine;
+	
+	// 현재 로그인한 사람의 개인정보를 empVO로 불러온다.
+	private EmpVO whoAmI() {
+		/*
+		LoginUserVO loginUserVO = (LoginUserVO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Integer currUserNo = Integer.parseInt(loginUserVO.getUserVO().getUserNo());
+		
+		EmpVO empVO = new EmpVO();
+		empVO.setUserNo(currUserNo);
+		*/
+		
+		// 로그인 없을때 임시로
+		EmpVO empVO = new EmpVO();
+    	empVO.setUserNo(101);
+    	empVO = empService.findEmpByEmpNo(empVO);
+		
+		return empVO;
+	}
 	
 	@GetMapping("approval/waiting")
 	public String waiting(Model model, ApprovalVO approvalVO) {
@@ -51,35 +102,162 @@ public class ApprovalController {
 	}
 	
 	@GetMapping("approval/write")
-	public String formWriteGet(Model model) {
+	public String writeGet(Model model, @RequestParam String apprType) {
+		ApprFormVO apprFormVO = new ApprFormVO();
+		apprFormVO.setApprType(apprType);
+		model.addAttribute("apprForm", apprFormService.selectForm(apprFormVO));
+		
+		EmpVO myself = whoAmI();
+		model.addAttribute("creator", empService.findEmpByEmpNo(myself));
+		model.addAttribute("apprLineList", apprLineService.selectApprLineList(myself));
+		
 		return "approval/write";
 	}
 	
 	@PostMapping("approval/write")
-	public String formWritePost(Model model) {
-		return "approval/formList";
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> writePost(
+		@RequestBody Map<String, Object> request, 
+		@RequestPart(value="files", required=false) MultipartFile[] files
+	) throws IOException {
+		// JSON 객체에서 공통되는 부분만 approvalVO에 전이
+		ApprovalVO approvalVO = objectMapper.convertValue(request, ApprovalVO.class);
+		
+		// 결재문서를 DB에 등록
+		EmpVO myself = whoAmI();
+		approvalVO.setUserNo(myself.getUserNo());
+		approvalVO.setDeptNo(myself.getDepartmentId());
+
+		Map<String, Object> response = new HashMap<>();
+        
+        int result = approvalService.insertApproval(approvalVO);
+        if(result <= 0) {
+        	response.put("success", false);
+        	return ResponseEntity.badRequest().body(response);
+        }
+        
+        // 결재선(정확히 말하면 결재요소들)을 DB에 등록
+        for(Integer empNo : (List<Integer>) request.get("approverList")) {
+        	// 결재자 번호를 통해 결재자 정보 불러오기
+        	EmpVO empVO = new EmpVO();
+        	empVO.setUserNo(empNo);
+        	empVO = empService.findEmpByEmpNo(empVO);
+        	
+        	// 결재요소에 결재자 번호, 결재자의 부서, 결재문서 번호를 입력
+        	ApprElmntVO apprElmntVO = new ApprElmntVO();
+        	apprElmntVO.setApprover(empNo);
+        	apprElmntVO.setDeptNo(empVO.getDepartmentId());
+        	apprElmntVO.setApprNo(approvalVO.getApprNo());
+        	
+        	// 결재요소 등록
+        	apprElmntService.insertApprElmnt(apprElmntVO);
+        }
+        
+        // 파일 업로드 관리
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    byte[] bytes = file.getBytes();
+                    Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
+                    Files.write(path, bytes);
+                    System.out.println("File uploaded: " + file.getOriginalFilename());
+                }
+            }
+        }
+        
+        // 응답을 반송한다
+        response.put("success", true);
+        return ResponseEntity.ok(response);
+	}
+	
+	@PostMapping("approval/summonApprElmnts")
+	public ResponseEntity<List<EmpVO>> summonApprElmnts(@RequestBody Map<String, Object> request) {
+		ApprLineVO apprLineVO = new ApprLineVO();
+		apprLineVO.setApprlineNo(Integer.parseInt(request.get("apprLineNo").toString()));
+		
+        apprLineVO = apprLineService.selectApprLine(apprLineVO);
+        List<EmpVO> list = new ArrayList<>();
+        for(Integer empNo : apprLineVO.getComponentsByList()) {
+        	EmpVO empVO = new EmpVO();
+        	empVO.setUserNo(empNo);
+        	list.add(empService.findEmpByEmpNo(empVO));
+        }
+        return ResponseEntity.ok(list);
 	}
 	
 	@GetMapping("approval/read")
-	public String formReadGet(Model model, @RequestParam String apprNo) {
+	public String readGet(Model model, @RequestParam String apprNo) {
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
 		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
-		
-		ApprLineVO apprLineVO = new ApprLineVO();
-		apprLineVO.setApprNo(apprNo);
-		model.addAttribute("apprLine", apprLineService.selectApprLine(apprLineVO));
+		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
 		
 		return "approval/read";
 	}
 	
-	@DeleteMapping("approval/read")
-	public String formReadDelete(Model model) {
-		return "approval/formList";
+	@PutMapping("approval/read")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> readPut(@RequestBody ApprElmntVO apprElmntVO) 
+	throws IOException {
+		// 결재결과를 수정
+		apprElmntVO.setApprover(whoAmI().getUserNo());
+		System.out.println(apprElmntVO);
+		
+		Map<String, Object> response = new HashMap<>();
+		
+		int result = apprElmntService.updateApprElmnt(apprElmntVO);
+        if(result <= 0) {
+        	response.put("success", false);
+        	return ResponseEntity.badRequest().body(response);
+        }
+		
+        System.out.println("응애");
+        
+        // 결재문서의 결재결과를 결정
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setApprNo(apprElmntVO.getApprNo());
+		approvalService.updateApproval(approvalVO);
+		
+		response.put("success", true);
+        return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping("approval/manage")
 	public String manage(Model model) {
+		EmpVO myself = whoAmI();
+		model.addAttribute("signs", signService.selectSignList(myself));
+		model.addAttribute("apprLines", apprLineService.selectApprLineList(myself));
+		
 		return "approval/manage";
 	}
+
+	@GetMapping("approval/pdf")
+    public void generatePdf(Model model, HttpServletResponse response, @RequestParam String apprNo) throws IOException, DocumentException {
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setApprNo(apprNo);
+		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
+		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
+		
+		// Thymeleaf를 사용하여 동적으로 HTML 생성
+        Context context = new Context();
+        context.setVariables(model.asMap());
+        String htmlContent = templateEngine.process("approval/pdf", context);
+
+        // Flying Saucer를 사용하여 HTML을 PDF로 변환
+        try (ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream()) {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(htmlContent);
+            renderer.layout();
+            renderer.createPDF(pdfOutputStream);
+
+            // PDF 다운로드 설정
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=approvalFile.pdf");
+
+            // PDF 데이터를 응답 스트림에 쓰기
+            try (OutputStream responseOutputStream = response.getOutputStream()) {
+                pdfOutputStream.writeTo(responseOutputStream);
+            }
+        }
+    }
 }

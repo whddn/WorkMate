@@ -12,28 +12,30 @@
 		JOIN department d 
 		ON d.department_id = t.department_id 
 	</select>
-	<!--/* 사원 상세 조회 */-->
+	<!--/* 조직도의 사원 상세 조회 */-->
 	<select id="selectOneEmp" resultType="EmpVO">
-		SELECT u.user_name
-		        , d.department_name
-		        , t.team_name
-                , u.team_no
-		        , u.user_position
-		        , u.user_no
-		        , u.user_id
-		        , u.hire_date
-		        , u.resign_date
-		        , u.user_phone
-		        , u.address
-		        , u.user_ip
-		        , u.common_ip
-		FROM employee u 
-		JOIN team t 
-		ON u.team_no = t.team_no
-        JOIN department d 
-		ON t.department_id = d.department_id
+		SELECT user_no
+		    , user_id
+		    , user_position
+		    , hire_date
+		    , user_name
+		    , resign_date
+		    , status_user
+		    , address
+		    , user_phone
+		    , t.team_no
+		    , user_ip
+		    , common_ip
+		    , t.team_name
+		    , d.department_name
+		    , d.department_id
+		FROM employee u
+		    LEFT JOIN team t 
+		    ON u.team_no = t.team_no
+		    LEFT JOIN department d 
+		    ON t.department_id = d.department_id
 		WHERE u.user_no = #{userNo}
-		AND u.user_no between 100 AND 300
+		    AND u.user_no between 100 AND 300
 	</select>
 	
 	<!-- 팀명 조회 -->
@@ -51,6 +53,7 @@
 		FROM common_code
 		WHERE group_code = '0Q' 
 		AND code IS NOT NULL
+        AND code LIKE '%q%'
 	</select>
 	
 	<!-- 사원 등록 --> 
@@ -72,17 +75,138 @@
     				   , USER_PWD
     				   , USER_PHONE
     				   , ADDRESS
+    				   , USER_MAIL
+    				   , HIRE_DATE
 					) 
 		VALUES 		
 					(
 						#{userNo}
                       , #{userName}
 					  , #{teamNo}
-					  , #{userPosition}
+					  , ( SELECT CODE_NAME
+					  	  FROM COMMON_CODE
+					  	  WHERE CODE = #{userPosition} )
 					  , 'user' || #{userNo}
 					  , DBMS_RANDOM.STRING('X', 10) 
 					  , #{userPhone}
 					  , #{address}
+					  , 'user' || #{userNo} || '@example.com'
+					  , SYSDATE
 					)
 	</insert>
+	
+	<!-- 평가 조회 -->
+	<select id="selectOneEvalu" resultType="EvaluVO">
+		SELECT i.EVALU_SUMMARY
+		      , ef.EVALU_NO
+		      , i.EVALU_COMPET
+		      , i.EVALU_CONTENT
+		      , f.EVALU_NAME
+		 FROM EVALU_ITEM i 
+		 JOIN EVALU_FORMAT ef
+		   ON i.EVALU_ITEM_NO = ef.EVALU_ITEM_NO
+		 JOIN EVALU_FORM f 
+		   ON f.EVALU_FORM_NO = ef.EVALU_FORM_NO
+		WHERE f.EVALU_FORM_NO = 1
+	</select>
+	
+<!-- 사원 수정 -->
+	<update id="updateOneEmp" parameterType="EmpVO">
+		UPDATE employee 
+		SET
+              USER_NAME = #{userName}
+            , TEAM_NO =  #{teamNo}
+           
+    		, USER_POSITION = #{userPosition}
+    		, USER_PHONE = #{userPhone}
+    		, ADDRESS = #{address}
+
+        WHERE user_no = #{userNo}
+	</update>
+	
+    <!-- 부서 및 팀별 사원 조회 -->
+	<!--  <select id="" resultMap="">
+		SELECT t.team_no
+		        , t.team_name
+		        , d.department_id
+		        , d.department_name
+		        , e.user_name
+		        , e.user_id
+		        , e.user_no
+		FROM team t
+		LEFT JOIN department d
+		ON t.department_id = d.department_id
+		LEFT JOIN employee e 
+		ON e.team_no = t.team_no
+		</select>-->
+	
+		<!-- collection -->
+	<!--  <resultMap id="" type="DepartmentVO">
+		<constructor>
+			<idArg column="" javaType=""/>
+		</constructor>
+			<result property="" column=""/>
+			
+	</resultMap>-->
+	
+	<!-- 지난 평가 리스트 조회 (전체 출력) -->
+	<select id="selectAllEvalu" resultType="EvaluVO">
+		SELECT EVALU_NAME
+        , USAGE_STATUS 
+        , EVALU_START
+        , EVALU_END
+		FROM EVALU_FORM
+	</select>
+	<!-- 평가 단건 조회 (일반 사용자, 본인 로그인한 userNo, formNo기반) -->
+	<select id="selectMyEvaluResultOne" resultType="EvaluVO">
+
+			SELECT f.EVALU_NAME              
+			        , f.EVALU_START          
+			        , g.EVALUATEE_GROUP_ID      
+			        , u.USER_NO
+			        , u.USER_NAME          
+			        , i.EVALU_COMPET       
+			        , i.EVALU_CONTENT
+			        , r.EVALU_SCORE        
+			        , fm.ORDER_NO
+			FROM EVALU_FORM f              
+			JOIN EVALUATEE_GROUP g
+			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
+			JOIN EMPLOYEE u
+			ON g.USER_NO = u.USER_NO        
+			JOIN EVALU_FORMAT fm
+			ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO  
+			JOIN EVALU_RESULT r
+			ON r.EVALU_GROUP_ID = g.EVALUATEE_GROUP_ID AND fm.EVALU_NO = r.EVALU_NO 
+			JOIN EVALU_ITEM i
+			ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
+			WHERE f.EVALU_FORM_NO = 1
+		
+	</select>
+	
+	<!-- 평가 단순 조회 (관리자, formNo 기반) -->
+	<!-- <select id="" resultType="">
+					SELECT f.EVALU_NAME              
+			        , f.EVALU_START          
+			        , g.EVALUATEE_GROUP_ID      
+			        , u.USER_NO
+			        , u.USER_NAME          
+			        , i.EVALU_COMPET       
+			        , i.EVALU_CONTENT
+			        , r.EVALU_SCORE        
+			        , fm.ORDER_NO
+			FROM EVALU_FORM f              
+			JOIN EVALUATEE_GROUP g
+			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
+			JOIN EMPLOYEE u
+			ON g.USER_NO = u.USER_NO        
+			JOIN EVALU_FORMAT fm
+			ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO  
+			JOIN EVALU_RESULT r
+			ON r.EVALU_GROUP_ID = g.EVALUATEE_GROUP_ID AND fm.EVALU_NO = r.EVALU_NO 
+			JOIN EVALU_ITEM i
+			ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
+			WHERE f.EVALU_FORM_NO = 1
+	
+	</select> -->
 </mapper>

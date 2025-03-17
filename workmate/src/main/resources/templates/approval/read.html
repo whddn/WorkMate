@@ -12,7 +12,7 @@
 </head>
 
 <body>
-	<div th:insert="~{|forms/approval/${approval.formPath}| :: FormFrag}"></div>
+	<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
 	<div>
 		<table id="AttachTable" class="display>">
 			<thead>
@@ -38,7 +38,9 @@
 			<tbody>
 				<th:block th:each="apprElmnt, sts : ${apprLine}">
 					<tr>
-						<td>[[ ${apprElmnt.apprResult} ]]</td>
+						<td th:if="${apprElmnt.apprResult == 'a1'}">결재 대기</td>
+						<td th:if="${apprElmnt.apprResult == 'a2'}">결재 승인</td>
+						<td th:if="${apprElmnt.apprResult == 'a3'}">반려</td>
 						<td>[[ ${apprElmnt.userName} ]]</td>
 						<td>[[ ${apprElmnt.departmentName} ]]</td>
 						<td>[[ ${apprElmnt.apprDate} ]]</td>
@@ -48,11 +50,13 @@
 			</tbody>
 		</table>
 		<button
+			id="delApprBtn"
 			type="button" 
 			class="btn btn-secondary">
 			삭제
 		</button>
 		<button 
+			id="apprBtn"
 			type="button" 
 			class="btn btn-primary" 
 			data-bs-toggle="modal" 
@@ -81,17 +85,17 @@
 						<div class="mb-3">
 							<label for="recipient-name" class="col-form-label">결재처리</label>
 							<!-- input type="text" class="form-control" id="recipient-name" -->
-							<input type="radio" name="isApproved" value="yes">승인
-							<input type="radio" name="isApproved" value="no">반려
+							<input type="radio" name="apprResult" value="a2">승인
+							<input type="radio" name="apprResult" value="a3">반려
 						</div>
 						<div class="mb-3">
 							<label for="message-text" class="col-form-label">결재의견</label>
-							<textarea class="form-control" id="message-text"></textarea>
+							<textarea name="apprReason" class="form-control" id="message-text"></textarea>
 						</div>
 					</form>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary">결재</button>
+					<button type="button" class="btn btn-primary" id="approveBtn">결재</button>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
@@ -101,25 +105,84 @@
 </body>
 
 <script th:inline="javascript">
+	let approval = [[ ${approval} ]];
+	let apprLine = [[ ${apprLine} ]];
+	
 	$(document).ready(function() {
 		$('#ApprovalsTable').DataTable();
 		$('#AttachTable').DataTable();
 		
-		$('#apprNo').text('[[ ${approval.apprNo} ]]');
-		$('#apprTitle').text('[[ ${approval.apprTitle} ]]');
-		$('#apprContent').text('[[ ${approval.apprContent} ]]').attr("readonly", true);
+		$('#createDate').text(approval.createDate);
+		$('#departmentName').text(approval.departmentName);
+		$('#userNo').text(approval.userNo);
+		$('#userName').text(approval.userName);
+		$('#apprNo').text(approval.apprNo);
+
+		Object.keys(approval).forEach(function(key) {
+			let target = $(`input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']`);
+			if (target.length > 0) {
+				let value = approval[key] !== null ? approval[key] : 'null';
+				target.val(approval[key]).attr('readonly', true);
+			}
+		});
+		
 		$('#addLineBtn').remove();
 		$('#delLineBtn').remove();
-		$('#createDate').text('[[ ${approval.createDate} ]]');
-		$('#departmentName').text('[[ ${approval.departmentName} ]]');
-		$('#userName').text('[[ ${approval.userName} ]]');
 		
-		[[ ${apprLine} ]].forEach(function(element) {
+		apprLine.forEach(function(element) {
 			let liTag = $('<li>' + element.departmentName + 
 				' - ' + element.teamName + 
 				' - ' + element.userName +
 				'</li>');
 			$('#apprLine').append(liTag);
+		});
+		
+		if(approval.apprStatus != 'a1') {
+			$('#delApprBtn').remove();
+			$('#apprBtn').remove();
+		}
+	});
+	
+	$('#approveBtn').on('click', function() {
+		let request = {
+			'apprNo': approval.apprNo,
+			'signNo': null
+		};
+		
+		$('input[name]:checked, select[name], textarea[name], button[name]').each(function() {
+		    let name = $(this).attr('name');
+		    let value = $(this).val();
+
+		    // 체크박스는 같은 name을 가진 값들이 여러 개 선택될 수 있으므로 배열로 저장
+		    if ($(this).is(':checkbox')) {
+		        if (!request[name]) {
+		            request[name] = []; // 배열 초기화
+		        }
+		        request[name].push(value); // 체크된 값들을 배열에 추가
+		    } else {
+		        request[name] = value;
+		    }
+		});
+		
+		fetch([[ @{/approval/read} ]], {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(request)
+		})
+		.then(response => response.json())
+		.then(result => {
+			if(result.success) {
+				location.href = [[ @{/approval/waiting} ]];
+			}
+			else {
+				alert('결재에 실패하였습니다.');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			alert('서버 요청 중 오류가 발생했습니다.');
 		});
 	});
 </script>
