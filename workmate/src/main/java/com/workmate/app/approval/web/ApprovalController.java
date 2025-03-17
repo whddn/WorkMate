@@ -9,13 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,12 +49,21 @@ public class ApprovalController {
 	private final EmpService empService;
 	private final ObjectMapper objectMapper;
 	
+	// 현재 로그인한 사람의 개인정보를 empVO로 불러온다.
 	private EmpVO whoAmI() {
+		/*
 		LoginUserVO loginUserVO = (LoginUserVO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Integer currUserNo =  Integer.parseInt(loginUserVO.getUserVO().getUserNo());
+		Integer currUserNo = Integer.parseInt(loginUserVO.getUserVO().getUserNo());
 		
 		EmpVO empVO = new EmpVO();
 		empVO.setUserNo(currUserNo);
+		*/
+		
+		// 로그인 없을때 임시로
+		EmpVO empVO = new EmpVO();
+    	empVO.setUserNo(201);
+    	empVO = empService.findEmpByEmpNo(empVO);
+		
 		return empVO;
 	}
 	
@@ -106,6 +113,7 @@ public class ApprovalController {
 		@RequestBody Map<String, Object> map, 
 		@RequestPart(value="files", required=false) MultipartFile[] files
 	) throws IOException {
+		// JSON 객체에서 공통되는 부분만 approvalVO에 전이
 		ApprovalVO approvalVO = objectMapper.convertValue(map, ApprovalVO.class);
 		
 		// 결재문서를 DB에 등록
@@ -114,7 +122,6 @@ public class ApprovalController {
 		approvalVO.setDeptNo(myself.getDepartmentId());
 
         int result = approvalService.insertApproval(approvalVO);
-        System.out.println("apprNo : " + approvalVO.getApprNo());
         
         Map<String, Object> response = new HashMap<>();
         if(result <= 0) {
@@ -124,19 +131,22 @@ public class ApprovalController {
         
         // 결재선(정확히 말하면 결재요소들)을 DB에 등록
         for(Integer empNo : (List<Integer>) map.get("approverList")) {
-        	System.out.println("결재자번호 : " + empNo);	// 옵저버
+        	// 결재자 번호를 통해 결재자 정보 불러오기
         	EmpVO empVO = new EmpVO();
         	empVO.setUserNo(empNo);
         	empVO = empService.findEmpByEmpNo(empVO);
         	
+        	// 결재요소에 결재자 번호, 결재자의 부서, 결재문서 번호를 입력
         	ApprElmntVO apprElmntVO = new ApprElmntVO();
         	apprElmntVO.setApprover(empNo);
         	apprElmntVO.setDeptNo(empVO.getDepartmentId());
         	apprElmntVO.setApprNo(approvalVO.getApprNo());
         	
+        	// 결재요소 등록
         	apprElmntService.insertApprElmnt(apprElmntVO);
         }
         
+        // 파일 업로드 관리
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
@@ -148,34 +158,11 @@ public class ApprovalController {
             }
         }
         
+        // 응답을 반송한다
         response.put("success", true);
         return ResponseEntity.ok(response);
 	}
 	
-	@GetMapping("approval/read")
-	public String readGet(Model model, @RequestParam String apprNo) {
-		ApprovalVO approvalVO = new ApprovalVO();
-		approvalVO.setApprNo(apprNo);
-		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
-		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
-		
-		return "approval/read";
-	}
-	
-	@PutMapping("approval/read")
-	public String readPut(Model model) {
-		return "approval/read";
-	}
-	
-	@GetMapping("approval/manage")
-	public String manage(Model model) {
-		EmpVO myself = whoAmI();
-		model.addAttribute("signs", signService.selectSignList(myself));
-		model.addAttribute("apprLines", apprLineService.selectApprLineList(myself));
-		
-		return "approval/manage";
-	}
-
 	@PostMapping("approval/summonApprElmnts")
 	public ResponseEntity<List<EmpVO>> summonApprElmnts(@RequestBody Map<String, Object> request) {
 		ApprLineVO apprLineVO = new ApprLineVO();
@@ -190,4 +177,44 @@ public class ApprovalController {
         }
         return ResponseEntity.ok(list);
 	}
+	
+	@GetMapping("approval/read")
+	public String readGet(Model model, @RequestParam String apprNo) {
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setApprNo(apprNo);
+		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
+		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
+		
+		return "approval/read";
+	}
+	
+	@PutMapping("approval/read")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> readPut(@RequestBody ApprElmntVO apprElmntVO) 
+	throws IOException {
+		EmpVO empVO = whoAmI();
+		apprElmntVO.setApprover(empVO.getUserNo());
+		
+		int result = apprElmntService.updateApprElmnt(apprElmntVO);
+		Map<String, Object> response = new HashMap<>();
+		
+		if(result <= 0) {
+        	response.put("success", false);
+        	return ResponseEntity.badRequest().body(response);
+        }
+		else {
+			response.put("success", true);
+        	return ResponseEntity.ok(response);
+		}
+	}
+	
+	@GetMapping("approval/manage")
+	public String manage(Model model) {
+		EmpVO myself = whoAmI();
+		model.addAttribute("signs", signService.selectSignList(myself));
+		model.addAttribute("apprLines", apprLineService.selectApprLineList(myself));
+		
+		return "approval/manage";
+	}
+
 }

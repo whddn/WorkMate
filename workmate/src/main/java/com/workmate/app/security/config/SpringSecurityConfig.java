@@ -31,7 +31,7 @@ public class SpringSecurityConfig {
 				.requestMatchers("/header").authenticated()
 					.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
 					.requestMatchers("/admin/**").hasAuthority("") // 권한있는 사용자,관리자 접근 허용
-					.anyRequest().authenticated() // 권한 상관없이 인증받은 사용자만 접근 허용
+					.anyRequest().permitAll() // 권한 상관없이 인증받은 사용자만 접근 허용
 			)
 			.formLogin(login -> login
 					.loginPage("/login")

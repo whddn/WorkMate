@@ -7,6 +7,10 @@
 		    , appr_result
 		    , appr_reason
 		    , appr_date
+		    , sign_no
+		    , approver
+		    , dept_no
+		    , appr_no
 		    , user_name
 		    , team_name
 		    , department_name
@@ -22,17 +26,32 @@
 	<insert id="insertApprElmnt" parameterType="ApprElmntVO">
 		<selectKey keyProperty="apprelmntNo" resultType="Integer" order="BEFORE">
 			SELECT COUNT(appr_no) + 1
-			FROM approval
+			FROM appr_elmnt
 		</selectKey>
-		INSERT INTO appr_elmnt
+		INSERT INTO appr_elmnt(apprelmnt_no
+			, appr_result
+			, appr_reason
+			, appr_date
+			, approver
+			, dept_no
+			, appr_no
+		)
 		VALUES(#{apprelmntNo}
 			, 'a1'
-			, null
-			, null
-			, null
+			, ''
+			, TO_DATE('2000-01-01')
 			, #{approver}
 			, #{deptNo}
 			, #{apprNo}
 		)
 	</insert>
+	<update id="updateApprElmnt" parameterType="ApprElmntVO">
+		UPDATE appr_elmnt
+		SET appr_result = #{apprResult}
+			, appr_reason = #{apprReason}
+			, appr_date = SYSDATE
+			, sign_no = #{signNo}
+		WHERE apprelmnt_no = #{apprelmntNo}
+			AND appr_no = #{apprNo}
+	</update>
 </mapper>

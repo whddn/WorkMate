@@ -58,7 +58,7 @@
 								<td>
 									<ul class="list-group">
 										<li class="list-group-item">결재선 추가</li>
-										<li class="list-group-item" th:onclick="|delApprElmnt()|">결재선 제거</li>
+										<li class="list-group-item" id="delApprElmnt">결재선 제거</li>
 									</ul>
 								</td>
 								<td>
@@ -109,8 +109,8 @@
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" th:onclick="|saveApprLine()|">저장</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-primary" id="saveApprElmnts">저장</button>
+					<button type="button" class="btn btn-secondary" id="closeModalBtn" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
 		</div>
@@ -118,7 +118,9 @@
 </body>
 
 <script th:inline="javascript">
-	let apprElmntList;
+	let apprForm = [[ ${apprForm} ]];
+	let creator = [[ ${creator} ]];
+	let apprElmntList = [];
 
 	function loadApprElmnts() {
 	    let tbodyTag = $('#ApprovalTable > tbody');
@@ -168,34 +170,7 @@
 		
 	}
 	
-	function deleteApprElmnt() {
-		apprElmntList.pop();
-		loadApprElmnts();
-	}
-	
-	// 모달창의 결재선을 결재문서로 복사한다
-	function saveApprLine() {
-		let ulTag = $('#apprLine');
-		ulTag.empty();
-		
-		if (!Array.isArray(apprElmntList) || apprElmntList.length === 0) {
-	        return;
-	    }
-		
-		apprElmntList.forEach(function(element) {
-			let liTag = $(`
-				<li>
-					${element.departmentName} - ${element.teamName} - ${element.userName}
-				</li>
-	        `);
-			ulTag.append(liTag);
-		})
-	}
-	
 	$(document).ready(function() {
-		let apprForm = [[ ${apprForm} ]];
-		let creator = [[ ${creator} ]];
-
 		const today = new Date();
 		const year = today.getFullYear();
 		const month = (today.getMonth() + 1).toString().padStart(2, '0');
@@ -222,52 +197,87 @@
 		$('#departmentName').text(creator.departmentName);
 		$('#userNo').text(creator.userNo);
 		$('#userName').text(creator.userName);
-		
-		$('#submitBtn').on('click', function(event) {
-			let request = {};
-			
-			$('input[name], select[name], textarea[name], button[name]').each(function() {
-				let name = $(this).attr('name');
-				let value = $(this).val();
-				request[name] = value;
-			})
-			
-			if (!Array.isArray(apprElmntList) || apprElmntList.length < 2) {
-				alert('결재선을 2명 이상으로 설정해 주세요!');
-	        	return;
-	    	}
-			
-			let approverList = [];
-			apprElmntList.forEach(function(element) {
-				approverList.push(element.userNo);
-			});
-			request['approverList'] = approverList;
-			
-			fetch([[ @{/approval/write} ]], {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(request)
-			})
-			.then(response => response.json())
-			.then(result => {
-				if(result.success) {
-					location.href = [[ @{/approval/waiting} ]];
-				}
-				else {
-					alert('결재등록에 실패하였습니다.');
-				}
-			})
-			.catch(error => {
-				console.error('Error:', error);
-				alert('서버 요청 중 오류가 발생했습니다.');
-			});
-		});
-		$('#cancelBtn').on('click', function(event) {
-			 location.href = [[ @{/approval/formList} ]]; 
-		})
 	});
+	
+	$('#delApprElmnt').on('click', function() {
+		apprElmntList.pop();
+		loadApprElmnts();
+	});
+
+	$('#saveApprElmnts').on('click', function() {
+		let ulTag = $('#apprLine');
+		ulTag.empty();
+		
+		if (!Array.isArray(apprElmntList) || apprElmntList.length === 0) {
+	        return;
+	    }
+		
+		apprElmntList.forEach(function(element) {
+			let liTag = $(`
+				<li>
+					${element.departmentName} - ${element.teamName} - ${element.userName}
+				</li>
+	        `);
+			ulTag.append(liTag);
+		})
+		
+		$('#closeModalBtn').trigger('click');
+	});
+	
+	$('#submitBtn').on('click', function(event) {
+		let request = {};
+		
+		$('input[name]:checked, select[name], textarea[name], button[name]').each(function() {
+		    let name = $(this).attr('name');
+		    let value = $(this).val();
+
+		    // 체크박스는 같은 name을 가진 값들이 여러 개 선택될 수 있으므로 배열로 저장
+		    if ($(this).is(':checkbox')) {
+		        if (!request[name]) {
+		            request[name] = []; // 배열 초기화
+		        }
+		        request[name].push(value); // 체크된 값들을 배열에 추가
+		    } else {
+		        request[name] = value;
+		    }
+		});
+		
+		if (!Array.isArray(apprElmntList) || apprElmntList.length < 2) {
+			alert('결재선을 2명 이상으로 설정해 주세요!');
+        	return;
+    	}
+		
+		let approverList = [];
+		apprElmntList.forEach(function(element) {
+			approverList.push(element.userNo);
+		});
+		request['approverList'] = approverList;
+		
+		fetch([[ @{/approval/write} ]], {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(request)
+		})
+		.then(response => response.json())
+		.then(result => {
+			if(result.success) {
+				location.href = [[ @{/approval/waiting} ]];
+			}
+			else {
+				alert('결재등록에 실패하였습니다.');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			alert('서버 요청 중 오류가 발생했습니다.');
+		});
+	});
+	
+	$('#cancelBtn').on('click', function(event) {
+		 location.href = [[ @{/approval/formList} ]]; 
+	})
 </script>
 
 </html>

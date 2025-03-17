@@ -28,7 +28,13 @@ public class ApprElmntServiceImpl implements ApprElmntService {
 	@Override
 	public int insertApprElmnt(ApprElmntVO apprElmntVO) {
 		// TODO Auto-generated method stub
-		return 0;
+		return apprElmntMapper.insertApprElmnt(apprElmntVO);
+	}
+
+	@Override
+	public int updateApprElmnt(ApprElmntVO apprElmntVO) {
+		// TODO Auto-generated method stub
+		return apprElmntMapper.updateApprElmnt(apprElmntVO);
 	}
 
 }
