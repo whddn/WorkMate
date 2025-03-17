@@ -23,7 +23,9 @@
 			, appr_title
 			, appr_content
 			, create_date
+		    , expire_date
 			, department_name
+			, approval.user_no
 			, user_name
 			, form_name
 			, form_path
@@ -36,4 +38,45 @@
 		    ON approval.dept_no=department.department_id
 		WHERE appr_no=#{apprNo}
 	</select>
+	<insert id="insertApproval" parameterType="ApprovalVO">
+	    <!-- INSERT 전 새 apprNo 생성 -->
+	    <selectKey keyProperty="apprNo" resultType="String" order="BEFORE">
+	        SELECT 'YD' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(appr_no, 3))), 0) + 1, 3, '0')
+	        FROM approval
+	    </selectKey>
+	    INSERT INTO approval
+	    VALUES(#{apprNo}
+	    	, #{apprTitle}
+	    	, #{apprContent}
+	    	, SYSDATE
+	    	, SYSDATE + INTERVAL '1' YEAR
+	    	, 'a1'
+	    	, #{deptNo}
+	    	, null
+	    	, #{reportNo}
+	    	, #{userNo}
+	    	, #{reserNo}
+	    	, #{apprType}
+	    )
+	</insert>
+	<update id="updateApprovalStatus" parameterType="ApprovalVO">
+	    UPDATE approval a
+	    SET a.appr_status = (
+	        CASE 
+	            WHEN NOT EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a3') 
+	                 AND EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a2') 
+	            THEN 'a2'
+	            WHEN EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a3') 
+	            THEN 'a3'
+	            ELSE a.appr_status
+	        END
+	    )
+	    WHERE a.appr_no = #{apprNo}
+	</update>
+	<update id="updateApprovalDate" parameterType="ApprovalVO">
+		UPDATE approval
+		SET appr_date = SYSDATE
+		WHERE appr_no = #{apprNo} 
+    		AND appr_status IN ('a2', 'a3')
+	</update>
 </mapper>

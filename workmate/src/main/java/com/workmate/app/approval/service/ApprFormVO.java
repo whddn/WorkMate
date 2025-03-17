@@ -1,8 +1,11 @@
 package com.workmate.app.approval.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ApprFormVO {
 	private String apprType;	// 결재양식 식별자(결재유형)
 	private String formName;	// 결재양식 이름

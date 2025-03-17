@@ -12,12 +12,14 @@ import com.workmate.app.security.service.LoginUserVO;
 @Service
 public class CustomerUserDetailsService implements UserDetailsService{
 	private UserMapper userMapper;
+	
 	@Autowired
 	CustomerUserDetailsService(UserMapper userMapper){
 		this.userMapper = userMapper;
 	}
+	
 	@Override
-	public UserDetails loadUserByUsername(String username)throws UsernameNotFoundException{
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
 		UserVO userVO = userMapper.getUserInfo(username);
 		if(userVO == null) {
 			throw new UsernameNotFoundException(username);

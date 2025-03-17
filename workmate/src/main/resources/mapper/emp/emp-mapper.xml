@@ -14,26 +14,28 @@
 	</select>
 	<!--/* 조직도의 사원 상세 조회 */-->
 	<select id="selectOneEmp" resultType="EmpVO">
-		SELECT u.user_name
-		        , d.department_name
-		        , t.team_name
-                , u.team_no
-		        , u.user_position
-		        , u.user_no
-		        , u.user_id
-		        , u.hire_date
-		        , u.resign_date
-		        , u.user_phone
-		        , u.address
-		        , u.user_ip
-		        , u.common_ip
-		FROM employee u 
-		LEFT JOIN team t 
-		ON u.team_no = t.team_no
-        LEFT JOIN department d 
-		ON t.department_id = d.department_id
+		SELECT user_no
+		    , user_id
+		    , user_position
+		    , hire_date
+		    , user_name
+		    , resign_date
+		    , status_user
+		    , address
+		    , user_phone
+		    , t.team_no
+		    , user_ip
+		    , common_ip
+		    , t.team_name
+		    , d.department_name
+		    , d.department_id
+		FROM employee u
+		    LEFT JOIN team t 
+		    ON u.team_no = t.team_no
+		    LEFT JOIN department d 
+		    ON t.department_id = d.department_id
 		WHERE u.user_no = #{userNo}
-		AND u.user_no between 100 AND 300
+		    AND u.user_no between 100 AND 300
 	</select>
 	
 	<!-- 팀명 조회 -->

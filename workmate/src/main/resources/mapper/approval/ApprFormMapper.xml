@@ -16,4 +16,20 @@
 		    LEFT JOIN department
 		    ON team.department_id=department.department_id
 	</select>
+	<select id="selectApprForm" parameterType="ApprFormVO" resultType="ApprFormVO">
+		SELECT appr_type
+			, form_name
+			, form_path
+			, user_name
+			, team_name
+			, department_name
+		FROM appr_form
+			JOIN employee
+			ON appr_form.contact_no=employee.user_no
+			LEFT JOIN team
+			ON employee.team_no=team.team_no
+			LEFT JOIN department
+			ON team.department_id=department.department_id
+		WHERE appr_type=#{apprType}
+	</select>
 </mapper>

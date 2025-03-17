@@ -29,4 +29,20 @@ public class ApprovalServiceImpl implements ApprovalService {
 		// TODO Auto-generated method stub
 		return approvalMapper.selectApproval(approvalVO);
 	}
+
+	@Override
+	public int insertApproval(ApprovalVO approvalVO) {
+		// TODO Auto-generated method stub
+		return approvalMapper.insertApproval(approvalVO);
+	}
+
+	@Override
+	public int updateApproval(ApprovalVO approvalVO) {
+		// TODO Auto-generated method stub
+		int result = approvalMapper.updateApprovalStatus(approvalVO);
+		if(result < 1) {
+			return 0;
+		}
+		return approvalMapper.updateApprovalDate(approvalVO);
+	}
 }
