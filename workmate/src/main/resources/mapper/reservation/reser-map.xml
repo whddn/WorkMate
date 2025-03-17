@@ -3,7 +3,24 @@
 <mapper namespace="com.workmate.app.reservation.mapper.ReservationMapper">
 	<!-- 전체조회 -->
 	<select id="selectReservationList" resultType="ReservationVO">
-		
-	
+		select common_kind
+	      ,reser_date
+	      ,reser_start_time
+	      ,reser_end_time
+	      ,reser_availability
+	      ,content
+	      ,reser_no
+	      ,user_no
+	      ,common_name
+	      ,common_no
+	      ,usage_status
+	      ,image
+		from reser
 	</select>
+	
+	<!-- 예약 조회 -->
+	<select id="selectReservationInfo" resultType="ReservationVO" parameterType="ReservationVO">
+		
+	</select>
+	
 </mapper>

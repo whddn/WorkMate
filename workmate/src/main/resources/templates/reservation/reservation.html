@@ -84,9 +84,7 @@
                     <button type="button" class="btn btn-outline-primary btn-sm mb-3" onclick="toggleAllTimes()">전체 선택</button>
                     <div class="time-table">
                         <th:block th:each="hour : ${#numbers.sequence(6, 23)}">
-                            <div class="time-slot" 
-                                 th:id="'time'+${hour}" 
-                                 th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}" 
+                            <div class="time-slot" th:id="'time'+${hour}" th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}" 
                                  onclick="toggleTime(this)">
                                 <span th:text="${hour + ':00 - ' + (hour+1) + ':00'}"></span>
                             </div>
