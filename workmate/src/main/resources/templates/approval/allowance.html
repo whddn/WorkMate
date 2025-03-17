@@ -45,7 +45,7 @@
 					<td>[[ ${allowance.departmentName} ]]</td>
 					<td th:text="${#dates.format(allowance.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
 					<td>결재 승인</td>
-					<td><a download><button>다운받기</button></a></td>
+					<td><button th:onclick="| location.href = '@{/approval/pdf(apprNo=${allowance.apprNo})}' |">다운받기</button></td>
 				</tr>
 			</th:block>
 		</tbody>

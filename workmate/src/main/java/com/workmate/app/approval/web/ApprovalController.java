@@ -1,8 +1,6 @@
 package com.workmate.app.approval.web;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,12 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lowagie.text.DocumentException;
 import com.workmate.app.approval.service.ApprElmntService;
 import com.workmate.app.approval.service.ApprElmntVO;
 import com.workmate.app.approval.service.ApprFormService;
@@ -39,8 +34,7 @@ import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.approval.service.SignService;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
-
-import jakarta.servlet.http.HttpServletResponse;
+import com.workmate.app.security.service.LoginUserVO;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -54,21 +48,13 @@ public class ApprovalController {
 	private final SignService signService;
 	private final EmpService empService;
 	private final ObjectMapper objectMapper;
-	private final TemplateEngine templateEngine;
 	
 	// 현재 로그인한 사람의 개인정보를 empVO로 불러온다.
 	private EmpVO whoAmI() {
-		/*
 		LoginUserVO loginUserVO = (LoginUserVO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Integer currUserNo = Integer.parseInt(loginUserVO.getUserVO().getUserNo());
-		
 		EmpVO empVO = new EmpVO();
-		empVO.setUserNo(currUserNo);
-		*/
 		
-		// 로그인 없을때 임시로
-		EmpVO empVO = new EmpVO();
-    	empVO.setUserNo(101);
+		empVO.setUserNo(loginUserVO.getUserVO().getUserNo());
     	empVO = empService.findEmpByEmpNo(empVO);
 		
 		return empVO;
@@ -232,32 +218,12 @@ public class ApprovalController {
 	}
 
 	@GetMapping("approval/pdf")
-    public void generatePdf(Model model, HttpServletResponse response, @RequestParam String apprNo) throws IOException, DocumentException {
+	public String moveToPdf(Model model, @RequestParam String apprNo) {
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
 		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
 		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
 		
-		// Thymeleaf를 사용하여 동적으로 HTML 생성
-        Context context = new Context();
-        context.setVariables(model.asMap());
-        String htmlContent = templateEngine.process("approval/pdf", context);
-
-        // Flying Saucer를 사용하여 HTML을 PDF로 변환
-        try (ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream()) {
-            ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(htmlContent);
-            renderer.layout();
-            renderer.createPDF(pdfOutputStream);
-
-            // PDF 다운로드 설정
-            response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "attachment; filename=approvalFile.pdf");
-
-            // PDF 데이터를 응답 스트림에 쓰기
-            try (OutputStream responseOutputStream = response.getOutputStream()) {
-                pdfOutputStream.writeTo(responseOutputStream);
-            }
-        }
-    }
+		return "approval/pdf";
+	}
 }
