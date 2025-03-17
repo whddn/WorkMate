@@ -20,7 +20,7 @@
 		<li>결재일<input type="date">~<input type="date"></li>
 		<li><button><i class="fas fa-search"></i>검색</button></li>
 	</ul>
-	<table id="AllowancesTable" class="display">
+	<table id="RejectionsTable" class="display">
 		<thead>
 			<tr>
 				<th>NO</th>
@@ -45,7 +45,7 @@
 					<td>[[ ${rejection.departmentName} ]]</td>
 					<td th:text="${#dates.format(rejection.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
 					<td>반려</td>
-					<td><button>떼쓰기</button></td>
+					<td><button th:onclick="| event.stopPropagation(); location.href='@{/approval/pdf(apprNo=${rejection.apprNo})}' |">다운받기</button></td>
 				</tr>
 			</th:block>
 		</tbody>
@@ -54,7 +54,7 @@
 
 <script>
 	$(document).ready(function() {
-		$('#AllowancesTable').DataTable();
+		$('#RejectionsTable').DataTable();
 	});
 </script>
 

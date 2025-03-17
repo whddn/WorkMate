@@ -23,7 +23,12 @@
 		<tbody>
 		</tbody>
 	</table>
-	<button class="btn btn-primary">첨부</button>
+	<input type="file" id="fileInput" multiple style="display: none;">
+	<button
+		id="attachBtn"
+		class="btn btn-primary">
+		첨부
+	</button>
 	<button
 		id="submitBtn"
 		class="btn btn-secondary">
@@ -121,6 +126,7 @@
 	let apprForm = [[ ${apprForm} ]];
 	let creator = [[ ${creator} ]];
 	let apprElmntList = [];
+	const fileInput = $('#fileInput');
 
 	function loadApprElmnts() {
 	    let tbodyTag = $('#ApprovalTable > tbody');
@@ -224,7 +230,31 @@
 		$('#closeModalBtn').trigger('click');
 	});
 	
+	fileInput.on('change', function() {
+		console.log('응애');
+		const table = $('#AttachTable').DataTable();
+        for(let file of fileInput[0].files) {
+        	const fileName = file.name;
+            const deleteButton = '<button id="delFileBtn" class="btn btn-primary">삭제</button>';
+
+         	// DataTable에 행 추가
+            const rowNode = table.row.add([fileName, deleteButton]).draw().node();
+
+            // "삭제" 버튼 클릭 시 해당 행 삭제
+            $(rowNode).find('#delFileBtn').on('click', function() {
+                table.row($(this).parents('tr')).remove().draw();
+            });
+        }
+        // 파일 input 초기화.
+        fileInput.val('');
+	})
+	
+	$('#attachBtn').on('click', function(event) {
+		fileInput.click();
+	})
+	
 	$('#submitBtn').on('click', function(event) {
+		const formData = new FormData();
 		let request = {};
 		
 		$('input[name]:checked, select[name], textarea[name], button[name]').each(function() {
@@ -253,12 +283,18 @@
 		});
 		request['approverList'] = approverList;
 		
+		formData.append('request', JSON.stringify(jsonData));
+		
+		// 파일 데이터 추가
+		const fileInput = document.getElementById('fileInput'); // 파일 input 요소
+		const files = fileInput.files;
+		for (let i = 0; i < files.length; i++) {
+		    formData.append('files', files[i]);
+		}
+		
 		fetch([[ @{/approval/write} ]], {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(request)
+			body: formData
 		})
 		.then(response => response.json())
 		.then(result => {

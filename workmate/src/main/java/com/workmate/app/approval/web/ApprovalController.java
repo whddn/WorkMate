@@ -226,4 +226,25 @@ public class ApprovalController {
 		
 		return "approval/pdf";
 	}
+	
+	@PostMapping("approval/sign")
+	public ResponseEntity<?> addSign(
+		@RequestParam("signFile") MultipartFile signFile, 
+		@RequestParam("signTitle") String signTitle
+	) {
+	    try {
+	        // 파일 저장 및 DB에 서명 정보 저장 로직 구현
+	        // ...
+	        return ResponseEntity.ok("서명 추가 성공");
+	    } catch (IOException e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서명 추가 실패");
+	    }
+	}
+	
+	@PostMapping("approval/apprLine")
+	public ResponseEntity<?> addApprLine(@RequestBody ApprLineVO apprLineVO) {
+	    // DB에 결재선 정보 저장 로직 구현
+	    // ...
+	    return ResponseEntity.ok("결재선 추가 성공");
+	}
 }
