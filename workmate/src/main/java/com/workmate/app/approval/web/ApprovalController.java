@@ -1,6 +1,8 @@
 package com.workmate.app.approval.web;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +22,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lowagie.text.DocumentException;
 import com.workmate.app.approval.service.ApprElmntService;
 import com.workmate.app.approval.service.ApprElmntVO;
 import com.workmate.app.approval.service.ApprFormService;
@@ -34,7 +39,8 @@ import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.approval.service.SignService;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
-import com.workmate.app.security.service.LoginUserVO;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -48,6 +54,7 @@ public class ApprovalController {
 	private final SignService signService;
 	private final EmpService empService;
 	private final ObjectMapper objectMapper;
+	private final TemplateEngine templateEngine;
 	
 	// 현재 로그인한 사람의 개인정보를 empVO로 불러온다.
 	private EmpVO whoAmI() {
@@ -61,7 +68,7 @@ public class ApprovalController {
 		
 		// 로그인 없을때 임시로
 		EmpVO empVO = new EmpVO();
-    	empVO.setUserNo(201);
+    	empVO.setUserNo(101);
     	empVO = empService.findEmpByEmpNo(empVO);
 		
 		return empVO;
@@ -110,27 +117,27 @@ public class ApprovalController {
 	@PostMapping("approval/write")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> writePost(
-		@RequestBody Map<String, Object> map, 
+		@RequestBody Map<String, Object> request, 
 		@RequestPart(value="files", required=false) MultipartFile[] files
 	) throws IOException {
 		// JSON 객체에서 공통되는 부분만 approvalVO에 전이
-		ApprovalVO approvalVO = objectMapper.convertValue(map, ApprovalVO.class);
+		ApprovalVO approvalVO = objectMapper.convertValue(request, ApprovalVO.class);
 		
 		// 결재문서를 DB에 등록
 		EmpVO myself = whoAmI();
 		approvalVO.setUserNo(myself.getUserNo());
 		approvalVO.setDeptNo(myself.getDepartmentId());
 
-        int result = approvalService.insertApproval(approvalVO);
+		Map<String, Object> response = new HashMap<>();
         
-        Map<String, Object> response = new HashMap<>();
+        int result = approvalService.insertApproval(approvalVO);
         if(result <= 0) {
         	response.put("success", false);
         	return ResponseEntity.badRequest().body(response);
         }
         
         // 결재선(정확히 말하면 결재요소들)을 DB에 등록
-        for(Integer empNo : (List<Integer>) map.get("approverList")) {
+        for(Integer empNo : (List<Integer>) request.get("approverList")) {
         	// 결재자 번호를 통해 결재자 정보 불러오기
         	EmpVO empVO = new EmpVO();
         	empVO.setUserNo(empNo);
@@ -192,20 +199,27 @@ public class ApprovalController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> readPut(@RequestBody ApprElmntVO apprElmntVO) 
 	throws IOException {
-		EmpVO empVO = whoAmI();
-		apprElmntVO.setApprover(empVO.getUserNo());
+		// 결재결과를 수정
+		apprElmntVO.setApprover(whoAmI().getUserNo());
+		System.out.println(apprElmntVO);
 		
-		int result = apprElmntService.updateApprElmnt(apprElmntVO);
 		Map<String, Object> response = new HashMap<>();
 		
-		if(result <= 0) {
+		int result = apprElmntService.updateApprElmnt(apprElmntVO);
+        if(result <= 0) {
         	response.put("success", false);
         	return ResponseEntity.badRequest().body(response);
         }
-		else {
-			response.put("success", true);
-        	return ResponseEntity.ok(response);
-		}
+		
+        System.out.println("응애");
+        
+        // 결재문서의 결재결과를 결정
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setApprNo(apprElmntVO.getApprNo());
+		approvalService.updateApproval(approvalVO);
+		
+		response.put("success", true);
+        return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping("approval/manage")
@@ -217,4 +231,33 @@ public class ApprovalController {
 		return "approval/manage";
 	}
 
+	@GetMapping("approval/pdf")
+    public void generatePdf(Model model, HttpServletResponse response, @RequestParam String apprNo) throws IOException, DocumentException {
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setApprNo(apprNo);
+		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
+		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
+		
+		// Thymeleaf를 사용하여 동적으로 HTML 생성
+        Context context = new Context();
+        context.setVariables(model.asMap());
+        String htmlContent = templateEngine.process("approval/pdf", context);
+
+        // Flying Saucer를 사용하여 HTML을 PDF로 변환
+        try (ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream()) {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(htmlContent);
+            renderer.layout();
+            renderer.createPDF(pdfOutputStream);
+
+            // PDF 다운로드 설정
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=approvalFile.pdf");
+
+            // PDF 데이터를 응답 스트림에 쓰기
+            try (OutputStream responseOutputStream = response.getOutputStream()) {
+                pdfOutputStream.writeTo(responseOutputStream);
+            }
+        }
+    }
 }

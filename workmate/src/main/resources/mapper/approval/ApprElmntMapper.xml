@@ -39,7 +39,7 @@
 		VALUES(#{apprelmntNo}
 			, 'a1'
 			, ''
-			, TO_DATE('2000-01-01')
+			, null
 			, #{approver}
 			, #{deptNo}
 			, #{apprNo}
@@ -51,7 +51,7 @@
 			, appr_reason = #{apprReason}
 			, appr_date = SYSDATE
 			, sign_no = #{signNo}
-		WHERE apprelmnt_no = #{apprelmntNo}
+		WHERE approver = #{approver}
 			AND appr_no = #{apprNo}
 	</update>
 </mapper>

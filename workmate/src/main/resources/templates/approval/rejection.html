@@ -43,7 +43,7 @@
 					<td>[[ ${rejection.apprTitle} ]]</td>
 					<td>[[ ${rejection.userName} ]]</td>
 					<td>[[ ${rejection.departmentName} ]]</td>
-					<td>[[ ${rejection.createDate} ]]</td>
+					<td th:text="${#dates.format(rejection.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
 					<td>반려</td>
 					<td><button>떼쓰기</button></td>
 				</tr>

@@ -39,6 +39,10 @@ public class ApprovalServiceImpl implements ApprovalService {
 	@Override
 	public int updateApproval(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
-		return approvalMapper.updateApproval(approvalVO);
+		int result = approvalMapper.updateApprovalStatus(approvalVO);
+		if(result < 1) {
+			return 0;
+		}
+		return approvalMapper.updateApprovalDate(approvalVO);
 	}
 }

@@ -38,7 +38,9 @@
 			<tbody>
 				<th:block th:each="apprElmnt, sts : ${apprLine}">
 					<tr>
-						<td>[[ ${apprElmnt.apprResult} ]]</td>
+						<td th:if="${apprElmnt.apprResult == 'a1'}">결재 대기</td>
+						<td th:if="${apprElmnt.apprResult == 'a2'}">결재 승인</td>
+						<td th:if="${apprElmnt.apprResult == 'a3'}">반려</td>
 						<td>[[ ${apprElmnt.userName} ]]</td>
 						<td>[[ ${apprElmnt.departmentName} ]]</td>
 						<td>[[ ${apprElmnt.apprDate} ]]</td>
@@ -48,11 +50,13 @@
 			</tbody>
 		</table>
 		<button
+			id="delApprBtn"
 			type="button" 
 			class="btn btn-secondary">
 			삭제
 		</button>
 		<button 
+			id="apprBtn"
 			type="button" 
 			class="btn btn-primary" 
 			data-bs-toggle="modal" 
@@ -116,7 +120,6 @@
 
 		Object.keys(approval).forEach(function(key) {
 			let target = $(`input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']`);
-			console.log(target);
 			if (target.length > 0) {
 				let value = approval[key] !== null ? approval[key] : 'null';
 				target.val(approval[key]).attr('readonly', true);
@@ -126,15 +129,18 @@
 		$('#addLineBtn').remove();
 		$('#delLineBtn').remove();
 		
-		console.log(apprLine);
 		apprLine.forEach(function(element) {
-			console.log(element);	
 			let liTag = $('<li>' + element.departmentName + 
 				' - ' + element.teamName + 
 				' - ' + element.userName +
 				'</li>');
 			$('#apprLine').append(liTag);
 		});
+		
+		if(approval.apprStatus != 'a1') {
+			$('#delApprBtn').remove();
+			$('#apprBtn').remove();
+		}
 	});
 	
 	$('#approveBtn').on('click', function() {
@@ -157,8 +163,6 @@
 		        request[name] = value;
 		    }
 		});
-		
-		console.log(request);
 		
 		fetch([[ @{/approval/read} ]], {
 			method: 'PUT',

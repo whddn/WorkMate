@@ -59,4 +59,24 @@
 	    	, #{apprType}
 	    )
 	</insert>
+	<update id="updateApprovalStatus" parameterType="ApprovalVO">
+	    UPDATE approval a
+	    SET a.appr_status = (
+	        CASE 
+	            WHEN NOT EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a3') 
+	                 AND EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a2') 
+	            THEN 'a2'
+	            WHEN EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a3') 
+	            THEN 'a3'
+	            ELSE a.appr_status
+	        END
+	    )
+	    WHERE a.appr_no = #{apprNo}
+	</update>
+	<update id="updateApprovalDate" parameterType="ApprovalVO">
+		UPDATE approval
+		SET appr_date = SYSDATE
+		WHERE appr_no = #{apprNo} 
+    		AND appr_status IN ('a2', 'a3')
+	</update>
 </mapper>
