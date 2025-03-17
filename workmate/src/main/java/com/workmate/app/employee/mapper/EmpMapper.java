@@ -43,4 +43,7 @@ public interface EmpMapper {
 	
 	// 나의 평가 단순 조회 
 	public List<EvaluVO> selectMyEvaluResultOne(EvaluVO evaluVO);
+	
+	// 평가 등록 페이지 (관리자)
+	public int insertOneEvalu(EvaluVO evaluVO);
 }

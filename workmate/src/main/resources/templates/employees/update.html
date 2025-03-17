@@ -7,147 +7,156 @@
     <title>Organization</title>
     <style>
      /* 기본적인 리셋 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #f4f6f8;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-/* html과 body에 100% 높이 설정 */
-html, body {
-  height: 100%;
-  width: 100%;
-}
+    /* 화면 전체 레이아웃 */
+    .wrapper {
+      display: flex;
+      justify-content: center; /* 중앙 정렬 */
+      align-items: center; /* 수직 중앙 정렬 */
+      height: 100vh; /* 화면 전체 높이 */
+      padding: 20px;
+    }
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  display: flex;
-  justify-content: center;  /* 가로 중앙 정렬 */
-  align-items: center; /* 세로 중앙 정렬 */
-  padding: 20px;
-  margin: 0;  /* 기본 마진 제거 */
-}
+    /* 조직도 패널 */
+    .tree-panel {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      min-width: 250px;
+      width: 300px;
+      margin-right: 20px; /* 오른쪽에 약간의 간격 추가 */
+      max-height: 500px;
+      overflow-y: auto; /* 내용이 넘칠 경우 스크롤 추가 */
+    }
 
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;  /* 콘텐츠를 중앙 정렬 */
-  gap: 20px;
-  width: 100%;
-  max-width: 1200px;  /* 최대 너비 제한 */
-}
+    /* 상세 정보 카드 */
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      padding: 20px;
+      width: 100%;
+      max-width: 500px; /* 고정된 최대 너비 */
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      height: 500px;
+      overflow: hidden;
+    }
 
-.container {
-  display: flex;
-  justify-content: center; /* 수평 중앙 정렬 */
-  align-items: flex-start;
-  gap: 20px;
-  width: 100%;
-}
+    /* 내부 정보 리스트 */
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-.tree {
-  width: 250px;  /* 트리의 너비 줄이기 */
-  background-color: #fff;
-  padding: 8px;  /* 패딩 줄이기 */
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-height: 400px; /* 세로 높이 제한 */
-  overflow-y: auto;  /* 세로로 넘칠 경우 스크롤 */
-}
+    /* 각 줄 */
+    .info-row {
+      display: flex;
+      align-items: center;
+    }
 
-.details {
-  flex-grow: 1;
-  background-color: #fff;
-  padding: 15px 20px; /* 패딩 줄이기 */
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-height: 400px; /* 세로 길이 제한 */
-  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
-   /*display: none; 기본적으로 상세 페이지 숨기기 */
-}
+    /* 라벨 */
+    .label {
+      width: 100px;
+      font-weight: bold;
+      color: #333;
+      background: #e7edf7;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-align: left;
+    }
 
-.action-buttons {
-  display: flex;
-  flex-direction: column;  /* 버튼 세로 정렬 */
-  gap: 8px;  /* 버튼 간격 줄이기 */
-  margin-top: 10px;  /* 상단 여백 줄이기 */
-  align-self: center; /* 중앙 정렬 */
-}
+    /* 값 */
+    .value {
+      flex: 1;
+      background: #f2f4f8;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: #222;
+      margin-left: 10px;
+    }
 
-.action-buttons button {
-  padding: 8px 15px;  /* 버튼 크기 줄이기 */
-  font-size: 13px;  /* 폰트 크기 줄이기 */
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+    h1 {
+      text-align: center; /* 중앙 정렬 */
+      margin-bottom: 20px; /* 제목 아래 간격 */
+    }
 
-.action-buttons button:hover {
-  background-color: #0056b3;
-}
+    .tree li {
+      list-style: none;
+      margin: 8px 0;
+      font-weight: 500;
+      color: #333;
+    }
 
-.buttons-container {
-  margin-top: 20px; /* 위쪽 여백 */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
-}
-     
+    .tree ul {
+      padding-left: 20px;
+    }
+
     </style>
   </head>
 
   <body>
-    <div class="wrapper">
-      <!-- 제목 부분 -->
-      <div class="title-container">
-        <h1 class="main-title">사원수정</h1>
-        <h2 class="sub-title">info update</h2>
-      </div>
-
-      <div class="container">
-        <!-- 조직도 트리 -->
-        <div class="tree">
-          <ul>
-            <li>
-            <th:block th:each="name : ${names} ">
-              <span class="folder" >[[ ${name.departmentName }]]</span>
-              <ul>
-                	<li><span class="employee" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span></li>
-              </ul>
-            </th:block>
-            </li>
-          </ul>
-        </div>
+  <div class="wrapper">
+    <!-- 왼쪽: 조직도 -->
+    <div class="tree-panel">
+      <ul class="tree">
+        <li>
+          <th:block th:each="name : ${names}">
+            <span class="folder">[[ ${name.departmentName} ]]</span>
+            <ul>
+              <li><span class="employee" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span></li>
+            </ul>
+          </th:block>
+        </li>
+      </ul>
+    </div>
         <!-- 사원 상세 정보 -->
-        <div class="details" id="detailsBox">
-          <div class="info-card">
-            <div class="row">
-              <label>ID</label><span id="info-id"></span>
-              <div class="image-box">이미지</div>
+        <div class="card" id="detailsBox">
+          <div class="info-list">
+            <div class="info-row">
+              <span class="label">ID</span>
+              <span class="value" id="info-id" readonly></span>
             </div>
-            <div class="row"><label>성명</label><input id="info-name" type="text" th:data-no="${update.userNo}"></div>
-            <div class="row"><label>팀이름</label>
+            <div class="info-row">
+	            <label>성명</label>
+	            <input id="info-name" type="text" th:data-no="${update.userNo}">
+            </div>
+       		<div class="info-row">
+            <span class="label">팀이름</span>
             <select>
-            	<option th:value="${team.teamNo}" th:each="team : ${teams}" id="info-task" >[[ ${team.teamName} ]]</option>
+            	<option th:value="${team.teamNo}" th:each="team : ${teams}" id="info-team" >[[ ${team.teamName} ]]</option>
             </select>
             </div>
-            <div class="row"><label>사원번호</label><input id="info-status" readonly></div>
-            <div class="row"><label>아이디</label><input id="info-emp" readonly></div>
-            <div class="row"><label>입사일</label><input id="info-dept" type="date"></div>
-            <div class="row">
-              <label>휴대폰</label><input id="info-phone"></span>
+        	<div class="info-row">
+	            <span class="label">사원번호</span>
+	            <input id="info-userNo" readonly>
             </div>
             <div class="row">
-              <label>집주소</label><input id="info-email">
-                              <span id="search_icon">
-                    <i class="fa fa-search"></i>
-                </span>
-              </span>
+	            <label>입사일</label>
+	            <input id="info-hire" type="date">
+            </div>
+            <div class="row">
+              <label>휴대폰</label>
+              <input id="info-phone">
+            </div>
+            </div>
+            <div class="row">
+              <label>집주소</label>.
+              <input id="info-address">
+              <span id="search_icon">
+              <i class="fa fa-search"></i>
+            </span>
+              </div>
             </div>
           </div>
         </div>
@@ -231,12 +240,12 @@ function homeAddCode() {
         .then(res => res.json())
         .then(result => {
           document.querySelector('#info-name').value = result.userName;
-          document.querySelector('#info-task').value = result.teamName;
-          document.querySelector('#info-status').value = result.userNo;
-          document.querySelector('#info-emp').value = result.userId;
-          document.querySelector('#info-dept').value = result.hireDate;
+          document.querySelector('#info-team').value = result.teamName;
+          document.querySelector('#info-userNo').value = result.userNo;
+          document.querySelector('#info-id').value = result.userId;
+          document.querySelector('#info-hire').value = result.hireDate;
           document.querySelector('#info-phone').value = result.userPhone;
-          document.querySelector('#info-email').value = result.address;
+          document.querySelector('#info-address').value = result.address;
 
         })
         .catch(err => console.log(err));
@@ -252,9 +261,9 @@ function homeAddCode() {
 	function updateEmp() {
 	let userName = document.querySelector('#info-name').value; // 이름 
 	//let userDName = document.querySelector('#info-ext').value; // 부서 
-	let userTeam = document.querySelector('#info-task').value; // 팀 
+	let userTeam = document.querySelector('#info-team').value; // 팀 
 	let userPhone =  document.querySelector('#info-phone').value; // 폰 번호  
-	let userAddress =  document.querySelector('#info-email').value; // 주소 
+	let userAddress =  document.querySelector('#info-address').value; // 주소 
 
 
 	let updateEmpData = {
@@ -277,9 +286,9 @@ function homeAddCode() {
 	    .then(result => {
    		  document.querySelector('#info-name').value = result.userName;
       //    document.querySelector('#info-ext').value = result.departmentName;
-          document.querySelector('#info-task').value = result.teamName;
+          document.querySelector('#info-team').value = result.teamName;
           document.querySelector('#info-phone').value = result.userPhone;
-          document.querySelector('#info-email').value = result.address;
+          document.querySelector('#info-address').value = result.address;
 	    })
 	    .catch(err => console.log(err));
 }

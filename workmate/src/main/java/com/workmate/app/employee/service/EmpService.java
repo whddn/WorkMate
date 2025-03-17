@@ -42,4 +42,7 @@ public interface EmpService {
 	
 	// 나의 평가 조회 (단건 조회) 
 	public List<EvaluVO> findOneEvaluResult(EvaluVO evaluVO);
+	
+	// 평가 등록 (관리자)
+	public int inputNewEvalu(EvaluVO evaluVO);
 }
