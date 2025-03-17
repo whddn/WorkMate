@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/default_layout}"
+	layout:decorate="~{common/layouts/attendance_layout}"
 	layout:fragment="content">
+<head>
 <meta charset="UTF-8">
 <title>근태관리</title>
+<!-- daterangepicker CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.1.0/daterangepicker.min.css" />
 <style>
 /* 전체 컨테이너를 세로 배치 */
 .main-container {
@@ -29,7 +32,10 @@
 	flex: 1;
 	padding: 20px;
 }
-
+.date-select {
+	width: 300px;
+	padding-bottom: 10px;
+}
 table {
 	width: 100%;
 	border-collapse: collapse;
@@ -43,10 +49,6 @@ table {
 	display: block;
 }
 
-.table-responsive {
-	max-height: 400px; 
-	overflow-y: auto;
-}
 </style>
 </head>
 <body>
@@ -54,59 +56,34 @@ table {
 
 		<!-- 오른쪽 컨테이너 -->
 		<div class="container">
-			<div class="card" id="card-top">
+		 	<div class="card" id="card-top">
 				<div class="card-body">
 					<!-- 내용 추가 -->
-					<div class="col-12 col-sm-6 col-md-6 col-xl-3">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                      <div>
-                        <h6><b>Todays Income</b></h6>
-                        <p class="text-muted">All Customs Value</p>
-                      </div>
-                      <h4 class="text-info fw-bold">$170</h4>
-                    </div>
-                    <div class="progress progress-sm">
-                      <div class="progress-bar bg-info w-75" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="d-flex justify-content-between mt-2">
-                      <p class="text-muted mb-0">Change</p>
-                      <p class="text-muted mb-0">75%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
 				</div>
-			</div>
+			</div>  
 			<div class="card" id="card-bottom">
 				<div class="card-body">
 					<!-- 내용 추가 -->
+					<h4 class="card-title">내 근태 조회</h4>						
 					<div class="content">
-						<h4 class="card-title">내 근태 조회</h4>	
-						
-						<!-- 년도 월별 조회 기능 -->					
-						 <input type="date" name="schedule" min="2022-04-01"	max="2022-04-30" />
-						<input type="date" name="schedule" min="2022-04-01" max="2022-04-30" />
-						<button class="btn btn-info">검색</button>
-						
-					<!--<div class="selectym">
-						<select id ="selectYear"  class="form-select input-fixed"></select>		
-						<select id ="selectMonth"  class="form-select input-fixed"></select>
-						<button class="btn btn-info" onclick="searchByYearMonth()">검색</button>	 -->	
-					</div>
-						
+					<!-- 년도 월별 조회 기능 -->	
+					<div class="date-select">
+					<label><b>기간 조회: <b></label>				
+					<input type="text" name="daterange"/>
+
+					</div>						
 						<div class="table-responsive">
-							<table class="table">
+							<table id="attendanceTable" class="table">
 								<thead>
 									<tr>
 										<th>날짜</th>
 										<th>출근시간</th>
 										<th>퇴근시간</th>
 										<th>근무시간</th>
-										<th>근무상태</th>
-										<th>근무유형</th>
 										<th>연장근무시간</th>
+										<th>근무상태</th>
+										<th>근무유형</th>										
 									</tr>
 								</thead>
 								<tbody>
@@ -116,7 +93,7 @@ table {
 										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
 										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
 										<td>[[ ${work.workTime} ]]</td>
-										<td>[[ ${work.workStatus} ]]</td>
+										<td>[[ ${work.addWorkTime} ]]</td>
 										<td>[[ ${work.workStatus} ]]</td>
 										<td>[[ ${work.workStatus} ]]</td>
 									</tr>
@@ -124,12 +101,61 @@ table {
 							</table>
 						</div>
 					</div>
+
 				</div>
 			</div>
 		</div>
 	</div>
 </body>
+<!--한국어  달력 쓰려면 추가 로드-->
+<script src="resources/js/plugin/datepicker/bootstrap-datepicker.ko.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <script>
+	$('#attendanceTable').DataTable({
+		order: [ [ 0, "desc" ] ],
+		info: false,
+	});
+	
+	$(function(){
+		// datepicker 설정
+		    var start = moment().subtract(29, 'days');
+   			var end = moment();
+    
+		  $('input[name="daterange"]').daterangepicker({
+			format : "yyyy-MM-dd", 
+			autoclose: true,
+			todayHighlight: true,
+		    opens: 'left',
+		    templates : {
+		        leftArrow: '&laquo;',
+		        rightArrow: '&raquo;'
+		    },
+		    locale: {
+		        format: 'YYYY-MM-DD'
+		      },
+		    startDate: start,
+		    endDate: end,
+		  }, function(start, end, label) {
+		    console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+		  });
+		  
+		// apply event
+			$('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+				  const stDate = picker.startDate.format('YYYY-MM-DD');
+				  const endDate = picker.endDate.format('YYYY-MM-DD');
+				  
+				  //상대경로
+				  location.href = `allList?stDate=${stDate}&endDate=${endDate}`;
+				  
+				  //절대경로 하려면 contextpath 추가
+		  });
+		  
+		  
+	}); //end of $(function()
+	
 	
 </script>
+
 </html>

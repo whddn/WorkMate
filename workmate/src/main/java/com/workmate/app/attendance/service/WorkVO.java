@@ -2,6 +2,8 @@ package com.workmate.app.attendance.service;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.Data;
 
 @Data
@@ -13,11 +15,12 @@ public class WorkVO {
 		private Date startWork;	    //출근일시   
 		private Date afterWork;		//퇴근일시
 		private Integer workNo;		//근태번호
-		private int workTime;		//근무시간
+		private double workTime;		//근무시간
 		private int totalWork;		//총근무시간
+		private double addWorkTime; //연장근무시간
 		private Integer userNo;		//사원번호
 		
-		//@DateTimeFormat(pattern = "yyyy-MM-dd")
+		
 		//private Date hireDate;
 		
 		// annual table 연차내역
@@ -37,4 +40,10 @@ public class WorkVO {
 		private int checkStatus;	//정산여부
 		private int usedAnnualCount;	//사용연차
 		private int remainAnlLeave;		//남은연차
+		
+		// 검색날짜
+		@DateTimeFormat(pattern = "yyyy-MM-dd")
+		private Date stDate;
+		@DateTimeFormat(pattern = "yyyy-MM-dd")
+		private Date endDate;
 }

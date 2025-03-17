@@ -24,8 +24,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 	}
 	//전체
 	@Override
-	public List<WorkVO> findAllWork() {	
-		return attendMapper.allWorkList();
+	public List<WorkVO> findAllWork(WorkVO workVO) {	
+		return attendMapper.allWorkList(workVO);
 	}
 	//출근여부
 	@Override

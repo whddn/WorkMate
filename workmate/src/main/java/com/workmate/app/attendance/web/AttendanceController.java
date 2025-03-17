@@ -29,6 +29,7 @@ public class AttendanceController {
 		List<WorkVO> list = attendService.findMonthWork();
 		//2-1)Service > View 전달
 		model.addAttribute("works", list);
+		//출근여부 userNO에 담기
 		model.addAttribute("attend",attendService.attendanceStatus(userNo));
 		
 		return "attendance/monthList";
@@ -36,15 +37,15 @@ public class AttendanceController {
 	
 	//전체 근태 조회
 	@GetMapping("attendance/allList")
-	public String allAttendanceList(Model model) {
+	public String allAttendanceList(Model model, WorkVO workVO) {
 		
-		List<WorkVO> list = attendService.findAllWork();
+		List<WorkVO> list = attendService.findAllWork(workVO);
 		model.addAttribute("works", list);
 
 		return "attendance/allList";
 	}
 	
-	
+
 	//출근 등록
 	@GetMapping("attendance/startWork")
 	public String startWork(WorkVO workVO) {		
@@ -68,5 +69,4 @@ public class AttendanceController {
 	public String annualList(Model model) {
 		return "attendance/annual";
 	}
-	
 }
