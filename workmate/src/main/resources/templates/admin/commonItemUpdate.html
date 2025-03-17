@@ -1,108 +1,155 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{common/layouts/commonItem_layout}"
-	  layout:fragment="content">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/commonItem_layout}"
+	layout:fragment="content">
 <head>
-    <meta charset="UTF-8">
-    <title>공용품 관리 등록</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 50%;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top:100px;
-        }
-        h2 {
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            font-weight: bold;
-        }
-        select, input, button {
-            padding: 8px;
-            margin-top: 5px;
-        }
-        .time-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .btn {
-            padding: 8px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .btn-save {
-            background-color: #007bff;
-            color: white;
-        }
-        .btn-cancel {
-            background-color: #ccc;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>공용품 관리 등록</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+}
+
+.container {
+	width: 50%;
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+	margin-top: 100px;
+}
+
+h2 {
+	text-align: center;
+}
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+label {
+	font-weight: bold;
+}
+
+select, input, button {
+	padding: 8px;
+	margin-top: 5px;
+}
+
+.time-group {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.btn-save {
+	background-color: #007bff;
+	color: white;
+}
+
+.btn-cancel {
+	background-color: #ccc;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h2>공용품 관리 수정</h2>
-        <form id="itemForm" th:action="@{/admin/commonItemUpdate}" method="post">
-            <div class="form-group">
-                <label>공용품 종류</label>
-                <select name="commonKind" id="item-type">
-                    <option value="회의실">회의실</option>
-                    <option value="차량">차량</option>
-                </select>
-            </div>
+	<div class="container">
+		<h2>공용품 관리 수정</h2>
+		<form name="updateForm" th:object="${update}" enctype="multipart/form-data">
+		<input type="hidden" class="common-no" th:field="*{commonNo}" >
+			<div class="form-group">
+				<label>공용품 종류</label> <select th:field="*{commonKind}">
+					<option value="회의실">회의실</option>
+					<option value="차량">차량</option>
+				</select>
+			</div>
 
-            <div class="form-group">
-                <label>이름</label>
-                <input type="text" name="name" id="item-name" placeholder="이름 입력">
-            </div>
-            
-             <div class="form-group">
-                <label>설명</label>
-                <textarea name="content" id="item-content" placeholder="항목 입력" rows="4"></textarea>
-            </div>
+			<div class="form-group">
+				<label>이름</label> <input type="text" placeholder="이름 입력" th:field="*{name}">
+			</div>
 
-            <div class="form-group">
-                <label>시간 추가</label>
-                <div class="time-group">
-                    <input type="time" name="reservationStartTime" id="start-time">
-                    ~
-                    <input type="time" name="reservationEndTime" id="end-time">
-                    <button type="button" class="btn btn-save" onclick="addTime()">+</button>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>이미지 추가</label>
-                <input type="file" name="itemImage" accept="image/*" id="item-image">
-            </div>
+			<div class="form-group">
+				<label>설명</label>
+				<textarea  placeholder="항목 입력" rows="4" th:field="*{content}"></textarea>
+			</div>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-save">수정</button>
-                <button type="button" class="btn btn-cancel" onclick="cancelForm()">취소</button>
-            </div>
-        </form>
-    </div>
+			<div class="form-group">
+				<label>시간 추가</label>
+				<div class="time-group">
+					<input type="time" th:field="*{reserStartTime}">
+					 ~ <input type="time" th:field="*{reserEndTime}">
+				</div>
+			</div>
 
-    <script>
-        function cancelForm() {
-            if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
-                window.location.href = "/admin/commonItemList"; // 공용품 목록 페이지로 이동
+			<div class="form-group">
+				<label>이미지 추가</label>
+				 <input type="file" name="itemImage" accept="image/*" id="item-image" >
+			</div>
+
+			<div class="form-group">
+				<button type="button" class="btn btn-save" onclick="updateItem()">수정</button>
+				<button type="button" class="btn btn-cancel" onclick="cancelForm()">취소</button>
+			</div>
+		</form>
+	</div>
+
+	<script>
+		function cancelForm() {
+		    if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
+		        window.location.href = `${contextPath}/admin/commonItemList`; // 🚀 컨텍스트 경로 추가
+		    }
+		}
+	
+		function updateItem() {
+		    if (confirm("공용품이 수정되었습니다.")) {
+		        window.location.href = `${contextPath}/admin/commonItemList`; // 🚀 컨텍스트 경로 추가
+		    }
+		}
+        
+        document.querySelector('form[name="updateForm"] button.btn-save').addEventListener('click', updateAjax);
+        
+        const metaTag = document.querySelector('meta[name="contextPath"]');
+        const context = metaTag ? metaTag.getAttribute('value') : '';
+        
+        function updateAjax(event) {
+            let formElement = document.querySelector('form[name="updateForm"]');
+            if (!formElement) {
+                console.error("폼을 찾을 수 없습니다.");
+                return;
             }
+
+            let formData = new FormData(formElement); // FormData 객체 사용
+
+            fetch(`commonItemUpdate`, {
+                method: 'POST',
+                body: formData, // JSON.stringify() 대신 FormData 직접 전달
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result) {
+                    alert(`${data.target.name}을 수정했습니다`);
+                    window.location.href = `commonItemList`;
+                } else {
+                    alert('수정한게 없습니다.');
+                }
+            })
+            .catch(err => console.log(err));
         }
+
+	        function getFormData() {
+	            let formElement = document.querySelector('form[name="updateForm"]');
+	            if (!formElement) {
+	                console.error("폼을 찾을 수 없습니다.");
+	                return null;
+	            }
+	
+	            return new FormData(formElement); // FormData 객체 그대로 반환
+	        }
+
+        
     </script>
 </body>
 </html>
