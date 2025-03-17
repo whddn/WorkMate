@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.attendance.mapper.AttendMapper">
 
-	<!-- 월별조회 -->	
-	<select id="selectWorkList" resultType="WorkVO">
+	<!-- 해당 월별조회 -->	
+	<!--<select id="selectWorkList" resultType="WorkVO">	
 		SELECT start_work
 		     , after_work
 		     , work_time
@@ -12,17 +12,38 @@
 		WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
 		 AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
 		 ORDER BY start_work DESC
+	</select> -->
+	<select id="selectWorkList" resultType="WorkVO">	
+	    SELECT start_work,
+	           after_work,
+	           work_time,
+	           work_status,
+	           (SELECT COUNT(*) 
+	            FROM work 
+	            WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+	              AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+	              AND work_status <![CDATA[<>]]> '정상') AS status_count
+	    FROM work
+	    WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+	      AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+	    ORDER BY start_work DESC
 	</select>
+	
 	
 	<!-- 전체조회 -->
 	<select id="allWorkList" resultType="WorkVO">
-		SELECT start_work
-		     , after_work
-		     , work_time
-		     , work_status
-		FROM work
-		ORDER BY start_work DESC	
+	    SELECT start_work,
+	           after_work,
+	           work_time,
+	           work_status
+	    FROM work
+	    WHERE 1 = 1
+    <if test="stDate != null and endDate != null">
+        AND start_work BETWEEN #{stDate} AND #{endDate} + 1
+    </if>
+	    ORDER BY start_work DESC
 	</select>
+	
 	
 	<!-- 출퇴근여부 -->
 	<select id="attendanceStatus" resultType="workVO">
@@ -61,10 +82,15 @@
 		UPDATE WORK
 		SET 
 		    after_work = SYSDATE,
-		    work_time = ROUND(
-		        ((SYSDATE - start_work) * 24 * 60 * 60 / 3600) - 1, 2
-		    )
+		    work_time = ROUND((SYSDATE - start_work) * 24 , 1) -1,
+		    add_work_time = F_ADD_WORK_TIME(SYSDATE),
+		    work_status = 
+		    	CASE
+			    	WHEN TO_CHAR(SYSDATE, 'HH24:MI') <![CDATA[<]]> '17:59' THEN '조퇴'
+			    	ELSE NVL(work_status, '정상') <!-- 원래값이 있으면 그대로 두고 없으면 정상으로 등록 -->
+		   		END
 		WHERE work_no = #{workNo}
-	</update>
+	</update>	
+	
 	
 </mapper>

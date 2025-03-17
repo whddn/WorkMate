@@ -10,7 +10,7 @@ public interface AttendMapper {
 	public List<WorkVO> selectWorkList();
 	
 	// 전체 근태 조회
-	public List<WorkVO> allWorkList();
+	public List<WorkVO> allWorkList(WorkVO workVO);
 	
 	// 출근 등록
 	public int insertStartInfo(WorkVO workVO);
