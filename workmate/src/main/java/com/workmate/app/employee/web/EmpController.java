@@ -64,7 +64,7 @@ public class EmpController {
 	
 	// 지난 평가 리스트 중 단건 조회 (관리자)
 	@GetMapping("emp/bfoneevalu")
-	//	@GetMapping("emp/bfoneevalu/${evaluFormNo}")
+	//@GetMapping("emp/bfoneevalu/${evaluFormNo}")
 	public String beforeEvaluOneResultPage(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
 		evaluVO.setEvaluFormNo(evaluFormNo);
 		List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluOne(evaluVO);
@@ -86,6 +86,11 @@ public class EmpController {
 		return "employees/evaluResult";
 	}
 	
+	// 평가 등록 (관리자) 
+	@GetMapping("emp/neweva")
+	public String evaluNewOneInsert(EvaluVO evaluVO) {
+		return "employees/newEvalu";
+	}
 	
 	// 사원 등록 페이지 
 	@GetMapping("emp/newemp") 

@@ -95,8 +95,12 @@ public class EmpServiceImpl implements EmpService {
 	public List<EvaluVO> findBeforeEvaluOne(EvaluVO evaluVO) {
 		return empMapper.selectOneEvaluInList(evaluVO);
 	}
-	
 
+	// 평가 등록
+	@Override
+	public int inputNewEvalu(EvaluVO evaluVO) {
+		return empMapper.insertOneEvalu(evaluVO);
+	}
 
 	
 }
