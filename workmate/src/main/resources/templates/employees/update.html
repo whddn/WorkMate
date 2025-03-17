@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
+  <head>
+    <meta charset="UTF-8">
+    <title>Organization</title>
+    <style>
+     /* 기본적인 리셋 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* html과 body에 100% 높이 설정 */
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;  /* 가로 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  padding: 20px;
+  margin: 0;  /* 기본 마진 제거 */
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* 콘텐츠를 중앙 정렬 */
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;  /* 최대 너비 제한 */
+}
+
+.container {
+  display: flex;
+  justify-content: center; /* 수평 중앙 정렬 */
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+}
+
+.tree {
+  width: 250px;  /* 트리의 너비 줄이기 */
+  background-color: #fff;
+  padding: 8px;  /* 패딩 줄이기 */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 400px; /* 세로 높이 제한 */
+  overflow-y: auto;  /* 세로로 넘칠 경우 스크롤 */
+}
+
+.details {
+  flex-grow: 1;
+  background-color: #fff;
+  padding: 15px 20px; /* 패딩 줄이기 */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 400px; /* 세로 길이 제한 */
+  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
+   /*display: none; 기본적으로 상세 페이지 숨기기 */
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;  /* 버튼 세로 정렬 */
+  gap: 8px;  /* 버튼 간격 줄이기 */
+  margin-top: 10px;  /* 상단 여백 줄이기 */
+  align-self: center; /* 중앙 정렬 */
+}
+
+.action-buttons button {
+  padding: 8px 15px;  /* 버튼 크기 줄이기 */
+  font-size: 13px;  /* 폰트 크기 줄이기 */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.action-buttons button:hover {
+  background-color: #0056b3;
+}
+
+.buttons-container {
+  margin-top: 20px; /* 위쪽 여백 */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+     
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <!-- 제목 부분 -->
+      <div class="title-container">
+        <h1 class="main-title">사원수정</h1>
+        <h2 class="sub-title">info update</h2>
+      </div>
+
+      <div class="container">
+        <!-- 조직도 트리 -->
+        <div class="tree">
+          <ul>
+            <li>
+            <th:block th:each="name : ${names} ">
+              <span class="folder" >[[ ${name.departmentName }]]</span>
+              <ul>
+                	<li><span class="employee" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span></li>
+              </ul>
+            </th:block>
+            </li>
+          </ul>
+        </div>
+        <!-- 사원 상세 정보 -->
+        <div class="details" id="detailsBox">
+          <div class="info-card">
+            <div class="row">
+              <label>ID</label><span id="info-id"></span>
+              <div class="image-box">이미지</div>
+            </div>
+            <div class="row"><label>성명</label><input id="info-name" type="text" th:data-no="${update.userNo}"></div>
+            <div class="row"><label>팀이름</label>
+            <select>
+            	<option th:value="${team.teamNo}" th:each="team : ${teams}" id="info-task" >[[ ${team.teamName} ]]</option>
+            </select>
+            </div>
+            <div class="row"><label>사원번호</label><input id="info-status" readonly></div>
+            <div class="row"><label>아이디</label><input id="info-emp" readonly></div>
+            <div class="row"><label>입사일</label><input id="info-dept" type="date"></div>
+            <div class="row">
+              <label>휴대폰</label><input id="info-phone"></span>
+            </div>
+            <div class="row">
+              <label>집주소</label><input id="info-email">
+                              <span id="search_icon">
+                    <i class="fa fa-search"></i>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 버튼을 detailsBox 바깥 아래에 위치시킴 -->
+        <div class="buttons-container">
+          <div class="action-buttons">
+            <button id="update-employee" type="button">+ 저장하기</button>
+            <button id="">📝 조직도로 돌아가기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+    
+    
+    function addCheck(){
+        document.querySelector('#search_icon').addEventListener('click', e => {
+            homeAddCode();
+        })
+    }
+    addCheck();
+
+function homeAddCode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                var addr = ''; // 주소 변수
+                var extraAddr = ''; // 참고항목 변수
+
+                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                    addr = data.roadAddress;
+                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                    addr = data.jibunAddress;
+                }
+
+                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+                if(data.userSelectedType === 'R'){
+                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraAddr += data.bname;
+                    }
+                    // 건물명이 있고, 공동주택일 경우 추가한다.
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                    if(extraAddr !== ''){
+                        extraAddr = ' (' + extraAddr + ')';
+                    }
+                    // 조합된 참고항목을 해당 필드에 넣는다.
+                    document.querySelector('.addresshome').value = extraAddr;
+                
+                } else {
+                    document.querySelector('.addresshome').value = extraAddr;
+                }
+
+                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                document.querySelector('.addresshome').value = data.zonecode;
+                document.querySelector('.addresshome').value = addr;
+
+            }
+        }).open();
+}
+ let names = document.querySelectorAll('.employee');
+
+  // 화면 부르기 AJAX
+  for (let nameclick of names) {
+    nameclick.addEventListener('click', function(event) {
+      const userNo = event.target.dataset.id;
+      document.getElementById("detailsBox").style.display = 'block';  // 상세 페이지 표시
+      
+      fetch(`/workmate/emp/update/${userNo}`)
+        .then(res => res.json())
+        .then(result => {
+          document.querySelector('#info-name').value = result.userName;
+          document.querySelector('#info-task').value = result.teamName;
+          document.querySelector('#info-status').value = result.userNo;
+          document.querySelector('#info-emp').value = result.userId;
+          document.querySelector('#info-dept').value = result.hireDate;
+          document.querySelector('#info-phone').value = result.userPhone;
+          document.querySelector('#info-email').value = result.address;
+
+        })
+        .catch(err => console.log(err));
+    });
+  }
+
+	// 사원 수정 AJAX
+	
+	document.querySelector('#update-employee').addEventListener('click', e => {
+		updateEmp();
+	})
+	
+	function updateEmp() {
+	let userName = document.querySelector('#info-name').value; // 이름 
+	//let userDName = document.querySelector('#info-ext').value; // 부서 
+	let userTeam = document.querySelector('#info-task').value; // 팀 
+	let userPhone =  document.querySelector('#info-phone').value; // 폰 번호  
+	let userAddress =  document.querySelector('#info-email').value; // 주소 
+
+
+	let updateEmpData = {
+		'userName' : userName,
+	//	'departmentName' : userDName,
+		'teamNo' : userTeam,
+		'userPhone' : userPhone,
+		'address' : userAddress
+		};
+		const updateNo = document.querySelector('#info-status').value;
+		console.log(updateNo);
+		fetch(`/workmate/emp/update/${updateNo}`, {
+	    method : "put",
+	    headers : {
+	        'Content-type' : "application/json"
+	      },
+	      body : JSON.stringify(updateEmpData),
+	    })
+	    .then(res => res.json())
+	    .then(result => {
+   		  document.querySelector('#info-name').value = result.userName;
+      //    document.querySelector('#info-ext').value = result.departmentName;
+          document.querySelector('#info-task').value = result.teamName;
+          document.querySelector('#info-phone').value = result.userPhone;
+          document.querySelector('#info-email').value = result.address;
+	    })
+	    .catch(err => console.log(err));
+}
+	
+    </script>
+  </body>
+</html>

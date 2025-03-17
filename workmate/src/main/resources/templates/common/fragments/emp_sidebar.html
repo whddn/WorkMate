@@ -88,10 +88,9 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a data-bs-toggle="collapse" th:href="@{/emp/evalu}">
+                <a th:href="@{/emp/myEvalu}">
                   <i class="fas fa-th-list"></i>
-                  <p>사원평가</p>
-                  <span class="caret"></span>
+                  <p>나의 평가 관리</p>
                 </a>
                 <div class="collapse" id="base">
                   <ul class="nav nav-collapse">
@@ -144,9 +143,9 @@
                 </div>
               </li>              
               <li class="nav-item">
-                <a href="#forms">
+                <a th:href="@{/emp/bfevalu}">
                   <i class="fas fa-pen-square"></i>
-                  <p>평가관리</p>
+                  <p>지난 평가 조회(관리자)</p>
                 </a>
               </li>
             </ul>

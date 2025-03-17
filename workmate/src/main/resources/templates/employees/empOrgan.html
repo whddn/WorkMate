@@ -113,12 +113,15 @@ body {
         <div class="tree">
           <ul>
             <li>
-            <th:block th:each="name : ${names} ">
-              <span class="folder">[[ ${name.departmentName }]]</span>
-              <ul>
-                <li><span class="employee" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span></li>
-              </ul>
+            <th:block th:each="name : ${names}">
+              <span class="folder">[[ ${name.departmentName} ]]</span>
             </th:block>
+              <ul>
+                <li th:each="name : ${oneinfo}">
+                  <span class="employee" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span>
+                </li>
+              </ul>
+ 
             </li>
           </ul>
         </div>
@@ -131,18 +134,31 @@ body {
               <div class="image-box">이미지</div>
             </div>
             <div class="row">
-            <label>성명</label><span id="info-name">[[ ${oneinfo.userName} ]]</span></div>
-            <div class="row"><label>부서명</label><span id="info-ext"></span>[[ ${oneinfo.departmentName} ]]</div>
-            <div class="row"><label>팀이름</label><span id="info-task"></span>[[ ${oneinfo.teamName} ]]</div>
-            <div class="row"><label>사원번호</label><span id="info-status"></span>[[ ${oneinfo.userNo} ]]</div>
-            <div class="row"><label>아이디</label><span id="info-emp">[[ ${oneinfo.userId} ]]</span></div>
-            <div class="row"><label>입사일</label><span id="info-dept">[[ ${oneinfo.hireDate} ]]</span></div>
-            <div class="row">
-              <label>휴대폰</label>[[ ${oneinfo.userPhone} ]]<span id="info-phone"></span>
+              <label>성명</label><span id="info-name"></span>
             </div>
             <div class="row">
-              <label>집주소</label>[[ ${oneinfo.address} ]]<span id="info-email"></span>
+              <label>부서명</label><span id="info-ext"></span>
             </div>
+            <div class="row">
+              <label>팀이름</label><span id="info-task"></span>
+            </div>
+            <div class="row">
+              <label>사원번호</label><span id="info-status"></span>
+            </div>
+            <div class="row">
+              <label>아이디</label><span id="info-emp"></span>
+            </div>
+            <div class="row">
+              <label>입사일</label><span id="info-dept"></span>
+            </div>
+            <div class="row">
+              <label>휴대폰</label><span id="info-phone"></span>
+            </div>
+            <div class="row">
+              <label>집주소</label><span id="info-email"></span>
+            </div>
+          <button id="evaluate-employee-update" style="display: none;" th:onclick="|location.href='@{/emp/update}'|">수정하기</button>
+
           </div>
         </div>
 
@@ -151,23 +167,23 @@ body {
           <div class="action-buttons">
             <button id="add-employee" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
             <button id="evaluate-employee">📝 평가하기</button>
+            <button id="evaluate-employee-update" th:onclick="|location.href='@{/emp/update}'|">수정하기</button>
             <button id="">📝 조직도로 돌아가기</button>
           </div>
         </div>
       </div>
     </div>
 
-    <script>
-    let names = document.querySelectorAll('.employee');
-    
-    for (let nameclick of names) {
-      nameclick.addEventListener('click', function(event) {
-        console.log(event.target);
-        detailsBox.style.display = 'block';
-        
-    	let userNo = event.target.dataset.id;
-    	
-        fetch(`/workmate/emp/Organ/${userNo}`)
+<script>
+
+  let names = document.querySelectorAll('.employee');
+  
+  for (let nameclick of names) {
+    nameclick.addEventListener('click', function(event) {
+      const userNo = event.target.dataset.id;
+      document.getElementById("detailsBox").style.display = 'block';  // 상세 페이지 표시
+      
+      fetch(`/workmate/emp/Organ/${userNo}`)
         .then(res => res.json())
         .then(result => {
           document.querySelector('#info-name').textContent = result.userName;
@@ -178,10 +194,14 @@ body {
           document.querySelector('#info-dept').textContent = result.hireDate;
           document.querySelector('#info-phone').textContent = result.userPhone;
           document.querySelector('#info-email').textContent = result.address;
+
         })
         .catch(err => console.log(err));
-      })
-    }
-    </script>
+    });
+  }
+
+  
+</script>
+
   </body>
 </html>
