@@ -110,7 +110,7 @@
 
 <body>
     <div id="container">
-    <h2>다면평가 양식</h2>
+    <h2>평가 결과 조회</h2>
 
     <form id="evaluationForm">
       <!-- 1. 평가자 정보 -->
@@ -154,19 +154,12 @@
         </tr>
 
         <!-- 핵심가치 -->
-        <th:block th:each = "e : ${evalu}">
+        <th:block th:each = "e : ${result}">
         <tr>
           <td>[[ ${e.evaluCompet} ]]</td>
           <td>[[ ${e.evaluContent} ]]</td>
           <td>
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
+              <input th:value="${e.evaluScore}">
           </td>
         </tr>
         </th:block>
