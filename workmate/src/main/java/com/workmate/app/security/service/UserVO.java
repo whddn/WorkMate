@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class UserVO {
-	private String userNo; //사원번호
+	private int userNo; //사원번호
 	private String userId; // 사원아이디
 	private String userPwd; // 사원비밀번호
 	private String userMail; //사원메일

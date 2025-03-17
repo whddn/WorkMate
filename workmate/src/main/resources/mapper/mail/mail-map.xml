@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workmate.app.mail.mapper.MailMapper">
+	<!-- mail-map.xml -->
+	<select id="getReceivedMails" resultType="MailVO">
+		SELECT MAIL_ID, USER_NO, RECIPIENTS, SUBJECT, CONTENT, SENT_AT, STATUS, FOLDER_ID
+    FROM MAIL
+    WHERE USER_NO = #{userNo} 
+<!--       AND REGEXP_LIKE(RECIPIENTS, '(^|,)' || #{userNo} || '($|,)') -->
+    ORDER BY SENT_AT DESC
+	</select>
+
+</mapper>

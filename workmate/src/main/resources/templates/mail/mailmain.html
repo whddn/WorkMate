@@ -45,7 +45,16 @@
 						</tr>
 					</thead>
 					<tbody>
-
+						<tr
+							th:if="${receivedMails == null or #lists.isEmpty(receivedMails)}">
+							<td colspan="3" class="text-center">받은 메일이 없습니다.</td>
+						</tr>
+						<tr th:each="mail : ${receivedMails}">
+							<td th:text="${mail.userNo}"></td>
+							<td><a th:href="@{/mail/view(mailId=${mail.mailId})}"
+								th:text="${mail.subject}"></a></td>
+							<td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
@@ -53,4 +62,4 @@
 	</div>
 </body>
 
-</html>	
+</html>
