@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 public interface ApprovalService {
 	public List<ApprovalVO> selectApprovalList(ApprovalVO approvalVO);
 	public ApprovalVO selectApproval(ApprovalVO approvalVO);
-	public String insertApproval(ApprovalVO approvalVO);
+	public int insertApproval(ApprovalVO approvalVO);
 	public int updateApproval(ApprovalVO approvalVO);
 }

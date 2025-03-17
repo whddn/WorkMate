@@ -58,11 +58,5 @@
 	    	, #{reserNo}
 	    	, #{apprType}
 	    )
-	    <!-- INSERT 후 실제 추가된 행의 apprNo를 가져오기 -->
-	    <selectKey id="selectLastInsertId" keyProperty="apprNo" resultType="String" order="AFTER">
-	        SELECT appr_no 
-	        FROM approval 
-	        WHERE appr_no = #{apprNo}
-	    </selectKey>
 	</insert>
 </mapper>

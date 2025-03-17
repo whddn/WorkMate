@@ -113,11 +113,11 @@ public class ApprovalController {
 		approvalVO.setUserNo(myself.getUserNo());
 		approvalVO.setDeptNo(myself.getDepartmentId());
 
-        String apprNo = approvalService.insertApproval(approvalVO);
-        System.out.println("apprNo : " + apprNo);
+        int result = approvalService.insertApproval(approvalVO);
+        System.out.println("apprNo : " + approvalVO.getApprNo());
         
         Map<String, Object> response = new HashMap<>();
-        if(apprNo == null) {
+        if(result <= 0) {
         	response.put("success", false);
         	return ResponseEntity.badRequest().body(response);
         }
@@ -132,7 +132,7 @@ public class ApprovalController {
         	ApprElmntVO apprElmntVO = new ApprElmntVO();
         	apprElmntVO.setApprover(empNo);
         	apprElmntVO.setDeptNo(empVO.getDepartmentId());
-        	apprElmntVO.setApprNo(apprNo);
+        	apprElmntVO.setApprNo(approvalVO.getApprNo());
         	
         	apprElmntService.insertApprElmnt(apprElmntVO);
         }

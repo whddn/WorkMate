@@ -31,7 +31,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 	}
 
 	@Override
-	public String insertApproval(ApprovalVO approvalVO) {
+	public int insertApproval(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
 		return approvalMapper.insertApproval(approvalVO);
 	}
