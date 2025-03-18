@@ -107,14 +107,19 @@
   <div class="wrapper">
     <!-- 왼쪽: 조직도 -->
     <div class="tree-panel">
-      <ul class="tree">
-        <li>
-          <th:block th:each="name : ${names}">
-            <span class="folder">[[ ${name.departmentName} ]]</span>
+	      <ul class="tree">
+			<li th:each="dpt : ${names}">
+            <span class="folder">[[ ${dpt.departmentName} ]]</span>
             <ul>
-              <li><span class="employee" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span></li>
+            <li th:each="team : ${dpt.teamList}"> 
+            <span class="employee">[[ ${team.teamName} ]]</span>
+             <ul>
+            <li th:each="name : ${team.empList}"> 
+            <span class="folder" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span>
+             </li>
             </ul>
-          </th:block>
+             </li>
+            </ul>
         </li>
       </ul>
     </div>
@@ -166,6 +171,9 @@
   </div>
 
   <script>
+	let hireD = document.querySelector('#info-hire').value;
+    console.log(hireD);
+  
     let names = document.querySelectorAll('.employee');
 
     for (let nameclick of names) {
@@ -173,6 +181,7 @@
         const userNo = event.target.dataset.id;
         document.getElementById("detailsBox").style.display = 'block';  // 상세 페이지 표시
 
+		
         fetch(`/workmate/emp/Organ/${userNo}`)
           .then(res => res.json())
           .then(result => {

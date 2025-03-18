@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.employee.mapper.EmpMapper">
 	<!-- 사원 전체 조회 (조직도/사원이름/부서명) -->
-	<select id="selectAllName" resultType="EmpVO">
+	<!-- <select id="selectAllName" resultType="EmpVO">
  		SELECT u.user_name
  				, u.user_no
 		        , d.department_name
@@ -11,7 +11,7 @@
 		ON u.team_no = t.team_no
 		JOIN department d 
 		ON d.department_id = t.department_id 
-	</select>
+	</select> -->
 	<!--/* 조직도의 사원 상세 조회 */-->
 	<select id="selectOneEmp" resultType="EmpVO">
 		SELECT u.user_name
@@ -36,14 +36,7 @@
 		AND u.user_no between 100 AND 300
 	</select>
 	
-	<!-- 팀명 조회 -->
-	<select id="selectAllEmpTeam" resultType="EmpVO">
-		SELECT   team_no 
-        	   , team_name
-		FROM team
-		ORDER BY team_no
-	</select>
-	
+
 	<!-- 직급 조회 -->
 	<select id="selectAllPosition" resultType="EmpVO">
 		SELECT code_name
@@ -123,11 +116,12 @@
 	</update>
 	
     <!-- 부서 및 팀별 사원 조회 -->
-	<!--  <select id="" resultMap="">
-		SELECT t.team_no
-		        , t.team_name
-		        , d.department_id
+	<select id="selectAllName" resultMap="departTeamMap">
+		SELECT 
+		          d.department_id
 		        , d.department_name
+		        , t.team_no
+		        , t.team_name
 		        , e.user_name
 		        , e.user_id
 		        , e.user_no
@@ -136,16 +130,22 @@
 		ON t.department_id = d.department_id
 		LEFT JOIN employee e 
 		ON e.team_no = t.team_no
-		</select>-->
+		ORDER BY e.user_no
+	</select>
 	
 		<!-- collection -->
-	<!--  <resultMap id="" type="DepartmentVO">
-		<constructor>
-			<idArg column="" javaType=""/>
-		</constructor>
-			<result property="" column=""/>
-			
-	</resultMap>-->
+	<resultMap id="departTeamMap" type="DepartmentVO">	
+		<id property="departmentId" column="department_id" />
+		<result property="departmentName" column="department_name" />
+			<collection property="teamList" ofType="TeamVO">
+				<result property="teamNo" column="team_no" />
+				<result property="teamName" column="team_name" />
+					<collection property="empList" ofType="EmpVO">
+						<result property="userName" column="user_name" />
+						<result property="userNo" column="user_no" />
+					</collection>
+			</collection>
+	</resultMap> 
 	
 	<!-- 지난 평가 리스트 조회 (전체 출력) -->
 	<select id="selectAllEvalu" resultType="EvaluVO">
@@ -153,6 +153,7 @@
         , USAGE_STATUS 
         , EVALU_START
         , EVALU_END
+        , EVALU_FORM_NO
 		FROM EVALU_FORM
 	</select>
 	<!-- 평가 단건 조회 (일반 사용자, 본인 로그인한 userNo, formNo기반) -->
@@ -183,8 +184,10 @@
 	</select>
 	
 	<!-- 평가 단순 조회 (관리자, formNo 기반) -->
-	<!-- <select id="" resultType="">
-					SELECT f.EVALU_NAME              
+		<select id="selectOneEvaluInList" resultType="EvaluVO">
+			SELECT    
+			    	  f.EVALU_FORM_NO
+					, f.EVALU_NAME              
 			        , f.EVALU_START          
 			        , g.EVALUATEE_GROUP_ID      
 			        , u.USER_NO
@@ -193,6 +196,7 @@
 			        , i.EVALU_CONTENT
 			        , r.EVALU_SCORE        
 			        , fm.ORDER_NO
+			        , f.EVALU_FORM_NO
 			FROM EVALU_FORM f              
 			JOIN EVALUATEE_GROUP g
 			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
@@ -204,7 +208,24 @@
 			ON r.EVALU_GROUP_ID = g.EVALUATEE_GROUP_ID AND fm.EVALU_NO = r.EVALU_NO 
 			JOIN EVALU_ITEM i
 			ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
-			WHERE f.EVALU_FORM_NO = 1
+			WHERE f.EVALU_FORM_NO = #{evaluFormNo}
 	
-	</select> -->
+	</select> 
+	<!-- 평가 폼 등록 시 필요한 항목과 내용 선택하기 위한 조회 쿼리문 -->
+	<select id="selectAllContent" resultType="EvaluVO">
+			SELECT EVALU_ITEM_NO
+		        ,  EVALU_COMPET
+		        ,  EVALU_CONTENT
+			FROM EVALU_ITEM   
+	</select>
+	
+		<select id="selectAllEmpTeam" resultType="EmpVO">
+				SELECT t.team_no
+				        , t.team_name
+				        , d.department_name
+				        , t.department_id
+				FROM team t 
+				JOIN department d 
+				ON t.department_id = d.department_id
+	</select>
 </mapper>
