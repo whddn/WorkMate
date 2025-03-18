@@ -4,7 +4,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>지난 평가 조회(관리자)</title>
+  <title>지난 평가 조회 (관리자)</title>
   <style>
    body {
     font-family: 'Arial', sans-serif;
@@ -111,10 +111,9 @@
 <body>
     <div id="container">
     <h2>지난 평가 결과 조회(관리자)</h2>
-
     <form id="evaluationForm">
       <!-- 1. 평가자 정보 -->
-
+	
       <h3>1. 평가자 정보</h3>
       <table>
         <tr>
@@ -154,17 +153,14 @@
         </tr>
 
         <!-- 핵심가치 -->
-     
+     <th:block th:each="one : ${one}">
         <tr>
-          <td></td>
-          <td></td>
-          <td>
-              <input value="">
-          </td>
+          <td>[[ ${one.evaluCompet} ]]</td>
+          <td>[[ ${one.evaluContent} ]]</td>
+          <td>[[ ${one.evaluScore} ]]</td>
         </tr>
-        </th:block>
       </table>
-
+	 </th:block>
 
       <!-- 4. 추가 의견 -->
       <h3>4. 추가 의견</h3>

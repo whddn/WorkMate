@@ -2,22 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.attendance.mapper.AttendMapper">
 
-	<!-- 해당 월별조회 -->	
-	<!--<select id="selectWorkList" resultType="WorkVO">	
-		SELECT start_work
-		     , after_work
-		     , work_time
-		     , work_status
-		FROM work
-		WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
-		 AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
-		 ORDER BY start_work DESC
-	</select> -->
-	<select id="selectWorkList" resultType="WorkVO">	
+	<!-- 해당 월별조회 -->
+		<select id="selectWorkList" resultType="WorkVO">	
 	    SELECT start_work,
 	           after_work,
 	           work_time,
 	           work_status,
+	           add_work_time,
 	           (SELECT COUNT(*) 
 	            FROM work 
 	            WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
@@ -28,6 +19,17 @@
 	      AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
 	    ORDER BY start_work DESC
 	</select>
+	<!--<select id="selectWorkList" resultType="WorkVO">	
+		SELECT start_work
+		     , after_work
+		     , work_time
+		     , work_status
+		FROM work
+		WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+		 AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+		 ORDER BY start_work DESC
+	</select> -->
+
 	
 	
 	<!-- 전체조회 -->
@@ -35,7 +37,8 @@
 	    SELECT start_work,
 	           after_work,
 	           work_time,
-	           work_status
+	           work_status,
+	           add_work_time
 	    FROM work
 	    WHERE 1 = 1
     <if test="stDate != null and endDate != null">
@@ -91,6 +94,25 @@
 		   		END
 		WHERE work_no = #{workNo}
 	</update>	
+	
+	<!-- 연차전체조회 -->
+	<select id="occAnnualList" resultType="WorkVO">
+	    SELECT occ_annual,
+	           used_annual_count,
+	           remain_anl_leave
+	    FROM occ_annual
+	    WHERE user_no = #{userNo}
+	</select>
+	
+	<!-- 연차 사용내역 전체조회 -->
+	<select id="allAnnualList" resultType="WorkVO">
+		SELECT a.annual_start, a.annual_count, a.annual_type,
+		       b.appr_date, b.appr_content
+		FROM annual a 
+		INNER JOIN approval b 
+		ON a.appr_no = b.appr_no
+		WHERE TO_NUMBER(a.user_no) = #{userNo}
+	</select>
 	
 	
 </mapper>

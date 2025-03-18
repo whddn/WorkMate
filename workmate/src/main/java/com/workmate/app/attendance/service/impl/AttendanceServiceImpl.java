@@ -47,6 +47,18 @@ public class AttendanceServiceImpl implements AttendanceService {
 		int result = attendMapper.insertAfterInfo(workVO);
 		
 		return result;
+	}
+	
+	//내 연차 조회
+	@Override
+	public List<WorkVO> findOccAnnual(WorkVO workVO) {		
+		return attendMapper.occAnnualList(workVO);
+	}
+	
+	//연차 사용내역 전체 조회
+	@Override
+	public List<WorkVO> findAllAnnual(WorkVO workVO) {
+		return attendMapper.allAnnualList(workVO);
 	};
 	
 	

@@ -70,12 +70,12 @@ table {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
+                        <tr th:each="occ : ${occs}">
+                          <td>[[ ${occ.occAnnual} ]]</td>
                           <td>15</td>
-                          <td>15</td>
-                          <td>2</td>
-                          <td>13</td>
-                        </tr>
+                          <td>[[ ${occ.usedAnnualCount} ]]</td>
+                          <td>[[ ${occ.remainAnlLeave} ]]</td>
+                        </tr>                        
                       </tbody>
                     </table>
 				</div>
@@ -86,22 +86,17 @@ table {
 					<div class="content">
 						<h4 class="card-title">내 연차 사용내역 조회</h4>	
 						
-						<!-- 년도 월별 조회 기능 -->					
-						 <input type="date" name="schedule" min="2022-04-01"	max="2022-04-30" />
-						<input type="date" name="schedule" min="2022-04-01" max="2022-04-30" />
-						<button class="btn btn-info">검색</button>
-						
-					<!--<div class="selectym">
-						<select id ="selectYear"  class="form-select input-fixed"></select>		
-						<select id ="selectMonth"  class="form-select input-fixed"></select>
-						<button class="btn btn-info" onclick="searchByYearMonth()">검색</button>	 -->	
-					</div>
-						
+					<!-- 년도 월별 조회 기능 -->					
+					<!--<div class="date-select">
+					<label><b>기간 조회: <b></label>				
+					<input type="text" name="daterange"/>						
+				
+					</div>		-->				
 						<div class="table-responsive">
 							<table class="table">
 								<thead>
 									<tr>
-										<th>등록일</th>
+										<th>연차신청일</th>
 										<th>사용일</th>
 										<th>발생기간</th>
 										<th>유형</th>
@@ -110,12 +105,12 @@ table {
 								</thead>
 								<tbody>
 									<!-- 단건 : 배열 -->
-									<tr th:each="work : ${works}">
-										<td>[[ ${#dates.format(work.startWork, 'yyyy/MM/dd')} ]]</td>
-										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
-										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
-										<td>[[ ${work.workTime} ]]</td>
-										<td>[[ ${work.workStatus} ]]</td>
+									<tr th:each="anl: ${anls}">
+										<td>[[ ${#dates.format(anl.apprDate, 'yyyy/MM/dd')} ]]</td>
+										<td>[[ ${#dates.format(anl.annualStart, 'yyyy/MM/dd')} ]]</td>
+										<td>[[ ${anl.annualCount} ]]</td>
+										<td>[[ ${anl.annualType} ]]</td>
+										<td>[[ ${anl.apprContent} ]]</td>
 									</tr>
 								</tbody>
 							</table>
@@ -126,7 +121,43 @@ table {
 		</div>
 	</div>
 </body>
+<script src="resources/js/plugin/datepicker/bootstrap-datepicker.ko.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <script>
-	
+$(function(){
+	// datepicker 설정
+	    var start = moment().subtract(29, 'days');
+			var end = moment();
+
+	  $('input[name="daterange"]').daterangepicker({
+		format : "yyyy-MM-dd", 
+		autoclose: true,
+		todayHighlight: true,
+	    opens: 'left',
+	    templates : {
+	        leftArrow: '&laquo;',
+	        rightArrow: '&raquo;'
+	    },
+	    locale: {
+	        format: 'YYYY-MM-DD'
+	      },
+	    startDate: start,
+	    endDate: end,
+	  }, function(start, end, label) {
+	    console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+	  });
+	  
+	// apply event
+		$('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+			  const stDate = picker.startDate.format('YYYY-MM-DD');
+			  const endDate = picker.endDate.format('YYYY-MM-DD');
+			  
+			  //상대경로
+			  location.href = `allList?stDate=${stDate}&endDate=${endDate}`;				 
+	  });	  
+	  
+}); //end of $(function()
 </script>
 </html>

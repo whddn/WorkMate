@@ -20,4 +20,10 @@ public interface AttendMapper {
 	
 	// 출퇴근 여부
 	public WorkVO attendanceStatus(int userNo);
+	
+	// 내 연차 조회
+	public List<WorkVO> occAnnualList(WorkVO workVO);
+	
+	// 연차 사용내역 전체 조회
+	public List<WorkVO> allAnnualList(WorkVO workVO);
 }

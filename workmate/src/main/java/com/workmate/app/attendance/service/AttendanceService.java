@@ -18,4 +18,10 @@ public interface AttendanceService {
 	
 	//출근여부
 	public WorkVO attendanceStatus(int userNo);
+	
+	//연차 조회
+	public List<WorkVO> findOccAnnual(WorkVO workVO);
+	
+	//연차 사용 내역 전체조회
+	public List<WorkVO> findAllAnnual(WorkVO workVO);
 }

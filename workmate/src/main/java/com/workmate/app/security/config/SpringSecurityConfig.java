@@ -30,10 +30,12 @@ public class SpringSecurityConfig {
 					//.requestMatchers("/", "/workmate").permitAll()	// 전체 접근 허용
 				.requestMatchers("/header").authenticated()
 					.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
-
+					.requestMatchers("/team/**").hasAuthority("인사팀")  // 중간 권한
 					.requestMatchers("/admin/**").hasAuthority("관리자") // 권한있는 사용자,관리자 접근 허용
-					.anyRequest().authenticated() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능
+					.anyRequest().permitAll() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능
+
 			)                                 //authenticated 넣을시 권한에 따라 페이지 접근 가능 로그인 필수
+
 
 			.formLogin(login -> login
 					.loginPage("/login")
