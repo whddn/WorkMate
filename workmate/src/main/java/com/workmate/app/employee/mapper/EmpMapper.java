@@ -2,6 +2,7 @@ package com.workmate.app.employee.mapper;
 
 import java.util.List;
 
+import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
 
@@ -31,7 +32,12 @@ public interface EmpMapper {
 	
 	// 지난 평가 단건 조회 (관리자)
 	public List<EvaluVO> selectOneEvaluInList(EvaluVO evaluVO);
- 	
+	
+	
+	//public List<DepartmentVO> selectEvaluInfo(EvaluVO evaluVO);			// 평가 결과 - 평가자 정보 조회 
+	//public List<DepartmentVO> selectEvaluateeInfo(EvaluVO evaluVO); 	// 평가 결과 - 피평가자 정보 조회
+	public List<EvaluVO> selectEvaluInfo(EvaluVO evaluVO);
+	public List<EvaluVO> selectEvaluateeInfo(EvaluVO evaluVO);
 	// 지난 평가 결과 페이지 단순 불러냄
 	//public List<EvaluVO> selectEvaluList(EvaluVO evaluVO);
 	

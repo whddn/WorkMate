@@ -118,23 +118,24 @@
       <table>
         <tr>
           <th>구분</th>
-          <th>소속</th>
-          <th>직책</th>
+          <th>부서명</th>
+          <th>팀명</th>
           <th>성명</th>
         </tr>
         <tr>
-          <td>피평가자</td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
+         <td>평가자</td>
+         [[ ${evalu} ]]
+        <!--  <td><input type="text" name="" th:value="${evalu.departmentName}"></td>
+          <td><input type="text" name="" th:value="${evalu.teamName}"></td>
+          <td><input type="text" name="" th:value="${evalu.userName}"></td>
         </tr>
         <tr>
           <td>평가자</td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
+          <td><input type="text" name="" th:value="${evaluatee.departmentName}"></td>
+          <td><input type="text" name="" th:value="${evaluatee.teamName}"></td>
+          <td><input type="text" name="" th:value="${evaluatee.userName}"></td>
         </tr>
-      </table>
+      </table> -->
 
       <!-- 2. 평가 안내-->
       <h3>2. 평가 설명</h3>

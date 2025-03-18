@@ -29,6 +29,7 @@ public class EvaluVO {
 	private String orderNo;			// 평가 번호 나열 순서
 	private int evaluFormNo;		// 평가 폼 번호 
 	
+	//List<DepartmentVO> dptList;
 	// 평가 폼 (문제은행에서 랜덤으로 골라서 평가 양식을 생성함)
 	private String evaluName;		// 평가 이름 
 	private String evaluDescript;	// 평가 설명

@@ -197,6 +197,8 @@
 			        , r.EVALU_SCORE        
 			        , fm.ORDER_NO
 			        , f.EVALU_FORM_NO
+                    , d.department_name
+                    , t.team_name
 			FROM EVALU_FORM f              
 			JOIN EVALUATEE_GROUP g
 			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
@@ -208,8 +210,11 @@
 			ON r.EVALU_GROUP_ID = g.EVALUATEE_GROUP_ID AND fm.EVALU_NO = r.EVALU_NO 
 			JOIN EVALU_ITEM i
 			ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
+            JOIN TEAM t
+            ON t.TEAM_NO = u.TEAM_NO
+            JOIN DEPARTMENT d
+            ON t.department_id = d.department_id
 			WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-	
 	</select> 
 	<!-- 평가 폼 등록 시 필요한 항목과 내용 선택하기 위한 조회 쿼리문 -->
 	<select id="selectAllContent" resultType="EvaluVO">
@@ -218,7 +223,44 @@
 		        ,  EVALU_CONTENT
 			FROM EVALU_ITEM   
 	</select>
+	<!-- 평가자 기반 평가자 직급, 이름, 팀명, 부서명, 폼 번호 쿼리문 -->
+	<select id="selectEvaluInfo" resultType="EvaluVO">
+		SELECT
+			d.DEPARTMENT_ID 
+	        , u.USER_POSITION 
+	        , u.USER_NAME  
+	        , t.TEAM_NAME 
+	        , d.DEPARTMENT_NAME 
+	        , f.EVALU_FORM_NO
+			, t.TEAM_NO
+	        
+		FROM EMPLOYEE u 
+		JOIN TEAM t ON u.TEAM_NO = t.TEAM_NO 
+		JOIN DEPARTMENT d ON d.DEPARTMENT_ID = t.DEPARTMENT_ID 
+		JOIN EVALU_GROUP g ON g.USER_NO = u.USER_NO  
+		JOIN EVALU_FORM f ON g.EVALU_FORM_NO = f.EVALU_FORM_NO 
+		WHERE f.EVALU_FORM_NO = #{evaluFormNo}
+	</select>
 	
+	<!-- 피평가자 기반 평가자 직급, 이름, 팀명, 부서명, 폼 번호 쿼리문-->
+	<select id="selectEvaluateeInfo" resultType="EvaluVO">
+		SELECT 
+			d.DEPARTMENT_ID 
+	        , u.USER_POSITION 
+	        , f.EVALU_FORM_NO 
+	        , u.USER_NAME
+	        , t.TEAM_NAME 
+	        , d.DEPARTMENT_NAME
+	        , t.TEAM_NO
+		FROM EMPLOYEE u 
+		JOIN TEAM t ON u.TEAM_NO = t.TEAM_NO 
+		JOIN DEPARTMENT d ON d.DEPARTMENT_ID = t.DEPARTMENT_ID 
+		JOIN EVALUATEE_GROUP evg ON evg.USER_NO = u.USER_NO 
+		JOIN EVALU_FORM f ON evg.EVALU_FORM_NO = f.EVALU_FORM_NO 
+		WHERE f.EVALU_FORM_NO = #{evaluFormNo}
+	</select>
+
+	<!-- 부서명과 팀명 조회 쿼리문 -->
 		<select id="selectAllEmpTeam" resultType="EmpVO">
 				SELECT t.team_no
 				        , t.team_name

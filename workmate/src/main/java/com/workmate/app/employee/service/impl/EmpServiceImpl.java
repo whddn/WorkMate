@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.employee.mapper.EmpMapper;
+import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
@@ -123,6 +124,26 @@ public class EmpServiceImpl implements EmpService {
 		}
 		System.out.println(evaMap);
 		return evaMap;
+	}
+//	// 평가 결과 - 평가자 정보 조회
+//	@Override
+//	public List<DepartmentVO> findEvaluInfo(EvaluVO evaluVO) {
+//		return empMapper.selectEvaluInfo(evaluVO);
+//	}
+//	// 평가 결과 - 피평가자 정보 조회
+//	@Override
+//	public List<DepartmentVO> findEvaluateeInfo(EvaluVO evaluVO) {
+//		return empMapper.selectEvaluateeInfo(evaluVO);
+//	}
+
+	@Override
+	public List<EvaluVO> findEvaluInfo(EvaluVO evaluVO) {
+		return empMapper.selectEvaluInfo(evaluVO);
+	}
+
+	@Override
+	public List<EvaluVO> findEvaluateeInfo(EvaluVO evaluVO) {
+		return empMapper.selectEvaluateeInfo(evaluVO);
 	}
 
 	
