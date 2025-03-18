@@ -11,6 +11,7 @@ public class WorkVO {
 	
 		// work table 근태
 		private String workStatus;	//근무상태
+		private int statusCount;	//근무상태		
 		private Date workDate;	    //출근일시   
 		private Date startWork;	    //출근일시   
 		private Date afterWork;		//퇴근일시
@@ -20,8 +21,8 @@ public class WorkVO {
 		private double addWorkTime; //연장근무시간
 		private Integer userNo;		//사원번호
 		
-		
-		//private Date hireDate;
+		private double totalWorkTime; // 현재달 총 근무시간 
+		private double remainWorkTime; // 남은 근무시간
 		
 		// annual table 연차내역
 		private String annualNo;	//연차번호
@@ -46,4 +47,8 @@ public class WorkVO {
 		private Date stDate;
 		@DateTimeFormat(pattern = "yyyy-MM-dd")
 		private Date endDate;
+		
+		// 결재관련
+		private Date apprDate; // 결재 상신 날짜
+		private String apprContent; //결재 내용
 }
