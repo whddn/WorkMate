@@ -5,6 +5,7 @@ import java.util.Date;
 import lombok.Data;
 @Data
 public class MailVO {
+	private int attachmentCount; //첨부파일이 존재하는지 확인
 	private int mailId; // 메일 id
 	private int userNo; //사원번호
 	private String recipients; // 수신자목록

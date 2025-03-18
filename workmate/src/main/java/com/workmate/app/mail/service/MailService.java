@@ -2,22 +2,15 @@ package com.workmate.app.mail.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import jakarta.mail.MessagingException;
 
-import com.workmate.app.mail.mapper.MailMapper;
+public interface MailService {
+    // 받은 메일 조회
+    List<MailVO> getReceivedMails(int userNo);
 
-@Service
-public class MailService {
-	private final MailMapper mailMapper;
+    // 단일 메일 조회
+    MailVO getMailById(int mailId);
 
-    @Autowired
-    public MailService(MailMapper mailMapper) {
-        this.mailMapper = mailMapper;
-    }
-
-    public List<MailVO> getReceivedMails(int userNo) {
-        return mailMapper.getReceivedMails(userNo);
-    }
-    
+    // 이메일 전송
+    void sendEmail(String fromEmail, String toEmail, String subject, String content) throws MessagingException;
 }
