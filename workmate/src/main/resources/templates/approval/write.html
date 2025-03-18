@@ -127,6 +127,7 @@
 	let apprElmntList = [];
 	const fileInput = $('#fileInput');
 
+	// apprElmntList의 내용을 모달화면에 띄운다
 	function loadApprElmnts() {
 	    let tbodyTag = $('#ApprovalTable > tbody');
 	    tbodyTag.empty();
@@ -150,6 +151,7 @@
 	    });
 	}
 	
+	// 결재선을 클릭하면 결재선을 이루는 결재자들을 apprElmntList에 저장한다.
 	function summonApprElmnts(apprLineNo) {
 		fetch([[ @{/approval/summonApprElmnts} ]], {
 			method: 'POST',
@@ -171,10 +173,12 @@
 		});
 	}
 	
+	// 조직도의 사원을 클릭하면 결재자로 apprElmntList에 저장한다
 	function insertApprElmnt(userNo) {
 		
 	}
 	
+	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
 		const today = new Date();
 		const year = today.getFullYear();
@@ -204,27 +208,36 @@
 		$('#userName').text(creator.userName);
 	});
 	
+	// apprElmntList에서 하나씩 결재자 정보를 삭제한다 
 	$('#delApprElmnt').on('click', function() {
 		apprElmntList.pop();
 		loadApprElmnts();
 	});
 
+	// apprElmntList의 정보를 결재선 양식에 등록한다
 	$('#saveApprElmnts').on('click', function() {
-		let ulTag = $('#apprLine');
-		ulTag.empty();
+		let table = $('#apprLine');
+		
+		table.find('td').text('');
 		
 		if (!Array.isArray(apprElmntList) || apprElmntList.length === 0) {
 	        return;
 	    }
 		
-		apprElmntList.forEach(function(element) {
-			let liTag = $(`
-				<li>
-					${element.departmentName} - ${element.teamName} - ${element.userName}
-				</li>
-	        `);
-			ulTag.append(liTag);
-		})
+		let departmentRow = table.find('tr').eq(0);
+		let signRow = table.find('tr').eq(1);
+		let nameRow = table.find('tr').eq(2);
+		
+		// 결재선 데이터 삽입
+		$.each(apprElmntList, function(index, element) {
+			if(index > 2)
+				return false;
+			
+			let colIndex = index + 1;
+			
+			departmentRow.find('td').eq(colIndex - 1).text(element.departmentName);
+			nameRow.find('td').eq(colIndex - 1).text(element.userName);
+		});
 		
 		$('#closeModalBtn').trigger('click');
 	});
@@ -245,10 +258,12 @@
         }
 	})
 	
+	// 파일을 추가한다.
 	$('#attachBtn').on('click', function(event) {
 		fileInput.click();
 	})
 	
+	// 결재문서 데이터를 JSON으로 서버로 전송한다.
 	$('#submitBtn').on('click', function(event) {
 		if (!Array.isArray(apprElmntList) || apprElmntList.length < 2) {
 			alert('결재선을 2명 이상으로 설정해 주세요!');
@@ -302,7 +317,7 @@
 		.then(response => response.json())
 		.then(result => {
 			if(result.success) {
-				//location.href = [[ @{/approval/waiting} ]];
+				location.href = [[ @{/approval/waiting} ]];
 			}
 			else {
 				alert('결재등록에 실패하였습니다.');

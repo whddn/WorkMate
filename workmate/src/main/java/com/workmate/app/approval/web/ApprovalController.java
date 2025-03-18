@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -220,6 +221,20 @@ public class ApprovalController {
 		
 		response.put("success", true);
         return ResponseEntity.ok(response);
+	}
+	
+	@DeleteMapping("approval/read")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> readDelete(Model model, @RequestParam String apprNo) {		
+		int result = approvalService.deleteApproval(apprNo);
+		if(result > 0) {
+			response.put("success", true);
+	        return ResponseEntity.ok(response);
+		}
+		else {
+			response.put("success", false);
+        	return ResponseEntity.badRequest().body(response);
+		}
 	}
 	
 	// 파일 다운로드 컨트롤러

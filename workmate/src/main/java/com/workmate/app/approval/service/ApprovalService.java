@@ -9,4 +9,5 @@ public interface ApprovalService {
 	public ApprovalVO selectApproval(ApprovalVO approvalVO);
 	public int insertApproval(ApprovalVO approvalVO);
 	public int updateApproval(ApprovalVO approvalVO);
+	public int deleteApproval(String apprNo);
 }

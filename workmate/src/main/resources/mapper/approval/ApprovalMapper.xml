@@ -24,6 +24,7 @@
 			, appr_content
 			, create_date
 		    , expire_date
+		    , appr_status
 			, department_name
 			, approval.user_no
 			, user_name
@@ -79,4 +80,9 @@
 		WHERE appr_no = #{apprNo} 
     		AND appr_status IN ('a2', 'a3')
 	</update>
+	<delete id="deleteApproval" parameterType="ApprovalVO">
+		DELETE FROM approval
+		WHERE appr_no = #{apprNo}
+			AND appr_status = 'a1'
+	</delete>
 </mapper>

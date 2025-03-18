@@ -45,4 +45,12 @@ public class ApprovalServiceImpl implements ApprovalService {
 		}
 		return approvalMapper.updateApprovalDate(approvalVO);
 	}
+
+	@Override
+	public int deleteApproval(String apprNo) {
+		// TODO Auto-generated method stub
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setApprNo(apprNo);
+		return approvalMapper.deleteApproval(approvalVO);
+	}
 }

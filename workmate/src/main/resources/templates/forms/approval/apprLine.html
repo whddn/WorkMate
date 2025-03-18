@@ -1,0 +1,43 @@
+<div xmlns:th="https://www.thymeleaf.org" th:fragment="apprLineFrag">
+
+<!-- 결재선 기본값으로 신청 1명, 승인 2~3명으로 설정--> 
+<style>
+	table#apprLine {
+        border: 1px solid black;
+        border-collapse: collapse;
+        margin-left: auto;
+    }
+    table#apprLine th, 
+    table#apprLine td {
+        border: 1px solid black;
+    }
+</style>
+<table id="apprLine">
+	<tr>
+		<th>부서명</th>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<th>사인</th>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<th>성명</th>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+</table>
+<button 
+	id="setApprLine"
+	data-bs-toggle="modal" 
+	data-bs-target="#addApprLineModal" 
+	data-bs-whatever="@mdo">
+	결재선 지정
+</button>
+
+</div>
