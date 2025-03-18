@@ -1,12 +1,21 @@
 package com.workmate.app.employee.service;
 
 import java.util.Date;
-
+import java.util.List;
 
 import lombok.Data;
 
 @Data
 public class EvaluVO {
+	
+	public EvaluVO() {
+		
+	}
+ 	public EvaluVO(Integer evaluItemNo, String evaluContent) {
+		super();
+		this.evaluItemNo = evaluItemNo;
+		this.evaluContent = evaluContent;
+	}
 	// 평가 항목 테이블 (이미 만들어진 문제은행)
 	private Integer evaluItemNo; 	// 평가 항목 번호
 	private String evaluCompet;		// 평가 역량(평가분야)
@@ -15,7 +24,6 @@ public class EvaluVO {
 	private Date regDate;			// 평가 항목 등록 일자
 	private String usageStatus;		// 사용 여부
 	private String evaluSummary;	// 평가 요약
-	
 	// 평가 양식 (평가 양식 개별...?)
 	private Integer evaluNo;		// 평가 번호
 	private String orderNo;			// 평가 번호 나열 순서

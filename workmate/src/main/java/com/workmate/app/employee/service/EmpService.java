@@ -1,6 +1,7 @@
 package com.workmate.app.employee.service;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EmpService {
 	
@@ -45,4 +46,7 @@ public interface EmpService {
 	
 	// 평가 등록 (관리자)
 	public int inputNewEvalu(EvaluVO evaluVO);
+	
+	// 평가 등록시 평가 항목 / 평가 내용 조회 
+	public Map<String, List<EvaluVO>> allEvaluContent(EvaluVO evaluVO);
 }
