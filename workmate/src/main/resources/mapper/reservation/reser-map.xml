@@ -1,26 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.workmate.app.reservation.mapper.ReservationMapper">
+<mapper
+	namespace="com.workmate.app.reservation.mapper.ReservationMapper">
 	<!-- 전체조회 -->
 	<select id="selectReservationList" resultType="ReservationVO">
-		select common_kind
-	      ,reser_date
-	      ,reser_start_time
-	      ,reser_end_time
-	      ,reser_availability
-	      ,content
-	      ,reser_no
-	      ,user_no
-	      ,common_name
-	      ,common_no
-	      ,usage_status
-	      ,image
-		from reser
+		SELECT
+			 r.user_no
+			,r.reser_no
+			,r.usage_status
+			,c.name
+			,c.common_no
+			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS reser_start_time_str
+			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS reser_end_time_str
+			,r.reser_date
+			,c.common_kind
+			,c.image
+			,c.content
+		FROM common_Item c
+		LEFT JOIN reser r ON r.common_no = c.common_no
+		LEFT JOIN employee e ON r.user_no = e.user_no
 	</select>
-	
-	<!-- 예약 조회 -->
+
+	<!-- 예약 단건 조회 -->
 	<select id="selectReservationInfo" resultType="ReservationVO" parameterType="ReservationVO">
-		
+		SELECT
+			COALESCE(r.user_no, e.user_no) AS user_no
+			,r.reser_no
+			,r.usage_status
+			,c.name
+			,c.common_no
+			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS common_item_start_time
+			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS common_item_end_time
+			,c.date_select
+			,c.common_kind
+			,c.image
+			,c.content
+		FROM common_Item c
+		LEFT JOIN reser r
+			ON r.common_no = c.common_no
+		LEFT JOIN employee e
+			ON r.user_no = e.user_no
+		where r.common_no = #{commonNo}
 	</select>
-	
+
+	<!-- 예약신청 -->
+
+	<!-- 예약수정 -->
+
+	<!-- 예약삭제 -->
+
 </mapper>

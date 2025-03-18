@@ -15,6 +15,9 @@ public interface ReservationMapper {
 	// 예약신청
 	public int insertReservationInfo(ReservationVO reservationVO);
 	
-	// 예약취소
+	// 예약수정
+	public int updateReservationInfo(ReservationVO reservationVO);
 	
+	// 예약취소
+	public int deleteReservationInfo(int commonNo);
 }
