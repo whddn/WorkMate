@@ -22,15 +22,22 @@ public class AttendanceController {
 	
 	//월별 근태 전체조회 : GET	
 	@GetMapping("attendance/monthList")
-	public String monthAttendanceList(Model model) {
-		
-		int userNo = 201; 
+	public String monthAttendanceList(Model model) {		
+		int userNo = 201; 		
 		//2)Service
-		List<WorkVO> list = attendService.findMonthWork();
+		//근태 데이터 조회
+		List<WorkVO> list = attendService.findMonthWork(); 
+		double addWorkTime = list.stream().mapToDouble(WorkVO::getAddWorkTime).sum();
+		double totalWorkTime = list.stream().mapToDouble(WorkVO::getWorkTime).sum();
+		double remainWorkTime = 208 - totalWorkTime;
+		
 		//2-1)Service > View 전달
 		model.addAttribute("works", list);
 		//출근여부 userNO에 담기
 		model.addAttribute("attend",attendService.attendanceStatus(userNo));
+		model.addAttribute("totalWorkTime", totalWorkTime);
+		model.addAttribute("addWorkTime", addWorkTime); 
+		model.addAttribute("remainWorkTime", remainWorkTime);
 		
 		return "attendance/monthList";
 	}
@@ -64,9 +71,18 @@ public class AttendanceController {
 		return "redirect:/attendance/monthList";
 	}
 	
-	//내 연차 내역
+	//내 발생 연차 / 내 발생 연차
 	@GetMapping("attendance/annual")
-	public String annualList(Model model) {
+	public String annualList(Model model, WorkVO workVO) {
+		workVO.setUserNo(201);	
+		
+		List<WorkVO> list = attendService.findOccAnnual(workVO);
+		List<WorkVO> alist = attendService.findAllAnnual(workVO);
+		
+		model.addAttribute("occs", list);
+		model.addAttribute("anls", alist);
+		
 		return "attendance/annual";
 	}
+	
 }
