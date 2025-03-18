@@ -13,7 +13,7 @@
 	</select>
 	<insert id="insertApprovalRA" parameterType="ReportAttachVO">
 		<selectKey keyProperty="repattachNo" resultType="int" order="BEFORE">
-			SELECT COUNT(repattach_no) + 1
+			SELECT COALESCE(MAX(repattach_no), 0) + 1
 			FROM report_attach
 		</selectKey>
 		INSERT INTO report_attach
@@ -21,7 +21,7 @@
 			, #{fileName}
 			, #{filePath}
 			, SYSDATE
-			, null
+			, #{reportNo}
 			, #{apprNo}
 		)
 	</insert>

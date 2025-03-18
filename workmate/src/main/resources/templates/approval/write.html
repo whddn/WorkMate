@@ -12,7 +12,7 @@
 </head>
 
 <body>
-	<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
+	<div th:insert="~{|forms/approval/${apprForm.formPath}|}"></div>
 	<table id="AttachTable" class="display">
 		<thead>
 			<tr>
@@ -123,7 +123,6 @@
 </body>
 
 <script th:inline="javascript">
-	let apprForm = [[ ${apprForm} ]];
 	let creator = [[ ${creator} ]];
 	let apprElmntList = [];
 	const fileInput = $('#fileInput');
@@ -137,7 +136,7 @@
 	    }
 
 	    apprElmntList.sort((a, b) => a.order - b.order); // 정렬 (order 속성이 있다고 가정)
-
+	    
 	    apprElmntList.forEach(function(element, index) {
 	        let trTag = $(`
 	        	<tr>

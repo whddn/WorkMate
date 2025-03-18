@@ -46,7 +46,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class ApprovalController {
-	private final static String UPLOAD_FOLDER = "classpath://static/attachFiles";
+	private final static String UPLOAD_FOLDER = "D:/workmateUploads/";
 	private final ApprElmntService apprElmntService;
 	private final ApprFormService apprFormService;
 	private final ApprLineService apprLineService;
@@ -57,7 +57,7 @@ public class ApprovalController {
 	private final ObjectMapper objectMapper;
 	
 	// 현재 로그인한 사람의 개인정보를 empVO로 불러온다.
-	private EmpVO whoAmI() {
+	public EmpVO whoAmI() {
 		LoginUserVO loginUserVO = (LoginUserVO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		EmpVO empVO = new EmpVO();
 		
@@ -150,7 +150,7 @@ public class ApprovalController {
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
             	String fileName = file.getOriginalFilename();
-                Path filePath = Paths.get("D:/workmateUploads/" + fileName);
+                Path filePath = Paths.get(UPLOAD_FOLDER + fileName);
                 Files.write(filePath, file.getBytes());
                 System.out.println("파일 저장 완료: " + fileName);
                 
@@ -222,6 +222,7 @@ public class ApprovalController {
         return ResponseEntity.ok(response);
 	}
 	
+	// 파일 다운로드 컨트롤러
 	@GetMapping("approval/download")
     public ResponseEntity<FileSystemResource> downloadFile(
     	@RequestParam("filePath") String filePath, 

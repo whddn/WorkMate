@@ -25,7 +25,7 @@
 	</select>
 	<insert id="insertApprElmnt" parameterType="ApprElmntVO">
 		<selectKey keyProperty="apprelmntNo" resultType="Integer" order="BEFORE">
-			SELECT COUNT(appr_no) + 1
+			SELECT COUNT(apprelmnt_no) + 1
 			FROM appr_elmnt
 		</selectKey>
 		INSERT INTO appr_elmnt(apprelmnt_no
