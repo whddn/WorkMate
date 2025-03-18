@@ -14,17 +14,24 @@
 <body>
 	<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
 	<div>
-		<table id="AttachTable" class="display>">
-			<thead>
-				<tr>
-					<th>파일명</th>
-					<th>삭제</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
+		<table id="AttachTable" class="display">
+		    <thead>
+		        <tr>
+		            <th>파일 이름</th>
+		            <th>다운로드</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		        <tr th:each="file : ${fileList}">
+		            <td th:text="${file.fileName}"></td>
+		            <td>
+		                <a th:href="@{/approval/download(filePath=${file.filePath}, fileName=${file.fileName})}">
+		                	<button class="btn btn-primary">다운로드</button>
+		                </a>
+		            </td>
+		        </tr>
+		    </tbody>
 		</table>
-		<button class="btn btn-primary">첨부</button>
 		<table id="ApprovalsTable" class="display">
 			<thead>
 				<tr>

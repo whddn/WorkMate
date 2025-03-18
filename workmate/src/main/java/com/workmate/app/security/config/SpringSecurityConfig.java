@@ -35,6 +35,7 @@ public class SpringSecurityConfig {
 					.anyRequest().permitAll() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능
 			)                                 //authenticated 넣을시 권한에 따라 페이지 접근 가능 로그인 필수
 
+
 			.formLogin(login -> login
 					.loginPage("/login")
 				//	.loginProcessingUrl("/workmate")

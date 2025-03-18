@@ -26,10 +26,10 @@ public interface EmpMapper {
 		// 평가 양식 조회
 	public List<EvaluVO> selectOneEvalu(EvaluVO evaluVO);
 	
-	// 지난 평가 결과 조회 (관리자)
+	// 지난 평가 결과 전체 조회 (관리자)
 	public List<EvaluVO> selectAllEvalu(EvaluVO evaluVO);
 	
-	// 지난 평가 단순 조회 (관리자)
+	// 지난 평가 단건 조회 (관리자)
 	public List<EvaluVO> selectOneEvaluInList(EvaluVO evaluVO);
  	
 	// 지난 평가 결과 페이지 단순 불러냄
@@ -46,4 +46,7 @@ public interface EmpMapper {
 	
 	// 평가 등록 페이지 (관리자)
 	public int insertOneEvalu(EvaluVO evaluVO);
+	
+	// 평가 항목, 평가 내용 조회 (평가 등록시 필요)
+	public List<EvaluVO> selectAllContent(EvaluVO evaluVO);
 }

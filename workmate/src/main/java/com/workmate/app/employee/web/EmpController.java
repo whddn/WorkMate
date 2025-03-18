@@ -2,7 +2,6 @@ package com.workmate.app.employee.web;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,25 +13,28 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Controller
 public class EmpController {
-	private EmpService empService;
+	private final EmpService empService;
 	
-	@Autowired
-	public EmpController(EmpService empService) {
-		this.empService = empService;
-	}
+//	@Autowired
+//	public EmpController(EmpService empService) {
+//		this.empService = empService;
+//	}
 
 		// 1) 조직도 페이지 (페이지 불러냄)
 	@GetMapping("emp/organ") // 조직도 
 	public String empOrganPage(EmpVO empVO, Model model) {
 		// 2) 서비스 
-		EmpVO findVO = new EmpVO();
-		model.addAttribute("oneinfo", findVO);
+		model.addAttribute("oneinfo", empVO);
 		model.addAttribute("names", empService.empNameList()); // 부서명 
 		return "employees/empOrgan";
 	}
@@ -63,8 +65,8 @@ public class EmpController {
 	}
 	
 	// 지난 평가 리스트 중 단건 조회 (관리자)
-	@GetMapping("emp/bfoneevalu")
-	//@GetMapping("emp/bfoneevalu/${evaluFormNo}")
+	//@GetMapping("emp/bfoneevalu")
+	@GetMapping("emp/bfoneevalu/{evaluFormNo}")
 	public String beforeEvaluOneResultPage(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
 		evaluVO.setEvaluFormNo(evaluFormNo);
 		List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluOne(evaluVO);
@@ -88,7 +90,10 @@ public class EmpController {
 	
 	// 평가 등록 (관리자) 
 	@GetMapping("emp/neweva")
-	public String evaluNewOneInsert(EvaluVO evaluVO) {
+	public String evaluNewOneInsert(EvaluVO evaluVO, Model model) {
+		model.addAttribute("teams", empService.selectAllTeam());
+		model.addAttribute("content", empService.allEvaluContent(evaluVO));
+		model.addAttribute("names", empService.empNameList()); // 부서명 
 		return "employees/newEvalu";
 	}
 	
@@ -116,7 +121,7 @@ public class EmpController {
 		model.addAttribute("teams", empService.selectAllTeam()); // 팀명 
 		model.addAttribute("names", empService.empNameList()); // 부서명 
 		model.addAttribute("rank", empService.selectAllPosition()); // 직급명
-		return "redirect:update"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
+		return "employees/update"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
 		// redirect:/workmate/emp/update
 	}
 	

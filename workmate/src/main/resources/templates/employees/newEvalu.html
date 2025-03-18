@@ -3,7 +3,7 @@
   layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
   <head>
     <meta charset="UTF-8">
-    <title>Organization</title>
+    <title>new Evalu</title>
     <style>
      body {
       font-family: 'Segoe UI', sans-serif;
@@ -43,13 +43,24 @@
       margin-top: 5px;
       border: 1px solid #ddd;
       border-radius: 6px;
-      box-sizing: border-box; /* 테두리와 패딩을 포함한 너비 계산 */
+      box-sizing: border-box;
     }
 
-    select {
-      background-color: #f9f9f9;
-    }
+	select {
+	  width: 100%; /* select 요소가 부모 컨테이너의 너비를 따르도록 설정 */
+	  min-width: 200px; /* 최소 너비 설정 */
+	  white-space: nowrap; /* 텍스트가 줄 바꿈 없이 한 줄로 표시 */
+	  overflow: hidden; /* 넘칠 경우 숨김 */
+	  text-overflow: ellipsis; /* 넘칠 경우 "..."으로 표시 */
+	  background-color: #f9f9f9;
+}
 
+	select option {
+	  white-space: nowrap; /* 텍스트가 줄 바꿈 없이 한 줄로 표시 */
+	  overflow: hidden; /* 넘칠 경우 숨김 */
+	  text-overflow: ellipsis; /* 넘칠 경우 "..."으로 표시 */
+}
+	
     .form-row {
       display: flex;
       justify-content: space-between;
@@ -101,25 +112,80 @@
       background-color: #f4f6f8;
     }
 
-    /* 간격 조정 */
     .form-row .form-group {
-      margin-right: 10px; /* 시작일과 종료일 사이 간격 */
+      margin-right: 10px;
     }
 
     .form-row .form-group:last-child {
-      margin-right: 0; /* 마지막 항목은 간격 없게 */
+      margin-right: 0;
     }
 
     .form-group.select-group {
-      margin-top: 20px; /* 평가자와 피평가자, 소속 부서와 팀 간의 간격 */
+      margin-top: 20px;
     }
-    </style>
+
+    #evaluName {
+      width: 400px; /* 너비 조정 */
+    }
+
+    /* +, - 버튼 스타일 */
+    .add-remove-buttons {
+      text-align: right;
+      margin-top: 10px;
+    }
+
+    .add-remove-buttons button {
+      padding: 5px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #f4f6f8;
+      cursor: pointer;
+    }
+    
+    .add-remove-buttons button:hover {
+      background-color: #e0e0e0;
+    }
+
+    /* 평가 제목 레이블 스타일 */
+    .form-row label {
+      font-size: 1.1em;
+      color: #555;
+    }
+
+    .form-row input {
+      border: 1px solid #ccc;
+      padding: 12px;
+    }
+
+    /* 평가 제목과 input 나란히 배치 */
+    .form-row .form-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .form-row .form-group label {
+      width: 100px; /* 레이블 너비 조정 */
+      margin-right: 10px;
+    }
+
+    .form-row .form-group input {
+      flex: 1;
+    }
+  </style>
   </head>
 <body>
-	  <div class="container">
+  <div class="container">
     <h1>다면 평가 등록</h1>
     <form id="evaluation-form">
-      <!-- 기간 설정: 한 줄에 표시 -->
+      <!-- 평가 제목 부분 -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="evaluName">평가 제목</label>
+          <input type="text" id="evaluName" name="evaluName" required>
+        </div>
+      </div>
+
+      <!-- 기간 설정 -->
       <div class="form-row">
         <div class="form-group">
           <label for="start-date">평가 시작일</label>
@@ -132,12 +198,6 @@
         </div>
       </div>
 
-      <!-- 평가 포맷 등록 버튼 -->
-      <div class="form-group">
-        <label for="evaluation-format">평가 포맷 등록</label>
-        <button type="button" id="evaluation-format-btn">평가 포맷 등록</button>
-      </div>
-
       <!-- 항목 1~7: 표 형태 -->
       <table id="evaluation-items">
         <thead>
@@ -148,68 +208,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>항목 1</td>
-            <td><input type="text" name="item-1" required></td>
+			<td>
+              <select id="evaCompet">
+                <option th:each="con : ${content}">[[ ${con.key} ]]</option>
+              </select>
+            </td>
+            <td>
+              <select id="allContent">
+                <option id="evaContent">내용을 선택하세요.</option>
+              </select>
+            </td>
           </tr>
-          <tr>
-            <td>항목 2</td>
-            <td><input type="text" name="item-2" required></td>
-          </tr>
-          <tr>
-            <td>항목 3</td>
-            <td><input type="text" name="item-3" required></td>
-          </tr>
-          <tr>
-            <td>항목 4</td>
-            <td><input type="text" name="item-4" required></td>
-          </tr>
-          <tr>
-            <td>항목 5</td>
-            <td><input type="text" name="item-5" required></td>
-          </tr>
-          <tr>
-            <td>항목 6</td>
-            <td><input type="text" name="item-6" required></td>
-          </tr>
-          <tr>
-            <td>항목 7</td>
-            <td><input type="text" name="item-7" required></td>
-          </tr>
+          
         </tbody>
       </table>
 
-      <!-- 평가자와 피평가자 선택: 한 줄에 표시 -->
-      <div class="form-row select-group">
-        <div class="form-group">
-          <label for="evaluator">평가자</label>
-          <select id="evaluator" name="evaluator" required>
-            <option value="">평가자를 선택하세요</option>
-            <option value="evaluator1">평가자 1</option>
-            <option value="evaluator2">평가자 2</option>
-            <option value="evaluator3">평가자 3</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="evaluatee">피평가자</label>
-          <select id="evaluatee" name="evaluatee" required>
-            <option value="">피평가자를 선택하세요</option>
-            <option value="evaluatee1">피평가자 1</option>
-            <option value="evaluatee2">피평가자 2</option>
-            <option value="evaluatee3">피평가자 3</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- 소속 부서와 소속 팀 선택: 한 줄에 표시 -->
+      <!-- 소속 부서와 소속 팀 선택 -->
       <div class="form-row select-group">
         <div class="form-group">
           <label for="department">소속 부서</label>
           <select id="department" name="department" required>
             <option value="">부서를 선택하세요</option>
-            <option value="department1">부서 1</option>
-            <option value="department2">부서 2</option>
-            <option value="department3">부서 3</option>
+            <option value="department1" th:each="dept : ${names}">[[ ${dept.departmentName} ]]</option>
           </select>
         </div>
 
@@ -217,9 +237,7 @@
           <label for="team">소속 팀</label>
           <select id="team" name="team" required>
             <option value="">팀을 선택하세요</option>
-            <option value="team1">팀 1</option>
-            <option value="team2">팀 2</option>
-            <option value="team3">팀 3</option>
+            <option th:each="t : ${teams}" th:value="${t.teamNo}">[[ ${t.teamName} ]]</option>
           </select>
         </div>
       </div>
@@ -227,17 +245,29 @@
       <!-- 등록하기 버튼과 취소 버튼 -->
       <div class="button-container">
         <button type="submit" id="submit-btn">등록하기</button>
-        <button type="button" id="cancel-btn" onclick="window.location.href='/home'">취소</button>
+        <button type="button" id="cancel-btn">취소</button>
       </div>
     </form>
   </div>
+ <script th:inline="javascript">
+//타임리프에서 content 배열을 받아옵니다.
+ let compet = [[ ${content} ]];  // compet 배열을 타임리프에서 받아옴
+ let competSelect = document.querySelector("#evaCompet");  // 왼쪽 드롭다운
+ let contentSelect = document.querySelector("#evaContent"); // 오른쪽 드롭다운
+ let rightAll = document.querySelector("#allContent");
+ 
+ competSelect.addEventListener('change', function() {
+	rightAll.innerHTML = ''; // option 태그 초기화
+	for (let i = 0; i < competSelect.length; i++) {
+		let option = document.createElement("option");
+		option.textContent = compet[evaCompet.value][i].evaluContent;
+		rightAll.append(option);
+	}
+ });
 
-  <script>
-    // 예시로, 평가 포맷 등록 버튼 클릭 시 항목 추가하는 기능 구현 (추후 서버 로직에 맞게 변경 필요)
-    document.getElementById('evaluation-format-btn').addEventListener('click', function() {
-      alert("평가 포맷이 등록되었습니다.");
-      // 실제로 서버와 연동하는 부분을 여기에 작성하면 됩니다.
-    });
-  </script>
+    </script>
+
+
+
 </body>
 </html>

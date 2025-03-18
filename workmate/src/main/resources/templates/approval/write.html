@@ -12,7 +12,7 @@
 </head>
 
 <body>
-	<div th:insert="~{forms/approval/annualLeave :: FormFrag}"></div>
+	<div th:insert="~{|forms/approval/${apprForm.formPath}|}"></div>
 	<table id="AttachTable" class="display">
 		<thead>
 			<tr>
@@ -23,7 +23,12 @@
 		<tbody>
 		</tbody>
 	</table>
-	<button class="btn btn-primary">첨부</button>
+	<input type="file" id="fileInput" multiple style="display: none;">
+	<button
+		id="attachBtn"
+		class="btn btn-primary">
+		첨부
+	</button>
 	<button
 		id="submitBtn"
 		class="btn btn-secondary">
@@ -118,9 +123,9 @@
 </body>
 
 <script th:inline="javascript">
-	let apprForm = [[ ${apprForm} ]];
 	let creator = [[ ${creator} ]];
 	let apprElmntList = [];
+	const fileInput = $('#fileInput');
 
 	function loadApprElmnts() {
 	    let tbodyTag = $('#ApprovalTable > tbody');
@@ -131,7 +136,7 @@
 	    }
 
 	    apprElmntList.sort((a, b) => a.order - b.order); // 정렬 (order 속성이 있다고 가정)
-
+	    
 	    apprElmntList.forEach(function(element, index) {
 	        let trTag = $(`
 	        	<tr>
@@ -224,13 +229,44 @@
 		$('#closeModalBtn').trigger('click');
 	});
 	
+	fileInput.on('change', function() {
+		const table = $('#AttachTable').DataTable();
+        for(let file of fileInput[0].files) {
+        	const fileName = file.name;
+            const deleteButton = '<button id="delFileBtn" class="btn btn-primary">삭제</button>';
+
+         	// DataTable에 행 추가
+            const rowNode = table.row.add([fileName, deleteButton]).draw().node();
+
+            // "삭제" 버튼 클릭 시 해당 행 삭제
+            $(rowNode).find('#delFileBtn').on('click', function() {
+                table.row($(this).parents('tr')).remove().draw();
+            });
+        }
+	})
+	
+	$('#attachBtn').on('click', function(event) {
+		fileInput.click();
+	})
+	
 	$('#submitBtn').on('click', function(event) {
+		if (!Array.isArray(apprElmntList) || apprElmntList.length < 2) {
+			alert('결재선을 2명 이상으로 설정해 주세요!');
+        	return;
+    	}
+		
+		const formData = new FormData();
+		
+		// 일반 JSON데이터 추가
 		let request = {};
 		
-		$('input[name]:checked, select[name], textarea[name], button[name]').each(function() {
+		$('input[name], select[name], textarea[name], button[name]').each(function() {
 		    let name = $(this).attr('name');
 		    let value = $(this).val();
-
+		    request[name] = value;
+		});
+		
+		$('input[type="radio"]:checked, input[type="checkbox"]:checked').each(function() {
 		    // 체크박스는 같은 name을 가진 값들이 여러 개 선택될 수 있으므로 배열로 저장
 		    if ($(this).is(':checkbox')) {
 		        if (!request[name]) {
@@ -242,28 +278,31 @@
 		    }
 		});
 		
-		if (!Array.isArray(apprElmntList) || apprElmntList.length < 2) {
-			alert('결재선을 2명 이상으로 설정해 주세요!');
-        	return;
-    	}
-		
 		let approverList = [];
 		apprElmntList.forEach(function(element) {
 			approverList.push(element.userNo);
 		});
 		request['approverList'] = approverList;
 		
+		formData.append('request', JSON.stringify(request));
+		
+		// 파일 데이터 추가
+		const fileInput = document.getElementById('fileInput');
+		for(let file of fileInput.files) {
+			formData.append('files', file);
+		}
+		
+		console.log(formData.get('request'))
+		console.log(fileInput.files);
+
 		fetch([[ @{/approval/write} ]], {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(request)
+			body: formData
 		})
 		.then(response => response.json())
 		.then(result => {
 			if(result.success) {
-				location.href = [[ @{/approval/waiting} ]];
+				//location.href = [[ @{/approval/waiting} ]];
 			}
 			else {
 				alert('결재등록에 실패하였습니다.');
