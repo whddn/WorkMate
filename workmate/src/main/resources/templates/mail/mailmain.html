@@ -28,7 +28,6 @@
 			<button class="btn btn-secondary" onclick="searchTable()">검색</button>
 		</div>
 		<div class="card">
-
 			<div class="card-body">
 				<div class="asd">
 					<button class="btn btn-danger btn-sm">삭제</button>
@@ -44,15 +43,20 @@
 							<th>날짜</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody id="mailBody">
 						<tr
 							th:if="${receivedMails == null or #lists.isEmpty(receivedMails)}">
-							<td colspan="3" class="text-center">받은 메일이 없습니다.</td>
+							<td colspan="5" class="text-center">받은 메일이 없습니다.</td>
 						</tr>
-						<tr th:each="mail : ${receivedMails}">
-							<td th:text="${mail.userNo}"></td>
+
+						<tr th:each="mail : ${receivedMails}" class="mail-row">
+							<td><input type="checkbox" class="mail-checkbox"
+								th:value="${mail.mailId}"></td>
+							<td th:text="${mail.recipients}"></td>
 							<td><a th:href="@{/mail/view(mailId=${mail.mailId})}"
 								th:text="${mail.subject}"></a></td>
+							<td th:if="${mail.attachmentCount > 0}">📎</td>
+							<td th:if="${mail.attachmentCount == 0}"></td>
 							<td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></td>
 						</tr>
 					</tbody>
@@ -61,5 +65,40 @@
 		</div>
 	</div>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectAllCheckbox = document.getElementById("selectAll");
+        const checkboxes = document.querySelectorAll(".mail-checkbox");
 
+        // 전체 선택 체크박스 클릭 시 모든 체크박스 선택/해제
+        selectAllCheckbox.addEventListener("change", function() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        // 개별 체크박스 상태 변경 시 전체 선택 체크박스 상태 조정
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", function() {
+                selectAllCheckbox.checked = [...checkboxes].every(cb => cb.checked);
+            });
+        });
+    });
+    //검색
+    function searchTable() {
+        let input = document.getElementById("searchBox").value.toLowerCase();
+        let rows = document.querySelectorAll("#mailBody .mail-row");
+
+        rows.forEach(row => {
+            let recipient = row.cells[1].textContent.toLowerCase(); // 보낸 사람
+            let subject = row.cells[2].textContent.toLowerCase(); // 제목
+
+            if (recipient.includes(input) || subject.includes(input)) {
+                row.style.display = ""; // 검색어가 포함된 행 표시
+            } else {
+                row.style.display = "none"; // 검색어가 없으면 숨김
+            }
+        });
+    }
+</script>
 </html>

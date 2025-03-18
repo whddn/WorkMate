@@ -7,7 +7,10 @@ import org.apache.ibatis.annotations.Param;
 import com.workmate.app.mail.service.MailVO;
 
 public interface MailMapper {
-	 List<MailVO> getReceivedMails(@Param("userNo") String userNo);
+	//받은메일
+	 List<MailVO> getReceivedMails(@Param("userNo") int userNo);
 
-	List<MailVO> getReceivedMails(int userNo);
+
+	//단건
+	MailVO getMailById(@Param("mailId") int mailId);
 }

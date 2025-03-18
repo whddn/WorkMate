@@ -7,10 +7,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.workmate.app.mail.service.MailService;
 import com.workmate.app.mail.service.MailVO;
 import com.workmate.app.security.service.LoginUserVO;
+
+import jakarta.mail.MessagingException;
 
 @Controller
 public class MailController {
@@ -34,5 +37,33 @@ public class MailController {
         model.addAttribute("receivedMails", receivedMails);
 
         return "mail/mailmain";
+    }
+    
+ // 메일 단건 조회
+    @GetMapping("mail/view")
+    public String viewMail(@RequestParam("mailId") int mailId, Model model) {
+        MailVO mail = mailService.getMailById(mailId);
+        model.addAttribute("mail", mail);
+        return "mail/view";
+    }
+    
+    
+    @GetMapping("mail/compose") 
+	public String compose() {
+		return "mail/compose";
+	}
+ // ✅ 메일 테스트 API (브라우저에서 호출 가능)
+    @GetMapping("/mail/sendTest")
+    public String sendTestEmail(@RequestParam String to) {
+        String fromEmail = "th9080@naver.com"; // 
+        String subject = "테스트 메일";
+        String content = "<h2>이메일 테스트</h2><p>이메일이 정상적으로 전송됩니다!</p>";
+
+        try {
+            mailService.sendEmail(fromEmail, to, subject, content);
+            return "메일 전송 성공!";
+        } catch (MessagingException e) {
+            return "메일 전송 실패: " + e.getMessage();
+        }
     }
 }
