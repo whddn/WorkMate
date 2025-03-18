@@ -9,11 +9,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +35,8 @@ import com.workmate.app.approval.service.ApprLineService;
 import com.workmate.app.approval.service.ApprLineVO;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.approval.service.ReportAttachService;
+import com.workmate.app.approval.service.ReportAttachVO;
 import com.workmate.app.approval.service.SignService;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
@@ -41,10 +47,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ApprovalController {
 	private final static String UPLOAD_FOLDER = "classpath://static/attachFiles";
-	private final ApprovalService approvalService;
+	private final ApprElmntService apprElmntService;
 	private final ApprFormService apprFormService;
 	private final ApprLineService apprLineService;
-	private final ApprElmntService apprElmntService;
+	private final ApprovalService approvalService;
+	private final ReportAttachService reportAttachService;
 	private final SignService signService;
 	private final EmpService empService;
 	private final ObjectMapper objectMapper;
@@ -103,11 +110,11 @@ public class ApprovalController {
 	@PostMapping("approval/write")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> writePost(
-		@RequestBody Map<String, Object> request, 
+		@RequestPart("request") String requestString,
 		@RequestPart(value="files", required=false) MultipartFile[] files
 	) throws IOException {
-		// JSON 객체에서 공통되는 부분만 approvalVO에 전이
-		ApprovalVO approvalVO = objectMapper.convertValue(request, ApprovalVO.class);
+		// JSON 객체에서 공통되는 키의 값만 해당 VO에 전이
+		ApprovalVO approvalVO = objectMapper.readValue(requestString, ApprovalVO.class);
 		
 		// 결재문서를 DB에 등록
 		EmpVO myself = whoAmI();
@@ -123,7 +130,7 @@ public class ApprovalController {
         }
         
         // 결재선(정확히 말하면 결재요소들)을 DB에 등록
-        for(Integer empNo : (List<Integer>) request.get("approverList")) {
+        for(Integer empNo : (List<Integer>) approvalVO.getApproverList()) {
         	// 결재자 번호를 통해 결재자 정보 불러오기
         	EmpVO empVO = new EmpVO();
         	empVO.setUserNo(empNo);
@@ -142,12 +149,18 @@ public class ApprovalController {
         // 파일 업로드 관리
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
-                    byte[] bytes = file.getBytes();
-                    Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
-                    Files.write(path, bytes);
-                    System.out.println("File uploaded: " + file.getOriginalFilename());
-                }
+            	String fileName = file.getOriginalFilename();
+                Path filePath = Paths.get("D:/workmateUploads/" + fileName);
+                Files.write(filePath, file.getBytes());
+                System.out.println("파일 저장 완료: " + fileName);
+                
+                ReportAttachVO reportAttachVO = new ReportAttachVO();
+                reportAttachVO.setFileName(fileName);
+                reportAttachVO.setFilePath(filePath.toString());
+                reportAttachVO.setApprNo(approvalVO.getApprNo());
+                System.out.println(reportAttachVO);
+                
+                reportAttachService.insertApprovalRA(reportAttachVO);
             }
         }
         
@@ -177,6 +190,7 @@ public class ApprovalController {
 		approvalVO.setApprNo(apprNo);
 		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
 		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
+		model.addAttribute("fileList", reportAttachService.selectApprovalRAList(approvalVO));
 		
 		return "approval/read";
 	}
@@ -208,6 +222,28 @@ public class ApprovalController {
         return ResponseEntity.ok(response);
 	}
 	
+	@GetMapping("approval/download")
+    public ResponseEntity<FileSystemResource> downloadFile(
+    	@RequestParam("filePath") String filePath, 
+    	@RequestParam("fileName") String fileName
+    ) throws IOException {
+        Path path = Paths.get(filePath);
+        FileSystemResource resource = new FileSystemResource(path.toFile());
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+	
 	@GetMapping("approval/manage")
 	public String manage(Model model) {
 		EmpVO myself = whoAmI();
@@ -227,6 +263,7 @@ public class ApprovalController {
 		return "approval/pdf";
 	}
 	
+	/*
 	@PostMapping("approval/sign")
 	public ResponseEntity<?> addSign(
 		@RequestParam("signFile") MultipartFile signFile, 
@@ -247,4 +284,5 @@ public class ApprovalController {
 	    // ...
 	    return ResponseEntity.ok("결재선 추가 성공");
 	}
+	*/
 }

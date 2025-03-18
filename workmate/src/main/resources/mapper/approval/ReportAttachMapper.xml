@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.workmate.app.approval.mapper.ReportAttachMapper">
+	<select id="selectApprovalRAList" parameterType="ApprovalVO" resultType="ReportAttachVO">
+		SELECT repattach_no
+			, file_name
+			, file_path
+			, upload_date
+			, report_no
+		FROM report_attach
+		WHERE appr_no = #{apprNo}
+	</select>
+	<insert id="insertApprovalRA" parameterType="ReportAttachVO">
+		<selectKey keyProperty="repattachNo" resultType="int" order="BEFORE">
+			SELECT COUNT(repattach_no) + 1
+			FROM report_attach
+		</selectKey>
+		INSERT INTO report_attach
+		VALUES(#{repattachNo}
+			, #{fileName}
+			, #{filePath}
+			, SYSDATE
+			, null
+			, #{apprNo}
+		)
+	</insert>
+</mapper>

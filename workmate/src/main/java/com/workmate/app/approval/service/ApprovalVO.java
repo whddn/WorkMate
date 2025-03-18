@@ -1,6 +1,8 @@
 package com.workmate.app.approval.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -31,4 +33,5 @@ public class ApprovalVO {
 	private String formPath;		// 결재양식 경로 FK
 	private String userName;		// 결재자 이름 FK
 	private String departmentName;	// 결재 부서 이름 FK
+	private List<Integer> approverList = new ArrayList<>();	// 결재자 번호 리스트
 }
