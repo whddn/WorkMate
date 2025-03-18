@@ -72,6 +72,58 @@
 		$('#SignsTable').DataTable();
 		$('#ApprLines').DataTable();
 	});
+	
+	$('#addSignBtn').on('click', function() {
+        $('#signFileInput').click();
+    });
+
+    $('#signFileInput').on('change', function() {
+        const file = this.files[0];
+        const title = $('#signTitleInput').val();
+
+        if (file && title) {
+            const formData = new FormData();
+            formData.append('signFile', file);
+            formData.append('signTitle', title);
+
+            $.ajax({
+                url: [[ @{/approval/sign} ]], // 서명 추가 요청을 처리할 서버 URL
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    // 서버 응답 처리 (예: 테이블에 새 서명 추가)
+                    console.log(response);
+                    location.reload(); // 페이지 새로고침
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        }
+    });
+    
+    $('#addApprLineBtn').on('click', function() {
+        const title = $('#apprLineTitleInput').val();
+
+        if (title) {
+            $.ajax({
+                url: [[ @{/approval/apprLine} ]], // 결재선 추가 요청을 처리할 서버 URL
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ insertTitle: title }),
+                success: function(response) {
+                    // 서버 응답 처리 (예: 테이블에 새 결재선 추가)
+                    console.log(response);
+                    location.reload(); // 페이지 새로고침
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        }
+    });
 </script>
 
 </html>

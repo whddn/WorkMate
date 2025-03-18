@@ -1,6 +1,9 @@
 package com.workmate.app.employee.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -100,6 +103,26 @@ public class EmpServiceImpl implements EmpService {
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {
 		return empMapper.insertOneEvalu(evaluVO);
+	}
+	
+	// 평가 등록시 평가 항목/평가 내용 조회
+	@Override
+	public Map<String, List<EvaluVO>> allEvaluContent(EvaluVO evaluVO) {
+		List<EvaluVO> evaluList = empMapper.selectAllContent(evaluVO); // 평가 항목 리스트 
+		// 동일한 평가 항목이 나오지 않게 하는 코드 (Map)
+		Map<String, List<EvaluVO>> evaMap = new HashMap<>();  
+		for (int i = 0; i < evaluList.size() ; i++ ) {  // evaluList.get(i) : 키 값, getEvaluCompet : value 값 
+			if (evaMap.get(evaluList.get(i).getEvaluCompet()) != null ) { // i 번째의 항목을 받아오고, 그 값이 널이 아니면 아래 코드를 실행함 
+				evaMap.get(evaluList.get(i).getEvaluCompet()).add(evaluList.get(i)); // 
+			} else {
+				List<EvaluVO> oneEva = new ArrayList<EvaluVO>();
+				oneEva.add(evaluList.get(i));
+				evaMap.put(evaluList.get(i).getEvaluCompet(), oneEva);
+			}
+			
+		}
+		System.out.println(evaMap);
+		return evaMap;
 	}
 
 	

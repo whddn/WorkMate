@@ -166,18 +166,18 @@
                     <th><input type="checkbox" name="postSelection"></th>
                     <th>평가 제목</th>
                     <th>상태</th>
-                    <th>피평가자?</th>
+                    <th>피평가자</th>
                     <th>평가 날짜(시작~종료)</th>
                     <th>비고</th>
                 </tr>
             </thead>
             <tbody>
             <th:block th:each="list : ${list}">
-                <tr>
+                <tr> 
                     <td><input type="checkbox" name="postSelection"></td>
-                    <td><a th:href="@{/emp/bfoneevalu}">[[ ${list.evaluName} ]]</a></td>
+                    <td><a th:href="@{/emp/bfoneevalu/{eva}(eva=${list.evaluFormNo})}">[[ ${list.evaluName} ]]</a></td>
                     <td>[[ ${list.usageStatus} ]]</td>
-                    <td>홍길동</td>
+                    <td>피평가자</td>
                   <td th:text="${#dates.format(list.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(list.evaluEnd, 'yyyy-MM-dd')}"></td>
                     <td>추가 설명</td>
                 </tr>

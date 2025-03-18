@@ -12,6 +12,5 @@ public class DepartmentVO {
 	private int budget;					// 예산 
 	private String budgetStatus;		// 예산 상태
 	
-	List<EmpVO> empList;
 	List<TeamVO> teamList;
 }
