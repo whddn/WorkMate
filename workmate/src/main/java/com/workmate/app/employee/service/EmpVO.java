@@ -14,7 +14,7 @@ public class EmpVO {
 	private String userMail;			// 메일 
 	private String userPosition;		// 직급 
 	// java.util.Date : yyyy/MM/dd
-	//@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date hireDate;			// 입사일자
 	private String userName; 		// 사원 이름
 	//@DateTimeFormat(pattern = "yyyy-MM-dd")

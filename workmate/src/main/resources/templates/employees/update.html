@@ -1,13 +1,14 @@
-
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
   layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
-  <head>
-    <meta charset="UTF-8">
-    <title>Organization</title>
-    <style>
-     /* 기본적인 리셋 */
-    body, html {
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>조직도 (수정)</title>
+  <style>
+    body,
+    html {
       margin: 0;
       padding: 0;
       height: 100%;
@@ -18,9 +19,12 @@
     /* 화면 전체 레이아웃 */
     .wrapper {
       display: flex;
-      justify-content: center; /* 중앙 정렬 */
-      align-items: center; /* 수직 중앙 정렬 */
-      height: 100vh; /* 화면 전체 높이 */
+      justify-content: center;
+      /* 중앙 정렬 */
+      align-items: center;
+      /* 수직 중앙 정렬 */
+      height: 100vh;
+      /* 화면 전체 높이 */
       padding: 20px;
     }
 
@@ -29,28 +33,32 @@
       background: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       min-width: 250px;
       width: 300px;
-      margin-right: 20px; /* 오른쪽에 약간의 간격 추가 */
+      margin-right: 20px;
+      /* 오른쪽에 약간의 간격 추가 */
       max-height: 500px;
-      overflow-y: auto; /* 내용이 넘칠 경우 스크롤 추가 */
+      overflow-y: auto;
+      /* 내용이 넘칠 경우 스크롤 추가 */
     }
 
     /* 상세 정보 카드 */
     .card {
       background: #ffffff;
       border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
       padding: 20px;
       width: 100%;
-      max-width: 500px; /* 고정된 최대 너비 */
+      max-width: 500px;
+      /* 고정된 최대 너비 */
       display: none;
       flex-direction: column;
       justify-content: center;
       height: 500px;
       overflow: hidden;
     }
+
 
     /* 내부 정보 리스트 */
     .info-list {
@@ -63,6 +71,10 @@
     .info-row {
       display: flex;
       align-items: center;
+    }
+
+    .employee {
+      display: none;
     }
 
     /* 라벨 */
@@ -87,8 +99,10 @@
     }
 
     h1 {
-      text-align: center; /* 중앙 정렬 */
-      margin-bottom: 20px; /* 제목 아래 간격 */
+      text-align: center;
+      /* 중앙 정렬 */
+      margin-bottom: 20px;
+      /* 제목 아래 간격 */
     }
 
     .tree li {
@@ -101,198 +115,162 @@
     .tree ul {
       padding-left: 20px;
     }
+  </style>
+</head>
 
-    </style>
-  </head>
-
-  <body>
+<body>
   <div class="wrapper">
     <!-- 왼쪽: 조직도 -->
     <div class="tree-panel">
       <ul class="tree">
-        <li>
-          <th:block th:each="name : ${names}">
-            <span class="folder">[[ ${name.departmentName} ]]</span>
-            <ul>
-              <li><span class="employee" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span></li>
-            </ul>
-          </th:block>
+        <li th:each="dpt : ${names}">
+          <span class="folder">[[ ${dpt.departmentName} ]]</span>
+          <ul>
+            <li th:each="team : ${dpt.teamList}">
+              <span class="teamN" th:data-tn="${team.teamName}">[[ ${team.teamName} ]]</span>
+              <ul>
+                <li th:each="name : ${team.empList}">
+                  <span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}">[[ ${name.userName}
+                    ]]</span>
+                </li>
+              </ul>
+            </li>
+          </ul>
         </li>
       </ul>
     </div>
-        <!-- 사원 상세 정보 -->
-        <div class="card" id="detailsBox">
-          <div class="info-list">
-            <div class="info-row">
-              <span class="label">ID</span>
-              <span class="value" id="info-id" readonly></span>
-            </div>
-            <div class="info-row">
-	            <label>성명</label>
-	            <input id="info-name" type="text" th:data-no="${update.userNo}">
-            </div>
-       		<div class="info-row">
-            <span class="label">팀이름</span>
-            <select>
-            	<option th:value="${team.teamNo}" th:each="team : ${teams}" id="info-team" >[[ ${team.teamName} ]]</option>
-            </select>
-            </div>
-        	<div class="info-row">
-	            <span class="label">사원번호</span>
-	            <input id="info-userNo" readonly>
-            </div>
-            <div class="row">
-	            <label>입사일</label>
-	            <input id="info-hire" type="date">
-            </div>
-            <div class="row">
-              <label>휴대폰</label>
-              <input id="info-phone">
-            </div>
-            </div>
-            <div class="row">
-              <label>집주소</label>.
-              <input id="info-address">
-              <span id="search_icon">
-              <i class="fa fa-search"></i>
-            </span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- 버튼을 detailsBox 바깥 아래에 위치시킴 -->
-        <div class="buttons-container">
-          <div class="action-buttons">
-            <button id="update-employee" type="button">+ 저장하기</button>
-            <button id="">📝 조직도로 돌아가기</button>
-          </div>
+    <!-- 오른쪽: 상세 정보 카드 -->
+    <div class="card" id="detailsBox">
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">ID</span>
+          <input class="value" id="info-id" th:value="${update.userId}" readonly>
+        </div>
+        <div class="info-row">
+          <span class="label">성명</span>
+          <input class="value" id="info-name" th:value="${update.userName}">
+        </div>
+        <div class="info-row">
+          <span class="label">팀이름</span>
+          <select class="value"  id="info-team">
+          	<option th:value="${team.teamNo}" th:each="team : ${teams}" th:text="${team.teamName}"></option>
+          </select>
+        </div>
+        <div class="info-row">
+          <span class="label">사원번호</span>
+          <input class="value" id="info-userNo" th:value="${update.userNo}" readonly>
+        </div>
+        <div class="info-row">
+          <span class="label">입사일</span>
+          <input class="value" type="date" id="info-hire" th:value="${update.hireDate}">
+        </div>
+        <div class="info-row">
+          <span class="label">휴대폰</span>
+          <input class="value" id="info-phone" th:value="${update.userPhone}">
+        </div>
+        <div class="info-row">
+          <span class="label">집주소</span>
+          <input class="value" id="info-address" th:value="${update.address}">
+        </div>
+      </div>
+      <div class="buttons-container">
+        <div class="action-buttons">
+          <button id="add-employee" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
+          <button id="evaluate-employee">📝 평가하기</button>
+          <button id="update-employee" th:onclick="|location.href='@{/emp/update}'|"
+            th:data-no="${update.userNo}" type="button">저장하기</button>
+          <button id="">📝 조직도로 돌아가기</button>
         </div>
       </div>
     </div>
 
     <script>
+      let hireD = document.querySelector('#info-hire').value;
+      console.log(hireD);
 
-    
-    
-    function addCheck(){
-        document.querySelector('#search_icon').addEventListener('click', e => {
-            homeAddCode();
-        })
-    }
-    addCheck();
+      let names = document.querySelectorAll('.employee'); // 사원이름 
+      let teamNames = document.querySelectorAll('.teamN'); // 팀이름
 
-function homeAddCode() {
-        new daum.Postcode({
-            oncomplete: function(data) {
-                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
-
-                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
-                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-                var addr = ''; // 주소 변수
-                var extraAddr = ''; // 참고항목 변수
-
-                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
-                    addr = data.roadAddress;
-                } else { // 사용자가 지번 주소를 선택했을 경우(J)
-                    addr = data.jibunAddress;
-                }
-
-                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
-                if(data.userSelectedType === 'R'){
-                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
-                        extraAddr += data.bname;
-                    }
-                    // 건물명이 있고, 공동주택일 경우 추가한다.
-                    if(data.buildingName !== '' && data.apartment === 'Y'){
-                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                    }
-                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-                    if(extraAddr !== ''){
-                        extraAddr = ' (' + extraAddr + ')';
-                    }
-                    // 조합된 참고항목을 해당 필드에 넣는다.
-                    document.querySelector('.addresshome').value = extraAddr;
-                
-                } else {
-                    document.querySelector('.addresshome').value = extraAddr;
-                }
-
-                // 우편번호와 주소 정보를 해당 필드에 넣는다.
-                document.querySelector('.addresshome').value = data.zonecode;
-                document.querySelector('.addresshome').value = addr;
-
+      for (let teamclick of teamNames) {
+        teamclick.addEventListener('click', e => {
+          const team = e.target.dataset.tn; // 클릭된 팀의 data-tn 값 가져오기
+          document.querySelectorAll('.employee').forEach(namedisplay => { // 사원 이름 보이게
+            if (namedisplay.dataset.tn === team) {
+              namedisplay.style.display = 'block'; // 클릭된 팀에 속한 사원만 보이게
+            } else {
+              namedisplay.style.display = 'none'; // 클릭된 팀 이외의 사원은 숨기기
             }
-        }).open();
-}
- let names = document.querySelectorAll('.employee');
-
-  // 화면 부르기 AJAX
-  for (let nameclick of names) {
-    nameclick.addEventListener('click', function(event) {
-      const userNo = event.target.dataset.id;
-      document.getElementById("detailsBox").style.display = 'block';  // 상세 페이지 표시
-      
-      fetch(`/workmate/emp/update/${userNo}`)
-        .then(res => res.json())
-        .then(result => {
-          document.querySelector('#info-name').value = result.userName;
-          document.querySelector('#info-team').value = result.teamName;
-          document.querySelector('#info-userNo').value = result.userNo;
-          document.querySelector('#info-id').value = result.userId;
-          document.querySelector('#info-hire').value = result.hireDate;
-          document.querySelector('#info-phone').value = result.userPhone;
-          document.querySelector('#info-address').value = result.address;
-
-        })
-        .catch(err => console.log(err));
-    });
-  }
-
-	// 사원 수정 AJAX
-	
-	document.querySelector('#update-employee').addEventListener('click', e => {
-		updateEmp();
-	})
-	
-	function updateEmp() {
-	let userName = document.querySelector('#info-name').value; // 이름 
-	//let userDName = document.querySelector('#info-ext').value; // 부서 
-	let userTeam = document.querySelector('#info-team').value; // 팀 
-	let userPhone =  document.querySelector('#info-phone').value; // 폰 번호  
-	let userAddress =  document.querySelector('#info-address').value; // 주소 
+          });
+        });
+      }
 
 
-	let updateEmpData = {
-		'userName' : userName,
-	//	'departmentName' : userDName,
-		'teamNo' : userTeam,
-		'userPhone' : userPhone,
-		'address' : userAddress
-		};
-		const updateNo = document.querySelector('#info-status').value;
-		console.log(updateNo);
-		fetch(`/workmate/emp/update/${updateNo}`, {
-	    method : "put",
-	    headers : {
-	        'Content-type' : "application/json"
-	      },
-	      body : JSON.stringify(updateEmpData),
-	    })
-	    .then(res => res.json())
-	    .then(result => {
-   		  document.querySelector('#info-name').value = result.userName;
-      //    document.querySelector('#info-ext').value = result.departmentName;
-          document.querySelector('#info-team').value = result.teamName;
-          document.querySelector('#info-phone').value = result.userPhone;
-          document.querySelector('#info-address').value = result.address;
-	    })
-	    .catch(err => console.log(err));
-}
-	
+   // 화면 부르기 AJAX
+      for (let nameclick of names) {
+        nameclick.addEventListener('click', function (event) {
+          const userNo = event.target.dataset.id;
+          document.getElementById("detailsBox").style.display = 'block'; // 상세 페이지 표시
+
+          fetch(`/workmate/emp/update/${userNo}`)
+            .then(res => res.json())
+            .then(result => {
+              let hireDate = result.hireDate.split('T')[0];
+              document.querySelector('#info-name').value = result.userName;
+              document.querySelector('#info-team option:checked').text = result.teamName;
+              document.querySelector('#info-userNo').value = result.userNo;
+              document.querySelector('#info-id').value = result.userId;
+              document.querySelector('#info-hire').value = hireDate;
+              document.querySelector('#info-phone').value = result.userPhone;
+              document.querySelector('#info-address').value = result.address;
+
+            })
+            .catch(err => console.log(err));
+        });
+      }
+
+      // 사원 수정 AJAX
+
+      document.querySelector('#update-employee').addEventListener('click', e => {
+        updateEmp();
+      })
+	 
+      function updateEmp() {
+    	
+        let userName = document.querySelector('#info-name').value; // 이름 
+        let userTeam = document.querySelector('#info-team').value; // 팀 
+        let userPhone = document.querySelector('#info-phone').value; // 폰 번호  
+        let userAddress = document.querySelector('#info-address').value; // 주소 
+		let hireDate = document.querySelector('#info-hire').value; 		// 날짜
+
+        let updateEmpData = {
+          'userName': userName,
+          'teamNo': userTeam,
+          'userPhone': userPhone,
+          'address': userAddress,
+          'hireDate' : hireDate
+        };
+        const updateNo = document.querySelector('#info-userNo').value;
+        console.log(updateNo);
+        fetch(`/workmate/emp/update/${updateNo}`, {
+            method: "put",
+            headers: {
+              'Content-type': "application/json"
+            },
+            body: JSON.stringify(updateEmpData),
+          })
+          .then(res => res.json())
+          .then(result => {
+        	let hireDateS = result.hireDate.split('T')[0];
+            document.querySelector('#info-name').value = result.userName;
+            document.querySelector('#info-team').value = result.teamNo;
+            document.querySelector('#info-phone').value = result.userPhone;
+            document.querySelector('#info-address').value = result.address;
+            document.querySelector('#info-hire').value = hireDateS;
+          })
+          .catch(err => console.log(err));
+      }
     </script>
-  </body>
+</body>
+
 </html>

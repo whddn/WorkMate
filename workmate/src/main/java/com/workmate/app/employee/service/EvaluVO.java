@@ -29,6 +29,7 @@ public class EvaluVO {
 	private String orderNo;			// 평가 번호 나열 순서
 	private int evaluFormNo;		// 평가 폼 번호 
 	
+	//List<DepartmentVO> dptList;
 	// 평가 폼 (문제은행에서 랜덤으로 골라서 평가 양식을 생성함)
 	private String evaluName;		// 평가 이름 
 	private String evaluDescript;	// 평가 설명
@@ -41,7 +42,10 @@ public class EvaluVO {
 	
 	private int userNo;				// 유저 번호 
 	private String userName;		// 유저 이름
-	
+	private String departmentName;	// 부서명
+	private String teamName;		// 팀이름
+	private String userPosition;	// 직급
+	List<EvaluVO> evaluItem;		// AJAX로 보낼 배열 이름과 동일하게 
 	// 평가자 그룹 
 	private int evaluGroupId;		// 평가자 그룹 아이디
 	// 피평가자 그룹 

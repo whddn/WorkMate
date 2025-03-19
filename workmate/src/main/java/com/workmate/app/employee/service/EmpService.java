@@ -35,6 +35,13 @@ public interface EmpService {
 	// 지나간 평가 단건 조회 (관리자) 
 	public List<EvaluVO> findBeforeEvaluOne(EvaluVO evaluVO);
 	
+	// 평가 결과 - 평가자 정보 조회 
+	//public List<DepartmentVO> findEvaluInfo(EvaluVO evaluVO);
+	public List<EvaluVO> findEvaluInfo(EvaluVO evaluVO);
+	
+	// 평가 결과 - 피평가자 정보 조회
+	//public List<DepartmentVO> findEvaluateeInfo(EvaluVO evaluVO);
+	public List<EvaluVO> findEvaluateeInfo(EvaluVO evaluVO);
 	// 지나간 평가 페이지 단순 출력문 
 	//public EvaluVO findEvaluList(EvaluVO evaluVO);
 	
@@ -44,9 +51,13 @@ public interface EmpService {
 	// 나의 평가 조회 (단건 조회) 
 	public List<EvaluVO> findOneEvaluResult(EvaluVO evaluVO);
 	
-	// 평가 등록 (관리자)
+	// 평가 등록 (관리자 페이지)
 	public int inputNewEvalu(EvaluVO evaluVO);
 	
 	// 평가 등록시 평가 항목 / 평가 내용 조회 
 	public Map<String, List<EvaluVO>> allEvaluContent(EvaluVO evaluVO);
+	
+	// 평가 등록 기능 AJAX 
+	public int insertNewEvaluAJAX(EvaluVO evaluVO);
+
 }

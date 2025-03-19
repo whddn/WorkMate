@@ -28,13 +28,13 @@ public class SignServiceImpl implements SignService {
 	@Override
 	public int insertSign(SignVO signVO) {
 		// TODO Auto-generated method stub
-		return 0;
+		return signMapper.insertSign(signVO);
 	}
 
 	@Override
-	public int deleteSign(int signNo) {
+	public int deleteSign(SignVO signVO) {
 		// TODO Auto-generated method stub
-		return 0;
+		return signMapper.deleteSign(signVO);
 	}
 
 }
