@@ -14,11 +14,10 @@
 <body>
 	<div>
 		<h3>서명 이미지 관리</h3>
-		<button class="btn btn-primary">파일 첨부</button>
+		<button id="addSignBtn" class="btn btn-primary">파일 첨부</button>
 		<table id="SignsTable" class="display">
 			<thead>
 				<tr>
-					<th><input type="checkbox"></th>
 					<th>서명</th>
 					<th>제목</th>
 					<th>등록일</th>
@@ -28,15 +27,15 @@
 			<tbody>
 				<th:block th:each="sign, sts : ${signs}">
 					<tr>
-						<th><input type="checkbox"></th>
-						<th>[[ ${sign.signPath} ]]</th>
+						<th><img th:src="${sign.signPath}" th:alt="${sign.signTitle}" width="50" height="50"></th>
 						<th>[[ ${sign.signTitle} ]]</th>
-						<th>[[ ${sign.insertDate ]]</th>
-						<th><button class="btn btn-primary">삭제</button></th>
+						<th>[[ ${sign.insertDate} ]]</th>
+						<th><button id="signFileDelete" th:onclick="|killSign(${sign.signNo})|" class="btn btn-primary">삭제</button></th>
 					</tr>
 				</th:block>
 			</tbody>
 		</table>
+		<input id="signFileInput" type="file" multiple style="display: none;">
 		*서명은 최대 3개까지 등록 가능합니다.<br>
 		서명이 3개 넘을 시 등록된 서명을 삭제 후 등록할 수 있습니다.
 	</div>
@@ -47,7 +46,6 @@
 		<table id="ApprLines" class="display">
 			<thead>
 				<tr>
-					<th><input type="checkbox"></th>
 					<th>제목</th>
 					<th>등록일</th>
 					<th>삭제</th>
@@ -56,7 +54,6 @@
 			<tbody>
 				<th:block th:each="apprLine, sts : ${apprLines}">
 					<tr>
-						<th><input type="checkbox"></th>
 						<th>[[ ${apprLine.insertTitle} ]]</th>
 						<th>[[ ${apprLine.insertDate} ]]</th>
 						<th><button class="btn btn-primary">삭제</button></th>
@@ -67,24 +64,56 @@
 	</div>
 </body>
 
-<script>
+<script th:inline="javascript">
+	// 서명 파일을 제거한다.
+	function killSign(signNo) {
+		const path = [[ @{/approval/sign} ]];
+		fetch(`${path}/${signNo}`, {
+			method: 'DELETE'
+		})
+		.then(response => response.json())
+		.then(result => {
+			if(result.success) {
+				alert('서명이 삭제되었습니다.');
+				location.reload(); // 페이지 새로고침
+			}
+			else {
+				alert('삭제에 실패하였습니다.');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			alert('서버 요청 중 오류가 발생했습니다.');
+		});
+	}
+
 	$(document).ready(function() {
 		$('#SignsTable').DataTable();
 		$('#ApprLines').DataTable();
 	});
 	
+	// 서명 파일 추가 버튼을 누를때 행동
 	$('#addSignBtn').on('click', function() {
+		// #SignsTable의 데이터 줄 수를 확인
+        var table = $('#SignsTable').DataTable();
+        var rowCount = table.rows().count();
+
+        // 데이터 줄 수가 3 이상이면 추가 거절
+        if (rowCount >= 3) {
+            alert("서명 파일은 최대 3개까지만 추가할 수 있습니다."); // 사용자에게 알림 메시지 표시 (선택 사항)
+            return; // 함수 실행 중단
+        }
+        
         $('#signFileInput').click();
     });
 
+	// 서명 파일을 추가한다.
     $('#signFileInput').on('change', function() {
         const file = this.files[0];
-        const title = $('#signTitleInput').val();
 
-        if (file && title) {
+        if (file) {
             const formData = new FormData();
-            formData.append('signFile', file);
-            formData.append('signTitle', title);
+            formData.append('file', file);
 
             $.ajax({
                 url: [[ @{/approval/sign} ]], // 서명 추가 요청을 처리할 서버 URL
@@ -94,7 +123,7 @@
                 processData: false,
                 success: function(response) {
                     // 서버 응답 처리 (예: 테이블에 새 서명 추가)
-                    console.log(response);
+                    alert(response);
                     location.reload(); // 페이지 새로고침
                 },
                 error: function(error) {
@@ -103,7 +132,7 @@
             });
         }
     });
-    
+	
     $('#addApprLineBtn').on('click', function() {
         const title = $('#apprLineTitleInput').val();
 

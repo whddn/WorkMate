@@ -24,4 +24,5 @@ public class ApprElmntVO {
 	private String userName;		// 결재자 이름
 	private String teamName;		// 팀명
 	private String departmentName;	// 부서명
+	private String signPath;		// 사인 경로
 }

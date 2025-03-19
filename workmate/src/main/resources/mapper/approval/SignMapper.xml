@@ -19,4 +19,27 @@
 		    ON team.department_id=department.department_id
 		WHERE sign.user_no=#{userNo}
 	</select>
+	<insert id="insertSign" parameterType="SignVO">
+		<selectKey keyProperty="signNo" resultType="int" order="BEFORE">
+			SELECT COALESCE(MAX(sign_no), 0) + 1
+			FROM sign
+		</selectKey>
+		INSERT INTO sign(sign_no
+			, sign_title
+			, sign_path
+			, insert_date
+			, user_no
+		)
+		VALUES(#{signNo}
+			, #{signTitle}
+			, #{signPath}
+			, SYSDATE
+			, #{userNo}
+		)
+	</insert>
+	<delete id="deleteSign" parameterType="SignVO">
+		DELETE FROM sign
+		WHERE sign_no = #{signNo}
+			AND user_no = #{userNo}
+	</delete>
 </mapper>
