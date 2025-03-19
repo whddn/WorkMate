@@ -10,7 +10,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // ✅ /uploads/** 요청이 /home/user/uploads/ 실제 폴더와 매핑되도록 설정
-        registry.addResourceHandler("/http://localhost:8099/workmate/**")
+        registry.addResourceHandler("/upload/**")
                 .addResourceLocations("file:///C:/CommonItemImage/"); // ✅ 실제 파일 경로
 
     }

@@ -1,162 +1,184 @@
 <!DOCTYPE html>
-<html xmlns:th=xmlns:th="https://www.thymeleaf.org/"
+<html xmlns:th=xmlns:th=
+	"https://www.thymeleaf.org/"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{common/layouts/reservation_layout}"
-	  layout:fragment="content">
+	layout:decorate="~{common/layouts/reservation_layout}"
+	layout:fragment="content">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>예약 시스템</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예약 시스템</title>
 
-    <!-- KaiAdmin Theme CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-    
-    <style>
-        .container {
-            max-width: 1200px;
-            margin: auto;
-        }
-        .equal-height {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .equal-height > div {
-            display: flex;
-            flex-direction: column;
-        }
-        .card {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .card-body {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .reservation-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-        }
-        .time-table {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .time-slot {
-            padding: 10px;
-            border: 1px solid #007bff;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            background-color: #f8f9fa;
-        }
-        .time-slot.selected {
-            background-color: #007bff;
-            color: white;
-        }
-    </style>
+<!-- KaiAdmin Theme CSS -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
+<link
+	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+	rel="stylesheet">
+
+<style>
+.container {
+	max-width: 1200px;
+	margin: auto;
+}
+
+.equal-height {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.equal-height>div {
+	display: flex;
+	flex-direction: column;
+}
+
+.card {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.card-body {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.reservation-image {
+	max-width: 100%;
+	height: auto;
+	border-radius: 5px;
+}
+
+.time-table {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
+}
+
+.time-slot {
+	padding: 10px;
+	border: 1px solid #007bff;
+	border-radius: 5px;
+	text-align: center;
+	cursor: pointer;
+	background-color: #f8f9fa;
+}
+
+.time-slot.selected {
+	background-color: #007bff;
+	color: white;
+}
+</style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <div class="row equal-height">
-        <!-- 캘린더 영역 -->
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white text-center">예약 진행 중</div>
-                <div class="card-body">
-                    <div id="calendar"></div>
-                </div>
-            </div>
-        </div>
+	<div class="container mt-5">
+		<div class="row equal-height">
+			<!-- 캘린더 영역 -->
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-header bg-primary text-white text-center">예약
+						진행 중</div>
+					<div class="card-body">
+						<div id="calendar"></div>
+					</div>
+				</div>
+			</div>
 
-        <!-- 시간 선택 영역 -->
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white text-center">시간 선택</div>
-                <div class="card-body">
-                    <button type="button" class="btn btn-outline-primary btn-sm mb-3" onclick="toggleAllTimes()">전체 선택</button>
-                    <div class="time-table">
-                        <th:block th:each="hour : ${#numbers.sequence(6, 23)}">
-                            <div class="time-slot" th:id="'time'+${hour}" th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}" 
-                                 onclick="toggleTime(this)">
-                                <span th:text="${hour + ':00 - ' + (hour+1) + ':00'}"></span>
-                            </div>
-                        </th:block>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row equal-height mt-3">
-        <!-- 이미지 영역 -->
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <img src="assets/img/reservation/meetingroom1.jpg" alt="회의실1" class="reservation-image">
-                </div>
-            </div>
-        </div>
+			<!-- 시간 선택 영역 -->
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-header bg-primary text-white text-center">시간
+						선택</div>
+					<div class="card-body">
+						<button type="button" class="btn btn-outline-primary btn-sm mb-3"
+							onclick="toggleAllTimes()">전체 선택</button>
+						<div class="time-table">
+							<th:block th:each="hour : ${#numbers.sequence(6, 23)}">
+								<div class="time-slot" th:id="'time'+${hour}"
+									th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}"
+									onclick="toggleTime(this)">
+									<span th:text="${hour + ':00 - ' + (hour+1) + ':00'}"></span>
+								</div>
+							</th:block>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        <!-- 예약 정보 입력 영역 -->
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white text-center">예약 정보 입력</div>
-                <div class="card-body">
-                    <form action="/reservations" method="POST">
-                        <div class="mb-3">
-                            <label class="form-label">공용품 종류</label>
-                            <select class="form-control" id="itemType" name="itemType" onchange="updateOptions()">
-                                <option value="meeting-room">회의실</option>
-                                <option value="car">차량</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">선택 항목</label>
-                            <select class="form-control" id="itemSelection" name="itemSelection">
-                                <!-- JavaScript에서 동적으로 변경됨 -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">이용 날짜</label>
-                            <input type="date" class="form-control" name="reservationDate">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">예약 내용</label>
-                            <textarea class="form-control" name="reservationDetails" rows="3" placeholder="예약 목적을 입력하세요"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">예약자 정보</label>
-                            <input type="text" class="form-control" name="userName" placeholder="예약자명">
-                            <input type="text" class="form-control" name="userPhone" placeholder="연락처">
-                            <input type="email" class="form-control" name="userEmail" placeholder="이메일">
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success">예약하기</button>
-                            <button type="reset" class="btn btn-danger">취소</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
-    </div>
-</div>
+		<div class="row equal-height mt-3">
+			<!-- ✅ 이미지 영역 (Thymeleaf로 변경) -->
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-body text-center">
+						<img th:src="@{'/workmate/upload/' + ${reser.image}}" alt="예약 이미지"
+							class="reservation-image">
+					</div>
+				</div>
+			</div>
 
-<!-- KaiAdmin & FullCalendar Scripts -->
-<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
+			<!-- ✅ 예약 정보 입력 영역 (Thymeleaf로 변경) -->
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-header bg-success text-white text-center">예약
+						정보 입력</div>
+					<div class="card-body">
+						<form action="/reservationDetail" method="POST">
+							<div class="mb-3">
+								<label class="form-label">공용품 종류</label> <input type="text"
+									class="form-control" name="commonKind"
+									th:value="${reser.commonKind}" readonly>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">이름</label> <input type="text"
+									class="form-control" name="name" th:value="${reser.name}"
+									readonly>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">이용 날짜</label> <input type="date"
+									class="form-control" name="reservationDate">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">예약 내용</label>
+								<textarea class="form-control" name="reservationDetails"
+									rows="3" placeholder="예약 목적을 입력하세요"></textarea>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">예약자 정보</label> <input type="text"
+									class="form-control" name="userName" placeholder="예약자명">
+								<input type="text" class="form-control" name="userPhone"
+									placeholder="연락처"> <input type="email"
+									class="form-control" name="userEmail" placeholder="이메일">
+							</div>
+							<div class="text-center">
+								<button type="submit" class="btn btn-success">예약하기</button>
+								<button type="reset" class="btn btn-danger">취소</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 
-<script>
+		</div>
+	</div>
+
+	<!-- KaiAdmin & FullCalendar Scripts -->
+	<script
+		src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/jquery-3.6.0.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
+
+	<script>
 	/* 캘린더 추가 */
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
@@ -227,6 +249,22 @@
             }
         });
     }
+    
+    async function loadReservationDetail() {
+        const reserNo = window.location.pathname.split("/").pop();  // URL에서 예약 번호 추출
+        const response = await fetch(`/api/reservationDetail/${reserNo}`);  // REST API 요청
+        const reser = await response.json();  // JSON 변환
+
+        if (reser) {
+            document.getElementById("reser-name").innerText = reser.name;
+            document.getElementById("reser-category").innerText = reser.commonKind;
+            document.getElementById("reser-image").src = `/workmate/upload/${reser.image}`;
+        } else {
+            document.body.innerHTML = "<h1>예약 정보를 찾을 수 없습니다.</h1>";
+        }
+    }
+
+    loadReservationDetail();  // 페이지 로드 시 실행
 </script>
 
 </body>

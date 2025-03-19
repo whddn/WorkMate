@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{common/layouts/commonItem_layout}"
+	  layout:decorate="~{common/layouts/admin_layout}"
 	  layout:fragment="content">
 <head>
     <meta charset="UTF-8">
@@ -61,7 +61,7 @@
 <div class="container">
     <div class="card">
         <h2 class="text-center">공용품 관리 수정</h2>
-        <form name="updateForm" method="POST" th:object="${update}" enctype="multipart/form-data">
+        <form name="updateForm" method="POST" th:object="${commonItemVO}" enctype="multipart/form-data" action="commonItemUpdate">
             <input type="hidden" class="common-no" th:field="*{commonNo}">
 
             <div class="form-group">
@@ -83,11 +83,11 @@
             </div>
 
             <div class="form-group">
-                <label>시간 추가</label>
+                <label>시간 추가(00분만 가능함)</label>
                 <div class="time-group">
-                    <input type="time" class="form-control" th:field="*{reserStartTime}">
+                    <input type="time" class="form-control" th:field="*{reserStartTime}" id="start-time" step="3600">
                     <span>~</span>
-                    <input type="time" class="form-control" th:field="*{reserEndTime}">
+                    <input type="time" class="form-control" th:field="*{reserEndTime}" id="end-time" step="3600">
                 </div>
             </div>
 
@@ -106,17 +106,38 @@
 </div>
 
 <script>
+	document.addEventListener("DOMContentLoaded", function() {
+	    let startTimeInput = document.getElementById("start-time");
+	    let endTimeInput = document.getElementById("end-time");
+	
+	    function enforceFullHour(input) {
+	        input.addEventListener("change", function() {
+	            let value = input.value;
+	            if (value) {
+	                let [hours, minutes] = value.split(":");
+	                if (minutes !== "00") {
+	                    input.value = `${hours}:00`; // 자동으로 00분으로 설정
+	                }
+	            }
+	        });
+	    }
+	    enforceFullHour(startTimeInput);
+        enforceFullHour(endTimeInput);
+    });
+
+
     function updateItem() {
         if (confirm("공용품을 수정하시겠습니까?")) {
-            document.updateForm.submit();
+        	updateForm.submit()
         }
     }
 
     function cancelForm() {
         if (confirm("수정을 취소하시겠습니까?")) {
-            window.location.href = "/admin/commonItemList";
+            window.location.href = "commonItemList";
         }
     }
+
 </script>
 
 </body>

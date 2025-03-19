@@ -10,7 +10,7 @@ public interface ReservationMapper {
 	public List<ReservationVO> selectReservationList();
 	
 	// 단건조회 - 예약정보
-	public ReservationVO selectReservationInfo(ReservationVO reservationVO);
+	public ReservationVO selectReservationInfo(int reserNo);
 	
 	// 예약신청
 	public int insertReservationInfo(ReservationVO reservationVO);
