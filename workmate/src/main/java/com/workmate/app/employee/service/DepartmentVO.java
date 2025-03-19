@@ -11,6 +11,6 @@ public class DepartmentVO {
 	private String departmentName;		// 부서 이름
 	private int budget;					// 예산 
 	private String budgetStatus;		// 예산 상태
-	
+	private int userNo;					// 사원번호 
 	List<TeamVO> teamList;
 }

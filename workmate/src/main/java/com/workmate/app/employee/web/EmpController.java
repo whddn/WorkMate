@@ -70,7 +70,17 @@ public class EmpController {
 	public String beforeEvaluOneResultPage(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
 		evaluVO.setEvaluFormNo(evaluFormNo);
 		List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluOne(evaluVO);
+		List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
+		List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
+		model.addAttribute("evalu", evalu); // 평가자 정보 
+		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
 		model.addAttribute("one", findOneEvaluResult);
+		model.addAttribute("names", empService.empNameList()); // 부서명 
+////		
+//		List<DepartmentVO> dptEvalu = empService.findEvaluInfo(evaluVO);
+//		List<DepartmentVO> dptEvaluatee = empService.findEvaluateeInfo(evaluVO);
+//		model.addAttribute("evalu", dptEvalu); // 평가자 정보 
+//		model.addAttribute("evaluatee", dptEvaluatee); // 피평가자 정보		
 		return "employees/beforeEvaluOneInList"; // 페이지 이동 방식 @PathVariable : 한 건만 넘길 때 / @requestParam : 여러 건 넘길 때
 	}
 	
@@ -88,7 +98,7 @@ public class EmpController {
 		return "employees/evaluResult";
 	}
 	
-	// 평가 등록 (관리자) 
+	// 평가 등록 페이지 (관리자) 
 	@GetMapping("emp/neweva")
 	public String evaluNewOneInsert(EvaluVO evaluVO, Model model) {
 		model.addAttribute("teams", empService.selectAllTeam());
@@ -96,6 +106,13 @@ public class EmpController {
 		model.addAttribute("names", empService.empNameList()); // 부서명 
 		return "employees/newEvalu";
 	}
+	
+	// 평가 등록 AJAX (관리자)
+	@PostMapping("emp/neweva")
+	public String evaluInsertAJAX(@RequestBody EvaluVO evaluVO) {
+		empService.insertNewEvaluAJAX(evaluVO);
+		return "redirect:/emp/neweva";
+	} 
 	
 	// 사원 등록 페이지 
 	@GetMapping("emp/newemp") 
@@ -110,9 +127,10 @@ public class EmpController {
 	public String empNew(@RequestBody EmpVO empVO) {
 		empService.inputNewEmp(empVO);
 		//return "employees/newEmp";
-		 return "redirect:organ"; // 등록 후 조직도로 반환, 페이지 이동
+		 return "redirect:/emp/organ"; // 등록 후 조직도로 반환, 페이지 이동
 	}
-	
+
+	// 조직도 수정 페이지 - 수정된 사원 정보 조회
 	@GetMapping("emp/update") // 조직도 수정 페이지 
 	public String empUpdatePage(EmpVO empVO, Model model) {
 		// 2) 서비스 
@@ -122,7 +140,21 @@ public class EmpController {
 		model.addAttribute("names", empService.empNameList()); // 부서명 
 		model.addAttribute("rank", empService.selectAllPosition()); // 직급명
 		return "employees/update"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
-		// redirect:/workmate/emp/update
+	    //return "redirect:/workmate/emp/update/" + empVO.getUserNo();
+	}
+	
+	// 조직도 수정 페이지 - 수정된 사원 정보 조회
+	@PostMapping("emp/update/{userNo}") // 조직도 수정 페이지 
+	public String empUpdatePage(EmpVO empVO, Model model, @PathVariable int userNo) {
+		// 2) 서비스 
+		empVO.setUserNo(userNo);
+		EmpVO findVO = new EmpVO();
+		model.addAttribute("update", findVO);
+		model.addAttribute("teams", empService.selectAllTeam()); // 팀명 
+		model.addAttribute("names", empService.empNameList()); // 부서명 
+		model.addAttribute("rank", empService.selectAllPosition()); // 직급명
+		return "employees/update"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
+	    //return "redirect:/workmate/emp/update/" + empVO.getUserNo();
 	}
 	
 	// 조직도 수정 AJAX 단건 조회
@@ -143,6 +175,7 @@ public class EmpController {
 	    EmpVO updatedEmp = empService.findEmpByEmpNo(empVO); // 수정된 사원 조회
 	    return ResponseEntity.ok(updatedEmp); // 수정된 사원 정보 반환
 	}
+	
 	
 
 

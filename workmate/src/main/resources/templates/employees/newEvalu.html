@@ -209,13 +209,13 @@
         <tbody>
           <tr>
 			<td>
-              <select id="evaCompet">
+              <select id="evaCompet" th:each="con : ${content}">
                 <option th:each="con : ${content}">[[ ${con.key} ]]</option>
               </select>
             </td>
             <td>
-              <select id="allContent">
-                <option id="evaContent">내용을 선택하세요.</option>
+              <select id="allContent" th:each="con : ${content}">
+                <option>내용을 선택하세요.</option>
               </select>
             </td>
           </tr>
@@ -226,15 +226,15 @@
       <!-- 소속 부서와 소속 팀 선택 -->
       <div class="form-row select-group">
         <div class="form-group">
-          <label for="department">소속 부서</label>
+          <label for="department">평가자</label>
           <select id="department" name="department" required>
-            <option value="">부서를 선택하세요</option>
-            <option value="department1" th:each="dept : ${names}">[[ ${dept.departmentName} ]]</option>
+            <option value="">팀을 선택하세요</option>
+            <option th:each="t : ${teams}" th:value="${t.teamNo}">[[ ${t.teamName} ]]</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="team">소속 팀</label>
+          <label for="team">피평가자</label>
           <select id="team" name="team" required>
             <option value="">팀을 선택하세요</option>
             <option th:each="t : ${teams}" th:value="${t.teamNo}">[[ ${t.teamName} ]]</option>
@@ -244,28 +244,106 @@
 
       <!-- 등록하기 버튼과 취소 버튼 -->
       <div class="button-container">
-        <button type="submit" id="submit-btn">등록하기</button>
+        <button type="button" id="submit-btn">등록하기</button>
         <button type="button" id="cancel-btn">취소</button>
       </div>
     </form>
   </div>
- <script th:inline="javascript">
-//타임리프에서 content 배열을 받아옵니다.
- let compet = [[ ${content} ]];  // compet 배열을 타임리프에서 받아옴
- let competSelect = document.querySelector("#evaCompet");  // 왼쪽 드롭다운
- let contentSelect = document.querySelector("#evaContent"); // 오른쪽 드롭다운
- let rightAll = document.querySelector("#allContent");
- 
- competSelect.addEventListener('change', function() {
-	rightAll.innerHTML = ''; // option 태그 초기화
-	for (let i = 0; i < competSelect.length; i++) {
-		let option = document.createElement("option");
-		option.textContent = compet[evaCompet.value][i].evaluContent;
-		rightAll.append(option);
-	}
- });
+<script th:inline="javascript">
 
-    </script>
+// 평가 항목과 내용을 동적으로 연결하는 로직
+let compet = [[ ${content} ]];  // 타임리프에서 가져온 compet 배열
+let competSelect = document.querySelectorAll("#evaCompet");  // 왼쪽 드롭다운들
+let contentSelect = document.querySelectorAll("#allContent"); // 오른쪽 드롭다운들
+
+// 각 드롭다운에 대해 이벤트 리스너 추가
+for (let i = 0; i < competSelect.length; i++) {
+    competSelect[i].addEventListener('change', function() {
+        let selectedCompet = competSelect[i].value;  // 선택된 평가 항목
+        let rightAll = contentSelect[i]; // 해당 평가 항목에 맞는 오른쪽 드롭다운
+
+        // 기존의 옵션을 초기화
+        rightAll.innerHTML = '';
+
+        // 선택된 평가 항목에 해당하는 내용을 오른쪽 드롭다운에 추가
+        if (compet[selectedCompet]) {
+            for (let j = 0; j < compet[selectedCompet].length; j++) {
+                let option = document.createElement("option");
+                option.textContent = compet[selectedCompet][j].evaluContent;
+                rightAll.append(option);
+            }
+        }
+    });
+}
+
+		// '등록하기' 버튼 클릭 시 실행되는 이벤트
+		document.querySelector('#submit-btn').addEventListener('click', e => {
+		    inputNewEvalu();  // 평가 등록 함수 호출
+		});
+
+	// 평가 등록 AJAX 함수
+	function inputNewEvalu() {
+	    // 폼에서 입력된 값 가져오기
+	    let evaluName = document.querySelector('#evaluName').value;
+	    let evaluStart = document.querySelector('#start-date').value;
+	    let evaluEnd = document.querySelector('#end-date').value;
+	    let competSelect = document.querySelectorAll("#evaCompet");
+	    let contentSelect = document.querySelectorAll("#allContent");
+	
+	    // 선택된 평가자와 피평가자 (팀)
+	    let department = document.querySelector('#department').value; // 평가자 (팀)
+	    let team = document.querySelector('#team').value; // 피평가자 (팀)
+	
+	    // 선택된 항목들을 저장할 배열
+	    let itemList = [];
+	
+	    // 평가 항목과 내용이 선택된 경우, 배열에 추가
+	    for (let i = 0; i < competSelect.length; i++) {
+	        let competValue = competSelect[i].value;  // 선택된 평가 항목
+	        let contentValue = contentSelect[i].value;  // 선택된 평가 내용
+	
+	        // 항목과 내용이 모두 선택되었을 때만 배열에 추가
+	        if (competValue && contentValue) {
+	            itemList.push({
+	                compet: competValue,
+	                content: contentValue
+	            });
+	        }
+	    }
+	
+	    // 평가 데이터를 객체로 구성
+	    let EvaluItem = {
+	        'evaluName': evaluName,
+	        'evaluStart': evaluStart,
+	        'evaluEnd': evaluEnd,
+	        'evaluGroupId': department,  // 평가자 (팀)
+	        'evaluateeGroupId': team,  // 피평가자 (팀)
+	        'evaluItem': itemList  // 선택된 항목 리스트
+	    };
+        console.log(EvaluItem);
+	
+	    // 서버로 평가 데이터를 전송 (AJAX 요청)
+	    fetch(`/workmate/emp/neweva`, {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json'
+	        },
+	        body: JSON.stringify(EvaluItem),  // 평가 데이터를 JSON 형식으로 전송
+	    })
+	    .then(res => res.json())  // 서버 응답을 JSON으로 파싱
+	    .then(result => {
+	        // 성공적인 응답 처리
+	        console.log('성공적으로 등록되었습니다:', result);
+
+	    })
+	    .catch(err => {
+	        // 오류 발생 시 처리
+	        console.error('에러 발생:', err);
+	    });
+	}
+
+</script>
+
 
 
 
