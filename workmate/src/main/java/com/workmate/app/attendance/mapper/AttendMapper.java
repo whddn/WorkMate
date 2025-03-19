@@ -26,4 +26,5 @@ public interface AttendMapper {
 	
 	// 연차 사용내역 전체 조회
 	public List<WorkVO> allAnnualList(WorkVO workVO);
+
 }

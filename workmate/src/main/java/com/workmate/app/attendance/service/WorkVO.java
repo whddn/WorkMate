@@ -20,6 +20,7 @@ public class WorkVO {
 		private int totalWork;		//총근무시간
 		private double addWorkTime; //연장근무시간
 		private Integer userNo;		//사원번호
+		private String userName;		//사원번호
 		
 		private double totalWorkTime; // 현재달 총 근무시간 
 		private double remainWorkTime; // 남은 근무시간
@@ -41,6 +42,8 @@ public class WorkVO {
 		private int checkStatus;	//정산여부
 		private int usedAnnualCount;	//사용연차
 		private int remainAnlLeave;		//남은연차
+		
+		
 		
 		// 검색날짜
 		@DateTimeFormat(pattern = "yyyy-MM-dd")

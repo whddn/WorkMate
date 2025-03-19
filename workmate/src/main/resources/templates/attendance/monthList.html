@@ -40,7 +40,8 @@
 
 .date-box {
 	font-size: 20px;
-	margin-bottom: 10px;
+	margin-bottom: 0px;
+	margin-top: 30px;
 }
 
 .time-box {
@@ -97,11 +98,11 @@ table {
 	<div class="main-container">
 		<div class="card" id="card-left">
 			<div class="card-body">
-				<h4 class="card-title"><i class="fas fa-user"> 김철수님, 근태현황</i>	</h4>
+				<h4 class="card-title"><i class="fas fa-user"> [[${userName}]]님, 근태현황</i></h4>
 				<p class="date-box" id="current-date"></p>
 				<p class="time-box" id="current-time"></p>				
-				<p>	출근시간 : <span id="start-time" >[[${attend} != null ? ${#dates.format(attend.startWork, 'HH:mm')} : 미등록 ]]</span> </p>
-				<p>	퇴근시간 : <span id="end-time">[[${attend} != null ? ${#dates.format(attend.afterWork, 'HH:mm')} : 미등록 ]]</span> </p>
+				<p>🕘 <b>출근시간 : </b> <span id="start-time" >[[${attend} != null ? ${#dates.format(attend.startWork, 'HH:mm')} : 미등록 ]]</span> </p>
+				<p>🕕 <b>퇴근시간 : </b> <span id="end-time">[[${attend} != null ? ${#dates.format(attend.afterWork, 'HH:mm')} : 미등록 ]]</span> </p>
 				
 				<form action="startWork" th:if ="${attend}== null">
 					<button class="btn btn-primary btn-fw" id="workStart">출근하기</button>
@@ -112,10 +113,10 @@ table {
 				</form>
 				<div class="dropdown-work" style="display: inline-flex; align-items: center; gap: 10px;">				
 					<select id="work-type" class="form-select input-fixed">
-						<option value="기본">근무타입선택</option>
-						<option value="연차">연차</option>
-						<option value="재택">재택</option>
-						<option value="출장">출장</option>
+						<option value="">근무타입선택</option>
+						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">연차</option>
+						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">재택</option>
+						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">출장</option>
 					</select>
 					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청</button>				
 				</div>
@@ -129,14 +130,14 @@ table {
 					<!-- 내용 추가 -->
     <div class="container mt-4">         
         <div class="user-icon"> 
-        	<h4 class="card-title">이번달 업무 시간 </h4>
+        	<h4 class="card-title">이번달 근무 시간 </h4>
         	<p class="text-muted">선택적 근로시간 [9:00 ~ 18:00]</p>
 					
 		</div>	
             <div class="col-10">
                 <div class="card" id="card-work">
                     <div class="card-body">
-                        <strong><h3 id="current-month"></h3></strong>
+                        <strong><h2 id="current-month"></h2></strong>
                         <p> [주 52시간 기준 주간 근무실적]</p>
                         <div class="d-flex justify-content-between">
                             <h3 class="text-info fw-bold">월 근무시간</h3>
@@ -230,6 +231,18 @@ table {
 	}
 	setInterval(currentDate, 1000);
 	currentDate();
+	
+	//근무타입신청
+	function applyWorkType() {
+		var selectedUrl = document.getElementById("work-type").value;
+		console.log("이벤트");
+		if(!selectedUrl){
+	        alert("근무 타입을 선택하세요!");
+	        return;
+		}
+	    // 선택된 URL로 이동
+	    window.location.href = selectedUrl;
+	}
 	
 </script>
 </html>

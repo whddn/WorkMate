@@ -30,7 +30,7 @@
 <nav
   class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"
 	>
-  <div class="container-fluid col-md-4">
+  <div class="container-fluid col-md-8">
   	<button class="btn btn-primary" th:onclick="| location.href = '@{/mail/mailmain}' |">	<!-- 나중에 수정 -->
   		전자메일
   	</button>
@@ -42,6 +42,9 @@
   	</button>
   	<button class="btn btn-primary" th:onclick="| location.href = '@{/reservation}' |">
   		예약
+  	</button>
+  	<button class="btn btn-primary" th:onclick="| location.href = '@{/document/list}' |">
+  		자료실
   	</button>
   	<div class="btn-group dropdown">
        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">

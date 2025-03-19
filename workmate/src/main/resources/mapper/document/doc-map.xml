@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workmate.app.document.mapper.DocMapper">
+
+	<!-- 자료실 전체조회 -->
+
+	<select id="selectFileList" resultType="DocVO">	
+		SELECT d.file_name
+		        , d.file_size
+		        , d.extenstion
+		        , d.file_reg_date
+		        , d.update_user
+		        , t.team_name
+		FROM document d 
+		LEFT JOIN EMPLOYEE e ON d.user_no = e.user_no
+		LEFT JOIN team t ON e.team_no = t.team_no
+	</select> 
+		
+	
+</mapper>

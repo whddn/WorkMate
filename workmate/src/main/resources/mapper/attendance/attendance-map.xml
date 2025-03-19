@@ -95,13 +95,14 @@
 		WHERE work_no = #{workNo}
 	</update>	
 	
-	<!-- 연차전체조회 -->
+	<!-- 연차 조회 -->
 	<select id="occAnnualList" resultType="WorkVO">
 	    SELECT occ_annual,
 	           used_annual_count,
 	           remain_anl_leave
 	    FROM occ_annual
 	    WHERE user_no = #{userNo}
+	    	AND use_annual_year = EXTRACT(YEAR FROM SYSDATE) <!-- 현재년도만 조회 -->
 	</select>
 	
 	<!-- 연차 사용내역 전체조회 -->
@@ -112,6 +113,11 @@
 		INNER JOIN approval b 
 		ON a.appr_no = b.appr_no
 		WHERE TO_NUMBER(a.user_no) = #{userNo}
+		AND 1 = 1
+	<if test="stDate != null and endDate != null">
+        AND appr_date BETWEEN #{stDate} AND #{endDate} + 1
+    </if>
+		ORDER BY annual_no DESC
 	</select>
 	
 	

@@ -63,7 +63,6 @@ table {
 					<table class="table table-head-bg-primary mt-4">
                       <thead>
                         <tr>
-                          <th scope="col">총연차</th>
                           <th scope="col">올해발생연차</th>
                           <th scope="col">사용연차</th>
                           <th scope="col">잔여연차</th>
@@ -72,7 +71,6 @@ table {
                       <tbody>
                         <tr th:each="occ : ${occs}">
                           <td>[[ ${occ.occAnnual} ]]</td>
-                          <td>15</td>
                           <td>[[ ${occ.usedAnnualCount} ]]</td>
                           <td>[[ ${occ.remainAnlLeave} ]]</td>
                         </tr>                        
@@ -87,13 +85,13 @@ table {
 						<h4 class="card-title">내 연차 사용내역 조회</h4>	
 						
 					<!-- 년도 월별 조회 기능 -->					
-					<!--<div class="date-select">
+					<div class="date-select">
 					<label><b>기간 조회: <b></label>				
 					<input type="text" name="daterange"/>						
 				
-					</div>		-->				
+					</div>			
 						<div class="table-responsive">
-							<table class="table">
+							<table id="annualTable" class="table">
 								<thead>
 									<tr>
 										<th>연차신청일</th>
@@ -126,11 +124,13 @@ table {
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <script>
+$('#annualTable').DataTable({
+	order: [ [ 0, "desc" ] ],
+	info: false,
+});
+
 $(function(){
 	// datepicker 설정
-	    var start = moment().subtract(29, 'days');
-			var end = moment();
-
 	  $('input[name="daterange"]').daterangepicker({
 		format : "yyyy-MM-dd", 
 		autoclose: true,
@@ -143,8 +143,8 @@ $(function(){
 	    locale: {
 	        format: 'YYYY-MM-DD'
 	      },
-	    startDate: start,
-	    endDate: end,
+	    startDate: moment(),
+	    endDate: moment(),
 	  }, function(start, end, label) {
 	    console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
 	  });
@@ -155,7 +155,7 @@ $(function(){
 			  const endDate = picker.endDate.format('YYYY-MM-DD');
 			  
 			  //상대경로
-			  location.href = `allList?stDate=${stDate}&endDate=${endDate}`;				 
+			  location.href = `annual?stDate=${stDate}&endDate=${endDate}`;				 
 	  });	  
 	  
 }); //end of $(function()
