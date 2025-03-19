@@ -75,12 +75,7 @@ public class EmpController {
 		model.addAttribute("evalu", evalu); // 평가자 정보 
 		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
 		model.addAttribute("one", findOneEvaluResult);
-		model.addAttribute("names", empService.empNameList()); // 부서명 
-////		
-//		List<DepartmentVO> dptEvalu = empService.findEvaluInfo(evaluVO);
-//		List<DepartmentVO> dptEvaluatee = empService.findEvaluateeInfo(evaluVO);
-//		model.addAttribute("evalu", dptEvalu); // 평가자 정보 
-//		model.addAttribute("evaluatee", dptEvaluatee); // 피평가자 정보		
+		model.addAttribute("names", empService.empNameList()); // 부서명 	
 		return "employees/beforeEvaluOneInList"; // 페이지 이동 방식 @PathVariable : 한 건만 넘길 때 / @requestParam : 여러 건 넘길 때
 	}
 	
