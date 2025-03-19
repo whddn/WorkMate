@@ -5,7 +5,7 @@ import java.util.List;
 public interface AttendanceService {
 	
 	//월별조회
-	public List<WorkVO> findMonthWork();
+	public List<WorkVO> findMonthWork(int userNo);
 	
 	//전체조회
 	public List<WorkVO> findAllWork(WorkVO workVO);
@@ -24,4 +24,5 @@ public interface AttendanceService {
 	
 	//연차 사용 내역 전체조회
 	public List<WorkVO> findAllAnnual(WorkVO workVO);
+
 }

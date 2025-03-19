@@ -3,16 +3,30 @@ package com.workmate.app.attendance.web;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.thymeleaf.TemplateEngine;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.workmate.app.approval.service.ApprElmntService;
+import com.workmate.app.approval.service.ApprFormService;
+import com.workmate.app.approval.service.ApprLineService;
+import com.workmate.app.approval.service.ApprovalService;
+import com.workmate.app.approval.service.SignService;
 import com.workmate.app.attendance.service.AttendanceService;
 import com.workmate.app.attendance.service.WorkVO;
+import com.workmate.app.employee.service.EmpService;
+import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.security.service.LoginUserVO;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 public class AttendanceController {
-	
+		
 	private AttendanceService attendService; 
 	
 	@Autowired
@@ -20,13 +34,19 @@ public class AttendanceController {
 		this.attendService = attendService;
 	}
 	
+
 	//월별 근태 전체조회 : GET	
 	@GetMapping("attendance/monthList")
-	public String monthAttendanceList(Model model) {		
-		int userNo = 201; 		
+	public String monthAttendanceList(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {		
+	    if (loginUser == null || loginUser.getUserVO() == null) {
+	        return "redirect:/login";  // 로그인 페이지로 리다이렉트
+	    }
+	    
+		int userNo = loginUser.getUserVO().getUserNo(); 		
+		String userName = loginUser.getUserVO().getUserName(); 		
 		//2)Service
 		//근태 데이터 조회
-		List<WorkVO> list = attendService.findMonthWork(); 
+		List<WorkVO> list = attendService.findMonthWork(userNo); 
 		double addWorkTime = list.stream().mapToDouble(WorkVO::getAddWorkTime).sum();
 		double totalWorkTime = list.stream().mapToDouble(WorkVO::getWorkTime).sum();
 		double remainWorkTime = 208 - totalWorkTime;
@@ -38,6 +58,8 @@ public class AttendanceController {
 		model.addAttribute("totalWorkTime", totalWorkTime);
 		model.addAttribute("addWorkTime", addWorkTime); 
 		model.addAttribute("remainWorkTime", remainWorkTime);
+		model.addAttribute("userNo", userNo);
+		model.addAttribute("userName", userName);
 		
 		return "attendance/monthList";
 	}
@@ -71,18 +93,20 @@ public class AttendanceController {
 		return "redirect:/attendance/monthList";
 	}
 	
-	//내 발생 연차 / 내 발생 연차
+	//내 발생 연차, 연차사용내역전체조회
 	@GetMapping("attendance/annual")
 	public String annualList(Model model, WorkVO workVO) {
-		workVO.setUserNo(201);	
+		workVO.setUserNo(201);			
 		
 		List<WorkVO> list = attendService.findOccAnnual(workVO);
-		List<WorkVO> alist = attendService.findAllAnnual(workVO);
+		List<WorkVO> alist = attendService.findAllAnnual(workVO);		
 		
 		model.addAttribute("occs", list);
 		model.addAttribute("anls", alist);
 		
 		return "attendance/annual";
 	}
+	
+	
 	
 }
