@@ -30,7 +30,7 @@ public class ReservationImpl implements ReservationService {
 	// 단건
 	@Override
 	public ReservationVO findReserInfo(int reserNo) {
-		return reservationMapper.selectReservationInfo(reserNo);
+		return reservationMapper.selectReservationById(reserNo);
 	}
 
 	// 예약 등록
