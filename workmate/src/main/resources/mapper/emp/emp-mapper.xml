@@ -107,7 +107,7 @@
 		SET
               USER_NAME = #{userName}
             , TEAM_NO =  #{teamNo}
-           
+            , HIRE_DATE = #{hireDate}
     		, USER_POSITION = #{userPosition}
     		, USER_PHONE = #{userPhone}
     		, ADDRESS = #{address}
@@ -233,7 +233,6 @@
 	        , d.DEPARTMENT_NAME 
 	        , f.EVALU_FORM_NO
 			, t.TEAM_NO
-	        
 		FROM EMPLOYEE u 
 		JOIN TEAM t ON u.TEAM_NO = t.TEAM_NO 
 		JOIN DEPARTMENT d ON d.DEPARTMENT_ID = t.DEPARTMENT_ID 
@@ -261,7 +260,7 @@
 	</select>
 
 	<!-- 부서명과 팀명 조회 쿼리문 -->
-		<select id="selectAllEmpTeam" resultType="EmpVO">
+	<select id="selectAllEmpTeam" resultType="EmpVO">
 				SELECT t.team_no
 				        , t.team_name
 				        , d.department_name
@@ -270,4 +269,32 @@
 				JOIN department d 
 				ON t.department_id = d.department_id
 	</select>
+	
+	<!-- 새 평가 등록 (form 부분) -->
+	<insert id="insertEvaluForm" parameterType="EvaluVO">
+		INSERT INTO EVALU_FORM
+					(EVALU_FORM_NO
+		            , EVALU_NAME
+		            , INSERT_DATE
+		            , EVALU_START
+		            , EVALU_END)
+		VALUES 	(EVALU_FORM_NO_SEQ.NEXTVAL
+		            , #{evaluName}
+		            , #{insertDate}
+		            , #{evaluStart}
+		            , #{evaluEnd})
+	</insert>
+	<!-- 새 평가 등록 (format 부분) -->
+	<insert id="insertEvaluFormat" parameterType="EvaluVO">	
+		INSERT INTO EVALU_FORMAT
+					(EVALU_NO
+					, ORDER_NO
+					, EVALU_ITEM_NO
+					, EVALU_FROM_NO)
+		VALUES 		( EVALU_NO_SEQ.NEXTVAL
+					, #{ORDER_NO}
+					, #{EVALU_ITEM_NO}
+					, #{EVALU_FORM_NO}
+					)
+	</insert>
 </mapper>

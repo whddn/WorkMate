@@ -124,18 +124,17 @@
         </tr>
         <tr>
          <td>평가자</td>
-         [[ ${evalu} ]]
-        <!--  <td><input type="text" name="" th:value="${evalu.departmentName}"></td>
-          <td><input type="text" name="" th:value="${evalu.teamName}"></td>
-          <td><input type="text" name="" th:value="${evalu.userName}"></td>
+        <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.departmentName}" readonly></td>
+          <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.teamName}" readonly></td>
+          <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.userName}" readonly></td>
         </tr>
         <tr>
-          <td>평가자</td>
-          <td><input type="text" name="" th:value="${evaluatee.departmentName}"></td>
-          <td><input type="text" name="" th:value="${evaluatee.teamName}"></td>
-          <td><input type="text" name="" th:value="${evaluatee.userName}"></td>
+          <td>피평가자</td>
+          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.departmentName}" readonly></td>
+          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.teamName}" readonly></td>
+          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.userName}" readonly></td>
         </tr>
-      </table> -->
+      </table>
 
       <!-- 2. 평가 안내-->
       <h3>2. 평가 설명</h3>

@@ -51,9 +51,13 @@ public interface EmpService {
 	// 나의 평가 조회 (단건 조회) 
 	public List<EvaluVO> findOneEvaluResult(EvaluVO evaluVO);
 	
-	// 평가 등록 (관리자)
+	// 평가 등록 (관리자 페이지)
 	public int inputNewEvalu(EvaluVO evaluVO);
 	
 	// 평가 등록시 평가 항목 / 평가 내용 조회 
 	public Map<String, List<EvaluVO>> allEvaluContent(EvaluVO evaluVO);
+	
+	// 평가 등록 기능 AJAX 
+	public int insertNewEvaluAJAX(EvaluVO evaluVO);
+
 }
