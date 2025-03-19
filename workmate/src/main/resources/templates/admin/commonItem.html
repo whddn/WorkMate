@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{common/layouts/commonItem_layout}"
+	  layout:decorate="~{common/layouts/admin_layout}"
 	  layout:fragment="content">
 <head>
     <meta charset="UTF-8">
@@ -61,7 +61,7 @@
 <div class="container">
     <div class="card">
         <h2 class="text-center">공용품 관리 등록</h2>
-        <form id="itemForm" th:action="@{/admin/commonItem}" method="post" enctype="multipart/form-data">
+        <form id="itemForm" th:action="@{commonItem}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label>공용품 종류</label>
                 <select class="form-control" name="commonKind" id="item-type">
@@ -81,11 +81,11 @@
             </div>
 
             <div class="form-group">
-                <label>시간 추가</label>
+                <label>시간 추가(00분만 가능함)</label>
                 <div class="time-group">
-                    <input type="time" class="form-control" name="reserStartTime" id="start-time">
+                    <input type="time" class="form-control" name="reserStartTime" id="start-time" step="3600" >
                     <span>~</span>
-                    <input type="time" class="form-control" name="reserEndTime" id="end-time">
+                    <input type="time" class="form-control" name="reserEndTime" id="end-time" step="3600" >
                 </div>
             </div>
             
@@ -133,6 +133,26 @@
         div.innerHTML = `<input type='hidden' name='times' value='${startTime} ~ ${endTime}'> ${startTime} ~ ${endTime}`;
         list.appendChild(div);
     }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        let startTimeInput = document.getElementById("start-time");
+        let endTimeInput = document.getElementById("end-time");
+
+        function enforceFullHour(input) {
+            input.addEventListener("change", function() {
+                let value = input.value;
+                if (value) {
+                    let [hours, minutes] = value.split(":");
+                    if (minutes !== "00") {
+                        input.value = `${hours}:00`; // 자동으로 00분으로 설정
+                    }
+                }
+            });
+        }
+
+        enforceFullHour(startTimeInput);
+        enforceFullHour(endTimeInput);
+    });
 
     function cancelForm() {
         if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
@@ -140,6 +160,7 @@
             document.getElementById("item-list").innerHTML = "";
             document.getElementById("time-list").innerHTML = "";
         }
+            window.location.href = "commonItemList";
     }
 </script>
 

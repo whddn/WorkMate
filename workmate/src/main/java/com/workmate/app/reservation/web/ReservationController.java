@@ -1,43 +1,44 @@
 package com.workmate.app.reservation.web;
 
 import java.util.List;
+
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import com.workmate.app.reservation.service.ReservationService;
 import com.workmate.app.reservation.service.ReservationVO;
+
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(origins = "*")
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class ReservationController {
-	
+
 	private final ReservationService reservationService;
-	
-	// 예약목록 전체조회
+
+	// 예약 리스트 페이지
 	@GetMapping("reservation")
-	public List<ReservationVO> ReserList(){
-		return reservationService.findAllReserList();
+	public String ReserList(Model model) {
+		List<ReservationVO> list = reservationService.findAllReserList();
+		model.addAttribute("reser", list);
+		return "reservation/reservation";
+	}
+
+	// 예약 상세 페이지
+	@GetMapping("reservationDetail/{reserNo}")
+	public String reservationDetail(@PathVariable("reserNo") int reserNo, Model model) {
+		ReservationVO reservation = reservationService.findReserInfo(reserNo);
+		model.addAttribute("reser", reservation);
+		return "reservation/reservationDetail"; // reservationDetail.html 반환
 	}
 	
-//	// 예약목록 단건조회
-//	@GetMapping("reservationDetail")
-//	public String reservationDetail(Model model) {
-//		return "reservation/reservationDetail";
+	
+	
+//	@GetMapping("reservationList")
+//	public String reservationList(Model model) {
+//		return "reservation/reservationList";
 //	}
-	
-	// 예약 입력
-	
-	// 예약 수정
-	
-	// 예약 삭제
-	
-	// 예약 목록 전체 조회
-	@GetMapping("reservationList")
-	public String reservationList(Model model) {
-		return "reservation/reservationList";
-	}
-	
+
 }

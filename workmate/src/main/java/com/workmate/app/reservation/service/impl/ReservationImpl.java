@@ -29,8 +29,8 @@ public class ReservationImpl implements ReservationService {
 
 	// 단건
 	@Override
-	public ReservationVO findReserInfo(ReservationVO reservationVO) {
-		return reservationMapper.selectReservationInfo(reservationVO);
+	public ReservationVO findReserInfo(int reserNo) {
+		return reservationMapper.selectReservationInfo(reserNo);
 	}
 
 	// 예약 등록

@@ -1,76 +1,84 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{common/layouts/commonItem_layout}"
-	  layout:fragment="content">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/reservation_layout}"
+	layout:fragment="content">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>예약 목록</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예약 목록</title>
 
-    <!-- ✅ KaiAdmin Lite 테마 적용 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
+<!-- ✅ KaiAdmin Lite 테마 적용 -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
 
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            max-width: 1200px;
-            margin-top: 30px;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-        }
-        .card:hover {
-            transform: scale(1.05);
-        }
-        .card-img-top {
-            height: 180px;
-            object-fit: cover;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-        .card-category {
-            font-size: 14px;
-            color: #007bff;
-            font-weight: bold;
-        }
-    </style>
+<style>
+body {
+	background-color: #f8f9fa;
+}
+
+.container {
+	max-width: 1200px;
+	margin-top: 100px;
+}
+
+.card {
+	border-radius: 10px;
+	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+	transform: scale(1.05);
+}
+
+.card-img-top {
+	height: 180px;
+	object-fit: cover;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.card-category {
+	font-size: 14px;
+	color: #007bff;
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
 
-<!-- ✅ 예약 목록을 동적으로 추가할 영역 -->
-<div class="container">
-    <div class="row" id="reservation-list"></div>
-</div>
+	<!-- ✅ 예약 목록을 동적으로 추가할 영역 -->
+	<div class="container">
+		<div class="row" id="reservation-list"></div>
+		<script src="script.js"></script>
+	</div>
 
-<!-- ✅ KaiAdmin Lite 테마 JS -->
-<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
-
-<script>
+	<script>
     // ✅ REST API에서 예약 목록을 가져와 동적으로 HTML에 추가하는 함수
     async function fetchReservations() {
         try {
-            const response = await fetch('/api/reservation');  // REST API 요청
+            const response = await fetch('api/reservation');  // REST API 요청
             const reservations = await response.json();  // JSON 데이터 변환
             const container = document.getElementById("reservation-list");
 
             reservations.forEach(reser => {
-                const card = `
+            	 const imagePath = `/workmate/upload/${reser.image}`;  // ✅ 이미지 경로 설정
+                 const detailPageUrl = `api/reservationDetail/${reser.reserNo}`;  // ✅ 예약 상세 페이지 경로 설정
+            	
+                 const card = `
                     <div class="col-md-4 mb-4">
                         <div class="card card-post card-round">
-                            <img src="${reser.image}" class="card-img-top" alt="시설 이미지">
+                            <img src="${imagePath}" class="card-img-top" alt="공용품목록" >
                             <div class="card-body">
-                                <p class="card-category">${reser.category}</p>
+                                <p class="card-category">${reser.commonKind}</p>
                                 <h5 class="card-title">
-                                    <a href="/reservation/${reser.id}" class="text-dark">${reser.name}</a>
+                                    <a href="${detailPageUrl}" class="text-dark">${reser.name}</a>
                                 </h5>
-                                <p class="card-text text-muted">${reser.description}</p>
-                                <a href="/reservation/${reser.id}" class="btn btn-primary btn-sm">예약하기</a>
+                                <p class="card-text text-muted">${reser.content}</p>
+                                <a href="${detailPageUrl}" class="btn btn-primary btn-sm">예약하기</a>
                             </div>
                         </div>
                     </div>
