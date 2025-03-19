@@ -1,5 +1,6 @@
 package com.workmate.app.mail.web;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.workmate.app.mail.service.MailService;
@@ -47,23 +49,46 @@ public class MailController {
         return "mail/view";
     }
     
-    
+    //메일 쓰기
     @GetMapping("mail/compose") 
 	public String compose() {
 		return "mail/compose";
 	}
- // ✅ 메일 테스트 API (브라우저에서 호출 가능)
-    @GetMapping("/mail/sendTest")
-    public String sendTestEmail(@RequestParam String to) {
-        String fromEmail = "th9080@naver.com"; // 
-        String subject = "테스트 메일";
-        String content = "<h2>이메일 테스트</h2><p>이메일이 정상적으로 전송됩니다!</p>";
-
+    //메일 보내는 기능
+    @PostMapping("/mail/send")
+    public String sendMail(
+            @AuthenticationPrincipal LoginUserVO loginUser,
+            @RequestParam String recipients,
+            @RequestParam(required = false) String ccList,
+            @RequestParam String subject,
+            @RequestParam String content) {
         try {
-            mailService.sendEmail(fromEmail, to, subject, content);
-            return "메일 전송 성공!";
+            // ✅ 로그인한 사용자의 정보 가져오기
+            String senderName = loginUser.getUserVO().getUserName();  // 사원 이름
+            String senderEmail = loginUser.getUserVO().getUserMail(); // 사원 이메일
+
+            // ✅ 메일 전송
+            mailService.sendEmail(senderName, senderEmail, recipients, subject, content);
+
+            return "redirect:/mail/mailmain"; // 성공 시 받은 메일함으로 이동
         } catch (MessagingException e) {
-            return "메일 전송 실패: " + e.getMessage();
+            return "전송 실패: " + e.getMessage();
         }
+    }
+    @GetMapping("mail/sent")
+    public String sentMailList(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+        int userNo = loginUser.getUserVO().getUserNo();
+
+        List<MailVO> sentMails = mailService.getSentMails(userNo);
+        model.addAttribute("sentMails", sentMails);
+
+        return "mail/sent";
+    }
+ // 보낸 메일 상세 
+    @GetMapping("mail/sentview")
+    public String viewSentMail(@RequestParam("mailId") int mailId, Model model) {
+        MailVO mail = mailService.getMailById(mailId);
+        model.addAttribute("mail", mail);
+        return "mail/sentview";
     }
 }
