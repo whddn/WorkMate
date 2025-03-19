@@ -12,5 +12,7 @@ public interface MailService {
     MailVO getMailById(int mailId);
 
     // 이메일 전송
-    void sendEmail(String fromEmail, String toEmail, String subject, String content) throws MessagingException;
+    void sendEmail(String senderName, String senderEmail, String toEmail, String subject, String content) throws MessagingException;
+    //보낸 메일함
+    List<MailVO> getSentMails(int userNo);
 }

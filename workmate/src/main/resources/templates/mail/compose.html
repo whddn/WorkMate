@@ -8,8 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>메일 쓰기 | KaiAdmin Lite</title>
 <!-- Quill 에디터 -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
-	rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <style>
 .form-group {
@@ -17,7 +16,7 @@
 }
 
 #editor-container {
-	height: 500px; 
+	height: 500px;
 	background: white;
 	border: 1px solid #ccc;
 	border-radius: 5px;
@@ -27,20 +26,29 @@
 <body>
 	<div class="container mt-4">
 		<h2 class="mb-4">메일 쓰기</h2>
-		<form th:action="@{/mail/send}" method="post"
-			enctype="multipart/form-data">
+		<form id="mailForm" th:action="@{/mail/send}" method="post" enctype="multipart/form-data">
+			<!-- ✅ 보내는 사람 정보 -->
 			<div class="form-group">
-				<label for="recipients">받는 사람</label> <input type="text"
-					id="recipients" name="recipients" class="form-control"
-					placeholder="쉼표(,)로 구분" required>
+				<label for="senderName">보내는 사람</label>
+				<div class="input-group">
+					<input type="text" id="senderName" name="senderName" class="form-control" 
+						th:value="${#authentication.principal.userVO.userName}" readonly>
+					<input type="text" id="senderEmail" name="senderEmail" class="form-control" 
+						th:value="${#authentication.principal.userVO.userMail}" readonly>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="recipients">받는 사람</label> 
+				<input type="text" id="recipients" name="recipients" class="form-control" placeholder="쉼표(,)로 구분" required>
 			</div>
 			<div class="form-group">
-				<label for="ccList">참조</label> <input type="text" id="ccList"
-					name="ccList" class="form-control" placeholder="쉼표(,)로 구분">
+				<label for="ccList">참조</label> 
+				<input type="text" id="ccList" name="ccList" class="form-control" placeholder="쉼표(,)로 구분">
 			</div>
 			<div class="form-group">
-				<label for="subject">제목</label> <input type="text" id="subject"
-					name="subject" class="form-control" required>
+				<label for="subject">제목</label> 
+				<input type="text" id="subject" name="subject" class="form-control" required>
 			</div>
 			<div class="mb-3">
 				<label>본문</label>
@@ -48,32 +56,57 @@
 				<input type="hidden" id="content" name="content">
 			</div>
 			<div class="form-group">
-				<label for="attachments">첨부 파일</label> <input type="file"
-					id="attachments" name="attachments" class="form-control" multiple>
+				<label for="attachments">첨부 파일</label> 
+				<input type="file" id="attachments" name="attachments" class="form-control" multiple>
 			</div>
 			<button type="submit" class="btn btn-primary">보내기</button>
-			<button type="button" class="btn btn-secondary" onclick="saveDraft()">임시
-				저장</button>
+			<button type="button" class="btn btn-secondary" onclick="saveDraft()">임시 저장</button>
 		</form>
 	</div>
+
 	<script>
-		function saveDraft() {
-			alert();
-		}
 		// Quill 에디터 초기화
 		var quill = new Quill('#editor-container', {
-			theme : 'snow',
-			placeholder : '메일 내용을 입력하세요...'
+			theme: 'snow',
+			placeholder: '메일 내용을 입력하세요...'
 		});
 
 		// 폼 제출 시 에디터 내용을 숨은 필드에 저장
-		document
-				.getElementById('mailForm')
-				.addEventListener(
-						'submit',
-						function() {
-							document.getElementById('content').value = quill.root.innerHTML;
-						});
+		document.getElementById('mailForm').addEventListener('submit', function() {
+			document.getElementById('content').value = quill.root.innerHTML;
+		});
+
+		// 임시 저장 기능
+		function saveDraft() {
+			let senderName = document.getElementById("senderName").value;
+			let senderEmail = document.getElementById("senderEmail").value;
+			let recipients = document.getElementById("recipients").value;
+			let ccList = document.getElementById("ccList").value;
+			let subject = document.getElementById("subject").value;
+			let content = quill.root.innerHTML;
+
+			// AJAX 요청 (임시 저장)
+			fetch('/mail/saveDraft', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					senderName: senderName,
+					senderEmail: senderEmail,
+					recipients: recipients,
+					ccList: ccList,
+					subject: subject,
+					content: content
+				})
+			}).then(response => response.json())
+			.then(data => {
+				alert("임시 저장 완료!");
+			}).catch(error => {
+				console.error('Error:', error);
+				alert("임시 저장 실패!");
+			});
+		}
 	</script>
 </body>
 </html>
