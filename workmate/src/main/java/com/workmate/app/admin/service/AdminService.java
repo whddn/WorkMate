@@ -7,7 +7,7 @@ import com.workmate.app.reservation.service.CommonItemVO;
 public interface AdminService {
 	
 	// 전체조회
-	public List<CommonItemVO> findAllItem();
+	public List<CommonItemVO> selectItemList();
 	
 	//단건조회
 	public CommonItemVO findItemInfo(CommonItemVO commonitemVO);

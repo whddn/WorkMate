@@ -38,7 +38,7 @@ public class AdminController {
 	// 공용품 관리
 	@GetMapping("admin/commonItemList")
 	public String commonItemList(Model model) {
-		List<CommonItemVO> list = adminService.findAllItem();
+		List<CommonItemVO> list = adminService.selectItemList();
 		model.addAttribute("item", list);
 		return "admin/commonItemList";
 	}
