@@ -83,6 +83,7 @@
 	<delete id="deleteApproval" parameterType="ApprovalVO">
 		DELETE FROM approval
 		WHERE appr_no = #{apprNo}
+			and user_no = #{userNo}
 			AND appr_status = 'a1'
 	</delete>
 </mapper>

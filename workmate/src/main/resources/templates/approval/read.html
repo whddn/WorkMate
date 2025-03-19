@@ -90,13 +90,24 @@
 				<div class="modal-body">
 					<form>
 						<div class="mb-3">
-							<label for="recipient-name" class="col-form-label">결재처리</label>
-							<!-- input type="text" class="form-control" id="recipient-name" -->
+							<label for="apprResult" class="col-form-label">결재처리</label>
 							<input type="radio" name="apprResult" value="a2">승인
 							<input type="radio" name="apprResult" value="a3">반려
 						</div>
 						<div class="mb-3">
-							<label for="message-text" class="col-form-label">결재의견</label>
+							<label for="signNo" class="col-form-label">결재서명</label>
+							<div class="image-container">
+								<th:block th:each="mySign : ${mySigns}">
+							        <div class="image-item">
+							            <img th:src="${mySign.signPath}" th:alt="${mySign.signTitle}">
+							            <br>
+							            <input type="radio" name="signNo" class="radio-btn" th:value="${mySign.signNo}">
+							        </div>
+						        </th:block>
+						    </div>
+						</div>
+						<div class="mb-3">
+							<label for="apprReason" class="col-form-label">결재의견</label>
 							<textarea name="apprReason" class="form-control" id="message-text"></textarea>
 						</div>
 					</form>
@@ -214,15 +225,18 @@
 	
 	// 아직 결재 완료가 안된 이 문서를 파기한다
 	$('#delApprBtn').on('click', function() {
+		if(!confirm('이 문서를 정말로 삭제하시겠습니까?')) {
+			return;
+		}
+		
 		const path = [[ @{/approval/read} ]];
-		fetch(`{path}?apprNo={approval.apprNo}`, {
+		fetch(`${path}/${approval.apprNo}`, {
 			method: 'DELETE'
 		})
-		;
-		/*
 		.then(response => response.json())
 		.then(result => {
 			if(result.success) {
+				alert('문서가 삭제되었습니다.');
 				location.href = [[ @{/approval/waiting} ]];
 			}
 			else {
@@ -232,8 +246,7 @@
 		.catch(error => {
 			console.error('Error:', error);
 			alert('서버 요청 중 오류가 발생했습니다.');
-		})
-		*/
+		});
 	});
 </script>
 

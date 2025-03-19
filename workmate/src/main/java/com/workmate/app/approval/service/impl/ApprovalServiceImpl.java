@@ -47,10 +47,8 @@ public class ApprovalServiceImpl implements ApprovalService {
 	}
 
 	@Override
-	public int deleteApproval(String apprNo) {
+	public int deleteApproval(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
-		ApprovalVO approvalVO = new ApprovalVO();
-		approvalVO.setApprNo(apprNo);
 		return approvalMapper.deleteApproval(approvalVO);
 	}
 }

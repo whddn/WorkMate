@@ -306,9 +306,6 @@
 		for(let file of fileInput.files) {
 			formData.append('files', file);
 		}
-		
-		console.log(formData.get('request'))
-		console.log(fileInput.files);
 
 		fetch([[ @{/approval/write} ]], {
 			method: 'POST',

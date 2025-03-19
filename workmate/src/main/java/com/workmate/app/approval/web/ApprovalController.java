@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +41,7 @@ import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.approval.service.ReportAttachService;
 import com.workmate.app.approval.service.ReportAttachVO;
 import com.workmate.app.approval.service.SignService;
+import com.workmate.app.approval.service.SignVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.security.service.LoginUserVO;
@@ -47,7 +50,6 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class ApprovalController {
-	private final static String UPLOAD_FOLDER = "D:/workmateUploads/";
 	private final ApprElmntService apprElmntService;
 	private final ApprFormService apprFormService;
 	private final ApprLineService apprLineService;
@@ -151,7 +153,7 @@ public class ApprovalController {
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
             	String fileName = file.getOriginalFilename();
-                Path filePath = Paths.get(UPLOAD_FOLDER + fileName);
+                Path filePath = Paths.get("C://CommonItemImage/apprAttach/" + fileName);
                 Files.write(filePath, file.getBytes());
                 System.out.println("파일 저장 완료: " + fileName);
                 
@@ -159,7 +161,6 @@ public class ApprovalController {
                 reportAttachVO.setFileName(fileName);
                 reportAttachVO.setFilePath(filePath.toString());
                 reportAttachVO.setApprNo(approvalVO.getApprNo());
-                System.out.println(reportAttachVO);
                 
                 reportAttachService.insertApprovalRA(reportAttachVO);
             }
@@ -192,6 +193,7 @@ public class ApprovalController {
 		model.addAttribute("approval", approvalService.selectApproval(approvalVO));
 		model.addAttribute("apprLine", apprElmntService.selectApprElmntList(approvalVO));
 		model.addAttribute("fileList", reportAttachService.selectApprovalRAList(approvalVO));
+		model.addAttribute("mySigns", signService.selectSignList(whoAmI()));
 		
 		return "approval/read";
 	}
@@ -202,7 +204,6 @@ public class ApprovalController {
 	throws IOException {
 		// 결재결과를 수정
 		apprElmntVO.setApprover(whoAmI().getUserNo());
-		System.out.println(apprElmntVO);
 		
 		Map<String, Object> response = new HashMap<>();
 		
@@ -223,10 +224,16 @@ public class ApprovalController {
         return ResponseEntity.ok(response);
 	}
 	
-	@DeleteMapping("approval/read")
+	@DeleteMapping("approval/read/{apprNo}")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> readDelete(Model model, @RequestParam String apprNo) {		
-		int result = approvalService.deleteApproval(apprNo);
+	public ResponseEntity<Map<String, Object>> readDelete(@PathVariable String apprNo) {
+		Map<String, Object> response = new HashMap<>();
+		
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setApprNo(apprNo);
+		approvalVO.setUserNo(whoAmI().getUserNo());
+		
+		int result = approvalService.deleteApproval(approvalVO);
 		if(result > 0) {
 			response.put("success", true);
 	        return ResponseEntity.ok(response);
@@ -259,15 +266,6 @@ public class ApprovalController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
-	
-	@GetMapping("approval/manage")
-	public String manage(Model model) {
-		EmpVO myself = whoAmI();
-		model.addAttribute("signs", signService.selectSignList(myself));
-		model.addAttribute("apprLines", apprLineService.selectApprLineList(myself));
-		
-		return "approval/manage";
-	}
 
 	@GetMapping("approval/pdf")
 	public String moveToPdf(Model model, @RequestParam String apprNo) {
@@ -279,21 +277,55 @@ public class ApprovalController {
 		return "approval/pdf";
 	}
 	
-	/*
-	@PostMapping("approval/sign")
-	public ResponseEntity<?> addSign(
-		@RequestParam("signFile") MultipartFile signFile, 
-		@RequestParam("signTitle") String signTitle
-	) {
-	    try {
-	        // 파일 저장 및 DB에 서명 정보 저장 로직 구현
-	        // ...
-	        return ResponseEntity.ok("서명 추가 성공");
-	    } catch (IOException e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서명 추가 실패");
-	    }
+	@GetMapping("approval/manage")
+	public String manage(Model model) {
+		EmpVO myself = whoAmI();
+		model.addAttribute("signs", signService.selectSignList(myself));
+		model.addAttribute("apprLines", apprLineService.selectApprLineList(myself));
+		
+		return "approval/manage";
 	}
 	
+	@PostMapping("approval/sign")
+	public ResponseEntity<String> addSign(@RequestParam("file") MultipartFile file) throws IOException {
+        // 파일 저장 및 DB에 서명 정보 저장 로직 구현
+        if (file != null) {
+        	String fileName = file.getOriginalFilename();
+            Path filePath = Paths.get("C://CommonItemImage/sign/" + fileName);
+            Files.write(filePath, file.getBytes());
+            System.out.println("파일 저장 완료: " + fileName);
+            
+            SignVO signVO = new SignVO();
+            signVO.setSignTitle(fileName);
+            signVO.setSignPath(filePath.toString());
+            signVO.setUserNo(whoAmI().getUserNo());
+            
+            signService.insertSign(signVO);
+        }
+        return ResponseEntity.ok("서명 추가 성공");
+	}
+	
+	@DeleteMapping("approval/sign/{signNo}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> delSign(@PathVariable Integer signNo) {
+		Map<String, Object> response = new HashMap<>();
+		
+		SignVO signVO = new SignVO();
+		signVO.setSignNo(signNo);
+		signVO.setUserNo(whoAmI().getUserNo());
+		
+		int result = signService.deleteSign(signVO);
+		if(result > 0) {
+			response.put("success", true);
+	        return ResponseEntity.ok(response);
+		}
+		else {
+			response.put("success", false);
+        	return ResponseEntity.badRequest().body(response);
+		}
+	}
+	
+	/*
 	@PostMapping("approval/apprLine")
 	public ResponseEntity<?> addApprLine(@RequestBody ApprLineVO apprLineVO) {
 	    // DB에 결재선 정보 저장 로직 구현
