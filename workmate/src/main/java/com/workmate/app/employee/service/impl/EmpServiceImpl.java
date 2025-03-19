@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.employee.mapper.EmpMapper;
+import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
@@ -99,11 +100,15 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.selectOneEvaluInList(evaluVO);
 	}
 
-	// 평가 등록
+	// 평가 등록 페이지 
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {
 		return empMapper.insertOneEvalu(evaluVO);
 	}
+	
+	// 평가지 등록 AJAX
+
+
 	
 	// 평가 등록시 평가 항목/평가 내용 조회
 	@Override
@@ -124,6 +129,30 @@ public class EmpServiceImpl implements EmpService {
 		System.out.println(evaMap);
 		return evaMap;
 	}
+	// 평가자 정보 조회
+	@Override
+	public List<EvaluVO> findEvaluInfo(EvaluVO evaluVO) {
+		return empMapper.selectEvaluInfo(evaluVO);
+	}
+	// 피평가자 정보 조회
+	@Override
+	public List<EvaluVO> findEvaluateeInfo(EvaluVO evaluVO) {
+		return empMapper.selectEvaluateeInfo(evaluVO);
+	}
+	
+	// 다면 평가 폼 등록 
+	@Override
+	public int insertNewEvaluAJAX(EvaluVO evaluVO) {
+		int formInsert = empMapper.insertEvaluForm(evaluVO); // 폼 등록 쿼리문 
+		int result = 0;
+		if (formInsert > 0) { // 폼 insert 성공 
+			List<EvaluVO> formatList = evaluVO.getEvaluItem();
+			for (EvaluVO format : formatList) {
+				result += empMapper.insertEvaluFormat(format); // 항목 등록 쿼리문 
+			} 
+		} 
+		return result; 
+	} 
 
 	
 }

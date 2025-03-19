@@ -2,6 +2,7 @@ package com.workmate.app.employee.mapper;
 
 import java.util.List;
 
+import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
 
@@ -12,7 +13,7 @@ public interface EmpMapper {
 	// 전체 조회 (사원명과 부서명)
 	public List<EmpVO> selectAllName(); 
 	
-	// 등록 
+	// 사원 등록 
 	public int insertOneEmp(EmpVO empVO);
 	
 	// 팀명 조회
@@ -31,12 +32,10 @@ public interface EmpMapper {
 	
 	// 지난 평가 단건 조회 (관리자)
 	public List<EvaluVO> selectOneEvaluInList(EvaluVO evaluVO);
- 	
-	// 지난 평가 결과 페이지 단순 불러냄
-	//public List<EvaluVO> selectEvaluList(EvaluVO evaluVO);
 	
-	// 나의 평가 관리 (일반 사용자) -> 쿼리문 완성되면 사용 할 것
-	//public List<EvaluVO> selectMyEvaluOne(EvaluVO evaluVO);
+	// 평가자 / 피평가자 정보 조회
+	public List<EvaluVO> selectEvaluInfo(EvaluVO evaluVO);
+	public List<EvaluVO> selectEvaluateeInfo(EvaluVO evaluVO);
 	
 	// 나의 평가 관리 페이지 (단순 출력문)
 	public String selectMyEvaluOne(EvaluVO evaluVO);
@@ -49,4 +48,11 @@ public interface EmpMapper {
 	
 	// 평가 항목, 평가 내용 조회 (평가 등록시 필요)
 	public List<EvaluVO> selectAllContent(EvaluVO evaluVO);
+	
+	// 평가 폼 등록 기능 
+	public int insertEvaluForm(EvaluVO evlauVO);
+	
+	// 평가 포맷 등록 기능
+	public int insertEvaluFormat(EvaluVO evaluVO);
+	
 }

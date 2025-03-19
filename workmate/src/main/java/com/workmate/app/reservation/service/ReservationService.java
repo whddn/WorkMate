@@ -9,7 +9,7 @@ public interface ReservationService {
 	public List<ReservationVO> findAllReserList();
 
 	// 단건조회
-	public ReservationVO findReserInfo(ReservationVO reservationVO);
+	public ReservationVO findReserInfo(int reserNo);
 
 	// 예약 등록
 	public int createReserInfo(ReservationVO reservationVO);

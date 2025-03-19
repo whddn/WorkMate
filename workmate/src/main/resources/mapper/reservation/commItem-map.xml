@@ -7,8 +7,8 @@
 		  ,common_kind
 	      ,name
 	      ,content
-	      ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_Start_Time_Str
-          ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_End_Time_Str
+	      ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_Start_Time_str
+          ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_End_Time_str
 		from common_Item
 		order by common_no
 	</select>
@@ -18,7 +18,7 @@
 		  ,common_kind
 	      ,name
 	      ,content
-	      ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_Start_Time_str 
+	      ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_Start_Time_str
           ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_End_Time_str
 		from common_Item
 		where common_no=#{commonNo}
@@ -44,8 +44,8 @@
 		VALUES (
 			#{commonNo}
 			,#{name}
-			,#{reserStartTime, jdbcType=DATE} 
-			,#{reserEndTime, jdbcType=DATE}
+			,#{reserStartTime}
+       		,#{reserEndTime}
 			,SYSDATE
 			,#{commonKind}
 			,#{image}

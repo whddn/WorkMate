@@ -118,21 +118,21 @@
       <table>
         <tr>
           <th>구분</th>
-          <th>소속</th>
-          <th>직책</th>
+          <th>부서명</th>
+          <th>팀명</th>
           <th>성명</th>
         </tr>
         <tr>
-          <td>피평가자</td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
+         <td>평가자</td>
+        <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.departmentName}" readonly></td>
+          <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.teamName}" readonly></td>
+          <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.userName}" readonly></td>
         </tr>
         <tr>
-          <td>평가자</td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
+          <td>피평가자</td>
+          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.departmentName}" readonly></td>
+          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.teamName}" readonly></td>
+          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.userName}" readonly></td>
         </tr>
       </table>
 
