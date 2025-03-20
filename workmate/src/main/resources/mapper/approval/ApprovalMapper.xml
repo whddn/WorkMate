@@ -24,6 +24,7 @@
 			, appr_content
 			, create_date
 		    , expire_date
+		    , appr_status
 			, department_name
 			, approval.user_no
 			, user_name
@@ -60,6 +61,10 @@
 	    )
 	</insert>
 	<update id="updateApprovalStatus" parameterType="ApprovalVO">
+		<selectKey keyProperty="apprNo" resultType="String" order="BEFORE">
+	        SELECT 'YD' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(appr_no, 3))), 0) + 1, 3, '0')
+	        FROM approval
+	    </selectKey>
 	    UPDATE approval a
 	    SET a.appr_status = (
 	        CASE 
@@ -79,4 +84,10 @@
 		WHERE appr_no = #{apprNo} 
     		AND appr_status IN ('a2', 'a3')
 	</update>
+	<delete id="deleteApproval" parameterType="ApprovalVO">
+		DELETE FROM approval
+		WHERE appr_no = #{apprNo}
+			and user_no = #{userNo}
+			AND appr_status = 'a1'
+	</delete>
 </mapper>

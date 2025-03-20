@@ -1,11 +1,15 @@
 package com.workmate.app.employee.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.employee.mapper.EmpMapper;
+import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
@@ -96,11 +100,59 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.selectOneEvaluInList(evaluVO);
 	}
 
-	// 평가 등록
+	// 평가 등록 페이지 
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {
 		return empMapper.insertOneEvalu(evaluVO);
 	}
+	
+	// 평가지 등록 AJAX
+
+
+	
+	// 평가 등록시 평가 항목/평가 내용 조회
+	@Override
+	public Map<String, List<EvaluVO>> allEvaluContent(EvaluVO evaluVO) {
+		List<EvaluVO> evaluList = empMapper.selectAllContent(evaluVO); // 평가 항목 리스트 
+		// 동일한 평가 항목이 나오지 않게 하는 코드 (Map)
+		Map<String, List<EvaluVO>> evaMap = new HashMap<>();  
+		for (int i = 0; i < evaluList.size() ; i++ ) {  // evaluList.get(i) : 키 값, getEvaluCompet : value 값 
+			if (evaMap.get(evaluList.get(i).getEvaluCompet()) != null ) { // i 번째의 항목을 받아오고, 그 값이 널이 아니면 아래 코드를 실행함 
+				evaMap.get(evaluList.get(i).getEvaluCompet()).add(evaluList.get(i)); // 
+			} else {
+				List<EvaluVO> oneEva = new ArrayList<EvaluVO>();
+				oneEva.add(evaluList.get(i));
+				evaMap.put(evaluList.get(i).getEvaluCompet(), oneEva);
+			}
+			
+		}
+		System.out.println(evaMap);
+		return evaMap;
+	}
+	// 평가자 정보 조회
+	@Override
+	public List<EvaluVO> findEvaluInfo(EvaluVO evaluVO) {
+		return empMapper.selectEvaluInfo(evaluVO);
+	}
+	// 피평가자 정보 조회
+	@Override
+	public List<EvaluVO> findEvaluateeInfo(EvaluVO evaluVO) {
+		return empMapper.selectEvaluateeInfo(evaluVO);
+	}
+	
+	// 다면 평가 폼 등록 
+	@Override
+	public int insertNewEvaluAJAX(EvaluVO evaluVO) {
+		int formInsert = empMapper.insertEvaluForm(evaluVO); // 폼 등록 쿼리문 
+		int result = 0;
+		if (formInsert > 0) { // 폼 insert 성공 
+			List<EvaluVO> formatList = evaluVO.getEvaluItem();
+			for (EvaluVO format : formatList) {
+				result += empMapper.insertEvaluFormat(format); // 항목 등록 쿼리문 
+			} 
+		} 
+		return result; 
+	} 
 
 	
 }

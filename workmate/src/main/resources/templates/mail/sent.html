@@ -6,13 +6,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>메일함 | KaiAdmin Lite</title>
+<title>보낸 메일함 | KaiAdmin Lite</title>
 <style>
 .w-25 {
 	margin-left: 70%;
 	padding-bottom: 10px;
 }
-
 .asd {
 	padding-bottom: 10px;
 }
@@ -21,7 +20,7 @@
 
 <body>
 	<div class="container mt-4">
-		<h2 class="mb-4">받은 메일함</h2>
+		<h2 class="mb-4">보낸 메일함</h2>
 		<div class="input-group w-25">
 			<input type="text" id="searchBox" class="form-control"
 				placeholder="검색...">
@@ -37,23 +36,22 @@
 					<thead>
 						<tr>
 							<th><input type="checkbox" id="selectAll"></th>
-							<th>보낸 사람</th>
+							<th>받는 사람</th> <!-- ✅ 받는 사람으로 변경 -->
 							<th>제목</th>
 							<th>첨부</th>
 							<th>날짜</th>
 						</tr>
 					</thead>
 					<tbody id="mailBody">
-						<tr
-							th:if="${receivedMails == null or #lists.isEmpty(receivedMails)}">
-							<td colspan="5" class="text-center">받은 메일이 없습니다.</td>
+						<tr th:if="${sentMails == null or #lists.isEmpty(sentMails)}">
+							<td colspan="5" class="text-center">보낸 메일이 없습니다.</td>
 						</tr>
 
-						<tr th:each="mail : ${receivedMails}" class="mail-row">
+						<tr th:each="mail : ${sentMails}" class="mail-row">
 							<td><input type="checkbox" class="mail-checkbox"
 								th:value="${mail.mailId}"></td>
-							<td th:text="${mail.recipients}"></td>
-							<td><a th:href="@{/mail/view(mailId=${mail.mailId})}"
+							<td th:text="${mail.recipients}"></td> <!-- ✅ 보낸사람 → 받는사람 -->
+							<td><a th:href="@{/mail/sentview(mailId=${mail.mailId})}"
 								th:text="${mail.subject}"></a></td>
 							<td th:if="${mail.attachmentCount > 0}">📎</td>
 							<td th:if="${mail.attachmentCount == 0}"></td>
@@ -84,13 +82,14 @@
             });
         });
     });
-    //검색
+
+    // 검색 기능
     function searchTable() {
         let input = document.getElementById("searchBox").value.toLowerCase();
         let rows = document.querySelectorAll("#mailBody .mail-row");
 
         rows.forEach(row => {
-            let recipient = row.cells[1].textContent.toLowerCase(); // 보낸 사람
+            let recipient = row.cells[1].textContent.toLowerCase(); // 받는 사람
             let subject = row.cells[2].textContent.toLowerCase(); // 제목
 
             if (recipient.includes(input) || subject.includes(input)) {

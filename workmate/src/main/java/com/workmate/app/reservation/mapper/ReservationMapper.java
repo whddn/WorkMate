@@ -10,11 +10,14 @@ public interface ReservationMapper {
 	public List<ReservationVO> selectReservationList();
 	
 	// 단건조회 - 예약정보
-	public ReservationVO selectReservationInfo(ReservationVO reservationVO);
+	public ReservationVO selectReservationById(int reserNo);
 	
 	// 예약신청
 	public int insertReservationInfo(ReservationVO reservationVO);
 	
-	// 예약취소
+	// 예약수정
+	public int updateReservationInfo(ReservationVO reservationVO);
 	
+	// 예약취소
+	public int deleteReservationInfo(int commonNo);
 }

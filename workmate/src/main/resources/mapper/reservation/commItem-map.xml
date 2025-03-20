@@ -7,19 +7,19 @@
 		  ,common_kind
 	      ,name
 	      ,content
-	      ,reser_start_time
-	      ,reser_end_time
+	      ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_Start_Time_str
+          ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_End_Time_str
 		from common_Item
 		order by common_no
 	</select>
 	<!-- 공용품 단건조회 -->
-	<select id="selectItemInfo" resultType="CommonItemVO" parameterType="CommonItemVO">
+	<select id="selectItemInfoById" resultType="CommonItemVO" parameterType="CommonItemVO">
 		select common_no
 		  ,common_kind
 	      ,name
 	      ,content
-	      ,reser_start_time
-	      ,reser_end_time
+	      ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_Start_Time_str
+          ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_End_Time_str
 		from common_Item
 		where common_no=#{commonNo}
 	</select>
@@ -44,8 +44,8 @@
 		VALUES (
 			#{commonNo}
 			,#{name}
-			,#{reserStartTime} 
-			,#{reserEndTime}
+			,#{reserStartTime}
+       		,#{reserEndTime}
 			,SYSDATE
 			,#{commonKind}
 			,#{image}

@@ -14,6 +14,7 @@ public class LoginController {
 	public String login() {
 		return "login/login";
 	}
+	
 	@GetMapping("/logout-success")
     public String logoutSuccess(RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("message", "로그아웃되었습니다.");

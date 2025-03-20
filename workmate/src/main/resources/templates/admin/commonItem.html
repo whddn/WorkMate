@@ -1,37 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{common/layouts/commonItem_layout}"
+	  layout:decorate="~{common/layouts/admin_layout}"
 	  layout:fragment="content">
 <head>
     <meta charset="UTF-8">
     <title>공용품 관리 등록</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap & KaiAdmin Theme CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
+
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
         }
         .container {
-            width: 50%;
-            background: white;
-            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top:100px;
-        }
-        h2 {
-            text-align: center;
+            padding: 20px;
         }
         .form-group {
             margin-bottom: 15px;
         }
         label {
             font-weight: bold;
-        }
-        select, input, button {
-            padding: 8px;
-            margin-top: 5px;
+            margin-bottom: 5px;
         }
         .time-group {
             display: flex;
@@ -41,19 +39,32 @@
         .btn-save {
             background-color: #007bff;
             color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
         }
         .btn-cancel {
-            background-color: #ccc;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>공용품 관리 등록</h2>
-        <form id="itemForm" th:action="@{/admin/commonItem}" method="post">
+
+<!-- 기존 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h2 class="text-center">공용품 관리 등록</h2>
+        <form id="itemForm" th:action="@{commonItem}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label>공용품 종류</label>
-                <select name="commonKind" id="item-type">
+                <select class="form-control" name="commonKind" id="item-type">
                     <option value="회의실">회의실</option>
                     <option value="차량">차량</option>
                 </select>
@@ -61,73 +72,97 @@
 
             <div class="form-group">
                 <label>이름</label>
-                <input type="text" name="name" id="item-name" placeholder="이름 입력">
+                <input type="text" class="form-control" name="name" id="item-name" placeholder="이름 입력">
             </div>
             
-             <div class="form-group">
+            <div class="form-group">
                 <label>설명</label>
-                <textarea name="content" id="item-content" placeholder="항목 입력" rows="4"></textarea>
+                <textarea class="form-control" name="content" id="item-content" placeholder="항목 입력" rows="4"></textarea>
             </div>
 
             <div class="form-group">
-                <label>시간 추가</label>
+                <label>시간 추가(00분만 가능함)</label>
                 <div class="time-group">
-                    <input type="time" name="reserStartTime" id="start-time">
-                    ~
-                    <input type="time" name="reserEndTime" id="end-time">
+                    <input type="time" class="form-control" name="reserStartTime" id="start-time" step="3600" >
+                    <span>~</span>
+                    <input type="time" class="form-control" name="reserEndTime" id="end-time" step="3600" >
                 </div>
             </div>
             
             <div class="form-group">
                 <label>이미지 추가</label>
-                <input type="file" name="itemImage" accept="image/*">
+                <input type="file" class="form-control" name="itemImage" accept="image/*">
             </div>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-save">저장</button>
-                <button type="button" class="btn btn-cancel" onclick="cancelForm()">취소</button>
+            <!-- 버튼 (스타일 유지) -->
+            <div class="form-group text-center">
+                <button type="submit" class="btn-save">저장</button>
+                <button type="button" class="btn-cancel" onclick="cancelForm()">취소</button>
             </div>
         </form>
     </div>
+</div>
 
-    <script>
-        function addItem() {
-            let itemName = document.getElementById("item-name").value;
-            if (itemName.trim() === "") {
-                alert("항목을 입력하세요.");
-                return;
-            }
-            let list = document.getElementById("item-list");
-            let div = document.createElement("div");
-            div.innerHTML = `<input type='hidden' name='items' value='${itemName}'> ${itemName}`;
-            list.appendChild(div);
-            document.getElementById("item-name").value = "";
+<script>
+    function addItem() {
+        let itemName = document.getElementById("item-name").value;
+        if (itemName.trim() === "") {
+            alert("항목을 입력하세요.");
+            return;
+        }
+        let list = document.getElementById("item-list");
+        let div = document.createElement("div");
+        div.innerHTML = `<input type='hidden' name='items' value='${itemName}'> ${itemName}`;
+        list.appendChild(div);
+        document.getElementById("item-name").value = "";
+    }
+
+    function addTime() {
+        let startTime = document.getElementById("start-time").value;
+        let endTime = document.getElementById("end-time").value;
+        if (startTime === "" || endTime === "") {
+            alert("시간을 입력하세요.");
+            return;
+        }
+        if (startTime >= endTime) {
+            alert("올바른 시간 범위를 입력하세요.");
+            return;
+        }
+        let list = document.getElementById("time-list");
+        let div = document.createElement("div");
+        div.innerHTML = `<input type='hidden' name='times' value='${startTime} ~ ${endTime}'> ${startTime} ~ ${endTime}`;
+        list.appendChild(div);
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        let startTimeInput = document.getElementById("start-time");
+        let endTimeInput = document.getElementById("end-time");
+
+        function enforceFullHour(input) {
+            input.addEventListener("change", function() {
+                let value = input.value;
+                if (value) {
+                    let [hours, minutes] = value.split(":");
+                    if (minutes !== "00") {
+                        input.value = `${hours}:00`; // 자동으로 00분으로 설정
+                    }
+                }
+            });
         }
 
-        function addTime() {
-            let startTime = document.getElementById("start-time").value;
-            let endTime = document.getElementById("end-time").value;
-            if (startTime === "" || endTime === "") {
-                alert("시간을 입력하세요.");
-                return;
-            }
-            if (startTime >= endTime) {
-                alert("올바른 시간 범위를 입력하세요.");
-                return;
-            }
-            let list = document.getElementById("time-list");
-            let div = document.createElement("div");
-            div.innerHTML = `<input type='hidden' name='times' value='${startTime} ~ ${endTime}'> ${startTime} ~ ${endTime}`;
-            list.appendChild(div);
-        }
+        enforceFullHour(startTimeInput);
+        enforceFullHour(endTimeInput);
+    });
 
-        function cancelForm() {
-            if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
-                document.getElementById("itemForm").reset();
-                document.getElementById("item-list").innerHTML = "";
-                document.getElementById("time-list").innerHTML = "";
-            }
+    function cancelForm() {
+        if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
+            document.getElementById("itemForm").reset();
+            document.getElementById("item-list").innerHTML = "";
+            document.getElementById("time-list").innerHTML = "";
         }
-    </script>
+            window.location.href = "commonItemList";
+    }
+</script>
+
 </body>
 </html>

@@ -1,10 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	>
+
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+	<script th:src="@{/assets/js/core/jquery-3.7.1.min.js}"></script>
+	<script th:src="@{/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js}"></script>
+	<script th:src="@{/assets/js/plugin/jsvectormap/jsvectormap.min.js}"></script>
+    <script th:src="@{/assets/js/plugin/jsvectormap/world.js}"></script>
+    
+    <!-- html2canvas 및 jsPDF 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+	<meta charset="UTF-8">
+	<title>전자 결재 PDF</title>
 </head>
+
 <body>
-	응애 테스트
+	<div id="pdf-content">
+		<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
+	</div>
 </body>
+
+<script th:inline="javascript">
+	let approval = [[ ${approval} ]];
+	let apprLine = [[ ${apprLine} ]];
+	
+	$(document).ready(function() {
+		$('#createDate').text(approval.createDate);
+		$('#departmentName').text(approval.departmentName);
+		$('#userNo').text(approval.userNo);
+		$('#userName').text(approval.userName);
+		$('#apprNo').text(approval.apprNo);
+
+		Object.keys(approval).forEach(function(key) {
+			let target = $(`input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']`);
+			if (target.length > 0) {
+				let value = approval[key] !== null ? approval[key] : 'null';
+				target.val(approval[key]).attr('readonly', true);
+			}
+		});
+		
+		$('#addLineBtn').remove();
+		$('#delLineBtn').remove();
+		
+		apprLine.forEach(function(element) {
+			let liTag = $('<li>' + element.departmentName + 
+				' - ' + element.teamName + 
+				' - ' + element.userName +
+				'</li>');
+			$('#apprLine').append(liTag);
+		});
+		
+		if(approval.apprStatus != 'a1') {
+			$('#delApprBtn').remove();
+			$('#apprBtn').remove();
+		}
+		
+		// PDF 자동 다운로드 실행
+		generatePDF();
+	});
+	
+	function generatePDF() {
+		const { jsPDF } = window.jspdf;
+		const pdfContent = document.getElementById("pdf-content");
+		
+		html2canvas(pdfContent, { scale: 2 }).then(canvas => {
+			let imgData = canvas.toDataURL("image/png");
+	        let pdf = new jsPDF("p", "mm", "a4");
+	        
+			// A4 크기 (mm)
+	        let pageWidth = 210;  // A4 가로 크기
+	        let pageHeight = 297; // A4 세로 크기
+
+	        // 이미지 비율 유지하여 크기 조정
+	        let imgWidth = pageWidth * 1;
+	        let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+	        // **여백 추가 (중앙 정렬)**
+	        let xPos = pageWidth * 0.1;
+
+	        // 한 페이지에 다 들어가는 경우
+	        if (imgHeight <= pageHeight) {
+	            pdf.addImage(imgData, "PNG", xPos, 10, imgWidth, imgHeight);
+	        } else {
+	            // 여러 페이지로 나누는 경우
+	            let heightLeft = imgHeight;
+	            let yPos = 10;
+
+	            while (heightLeft > 0) {
+	                pdf.addImage(imgData, "PNG", xPos, yPos, imgWidth, imgHeight);
+	                heightLeft -= pageHeight;
+	                yPos -= pageHeight;
+	                if (heightLeft > 0) pdf.addPage();
+	            }
+	        }
+	        
+	        pdf.save("approval.pdf");
+	    });
+	}
+</script>
+
 </html>

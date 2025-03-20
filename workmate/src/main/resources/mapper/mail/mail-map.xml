@@ -1,13 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.mail.mapper.MailMapper">
-	<!-- mail-map.xml -->
-	<select id="getReceivedMails" resultType="MailVO">
-		SELECT MAIL_ID, USER_NO, RECIPIENTS, SUBJECT, CONTENT, SENT_AT, STATUS, FOLDER_ID
-    FROM MAIL
-    WHERE USER_NO = #{userNo} 
-<!--       AND REGEXP_LIKE(RECIPIENTS, '(^|,)' || #{userNo} || '($|,)') -->
-    ORDER BY SENT_AT DESC
+	<!-- 받은메일함 리스트 -->
+	<select id="getReceivedMails" parameterType="int"
+		resultType="MailVO">
+		SELECT
+		M.MAIL_ID,
+		M.USER_NO AS SENDER_NO,
+		E_SENDER.USER_NAME
+		AS SENDER_NAME,
+		M.RECIPIENTS,
+		M.SUBJECT,
+		M.CONTENT,
+		M.SENT_AT,
+		M.STATUS,
+		M.FOLDER_ID,
+		(SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID =
+		M.MAIL_ID) AS
+		ATTACHMENT_COUNT
+		FROM MAIL M
+		JOIN EMPLOYEE E_SENDER ON
+		M.USER_NO = E_SENDER.USER_NO
+		WHERE E_SENDER.USER_NO = #{userNo}
+		and
+		M.FOLDER_ID = 1001
+		ORDER BY M.SENT_AT DESC
+	</select>
+	<!-- 받은메일 단건조회 -->
+	<select id="getMailById" parameterType="int" resultType="MailVO">
+		SELECT
+		MAIL_ID,
+		USER_NO,
+		RECIPIENTS,
+		SUBJECT,
+		CONTENT,
+		SENT_AT,
+		STATUS,
+		FOLDER_ID
+		FROM MAIL
+		WHERE MAIL_ID = #{mailId}
+	</select>
+	<!-- 보낸메일 저장 -->
+	<insert id="insertMail" parameterType="MailVO">
+		INSERT INTO MAIL
+		(MAIL_ID,
+		USER_NO, RECIPIENTS, CC_LIST, SUBJECT, CONTENT, SENT_AT, STATUS,
+		FOLDER_ID, ENCRYPTED, MAIL_TYPE, IS_SPAM)
+		VALUES
+		(MAIL_SEQ.NEXTVAL,
+		#{mail.userNo}, #{mail.recipients}, #{mail.ccList}, #{mail.subject},
+		#{mail.content}, SYSDATE, #{mail.status}, #{mail.folderId},
+		#{mail.encrypted}, #{mail.mailType}, #{mail.isSpam})
+	</insert>
+
+	<!-- 보낸 메일 전체 -->
+	<select id="getSentMails" parameterType="map"
+		resultType="MailVO">
+		SELECT
+		M.MAIL_ID,
+		M.USER_NO,
+		M.RECIPIENTS,
+		M.SUBJECT,
+		M.CONTENT,
+		M.SENT_AT,
+		M.STATUS,
+		M.FOLDER_ID,
+		(SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS
+		ATTACHMENT_COUNT
+		FROM MAIL M
+		WHERE M.USER_NO = #{userNo}
+		AND M.FOLDER_ID = 1002
+		ORDER BY M.SENT_AT DESC
+	</select>
+	<!-- 보낸 메일 단건 -->
+	<select id="getSentMailById" resultType="MailVO">
+		SELECT
+		M.MAIL_ID,
+		M.USER_NO AS SENDER_NO,
+		E_SENDER.USER_NAME AS SENDER_NAME,
+		M.RECIPIENTS,
+		M.SUBJECT,
+		M.CONTENT,
+		M.SENT_AT,
+		M.STATUS,
+		M.FOLDER_ID,
+		(SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS
+		ATTACHMENT_COUNT
+		FROM MAIL M
+		JOIN EMPLOYEE E_SENDER ON M.USER_NO = E_SENDER.USER_NO
+		WHERE M.MAIL_ID = #{mailId}
 	</select>
 
+	<select id="findUserByEmail" resultType="java.lang.Integer">
+		SELECT USER_NO FROM EMPLOYEE WHERE USER_MAIL = #{email}
+	</select>
 </mapper>

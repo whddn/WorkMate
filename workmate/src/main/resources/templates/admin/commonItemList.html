@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/layouts/commonItem_layout}"
+      layout:decorate="~{common/layouts/admin_layout}"
       layout:fragment="content">
 <head>
     <meta charset="UTF-8">
@@ -19,7 +19,8 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            margin: 50px auto;
+            margin: 0 auto;
+            margin-top:100px;
         }
         h2 {
             text-align: center;
@@ -68,7 +69,7 @@
                     <td th:text="${item.commonKind}"></td>
                     <td th:text="${item.name}"></td>
                     <td th:text="${item.content}"></td>
-                     <td th:text="${#dates.format(item.reserStartTime, 'HH시')} + ' ~ ' + ${#dates.format(item.reserEndTime, 'HH시')} + ' 까지'"></td>
+                     <td th:text="${item.reserStartTimeStr} + ' ~ ' + ${item.reserEndTimeStr} + ' 까지'"></td>
                     <td>
                     	<button class="btn btn-edit" th:onclick="|location.href='@{/admin/commonItemUpdate(commonNo=${item.commonNo})}'|">수정</button>
 						<button class="btn btn-delete" th:onclick="|if(confirm('삭제하시겠습니까?')) location.href='@{/admin/commonItemDelete(commonNo=${item.commonNo})}'|">삭제</button>

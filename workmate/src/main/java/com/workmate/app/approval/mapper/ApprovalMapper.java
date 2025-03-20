@@ -10,4 +10,5 @@ public interface ApprovalMapper {
 	public int insertApproval(ApprovalVO approvalVO);
 	public int updateApprovalStatus(ApprovalVO approvalVO);
 	public int updateApprovalDate(ApprovalVO approvalVO);
+	public int deleteApproval(ApprovalVO approvalVO);
 }
