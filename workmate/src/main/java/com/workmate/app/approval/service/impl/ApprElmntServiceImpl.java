@@ -20,19 +20,19 @@ public class ApprElmntServiceImpl implements ApprElmntService {
 	}
 	
 	@Override
-	public List<ApprElmntVO> selectApprElmntList(ApprovalVO approvalVO) {
+	public List<ApprElmntVO> findApprElmntList(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
 		return apprElmntMapper.selectApprElmntList(approvalVO);
 	}
 
 	@Override
-	public int insertApprElmnt(ApprElmntVO apprElmntVO) {
+	public int inputApprElmnt(ApprElmntVO apprElmntVO) {
 		// TODO Auto-generated method stub
 		return apprElmntMapper.insertApprElmnt(apprElmntVO);
 	}
 
 	@Override
-	public int updateApprElmnt(ApprElmntVO apprElmntVO) {
+	public int modifyApprElmnt(ApprElmntVO apprElmntVO) {
 		// TODO Auto-generated method stub
 		return apprElmntMapper.updateApprElmnt(apprElmntVO);
 	}

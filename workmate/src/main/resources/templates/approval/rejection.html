@@ -12,14 +12,9 @@
 </head>
 
 <body>
-	<h3>결재 진행</h3>
-	<ul class="list">
-		<li>기안자<input></li>
-		<li>양식명<input></li>
-		<li>문서번호<input></li>
-		<li>결재일<input type="date">~<input type="date"></li>
-		<li><button><i class="fas fa-search"></i>검색</button></li>
-	</ul>
+	<h3>결재 반려</h3>
+	<input type="text" id="min-date" placeholder="시작 날짜 (YYYY-MM-DD)">
+	<input type="text" id="max-date" placeholder="끝 날짜 (YYYY-MM-DD)">
 	<table id="RejectionsTable" class="display">
 		<thead>
 			<tr>
@@ -54,7 +49,34 @@
 
 <script>
 	$(document).ready(function() {
-		$('#RejectionsTable').DataTable();
+		let table = $('#RejectionsTable').DataTable();
+		
+		// 날짜 필터 함수 정의
+	    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+	        var minDate = $('#min-date').val();
+	        var maxDate = $('#max-date').val();
+	        var date = data[6]; // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
+
+	        if (!minDate && !maxDate) {
+	            return true; // 날짜 입력이 없으면 필터링 없이 표시
+	        }
+
+	        if (date) {
+	            var dateObj = new Date(date);
+	            var min = minDate ? new Date(minDate) : null;
+	            var max = maxDate ? new Date(maxDate) : null;
+
+	            if ((min === null || dateObj >= min) && (max === null || dateObj <= max)) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    });
+
+	    // 날짜 입력 필드 변경 시 필터 적용
+	    $('#min-date, #max-date').on('change', function () {
+	        table.draw();
+	    });
 	});
 </script>
 

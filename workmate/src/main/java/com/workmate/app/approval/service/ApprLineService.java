@@ -5,7 +5,7 @@ import java.util.List;
 import com.workmate.app.employee.service.EmpVO;
 
 public interface ApprLineService {
-	public List<ApprLineVO> selectApprLineList(EmpVO empVO);
-	public ApprLineVO selectApprLine(ApprLineVO apprLineVO);
-	public int insertApprLine(ApprLineVO apprLineVO);
+	public List<ApprLineVO> findApprLineList(EmpVO empVO);
+	public ApprLineVO findApprLineById(ApprLineVO apprLineVO);
+	public int inputApprLine(ApprLineVO apprLineVO);
 }

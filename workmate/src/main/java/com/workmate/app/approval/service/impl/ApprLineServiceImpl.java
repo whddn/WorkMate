@@ -20,19 +20,19 @@ public class ApprLineServiceImpl implements ApprLineService {
 	}
 	
 	@Override
-	public List<ApprLineVO> selectApprLineList(EmpVO empVO) {
+	public List<ApprLineVO> findApprLineList(EmpVO empVO) {
 		// TODO Auto-generated method stub
 		return apprLineMapper.selectApprLineList(empVO);
 	}
 	
 	@Override
-	public ApprLineVO selectApprLine(ApprLineVO apprLineVO) {
+	public ApprLineVO findApprLineById(ApprLineVO apprLineVO) {
 		// TODO Auto-generated method stub
-		return apprLineMapper.selectApprLine(apprLineVO);
+		return apprLineMapper.selectApprLineById(apprLineVO);
 	}
 	
 	@Override
-	public int insertApprLine(ApprLineVO apprLineVO) {
+	public int inputApprLine(ApprLineVO apprLineVO) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
