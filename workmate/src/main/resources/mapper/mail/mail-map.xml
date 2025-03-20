@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.mail.mapper.MailMapper">
 	<!-- 받은메일함 리스트 -->
-	<select id="getReceivedMails" parameterType="int"
+	<select id="findReceivedMailsList" parameterType="int"
 		resultType="MailVO">
 		SELECT
 		M.MAIL_ID,
@@ -27,7 +27,7 @@
 		ORDER BY M.SENT_AT DESC
 	</select>
 	<!-- 받은메일 단건조회 -->
-	<select id="getMailById" parameterType="int" resultType="MailVO">
+	<select id="findMailById" parameterType="int" resultType="MailVO">
 		SELECT
 		MAIL_ID,
 		USER_NO,
@@ -54,7 +54,7 @@
 	</insert>
 
 	<!-- 보낸 메일 전체 -->
-	<select id="getSentMails" parameterType="map"
+	<select id="findSentMailsList" parameterType="map"
 		resultType="MailVO">
 		SELECT
 		M.MAIL_ID,
@@ -73,7 +73,7 @@
 		ORDER BY M.SENT_AT DESC
 	</select>
 	<!-- 보낸 메일 단건 -->
-	<select id="getSentMailById" resultType="MailVO">
+	<select id="findSentMailById" resultType="MailVO">
 		SELECT
 		M.MAIL_ID,
 		M.USER_NO AS SENDER_NO,
@@ -90,8 +90,8 @@
 		JOIN EMPLOYEE E_SENDER ON M.USER_NO = E_SENDER.USER_NO
 		WHERE M.MAIL_ID = #{mailId}
 	</select>
-
-	<select id="findUserByEmail" resultType="java.lang.Integer">
+	<!-- 내부사용자 조회 -->
+	<select id="findUserByEmail" resultType="MailVO">
 		SELECT USER_NO FROM EMPLOYEE WHERE USER_MAIL = #{email}
 	</select>
 </mapper>

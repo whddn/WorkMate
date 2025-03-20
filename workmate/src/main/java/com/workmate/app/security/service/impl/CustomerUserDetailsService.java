@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.security.mapper.UserMapper;
 import com.workmate.app.security.service.UserVO;
 import com.workmate.app.security.service.LoginUserVO;
@@ -20,11 +21,11 @@ public class CustomerUserDetailsService implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
-		UserVO userVO = userMapper.getUserInfo(username);
-		if(userVO == null) {
+		EmpVO empVO = userMapper.getUserInfo(username);
+		if(empVO == null) {
 			throw new UsernameNotFoundException(username);
 		}
-		return new LoginUserVO(userVO);
+		return new LoginUserVO(empVO);
 	}
 	
 }

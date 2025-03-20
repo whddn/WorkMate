@@ -8,6 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.workmate.app.employee.service.EmpVO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.Getter;
 
@@ -15,7 +17,7 @@ import lombok.Getter;
 @Getter
 public class LoginUserVO implements UserDetails{
 	
-	private final UserVO userVO;
+	private final EmpVO userVO;
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
