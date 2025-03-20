@@ -163,6 +163,8 @@
               <option value="5">5점</option>
             </select>
           </td>
+          <td>
+          </td>
         </tr>
         </th:block>
       </table>
@@ -180,10 +182,36 @@
           <td><input type="text" name=""></td>
         </tr>
       </table>
-      <button type="submit">제출</button>
+      <button type="button" id="selectAjax">제출</button>
     </form>
-
   </div>
+  <script>
+  	// 평가 채점한 거 제출 AJAX 
+  	document.querySelector('#selectAjax').addEventListener('click', e => {
+  		evaluAjax();
+  	})
+  	
+  	
+  	let evaluAjax = {
+  	 	
+  	};
+  	
+  	function evaluAjax() {
+  		fetch(`/workmate/emp/evalu`, {
+  			method : 'POST',
+  			headers : {
+  				'Content-Type' : 'application/json'
+  			},
+  			body : JSON.stringify(evaluAjax)
+  		})
+  		.then(res => res.json())
+  		.then(result => {
+  			
+  		})
+  		.catch(err => console.log(err));
+  	}
+  	
+  </script>
 </body>
 
 </html>

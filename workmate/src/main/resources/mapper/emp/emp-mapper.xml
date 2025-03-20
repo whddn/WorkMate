@@ -13,34 +13,32 @@
 		ON d.department_id = t.department_id 
 	</select> -->
 	<!--/* 조직도의 사원 상세 조회 */-->
-	<select id="selectOneEmp" resultType="EmpVO">
-		SELECT user_no
-		    , user_id
-		    , user_position
-		    , hire_date
-		    , user_name
-		    , resign_date
-		    , status_user
-		    , address
-		    , user_phone
-		    , t.team_no
-		    , user_ip
-		    , common_ip
-		    , t.team_name
-		    , d.department_name
-		    , d.department_id
-		FROM employee u
-		    LEFT JOIN team t 
-		    ON u.team_no = t.team_no
-		    LEFT JOIN department d 
-		    ON t.department_id = d.department_id
+	<select id="selectEmpById" resultType="EmpVO">
+		SELECT u.user_name
+		        , d.department_name
+		        , t.team_name
+                , u.team_no
+		        , u.user_position
+		        , u.user_no
+		        , u.user_id
+		        , u.hire_date
+		        , u.resign_date
+		        , u.user_phone
+		        , u.address
+		        , u.user_ip
+		        , u.common_ip
+		FROM employee u 
+		LEFT JOIN team t 
+		ON u.team_no = t.team_no
+        LEFT JOIN department d 
+		ON t.department_id = d.department_id
 		WHERE u.user_no = #{userNo}
 		    AND u.user_no between 100 AND 300
 	</select>
 	
 
 	<!-- 직급 조회 -->
-	<select id="selectAllPosition" resultType="EmpVO">
+	<select id="selectEmpPositionList" resultType="EmpVO">
 		SELECT code_name
 			, code
 		FROM common_code
@@ -50,7 +48,7 @@
 	</select>
 	
 	<!-- 사원 등록 --> 
-	<insert id="insertOneEmp" parameterType="EmpVO">
+	<insert id="insertEmployee" parameterType="EmpVO">
 		<selectKey keyProperty="userNo"
 				   resultType="Integer"
 				   order="BEFORE">
@@ -89,7 +87,7 @@
 	</insert>
 	
 	<!-- 평가 조회 -->
-	<select id="selectOneEvalu" resultType="EvaluVO">
+	<select id="selectEvaluList" resultType="EvaluVO">
 		SELECT i.EVALU_SUMMARY
 		      , ef.EVALU_NO
 		      , i.EVALU_COMPET
@@ -104,7 +102,7 @@
 	</select>
 	
 <!-- 사원 수정 -->
-	<update id="updateOneEmp" parameterType="EmpVO">
+	<update id="updateEmployee" parameterType="EmpVO">
 		UPDATE employee 
 		SET
               USER_NAME = #{userName}
@@ -118,7 +116,7 @@
 	</update>
 	
     <!-- 부서 및 팀별 사원 조회 -->
-	<select id="selectAllName" resultMap="departTeamMap">
+	<select id="selectEmpNameList" resultMap="departTeamMap">
 		SELECT 
 		          d.department_id
 		        , d.department_name
@@ -150,7 +148,7 @@
 	</resultMap> 
 	
 	<!-- 지난 평가 리스트 조회 (전체 출력) -->
-	<select id="selectAllEvalu" resultType="EvaluVO">
+	<select id="selectBeforeEvaluList" resultType="EvaluVO">
 		SELECT EVALU_NAME
         , USAGE_STATUS 
         , EVALU_START
@@ -159,7 +157,7 @@
 		FROM EVALU_FORM
 	</select>
 	<!-- 평가 단건 조회 (일반 사용자, 본인 로그인한 userNo, formNo기반) -->
-	<select id="selectMyEvaluResultOne" resultType="EvaluVO">
+	<select id="selectMyEvaluResultById" resultType="EvaluVO">
 
 			SELECT f.EVALU_NAME              
 			        , f.EVALU_START          
@@ -186,12 +184,11 @@
 	</select>
 	
 	<!-- 평가 단순 조회 (관리자, formNo 기반) -->
-		<select id="selectOneEvaluInList" resultType="EvaluVO">
+		<select id="selectAdminBeforeEvaluList" resultType="EvaluVO">
 			SELECT    
 			    	  f.EVALU_FORM_NO
 					, f.EVALU_NAME              
-			        , f.EVALU_START          
-			        , g.EVALUATEE_GROUP_ID      
+			        , f.EVALU_START               
 			        , u.USER_NO
 			        , u.USER_NAME          
 			        , i.EVALU_COMPET       
@@ -219,14 +216,14 @@
 			WHERE f.EVALU_FORM_NO = #{evaluFormNo}
 	</select> 
 	<!-- 평가 폼 등록 시 필요한 항목과 내용 선택하기 위한 조회 쿼리문 -->
-	<select id="selectAllContent" resultType="EvaluVO">
+	<select id="selectContentList" resultType="EvaluVO">
 			SELECT EVALU_ITEM_NO
 		        ,  EVALU_COMPET
 		        ,  EVALU_CONTENT
 			FROM EVALU_ITEM   
 	</select>
 	<!-- 평가자 기반 평가자 직급, 이름, 팀명, 부서명, 폼 번호 쿼리문 -->
-	<select id="selectEvaluInfo" resultType="EvaluVO">
+	<select id="selectEvaluInfoById" resultType="EvaluVO">
 		SELECT
 			d.DEPARTMENT_ID 
 	        , u.USER_POSITION 
@@ -244,7 +241,7 @@
 	</select>
 	
 	<!-- 피평가자 기반 평가자 직급, 이름, 팀명, 부서명, 폼 번호 쿼리문-->
-	<select id="selectEvaluateeInfo" resultType="EvaluVO">
+	<select id="selectEvaluateeInfoById" resultType="EvaluVO">
 		SELECT 
 			d.DEPARTMENT_ID 
 	        , u.USER_POSITION 
@@ -262,7 +259,7 @@
 	</select>
 
 	<!-- 부서명과 팀명 조회 쿼리문 -->
-	<select id="selectAllEmpTeam" resultType="EmpVO">
+	<select id="selectTeamList" resultType="EmpVO">
 				SELECT t.team_no
 				        , t.team_name
 				        , d.department_name
@@ -272,31 +269,75 @@
 				ON t.department_id = d.department_id
 	</select>
 	
-	<!-- 새 평가 등록 (form 부분) -->
+	<!-- 새 평가 등록 : form 부분 -->
 	<insert id="insertEvaluForm" parameterType="EvaluVO">
+			<selectKey keyProperty="evaluFormNo"
+				   resultType="Integer"
+				   order="BEFORE">
+			 SELECT MAX(EVALU_FORM_NO) + 1
+	         FROM EVALU_FORM
+			</selectKey>
 		INSERT INTO EVALU_FORM
 					(EVALU_FORM_NO
 		            , EVALU_NAME
 		            , INSERT_DATE
 		            , EVALU_START
-		            , EVALU_END)
+		            , EVALU_END
+		            , USAGE_STATUS)
 		VALUES 	(EVALU_FORM_NO_SEQ.NEXTVAL
 		            , #{evaluName}
-		            , #{insertDate}
+		            , SYSDATE
 		            , #{evaluStart}
-		            , #{evaluEnd})
+		            , #{evaluEnd}
+		            , '대기 중')
 	</insert>
-	<!-- 새 평가 등록 (format 부분) -->
+	<!-- 새 평가 등록 : format 부분 -->
 	<insert id="insertEvaluFormat" parameterType="EvaluVO">	
-		INSERT INTO EVALU_FORMAT
+
+        		INSERT INTO EVALU_FORMAT
 					(EVALU_NO
 					, ORDER_NO
 					, EVALU_ITEM_NO
-					, EVALU_FROM_NO)
-		VALUES 		( EVALU_NO_SEQ.NEXTVAL
-					, #{ORDER_NO}
-					, #{EVALU_ITEM_NO}
-					, #{EVALU_FORM_NO}
+					, EVALU_FORM_NO)
+					
+				VALUES ( EVALU_NO_SEQ.NEXTVAL
+					, #{orderNo}
+					, #{evaluItemNo}
+					, #{evaluFormNo}
 					)
+	</insert>
+	<!-- 새 평가 등록 : 평가자 그룹 아이디 => 조회는 사원 번호와 평가 폼 번호로 -->
+	<insert id="insertEvaluGroup" parameterType="EvaluVO">
+			INSERT INTO EVALU_GROUP
+			(
+			    EVALU_GROUP_ID
+			    , EVALU_FORM_NO
+			    , USER_NO                
+			)
+			SELECT 
+			    EVALU_G_ID_SEQ.NEXTVAL
+			    , #{evaluFormNo}
+			    , u.user_no
+			FROM EMPLOYEE u 
+			JOIN TEAM t ON u.team_no = t.team_no
+			WHERE t.team_no = #{evaluGroupId}
+	</insert>
+	
+	<!-- 새 평가 등록 : 피평가자 그룹 아이디 -->
+	<insert id="insertEvaluateeGroup" parameterType="EvaluVO">
+
+			INSERT INTO EVALUATEE_GROUP
+			(
+			    EVALUATEE_GROUP_ID
+			    , EVALU_FORM_NO
+			    , USER_NO                
+			)
+			SELECT 
+			    EVALUATEE_G_ID_SEQ.NEXTVAL
+			    , #{evaluFormNo}
+			    , u.user_no
+			FROM EMPLOYEE u 
+			JOIN TEAM t ON u.team_no = t.team_no
+			WHERE t.team_no = #{evaluateeGroupId}
 	</insert>
 </mapper>

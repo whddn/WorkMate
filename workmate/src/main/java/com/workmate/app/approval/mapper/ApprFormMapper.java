@@ -6,7 +6,7 @@ import com.workmate.app.approval.service.ApprFormVO;
 
 public interface ApprFormMapper {
 	public List<ApprFormVO> selectApprFormList();
-	public ApprFormVO selectApprForm(ApprFormVO apprFormVO);
+	public ApprFormVO selectApprFormById(ApprFormVO apprFormVO);
 	public int insertApprForm(ApprFormVO apprFormVO);
 	public int updateApprForm(ApprFormVO apprFormVO);
 	public int deleteApprForm(String apprType);

@@ -27,30 +27,30 @@ public class EmpServiceImpl implements EmpService {
 	// 단건 조회 
 	@Override
 	public EmpVO findEmpByEmpNo(EmpVO empVO) {
-		return empMapper.selectOneEmp(empVO);
+		return empMapper.selectEmpById(empVO);
 	}
 	
 	// 등록 
 	@Override
 	public int inputNewEmp(EmpVO empVO) {
-		return empMapper.insertOneEmp(empVO);
+		return empMapper.insertEmployee(empVO);
 	}
 	
 	// 팀명 조회
 	@Override
-	public List<EmpVO> selectAllTeam() {
-		return empMapper.selectAllEmpTeam();
+	public List<EmpVO> findTeamList() {
+		return empMapper.selectTeamList();
 	}
 	
 	// 직급 조회
 	@Override
-	public List<EmpVO> selectAllPosition(){
-		return empMapper.selectAllPosition();
+	public List<EmpVO> findPositionList(){
+		return empMapper.selectEmpPositionList();
 	}
 	// 조직도 사원 전체 조회
 	@Override
-	public List<EmpVO> empNameList() {
-		return empMapper.selectAllName();
+	public List<EmpVO> findDeptEmpNameList() {
+		return empMapper.selectEmpNameList();
 	}
 
 
@@ -62,13 +62,13 @@ public class EmpServiceImpl implements EmpService {
 	// 사원 수정
 	@Override
 	public int updateEmp(EmpVO empVO) {
-		return empMapper.updateOneEmp(empVO);
+		return empMapper.updateEmployee(empVO);
 	}
 	
 	// 평가 양식 조회
 	@Override
 	public List<EvaluVO> findOneEvaluPage(EvaluVO evaluVO) {
-		return empMapper.selectOneEvalu(evaluVO);
+		return empMapper.selectEvaluList(evaluVO);
 	}
 	// 단순 평가 리스트 조회 (페이지 불러냄) 
 //	@Override
@@ -80,7 +80,7 @@ public class EmpServiceImpl implements EmpService {
 	// 지나간 평가 전체 리스트 조회 (전체 조회)
 	@Override
 	public List<EvaluVO> findBeforeEvaluList(EvaluVO evaluVO) {
-		return empMapper.selectAllEvalu(evaluVO);
+		return empMapper.selectBeforeEvaluList(evaluVO);
 	}
 	// 나의 평가 리스트 조회 
 	@Override
@@ -90,14 +90,14 @@ public class EmpServiceImpl implements EmpService {
 
 	// 나의 평가 단순 1건 조회
 	@Override
-	public List<EvaluVO> findOneEvaluResult(EvaluVO evaluVO) {
-		return empMapper.selectMyEvaluResultOne(evaluVO);
+	public List<EvaluVO> findMyEvaluById(EvaluVO evaluVO) {
+		return empMapper.selectMyEvaluResultById(evaluVO);
 	}
 
 	// 지나간 평가 단건 조회 (관리자 - 단건 조회)
 	@Override
-	public List<EvaluVO> findBeforeEvaluOne(EvaluVO evaluVO) {
-		return empMapper.selectOneEvaluInList(evaluVO);
+	public List<EvaluVO> findBeforeEvaluById(EvaluVO evaluVO) {
+		return empMapper.selectAdminBeforeEvaluList(evaluVO);
 	}
 
 	// 평가 등록 페이지 
@@ -112,13 +112,14 @@ public class EmpServiceImpl implements EmpService {
 	
 	// 평가 등록시 평가 항목/평가 내용 조회
 	@Override
-	public Map<String, List<EvaluVO>> allEvaluContent(EvaluVO evaluVO) {
-		List<EvaluVO> evaluList = empMapper.selectAllContent(evaluVO); // 평가 항목 리스트 
+	public Map<String, List<EvaluVO>> findEvaluContentList(EvaluVO evaluVO) {
+		List<EvaluVO> evaluList = empMapper.selectContentList(evaluVO); // 평가 항목 리스트 
 		// 동일한 평가 항목이 나오지 않게 하는 코드 (Map)
 		Map<String, List<EvaluVO>> evaMap = new HashMap<>();  
 		for (int i = 0; i < evaluList.size() ; i++ ) {  // evaluList.get(i) : 키 값, getEvaluCompet : value 값 
 			if (evaMap.get(evaluList.get(i).getEvaluCompet()) != null ) { // i 번째의 항목을 받아오고, 그 값이 널이 아니면 아래 코드를 실행함 
 				evaMap.get(evaluList.get(i).getEvaluCompet()).add(evaluList.get(i)); // 
+				
 			} else {
 				List<EvaluVO> oneEva = new ArrayList<EvaluVO>();
 				oneEva.add(evaluList.get(i));
@@ -132,26 +133,43 @@ public class EmpServiceImpl implements EmpService {
 	// 평가자 정보 조회
 	@Override
 	public List<EvaluVO> findEvaluInfo(EvaluVO evaluVO) {
-		return empMapper.selectEvaluInfo(evaluVO);
+		return empMapper.selectEvaluInfoById(evaluVO);
 	}
 	// 피평가자 정보 조회
 	@Override
 	public List<EvaluVO> findEvaluateeInfo(EvaluVO evaluVO) {
-		return empMapper.selectEvaluateeInfo(evaluVO);
+		return empMapper.selectEvaluateeInfoById(evaluVO);
 	}
 	
 	// 다면 평가 폼 등록 
 	@Override
-	public int insertNewEvaluAJAX(EvaluVO evaluVO) {
+	public int inputNewEvaluForm(EvaluVO evaluVO) {
+		
 		int formInsert = empMapper.insertEvaluForm(evaluVO); // 폼 등록 쿼리문 
 		int result = 0;
-		if (formInsert > 0) { // 폼 insert 성공 
-			List<EvaluVO> formatList = evaluVO.getEvaluItem();
+		int evaluGroup = 0;
+		int evaluateeGroup = 0;
+		if (formInsert > 0) {
+			evaluGroup = empMapper.insertEvaluGroup(evaluVO); // 평가자 그룹 등록 
+			evaluateeGroup = empMapper.insertEvaluateeGroup(evaluVO); // 피평가자 그룹 등록
+		}
+		if (formInsert > 0) { // 폼 등록 성공하면 실행 
+			List<EvaluVO> formatList = evaluVO.getEvaluItem(); // 여러 개의 항목 등록 
 			for (EvaluVO format : formatList) {
+				format.setEvaluFormNo(evaluVO.getEvaluFormNo()); // 등록된 formNo 불러옴
+				format.setEvaluItemNo(evaluVO.getEvaluItemNo());  
 				result += empMapper.insertEvaluFormat(format); // 항목 등록 쿼리문 
 			} 
+			
 		} 
 		return result; 
+	}
+	
+	
+	// 다면 평가 진행
+	@Override
+	public int inputEvaluResultScore(EvaluVO evaluVO) {
+		return empMapper.insertEvaluScore(evaluVO);
 	} 
 
 	

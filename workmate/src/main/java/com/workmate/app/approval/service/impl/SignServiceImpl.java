@@ -20,19 +20,19 @@ public class SignServiceImpl implements SignService {
 	}
 	
 	@Override
-	public List<SignVO> selectSignList(EmpVO empVO) {
+	public List<SignVO> findSignList(EmpVO empVO) {
 		// TODO Auto-generated method stub
 		return signMapper.selectSignList(empVO);
 	}
 
 	@Override
-	public int insertSign(SignVO signVO) {
+	public int inputSign(SignVO signVO) {
 		// TODO Auto-generated method stub
 		return signMapper.insertSign(signVO);
 	}
 
 	@Override
-	public int deleteSign(SignVO signVO) {
+	public int dropSign(SignVO signVO) {
 		// TODO Auto-generated method stub
 		return signMapper.deleteSign(signVO);
 	}

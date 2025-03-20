@@ -44,12 +44,13 @@ public class EvaluVO {
 	private String userName;		// 유저 이름
 	private String departmentName;	// 부서명
 	private String teamName;		// 팀이름
+	private String teamNo;			// 팀번호
 	private String userPosition;	// 직급
-	List<EvaluVO> evaluItem;		// AJAX로 보낼 배열 이름과 동일하게 
+	List<EvaluVO> evaluItem;		// AJAX로 보낼 배열 이름과 동일하게
 	// 평가자 그룹 
-	private int evaluGroupId;		// 평가자 그룹 아이디
+	private String evaluGroupId;		// 평가자 그룹 아이디
 	// 피평가자 그룹 
-	private int evaluateeGroupId;	// 피평가자 그룹 아이디
+	private String evaluateeGroupId;	// 피평가자 그룹 아이디
 	// 평가 결과 테이블
 	private String evaluResultId; 	//
 	private int evaluResScore;

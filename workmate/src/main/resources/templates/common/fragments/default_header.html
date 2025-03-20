@@ -1,68 +1,79 @@
 <!DOCTYPE html>
 <div xmlns:th="https://www.thymeleaf.org" th:fragment="HeaderFrag">
 
-<div class="main-header-logo">
-  <!-- Logo Header -->
-  <div class="logo-header" data-background-color="dark">
-    <a href="index.html" class="logo">
-      <img
-        src="@{/assets/img/kaiadmin/logo_light.svg}"
-        alt="navbar brand"
-        class="navbar-brand"
-        height="20"
-      />
-    </a>
-    <div class="nav-toggle">
-      <button class="btn btn-toggle toggle-sidebar">
-        <i class="gg-menu-right"></i>
-      </button>
-      <button class="btn btn-toggle sidenav-toggler">
-        <i class="gg-menu-left"></i>
-      </button>
+<!-- ✅ 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark custom-navbar">
+    <div class="container-fluid d-flex justify-content-center">
+        <!-- ✅ 토글 버튼 (모바일) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- ✅ 네비게이션 메뉴 -->
+        <div class="collapse navbar-collapse d-flex justify-content-center" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/mail/mailmain}">전자메일</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/approval/waiting}">전자결재</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/attendance/monthList}">근태관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/reservation/main}">예약</a>
+                </li>
+
+                <!-- ✅ 더보기 (드롭다운) -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="moreMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        더보기
+                    </a>
+                    <ul class="dropdown-menu custom-dropdown" aria-labelledby="moreMenu">
+                        <li><a class="dropdown-item" href="#">사원관리</a></li>
+                        <li><a class="dropdown-item" th:href="@{/document/list}">자료실</a></li>
+                        <li><a class="dropdown-item" href="#">재정관리</a></li>
+                        <li><a class="dropdown-item" href="#">거래처</a></li>
+                        <li><a class="dropdown-item" th:href="@{/Contracts/main}">전자계약</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ✅ 로그아웃 버튼 -->
+        <form th:action="@{/logout}" method="post" class="ms-auto">
+            <button type="submit" class="btn btn-danger"><i class="fas fa-power-off"></i> Logout</button>
+        </form>
     </div>
-    <button class="topbar-toggler more">
-      <i class="gg-more-vertical-alt"></i>
-    </button>
-  </div>
-  <!-- End Logo Header -->
-</div>
-<!-- Navbar Header -->
-<nav
-  class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"
-	>
-  <div class="container-fluid col-md-8">
-  	<button class="btn btn-primary" th:onclick="| location.href = '@{/mail/mailmain}' |">	<!-- 나중에 수정 -->
-  		전자메일
-  	</button>
-  	<button class="btn btn-primary" th:onclick="| location.href = '@{/approval/waiting}' |">
-  		전자결재
-  	</button>
-  	<button class="btn btn-primary" th:onclick="| location.href = '@{/attendance/monthList}' |">
-  		근태관리
-  	</button>
-  	<button class="btn btn-primary" th:onclick="| location.href = '@{/reservation}' |">
-  		예약
-  	</button>
-  	<button class="btn btn-primary" th:onclick="| location.href = '@{/document/list}' |">
-  		자료실
-  	</button>
-  	<div class="btn-group dropdown">
-       <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-         더보기
-       </button>
-       <ul class="dropdown-menu" role="menu">
-         <li>
-           <a class="dropdown-item" href="#">Action</a>
-           <a class="dropdown-item" href="#">Another action</a>
-           <div class="dropdown-divider"></div>
-           <a class="dropdown-item" href="#">Something else here</a>
-         </li>
-       </ul>
-      </div>
-  </div>
-  <form th:action="@{/logout}" method="post" style="display: inline;">
-    <button type="submit" class="btn btn-danger"><i class="fas fa-power-off"></i> Logout</button>
-</form>
 </nav>
-<!-- End Navbar -->
+
+<!-- ✅ Custom CSS -->
+<style>
+    /* ✅ 네비게이션 바 스타일 */
+    .custom-navbar {
+        padding: 10px 40px; /* 좌우 여백 40px */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    }
+
+    /* ✅ 네비게이션 메뉴 스타일 */
+    .navbar-nav .nav-link {
+        font-weight: bold; /* 폰트 두껍게 */
+        padding: 12px 20px; /* 메뉴 간격 */
+    }
+
+    /* ✅ 드롭다운 메뉴 스타일 */
+    .custom-dropdown {
+        padding: 10px 0; /* 드롭다운 내부 여백 */
+    }
+
+    .custom-dropdown .dropdown-item {
+        padding: 10px 20px; /* 드롭다운 항목 간격 */
+        line-height: 1.8; /* 행 간격 추가 */
+    }
+</style>
+
+<!-- ✅ Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
+
 </div>

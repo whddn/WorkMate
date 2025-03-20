@@ -33,13 +33,13 @@
             <ul class="nav nav-secondary">
               <!-- 고정 메뉴 -->
               <li class="nav-item">
-                <a href="#dashboard">
+                <a th:href="@{/}">
                   <i class="fas fa-home"></i>
                   <p>메인화면</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#dashboard">
+                <a th:href="@{/search}">
                   <i class="fas fa-search"></i>
                   <p>검색</p>
                 </a>
@@ -47,7 +47,7 @@
               <li class="nav-item">
                 <a
                   data-bs-toggle="collapse"
-                  href="#dashboard"
+                  th:href="@{/}"
                   class="collapsed"
                   aria-expanded="false"
                 >
@@ -58,17 +58,17 @@
                 <div class="collapse" id="dashboard">
                   <ul class="nav nav-collapse">
                     <li>
-                      <a href="">
+                      <a th:href="@{/}">
                         <span class="sub-item">메인화면</span>
                       </a>
                     </li>
                     <li>
-                      <a href="">
+                      <a th:href="@{/search}">
                         <span class="sub-item">검색</span>
                       </a>
                     </li>
                     <li>
-                      <a href="">
+                      <a th:href="@{/}">
                         <span class="sub-item">즐겨찾기</span>
                       </a>
                     </li>

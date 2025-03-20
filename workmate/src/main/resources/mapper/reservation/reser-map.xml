@@ -10,8 +10,8 @@
 			,r.usage_status
 			,c.name
 			,c.common_no
-			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS reser_start_time_str
-			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS reser_end_time_str
+			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS reser_start_time
+			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS reser_end_time
 			,r.reser_date
 			,c.common_kind
 			,c.image
@@ -38,7 +38,7 @@
 		FROM common_Item c
 			LEFT JOIN reser r ON r.common_no = c.common_no
 			LEFT JOIN employee e ON r.user_no = e.user_no
-		where r.common_no = #{commonNo}
+		 WHERE c.common_no = #{commonNo}
 	</select>
 
 	<!-- 예약신청 -->

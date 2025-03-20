@@ -13,7 +13,7 @@
 		    ON appr_line.inserter=employee.user_no
 		WHERE inserter=#{userNo}
 	</select>
-	<select id="selectApprLine" parameterType="ApprLineVO" resultType="ApprLineVO">
+	<select id="selectApprLineById" parameterType="ApprLineVO" resultType="ApprLineVO">
 		SELECT apprline_no
 		    , insert_title
 		    , insert_date

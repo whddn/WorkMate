@@ -131,14 +131,17 @@
 		$('#ApprovalsTable').DataTable();
 		$('#AttachTable').DataTable();
 		
-		$('#createDate').text(approval.createDate);
-		$('#departmentName').text(approval.departmentName);
-		$('#userNo').text(approval.userNo);
-		$('#userName').text(approval.userName);
 		$('#apprNo').text(approval.apprNo);
+		$('#userName').text(approval.userName);
+		$('#userNo').text(approval.userNo);
+		$('#departmentName').text(approval.departmentName);
+		$('#createDate').text(approval.createDate);
+		$('#expireDate').text(approval.expireDate);
 
 		Object.keys(approval).forEach(function(key) {
-			let target = $(`input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']`);
+			let target = $(`
+				input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']
+			`);
 			if (target.length > 0) {
 				let value = approval[key] !== null ? approval[key] : 'null';
 				target.val(approval[key]).attr('readonly', true);

@@ -6,6 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 public interface ApprFormService {
-	public List<ApprFormVO> selectFormList();
-	public ApprFormVO selectForm(ApprFormVO apprFormVO);
+	public List<ApprFormVO> findFormList();
+	public ApprFormVO findFormById(ApprFormVO apprFormVO);
 }

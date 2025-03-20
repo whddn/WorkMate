@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/contracts_layout}"
+      layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전자계약 작성</title>
+
+    <!-- ✅ KaiAdmin Lite CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
+
+    <style>
+        .contract-container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #007bff;
+        }
+
+        table.contract-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table.contract-table th, 
+        table.contract-table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table.contract-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .btn-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container contract-container">
+    <h3 class="text-center">전자계약 작성</h3>
+
+    <!-- ✅ 양식 선택 -->
+    <div class="mb-3 text-end">
+        <label for="contractTemplate" class="form-label fw-bold">양식 선택:</label>
+        <select id="contractTemplate" class="form-select" style="width: 200px; display: inline-block;">
+            <option value="employment">근로계약서</option>
+            <option value="trade">거래처 계약서</option>
+        </select>
+    </div>
+
+    <!-- ✅ 전자계약 작성 폼 -->
+    <form id="contractForm" enctype="multipart/form-data">
+        <table class="contract-table">
+            <tr>
+                <th colspan="4" class="text-center">전자계약서 작성</th>
+            </tr>
+            <tr>
+                <th>고용자(갑)</th>
+                <td colspan="3"><input type="text" name="employerName" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>성명</th>
+                <td><input type="text" name="employerSign" class="form-control"></td>
+                <th>사용자명</th>
+                <td><input type="text" name="userName" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>소재지</th>
+                <td colspan="3"><input type="text" name="employerAddress" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>근로자(을)</th>
+                <th>성명</th>
+                <th>성별</th>
+                <th>주민번호</th>
+            </tr>
+            <tr>
+                <td rowspan="2"></td>
+                <td><input type="text" name="employeeName" class="form-control"></td>
+                <td>
+                    <select name="gender" class="form-select">
+                        <option value="male">남</option>
+                        <option value="female">여</option>
+                    </select>
+                </td>
+                <td><input type="text" name="employeeId" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td colspan="2"><input type="text" name="employeeAddress" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>연락처</th>
+                <td colspan="3"><input type="text" name="employeePhone" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>직종</th>
+                <td><input type="text" name="jobTitle" class="form-control"></td>
+                <th>입금</th>
+                <td>
+                    시급: <input type="text" name="hourlyWage" class="form-control" style="width: 80px; display: inline-block;">
+                    원 / 월급: <input type="text" name="monthlySalary" class="form-control" style="width: 100px; display: inline-block;">
+                    원
+                </td>
+            </tr>
+            <tr>
+                <th>근로시간</th>
+                <td colspan="3"><input type="text" name="workHours" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>휴게시간</th>
+                <td colspan="3"><input type="text" name="breakTime" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>고용상태</th>
+                <td colspan="3"><input type="text" name="employmentStatus" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>취업장소</th>
+                <td colspan="3"><input type="text" name="workPlace" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>계약기간</th>
+                <td colspan="3">
+                    <input type="date" name="startDate" class="form-control" style="width: 45%; display: inline-block;">
+                    ~
+                    <input type="date" name="endDate" class="form-control" style="width: 45%; display: inline-block;">
+                </td>
+            </tr>
+            <tr>
+                <th>사인</th>
+                <td colspan="2">
+                    <input type="file" name="signFile" class="form-control">
+                </td>
+                <td>
+                    <button type="button" class="btn btn-secondary">작성</button>
+                </td>
+            </tr>
+        </table>
+
+        <!-- ✅ 버튼 영역 -->
+        <div class="btn-section">
+            <button type="submit" class="btn btn-primary">등록</button>
+        </div>
+    </form>
+</div>
+
+<!-- ✅ JavaScript & KaiAdmin JS -->
+<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#contractForm").submit(function(e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+            $.ajax({
+                url: "/Contracts/insert",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert("전자계약이 등록되었습니다.");
+                        window.location.href = "/Contracts/list";
+                    } else {
+                        alert("등록 실패");
+                    }
+                },
+                error: function() {
+                    alert("오류 발생");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

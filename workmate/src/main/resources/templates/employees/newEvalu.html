@@ -207,18 +207,22 @@
           </tr>
         </thead>
         <tbody>
+        <th:block th:each="con : ${content}">
           <tr>
 			<td>
-              <select id="evaCompet" th:each="con : ${content}">
-                <option th:each="con : ${content}">[[ ${con.key} ]]</option>
+              <select id="evaCompet">
+                <option th:each="com : ${content}">[[ ${com.key} ]]</option> 
+                <!-- [[ ${con.key} ]] 로 바꾸기 -->
               </select>
             </td>
             <td>
-              <select id="allContent" th:each="con : ${content}">
+              <select id="allContent">
                 <option>내용을 선택하세요.</option>
               </select>
             </td>
           </tr>
+          </th:block>
+         
           
         </tbody>
       </table>
@@ -251,37 +255,38 @@
   </div>
 <script th:inline="javascript">
 
-// 평가 항목과 내용을 동적으로 연결하는 로직
-let compet = [[ ${content} ]];  // 타임리프에서 가져온 compet 배열
-let competSelect = document.querySelectorAll("#evaCompet");  // 왼쪽 드롭다운들
-let contentSelect = document.querySelectorAll("#allContent"); // 오른쪽 드롭다운들
-
-// 각 드롭다운에 대해 이벤트 리스너 추가
-for (let i = 0; i < competSelect.length; i++) {
-    competSelect[i].addEventListener('change', function() {
-        let selectedCompet = competSelect[i].value;  // 선택된 평가 항목
-        let rightAll = contentSelect[i]; // 해당 평가 항목에 맞는 오른쪽 드롭다운
-
-        // 기존의 옵션을 초기화
-        rightAll.innerHTML = '';
-
-        // 선택된 평가 항목에 해당하는 내용을 오른쪽 드롭다운에 추가
-        if (compet[selectedCompet]) {
-            for (let j = 0; j < compet[selectedCompet].length; j++) {
-                let option = document.createElement("option");
-                option.textContent = compet[selectedCompet][j].evaluContent;
-                rightAll.append(option);
-            }
-        }
-    });
-}
+	// 평가 항목과 내용을 동적으로 연결하는 로직
+	let compet = [[ ${content} ]];  // 타임리프에서 가져온 compet 배열
+	let competSelect = document.querySelectorAll("#evaCompet");  // 왼쪽 드롭다운들
+	let contentSelect = document.querySelectorAll("#allContent"); // 오른쪽 드롭다운들
+	
+	// 각 드롭다운에 대해 이벤트 리스너 추가
+	for (let i = 0; i < competSelect.length; i++) {
+	    competSelect[i].addEventListener('change', function() {
+	        let selectedCompet = competSelect[i].value;  // 선택된 평가 항목
+	        let rightAll = contentSelect[i]; // 해당 평가 항목에 맞는 오른쪽 드롭다운
+	
+	        // 기존의 옵션을 초기화
+	        rightAll.innerHTML = '';
+	
+	        // 선택된 평가 항목에 해당하는 내용을 오른쪽 드롭다운에 추가
+	        if (compet[selectedCompet]) {
+	            for (let j = 0; j < compet[selectedCompet].length; j++) {
+	                let option = document.createElement("option");
+	                option.value = compet[selectedCompet][j].evaluItemNo;
+	                option.textContent = compet[selectedCompet][j].evaluContent;
+	                rightAll.append(option);
+	            }
+	        }
+	    });
+	}
 
 		// '등록하기' 버튼 클릭 시 실행되는 이벤트
 		document.querySelector('#submit-btn').addEventListener('click', e => {
 		    inputNewEvalu();  // 평가 등록 함수 호출
 		});
 
-	// 평가 등록 AJAX 함수
+	// 평가 폼 등록 AJAX 함수
 	function inputNewEvalu() {
 	    // 폼에서 입력된 값 가져오기
 	    let evaluName = document.querySelector('#evaluName').value;
@@ -289,7 +294,8 @@ for (let i = 0; i < competSelect.length; i++) {
 	    let evaluEnd = document.querySelector('#end-date').value;
 	    let competSelect = document.querySelectorAll("#evaCompet");
 	    let contentSelect = document.querySelectorAll("#allContent");
-	
+		let contentNo = document.querySelectorAll('#allContent').value;
+	    
 	    // 선택된 평가자와 피평가자 (팀)
 	    let department = document.querySelector('#department').value; // 평가자 (팀)
 	    let team = document.querySelector('#team').value; // 피평가자 (팀)
@@ -301,21 +307,23 @@ for (let i = 0; i < competSelect.length; i++) {
 	    for (let i = 0; i < competSelect.length; i++) {
 	        let competValue = competSelect[i].value;  // 선택된 평가 항목
 	        let contentValue = contentSelect[i].value;  // 선택된 평가 내용
-	
 	        // 항목과 내용이 모두 선택되었을 때만 배열에 추가
 	        if (competValue && contentValue) {
 	            itemList.push({
+	            	orderNo : i + 1,
 	                compet: competValue,
 	                content: contentValue
 	            });
 	        }
 	    }
-	
+
+		
 	    // 평가 데이터를 객체로 구성
 	    let EvaluItem = {
-	        'evaluName': evaluName,
-	        'evaluStart': evaluStart,
-	        'evaluEnd': evaluEnd,
+			'evaluItemNo' : contentNo, // 항목 번호 
+	        'evaluName' : evaluName,		// 폼 이름 
+	        'evaluStart' : evaluStart,	// 평가 시작
+	        'evaluEnd': evaluEnd,		// 평가 끝
 	        'evaluGroupId': department,  // 평가자 (팀)
 	        'evaluateeGroupId': team,  // 피평가자 (팀)
 	        'evaluItem': itemList  // 선택된 항목 리스트
@@ -326,7 +334,7 @@ for (let i = 0; i < competSelect.length; i++) {
 	    fetch(`/workmate/emp/neweva`, {
 	        method: 'POST',
 	        headers: {
-	            'Content-Type': 'application/json'
+	            'Content-type': 'application/json'
 	        },
 	        body: JSON.stringify(EvaluItem),  // 평가 데이터를 JSON 형식으로 전송
 	    })
@@ -341,11 +349,6 @@ for (let i = 0; i < competSelect.length; i++) {
 	        console.error('에러 발생:', err);
 	    });
 	}
-
 </script>
-
-
-
-
 </body>
 </html>

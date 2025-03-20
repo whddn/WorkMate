@@ -3,18 +3,48 @@
 <mapper namespace="com.workmate.app.document.mapper.DocMapper">
 
 	<!-- 자료실 전체조회 -->
-
 	<select id="selectFileList" resultType="DocVO">	
-		SELECT d.file_name
+		SELECT d.file_tag
+				, d.file_name
 		        , d.file_size
+		        , d.document_no
 		        , d.extenstion
 		        , d.file_reg_date
 		        , d.update_user
-		        , t.team_name
+		        , e.user_id
 		FROM document d 
 		LEFT JOIN EMPLOYEE e ON d.user_no = e.user_no
 		LEFT JOIN team t ON e.team_no = t.team_no
 	</select> 
+	
+	<insert id="insertFile" parameterType="DocVO">
+		INSERT INTO document (
+        DOCUMENT_NO
+        , FILE_NAME
+        , FILE_SIZE
+        , ATTACHMENT
+        , EXTENSTION
+        , FILE_REG_DATE
+        , FILE_TAG
+        , UPDATE_USER
+         
+    ) VALUES (
+        (SELECT NVL(MAX(DOCUMENT_NO), 0) + 1 FROM document), 
+        #{fileName}, 
+        #{fileSize}, 
+        #{attachment}, 
+        #{extension}, 
+        SYSDATE, 
+        #{fileTag}, 
+        #{userNo}, 
+    )	
+	</insert>
 		
+		
+	<!-- 파일 삭제 -->
+	<delete id="deleteFileInfo" parameterType="int">
+		DELETE FROM document
+		WHERE document_no = #{documentNo}
+	</delete>
 	
 </mapper>

@@ -30,7 +30,7 @@ public class SpringSecurityConfig {
 					//.requestMatchers("/", "/workmate").permitAll()	// 전체 접근 허용
 				.requestMatchers("/header").authenticated()
 					.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
-					.requestMatchers("/team/**").hasAuthority("인사팀")  // 중간 권한
+					.requestMatchers("/team/**").hasAuthority("과장")  // 중간 권한
 
 
 					.requestMatchers("/admin/**").permitAll() // 권한있는 사용자,관리자 접근 허용

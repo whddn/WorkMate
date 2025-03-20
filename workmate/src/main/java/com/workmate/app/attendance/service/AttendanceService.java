@@ -24,5 +24,8 @@ public interface AttendanceService {
 	
 	//연차 사용 내역 전체조회
 	public List<WorkVO> findAllAnnual(WorkVO workVO);
+	
+	//전체사원 근태조회
+	public List<WorkVO> findAllEmpWork(WorkVO workVO);
 
 }
