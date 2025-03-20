@@ -7,18 +7,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.thymeleaf.TemplateEngine;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.workmate.app.approval.service.ApprElmntService;
-import com.workmate.app.approval.service.ApprFormService;
-import com.workmate.app.approval.service.ApprLineService;
-import com.workmate.app.approval.service.ApprovalService;
-import com.workmate.app.approval.service.SignService;
 import com.workmate.app.attendance.service.AttendanceService;
 import com.workmate.app.attendance.service.WorkVO;
-import com.workmate.app.employee.service.EmpService;
-import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.security.service.LoginUserVO;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +29,9 @@ public class AttendanceController {
 	//월별 근태 전체조회 : GET	
 	@GetMapping("attendance/monthList")
 	public String monthAttendanceList(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {		
-	    if (loginUser == null || loginUser.getUserVO() == null) {
+	    
+		//로그인 여부 확인
+		if (loginUser == null || loginUser.getUserVO() == null) {
 	        return "redirect:/login";  // 로그인 페이지로 리다이렉트
 	    }
 	    
@@ -66,7 +59,15 @@ public class AttendanceController {
 	
 	//전체 근태 조회
 	@GetMapping("attendance/allList")
-	public String allAttendanceList(Model model, WorkVO workVO) {
+	public String allAttendanceList(Model model, WorkVO workVO, @AuthenticationPrincipal LoginUserVO loginUser) {
+		
+		//로그인 여부
+		if (loginUser == null || loginUser.getUserVO() == null) {
+		 return "redirect:/login";
+		}
+		
+		int userNo = loginUser.getUserVO().getUserNo();
+		workVO.setUserNo(userNo);
 		
 		List<WorkVO> list = attendService.findAllWork(workVO);
 		model.addAttribute("works", list);
@@ -95,8 +96,14 @@ public class AttendanceController {
 	
 	//내 발생 연차, 연차사용내역전체조회
 	@GetMapping("attendance/annual")
-	public String annualList(Model model, WorkVO workVO) {
-		workVO.setUserNo(201);			
+	public String annualList(Model model, WorkVO workVO, @AuthenticationPrincipal LoginUserVO loginUser) {
+		//로그인 여부
+		if (loginUser == null || loginUser.getUserVO() == null) {
+			return "redirect:/login";
+			}
+				
+		int userNo = loginUser.getUserVO().getUserNo();
+		workVO.setUserNo(userNo);	
 		
 		List<WorkVO> list = attendService.findOccAnnual(workVO);
 		List<WorkVO> alist = attendService.findAllAnnual(workVO);		
@@ -105,6 +112,16 @@ public class AttendanceController {
 		model.addAttribute("anls", alist);
 		
 		return "attendance/annual";
+	}
+	
+	//전체사원 근태조회()
+	@GetMapping("attendance/attendanceManage")
+	public String attendEmpList(Model model, WorkVO workVO) {
+		
+		List<WorkVO> list = attendService.findAllEmpWork(workVO);
+		
+		model.addAttribute("works", list);
+		return "attendance/attendanceManage";
 	}
 	
 	

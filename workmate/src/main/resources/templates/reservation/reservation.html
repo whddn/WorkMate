@@ -53,20 +53,19 @@ body {
 	<!-- ✅ 예약 목록을 동적으로 추가할 영역 -->
 	<div class="container">
 		<div class="row" id="reservation-list"></div>
-		<script src="script.js"></script>
 	</div>
 
 	<script>
     // ✅ REST API에서 예약 목록을 가져와 동적으로 HTML에 추가하는 함수
     async function fetchReservations() {
         try {
-            const response = await fetch('api/reservation');  // REST API 요청
+            const response = await fetch('/workmate/api/reservation/main');  // REST API 요청
             const reservations = await response.json();  // JSON 데이터 변환
             const container = document.getElementById("reservation-list");
 
             reservations.forEach(reser => {
             	 const imagePath = `/workmate/upload/${reser.image}`;  // ✅ 이미지 경로 설정
-                 const detailPageUrl = `api/reservationDetail/${reser.reserNo}`;  // ✅ 예약 상세 페이지 경로 설정
+                 const detailPageUrl = `detail/${reser.commonNo}`;  // ✅ 예약 상세 페이지 경로 설정
             	
                  const card = `
                     <div class="col-md-4 mb-4">

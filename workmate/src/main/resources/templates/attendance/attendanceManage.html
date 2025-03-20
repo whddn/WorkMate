@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/attendance_layout}"
+	layout:fragment="content">
+<head>
+<meta charset="UTF-8">
+<title>근태관리</title>
+<!-- daterangepicker CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.1.0/daterangepicker.min.css" />
+<style>
+/* 전체 컨테이너를 세로 배치 */
+.main-container {
+	display: flex;
+	width: 100%;
+}
+
+/* 오른쪽 컨테이너 (카드들을 세로 정렬) */
+.container {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+#card-top, #card-bottom {
+	width: 100%;
+	padding: 30px;
+	margin: 10px 0; /* 상하 간격 추가 */
+	flex-grow: 1;
+}
+.content {
+	flex: 1;
+	padding: 20px;
+}
+.date-select {
+	width: 300px;
+	padding-bottom: 10px;
+}
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+.table-container {
+	max-height: 300px;
+	overflow-y: auto;
+	border: 1px solid #ccc;
+	display: block;
+}
+
+</style>
+</head>
+<body>
+	<div class="main-container">		
+
+		<!-- 오른쪽 컨테이너 -->
+		<div class="container">
+		 	<div class="card" id="card-top">
+				<div class="card-body">
+					<!-- 내용 추가 -->
+
+				</div>
+			</div>  
+			<div class="card" id="card-bottom">
+				<div class="card-body">
+					<!-- 내용 추가 -->
+					<h4 class="card-title">사원 근태 조회</h4>						
+					<div class="content">
+					<!-- 년도 월별 조회 기능 -->	
+					<div class="date-select">
+					<label><b>기간 조회: <b></label>				
+					<input type="text" name="daterange"/>
+
+					</div>						
+						<div class="table-responsive">
+							<table id="attendanceTable" class="table">
+								<thead>
+									<tr>
+										<th>날짜</th>
+										<th>부서명</th>
+										<th>사원이름</th>
+										<th>출근시간</th>
+										<th>퇴근시간</th>
+										<th>근무시간</th>
+										<th>연장근무시간</th>
+										<th>근무상태</th>										
+									</tr>
+								</thead>
+								<tbody>
+									<!-- 단건 : 배열 -->
+									<tr th:each="work : ${works}">
+										<td>[[ ${#dates.format(work.startWork, 'yyyy/MM/dd')} ]]</td>
+										<td>[[ ${work.teamName} ]]</td>
+										<td>[[ ${work.userName} ]]</td>
+										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
+										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
+										<td>[[ ${work.workTime} ]]</td>
+										<td>[[ ${work.addWorkTime} ]]</td>
+										<td>[[ ${work.workStatus} ]]</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<!--한국어  달력 쓰려면 추가 로드-->
+<script src="resources/js/plugin/datepicker/bootstrap-datepicker.ko.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<script>
+	$('#attendanceTable').DataTable({
+		order: [ [ 0, "desc" ] ],
+		info: false,
+	});
+	
+	$(function(){
+		// datepicker 설정
+		    var start = moment().subtract(29, 'days');
+   			var end = moment();
+    
+		  $('input[name="daterange"]').daterangepicker({
+			format : "yyyy-MM-dd", 
+			autoclose: true,
+			todayHighlight: true,
+		    opens: 'left',
+		    templates : {
+		        leftArrow: '&laquo;',
+		        rightArrow: '&raquo;'
+		    },
+		    locale: {
+		        format: 'YYYY-MM-DD'
+		      },
+		    startDate: start,
+		    endDate: end,
+		  }, function(start, end, label) {
+		    console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+		  });
+		  
+		// apply event
+			$('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+				  const stDate = picker.startDate.format('YYYY-MM-DD');
+				  const endDate = picker.endDate.format('YYYY-MM-DD');
+				  
+				  //상대경로
+				  location.href = `allList?stDate=${stDate}&endDate=${endDate}`;
+				  
+				  //절대경로 하려면 contextpath 추가
+		  });
+		  
+		  
+	}); //end of $(function()
+	
+	
+</script>
+
+</html>

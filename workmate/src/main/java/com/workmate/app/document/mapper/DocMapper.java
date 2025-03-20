@@ -11,7 +11,8 @@ public interface DocMapper {
 	public List<DocVO> selectFileList();
 	
 	// 자료실 업로드
-	public int uploadFile(DocVO docVO);
+	public int insertFile(DocVO docVO);
 	
 	// 자료실 삭제
+	public int deleteFileInfo(int docVO);
 }

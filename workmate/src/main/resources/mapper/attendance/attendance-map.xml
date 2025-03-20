@@ -4,21 +4,24 @@
 
 	<!-- 해당 월별조회 -->
 		<select id="selectWorkList" resultType="WorkVO">	
-	    SELECT start_work,
-	           after_work,
-	           work_time,
-	           work_status,
-	           add_work_time,
-	           (SELECT COUNT(*) 
-	            FROM work 
-	            WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
-	              AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
-	              AND work_status <![CDATA[<>]]> '정상') AS status_count
-	    FROM work
-	    WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
-	      AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
-	    ORDER BY start_work DESC
-	</select>
+		    SELECT start_work,
+		           after_work,
+		           work_time,
+		           work_status,
+		           add_work_time,
+		           (SELECT COUNT(*) 
+		            FROM work 
+		            WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+		              AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+		              AND work_status <![CDATA[<>]]> '정상'
+		              AND user_no = #{userNo}) 
+		              AS status_count
+		    FROM work
+		    WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+		      AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+		      AND user_no = #{userNo}
+		    ORDER BY start_work DESC
+		</select>
 	<!--<select id="selectWorkList" resultType="WorkVO">	
 		SELECT start_work
 		     , after_work
@@ -40,7 +43,8 @@
 	           work_status,
 	           add_work_time
 	    FROM work
-	    WHERE 1 = 1
+	    WHERE user_no = #{userNo}
+	    AND 1 = 1
     <if test="stDate != null and endDate != null">
         AND start_work BETWEEN #{stDate} AND #{endDate} + 1
     </if>
@@ -120,5 +124,22 @@
 		ORDER BY annual_no DESC
 	</select>
 	
-	
+	<select id="selectAllEmpList" resultType="WorkVO">
+		SELECT t.TEAM_NAME,               
+		       e.USER_NAME,              
+		       w.start_work,             
+		       w.after_work,             
+		       w.work_time,
+		       w.add_work_time,               
+		       w.work_status              
+		FROM work w
+		JOIN employee e ON w.user_no = e.user_no  
+		JOIN team t ON e.team_no = t.team_no  
+		WHERE 1 = 1
+		<if test="stDate != null and endDate != null">
+		    AND w.start_work BETWEEN #{stDate} AND #{endDate} + 1
+		</if>
+		ORDER BY w.start_work DESC
+	</select>
+
 </mapper>

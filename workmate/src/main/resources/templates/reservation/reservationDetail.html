@@ -1,22 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th=xmlns:th=
-	"https://www.thymeleaf.org/"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{common/layouts/reservation_layout}"
 	layout:fragment="content">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>예약 시스템</title>
+<title>예약 상세 정보</title>
 
 <!-- KaiAdmin Theme CSS -->
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
-<link
-	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
-	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
 
 <style>
 .container {
@@ -79,7 +77,7 @@
 
 	<div class="container mt-5">
 		<div class="row equal-height">
-			<!-- 캘린더 영역 -->
+			<!-- ✅ 캘린더 영역 -->
 			<div class="col-md-6">
 				<div class="card shadow-sm">
 					<div class="card-header bg-primary text-white text-center">예약
@@ -90,7 +88,7 @@
 				</div>
 			</div>
 
-			<!-- 시간 선택 영역 -->
+			<!-- ✅ 시간 선택 영역 -->
 			<div class="col-md-6">
 				<div class="card shadow-sm">
 					<div class="card-header bg-primary text-white text-center">시간
@@ -113,31 +111,34 @@
 		</div>
 
 		<div class="row equal-height mt-3">
-			<!-- ✅ 이미지 영역 (Thymeleaf로 변경) -->
+			<!-- ✅ 이미지 영역 -->
 			<div class="col-md-6">
 				<div class="card shadow-sm">
 					<div class="card-body text-center">
-						<img th:src="@{'/workmate/upload/' + ${reser.image}}" alt="예약 이미지"
-							class="reservation-image">
+						<img th:src="|/workmate/upload/${reser.image}|" id="reser-image"
+							alt="예약 이미지">
 					</div>
 				</div>
 			</div>
 
-			<!-- ✅ 예약 정보 입력 영역 (Thymeleaf로 변경) -->
+			<!-- ✅ 예약 정보 입력 영역 -->
 			<div class="col-md-6">
 				<div class="card shadow-sm">
 					<div class="card-header bg-success text-white text-center">예약
 						정보 입력</div>
 					<div class="card-body">
-						<form action="/reservationDetail" method="POST">
+						<form th:action="@{approval}" method="POST"
+							enctype="multipart/form-data">
+							<input type="hidden" name="commonNo" id="commonNo">
+
 							<div class="mb-3">
 								<label class="form-label">공용품 종류</label> <input type="text"
-									class="form-control" name="commonKind"
+									class="form-control" id="reser-category"
 									th:value="${reser.commonKind}" readonly>
 							</div>
 							<div class="mb-3">
 								<label class="form-label">이름</label> <input type="text"
-									class="form-control" name="name" th:value="${reser.name}"
+									class="form-control" id="reser-name" th:value="${reser.name}"
 									readonly>
 							</div>
 							<div class="mb-3">
@@ -149,13 +150,6 @@
 								<textarea class="form-control" name="reservationDetails"
 									rows="3" placeholder="예약 목적을 입력하세요"></textarea>
 							</div>
-							<div class="mb-3">
-								<label class="form-label">예약자 정보</label> <input type="text"
-									class="form-control" name="userName" placeholder="예약자명">
-								<input type="text" class="form-control" name="userPhone"
-									placeholder="연락처"> <input type="email"
-									class="form-control" name="userEmail" placeholder="이메일">
-							</div>
 							<div class="text-center">
 								<button type="submit" class="btn btn-success">예약하기</button>
 								<button type="reset" class="btn btn-danger">취소</button>
@@ -164,76 +158,52 @@
 					</div>
 				</div>
 			</div>
-
 		</div>
 	</div>
 
-	<!-- KaiAdmin & FullCalendar Scripts -->
-	<script
-		src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/jquery-3.6.0.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
+	<!-- ✅ JavaScript -->
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
 
+	<!-- ✅ JavaScript -->
 	<script>
-	/* 캘린더 추가 */
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'ko',
-            initialView: 'dayGridMonth',
-            selectable: true,
-            editable: false,
-            height: 350,
-            events: function(fetchInfo, successCallback, failureCallback) {
-                fetch('/api/reservations')
-                    .then(response => response.json())
-                    .then(data => {
-                        let events = data.map(reservation => ({
-                            title: reservation.title,
-                            start: reservation.start,
-                            backgroundColor: '#28a745',
-                            borderColor: '#28a745'
-                        }));
-                        successCallback(events);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching reservations:', error);
-                        failureCallback(error);
-                    });
-            },
-            dateClick: function(info) {
-                document.querySelector('input[name="reservationDate"]').value = info.dateStr;
-            }
-        });
-        calendar.render();
-    });
-    /* 회의실,차량 예약  */
-    function updateOptions() {
-        const itemType = document.getElementById("itemType").value;
-        const itemSelection = document.getElementById("itemSelection");
-        itemSelection.innerHTML = "";
-
-        let options = [];
-        if (itemType === "meeting-room") {
-            options = ["회의실 201호", "회의실 202호", "회의실 203호", "대회의실"];
-        } else if (itemType === "car") {
-            options = ["K5 20머 2565", "BMW 20여 2544", "GV70 31가 3341"];
-        }
-
-        options.forEach(option => {
-            let opt = document.createElement("option");
-            opt.value = option;
-            opt.innerHTML = option;
-            itemSelection.appendChild(opt);
-        });
-    }
-    document.addEventListener("DOMContentLoaded", updateOptions);
     
-    /* 시간선택 */
+	document.addEventListener("DOMContentLoaded", function () {
+	    loadCalendar();
+	});
+	
+	function loadCalendar() {
+	    var calendarEl = document.getElementById('calendar');
+	    var calendar = new FullCalendar.Calendar(calendarEl, {
+	        locale: 'ko',
+	        initialView: 'dayGridMonth',
+	        selectable: true,
+	        editable: false,
+	        height: 350,
+	        events: function (fetchInfo, successCallback, failureCallback) {
+	            fetch('/api/reservations')  // ✅ REST API를 호출하여 예약 데이터 가져오기
+	                .then(response => response.json())
+	                .then(data => {
+	                    let events = data.map(reservation => ({
+	                        title: reservation.title,
+	                        start: reservation.start,
+	                        backgroundColor: '#28a745',
+	                        borderColor: '#28a745'
+	                    }));
+	                    successCallback(events);
+	                })
+	                .catch(error => {
+	                    console.error('예약 데이터를 불러오는 중 오류 발생:', error);
+	                    failureCallback(error);
+	                });
+	        },
+	        dateClick: function (info) {
+	            document.querySelector('input[name="reservationDate"]').value = info.dateStr;
+	        }
+	    });
+	    calendar.render();
+	}
+
     function toggleTime(element) {
         element.classList.toggle("selected");
     }
@@ -249,22 +219,6 @@
             }
         });
     }
-    
-    async function loadReservationDetail() {
-        const reserNo = window.location.pathname.split("/").pop();  // URL에서 예약 번호 추출
-        const response = await fetch(`/api/reservationDetail/${reserNo}`);  // REST API 요청
-        const reser = await response.json();  // JSON 변환
-
-        if (reser) {
-            document.getElementById("reser-name").innerText = reser.name;
-            document.getElementById("reser-category").innerText = reser.commonKind;
-            document.getElementById("reser-image").src = `/workmate/upload/${reser.image}`;
-        } else {
-            document.body.innerHTML = "<h1>예약 정보를 찾을 수 없습니다.</h1>";
-        }
-    }
-
-    loadReservationDetail();  // 페이지 로드 시 실행
 </script>
 
 </body>

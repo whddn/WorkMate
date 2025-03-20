@@ -19,68 +19,91 @@
 				<div class="card-header">
 					<div class="d-flex align-items-center">
 						<h4 class="card-title">전사 자료실</h4>
-						<button class="btn btn-primary btn-round ms-auto" onclick="uploadModal()"
-							data-bs-toggle="modal" data-bs-target="#addRowModal">
-							<i class="fa fa-plus"></i> FILE UPLOAD
-						</button>
+						<th:block th:if="${userId != null and #strings.contains(userId, 'team')}">
+						    <button class="btn btn-primary btn-round ms-auto" onclick="uploadModal()"
+						            data-bs-toggle="modal" data-bs-target="#addRowModal">
+						        <i class="fa fa-plus"></i> FILE UPLOAD
+						    </button>
+						</th:block>
 					</div>
 				</div>
 				<div class="card-body">
 					<!-- Modal -->
-<div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h3 class="modal-title">파일 업로드</h3>
-                <button type="button" class="close" onclick="closeModal()">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p class="small">파일을 업로드 해주세요.</p>
-                <form>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group form-group-default">
-                                <label>파일명</label>
-                                <input id="addName" type="text" class="form-control" placeholder="파일 설명을 입력하세요">
-                            </div>
-                        </div>
-                        <input type="file" class="form-control-file" id="exampleFormControlFile1">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" id="addRowButton" class="btn btn-primary">업로드하기</button>
-                <button type="button" class="btn btn-danger" onclick="closeModal()">취소</button>
-            </div>
-        </div>
-    </div>
-</div>
+				<div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true" >
+				    <div class="modal-dialog" role="document">
+				        <div class="modal-content">
+				            <div class="modal-header border-0">
+				                <h3 class="modal-title">파일 업로드</h3>
+				                <button type="button" class="close" onclick="closeModal()">
+				                    <span aria-hidden="true">×</span>
+				                </button>
+				            </div>
+				            <div class="modal-body">
+				                <p class="small">파일을 업로드 해주세요.</p>
+				                <form>
+				                    <div class="row">
+				                        <div class="col-sm-12">
+				                            <div class="form-group form-group-default">
+				                                <label>파일명</label>
+				                                <input id="addName" type="text" class="form-control" placeholder="파일 설명을 입력하세요">
+				                            </div>
+				                             <div class="form-group form-group-default">
+				                                <label>파일분류</label>
+												<select class="form-select input-fixed" id="notify_placement_from">
+												    <th:block th:each="tag : ${#sets.toSet(lists.![fileTag])}">
+												        <option th:value="${tag}">[[ ${tag} ]]</option>
+												    </th:block>
+												</select>
+				                            </div>
+				                        </div>
+				                        <input type="file" class="form-control-file" id="exampleFormControlFile1">
+				                    </div>
+				                </form>
+				            </div>
+				            <div class="modal-footer border-0">
+				                <button type="submit" id="addRowButton" class="btn btn-primary" >업로드하기</button>
+				                <button type="button" class="btn btn-danger" onclick="closeModal()">취소</button>
+				            </div>
+				        </div>
+				    </div>
+				</div>
 
 					<div class="table-responsive">
 							<table id="documentTable" class="table">
 								<thead>
-									<tr>
-										<th><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></th>
-										<th>파일명</th>
-										<th>파일크기</th>
-										<th>확장자</th>
-										<th>업로드날짜</th>							
-										<th><i class="fas fa-download"></i></th>							
-										<th><i class="fas fa-trash-alt"></i></th>							
-									</tr>
+								    <tr>
+								        <th>
+								        	<select id="extFilter" class="form-select">
+								                <option value="">자료 전체</option>
+								            </select></th> <!-- 체크박스 필터 X -->
+								        <th>파일명</th>
+								        <th>파일크기</th>
+								        <th>확장자</th>
+								        <th>업로드날짜</th>
+								        <th><i class="fas fa-download"></i></th>
+								        <th:block th:if="${userId != null and #strings.contains(userId, 'team')}">
+								        <th> <i class="fas fa-trash-alt"></i></th>
+   										</th:block>
+								    </tr>
 								</thead>
 								<tbody>
 									<!-- 단건 : 배열 -->
 									<tr th:each="list : ${lists}">
-										<td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
+										<td>[[ ${list.fileTag} ]]</td>
 										<td>[[ ${list.fileName} ]]</td>
 										<td>[[ ${list.fileSize} ]]</td>
 										<td>[[ ${list.extenstion} ]]</td>
 										<td>[[ ${#dates.format(list.fileRegDate, 'yyyy-MM-dd')} ]]</td>
 										<td><a href=""><i class="fas fa-download" th:if="${list.fileName} != null" ></i></a></td>
-										<td><i class="fas fa-trash-alt" th:if="${list.fileName} != null" ></i></td>										
+										<th:block th:if="${userId != null and #strings.contains(userId, 'team')}">
+										<td>
+										    <i class="fas fa-trash-alt"
+										       th:if="${not #strings.isEmpty(list.fileName)}"
+										       th:data-document-no="${list.documentNo}"
+										       onclick="deleteDocument(this)">										       
+										    </i>
+										</td>
+										</th:block>										
 									</tr>
 								</tbody>
 							</table>
@@ -91,10 +114,10 @@
 	</div>
 </body>
 <script>
-$('#documentTable').DataTable({
-	order: [ [ 0, "desc" ] ],
-	info: false,
-});
+//$('#documentTable').DataTable({
+//	order: [ [ 0, "desc" ] ],
+//	info: false,
+// });
 
 // 파일 등록 모달
 function uploadModal() {
@@ -113,5 +136,52 @@ function closeModal() {
     // backdrop 강제 제거
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 }
+
+// 파일 단건 삭제
+function deleteDocument(icon) {
+    const documentNo = icon.getAttribute("data-document-no");
+
+    if (confirm("삭제하시겠습니까?")) {
+        fetch(`/workmate/document/delete/${documentNo}`, {
+            method: "DELETE"
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("삭제 완료");
+                location.reload(); // 페이지 새로고침
+            } else {
+                alert("삭제 실패");
+            }
+        })
+        .catch(error => {
+            console.error("삭제 오류:", error);
+            alert("삭제 중 오류가 발생했습니다.");
+        });
+    }
+}
+$(document).ready(function() {
+    var table = $('#documentTable').DataTable({
+        "paging": true,
+        "ordering": false,
+        "searching": true,
+        "info": false,
+        "lengthMenu": [10, 25, 50, 100],
+        initComplete: function () {
+            var column = this.api().column(0);  // 파일분류
+            var select = $('#extFilter'); // thead에 있는 select 가져오기
+
+            // 기존 옵션 제거 후 새로운 옵션 추가
+            column.data().unique().sort().each(function (d, j) {
+                select.append('<option value="' + d + '">' + d + '</option>');
+            });
+
+            // 필터 적용 이벤트 리스너
+            select.on('change', function () {
+                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                column.search(val ? '^' + val + '$' : '', true, false).draw();
+            });
+        }
+    });
+});
 </script>
 </html>

@@ -196,6 +196,7 @@ table {
 										<th>출근시간</th>
 										<th>퇴근시간</th>
 										<th>근무시간</th>
+										<th>연장근무시간</th>
 										<th>근무상태</th>
 									</tr>
 								</thead>
@@ -206,6 +207,7 @@ table {
 										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
 										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
 										<td>[[ ${work.workTime} ]] h</td>
+										<td>[[ ${work.addWorkTime} ]] h</td>
 										<td>[[ ${work.workStatus} ]]</td>
 									</tr>
 								</tbody>

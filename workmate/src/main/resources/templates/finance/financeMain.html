@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>입출금 리포트 조회</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .search-bar select,
+        .search-bar input {
+            padding: 8px;
+            font-size: 14px;
+            width: 200px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .search-bar button {
+            padding: 8px 16px;
+            background-color: #337ab7;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .search-bar button:hover {
+            background-color: #286090;
+        }
+
+        .table-container {
+            margin-top: 30px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-container th, .table-container td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .table-container th {
+            background-color: #f0f0f0;
+        }
+
+        .table-container tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .table-container tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .paging {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .paging a {
+            padding: 8px 16px;
+            text-decoration: none;
+            background-color: #337ab7;
+            color: white;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+
+        .paging a:hover {
+            background-color: #286090;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+
+        .button-container button.delete {
+            background-color: #dc3545;
+        }
+
+        .button-container button:hover {
+            background-color: #218838;
+        }
+
+        .button-container button.delete:hover {
+            background-color: #c82333;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>입출금 리포트 조회</h1>
+
+        <!-- 기간 및 검색창 -->
+        <div class="search-bar">
+
+            <div>
+                <label for="dateRange">기간 선택:</label>
+                <select id="dateRange">
+                    <option value="7">최근 7일</option>
+                    <option value="30">최근 30일</option>
+                    <option value="90">최근 90일</option>
+                    <option value="custom">직접 입력</option>
+                </select>
+                <div id="customDateInput" style="display:none;">
+                    <label for="startDate">시작일:</label>
+                    <input type="date" id="startDate">
+                    <label for="endDate">끝일:</label>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+                <!--직접 입력 버튼을 누르면 시작일과 끝일이 나오게 가렸다가 저쩌고 하게-->
+            
+
+            <div>
+                <input type="text" id="search" placeholder="검색어 입력">
+                <button type="button">검색</button>
+            </div>
+        </div>
+
+        <!-- 게시글 목록 테이블 -->
+        <table class="table-container">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" name="postSelection"></th>
+                    <th>제목</th>
+                    <th>상태</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox" name="postSelection"></td>
+                    <td><a href="#">리포트 제목 1</a></td>
+                    <td>완료</td>
+                    <td>홍길동</td>
+                    <td>2025-03-13</td>
+                    <td>추가 설명</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="postSelection"></td>
+                    <td><a href="#">리포트 제목 2</a></td>
+                    <td>진행 중</td>
+                    <td>이순신</td>
+                    <td>2025-03-12</td>
+                    <td>추가 설명</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="postSelection"></td>
+                    <td><a href="#">리포트 제목 3</a></td>
+                    <td>완료</td>
+                    <td>김개발</td>
+                    <td>2025-03-11</td>
+                    <td>추가 설명</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 페이징 -->
+        <div class="paging">
+            <a href="#">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+        </div>
+
+        <!-- 버튼들 -->
+        <div class="button-container">
+            <button>작성</button>
+            <button class="delete">삭제</button>
+        </div>
+    </div>
+</body>
+</html>

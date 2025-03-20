@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.security.mapper.UserMapper">
 	<!-- user-map.xml -->
-	<select id="getUserInfo" resultType="UserVO">
+	<select id="getUserInfo" resultType="EmpVO">
 		SELECT user_no, user_id,
 		user_pwd, user_mail, user_position, hire_date,
 		user_name, resign_date, status_user, user_birth, address,

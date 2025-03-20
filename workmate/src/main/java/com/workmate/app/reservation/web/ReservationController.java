@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.workmate.app.reservation.service.ReservationService;
 import com.workmate.app.reservation.service.ReservationVO;
@@ -27,11 +26,11 @@ public class ReservationController {
 	}
 
 	// 예약 상세 페이지
-	@GetMapping("reservation/Detail/{reserNo}")
-	public String reservationDetail(@PathVariable("reserNo") int reserNo, Model model) {
-		ReservationVO reservation = reservationService.findReserInfo(reserNo);
-		model.addAttribute("reser", reservation);
-		return "reservation/reservationDetail"; // reservationDetail.html 반환
+	@GetMapping("reservation/detail/{commonNo}")
+	public String ReserDetail(ReservationVO reservationVO, Model model) {
+		ReservationVO detailVO = reservationService.findReserById(reservationVO);
+		model.addAttribute("reser", detailVO);
+	    return "reservation/reservationDetail";
 	}
 	
 	

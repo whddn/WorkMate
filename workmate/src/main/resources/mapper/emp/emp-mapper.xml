@@ -188,8 +188,7 @@
 			SELECT    
 			    	  f.EVALU_FORM_NO
 					, f.EVALU_NAME              
-			        , f.EVALU_START          
-			        , g.EVALUATEE_GROUP_ID      
+			        , f.EVALU_START               
 			        , u.USER_NO
 			        , u.USER_NAME          
 			        , i.EVALU_COMPET       
@@ -270,31 +269,75 @@
 				ON t.department_id = d.department_id
 	</select>
 	
-	<!-- 새 평가 등록 (form 부분) -->
+	<!-- 새 평가 등록 : form 부분 -->
 	<insert id="insertEvaluForm" parameterType="EvaluVO">
+			<selectKey keyProperty="evaluFormNo"
+				   resultType="Integer"
+				   order="BEFORE">
+			 SELECT MAX(EVALU_FORM_NO) + 1
+	         FROM EVALU_FORM
+			</selectKey>
 		INSERT INTO EVALU_FORM
 					(EVALU_FORM_NO
 		            , EVALU_NAME
 		            , INSERT_DATE
 		            , EVALU_START
-		            , EVALU_END)
+		            , EVALU_END
+		            , USAGE_STATUS)
 		VALUES 	(EVALU_FORM_NO_SEQ.NEXTVAL
 		            , #{evaluName}
-		            , #{insertDate}
+		            , SYSDATE
 		            , #{evaluStart}
-		            , #{evaluEnd})
+		            , #{evaluEnd}
+		            , '대기 중')
 	</insert>
-	<!-- 새 평가 등록 (format 부분) -->
+	<!-- 새 평가 등록 : format 부분 -->
 	<insert id="insertEvaluFormat" parameterType="EvaluVO">	
-		INSERT INTO EVALU_FORMAT
+
+        		INSERT INTO EVALU_FORMAT
 					(EVALU_NO
 					, ORDER_NO
 					, EVALU_ITEM_NO
-					, EVALU_FROM_NO)
-		VALUES 		( EVALU_NO_SEQ.NEXTVAL
-					, #{ORDER_NO}
-					, #{EVALU_ITEM_NO}
-					, #{EVALU_FORM_NO}
+					, EVALU_FORM_NO)
+					
+				VALUES ( EVALU_NO_SEQ.NEXTVAL
+					, #{orderNo}
+					, #{evaluItemNo}
+					, #{evaluFormNo}
 					)
+	</insert>
+	<!-- 새 평가 등록 : 평가자 그룹 아이디 => 조회는 사원 번호와 평가 폼 번호로 -->
+	<insert id="insertEvaluGroup" parameterType="EvaluVO">
+			INSERT INTO EVALU_GROUP
+			(
+			    EVALU_GROUP_ID
+			    , EVALU_FORM_NO
+			    , USER_NO                
+			)
+			SELECT 
+			    EVALU_G_ID_SEQ.NEXTVAL
+			    , #{evaluFormNo}
+			    , u.user_no
+			FROM EMPLOYEE u 
+			JOIN TEAM t ON u.team_no = t.team_no
+			WHERE t.team_no = #{evaluGroupId}
+	</insert>
+	
+	<!-- 새 평가 등록 : 피평가자 그룹 아이디 -->
+	<insert id="insertEvaluateeGroup" parameterType="EvaluVO">
+
+			INSERT INTO EVALUATEE_GROUP
+			(
+			    EVALUATEE_GROUP_ID
+			    , EVALU_FORM_NO
+			    , USER_NO                
+			)
+			SELECT 
+			    EVALUATEE_G_ID_SEQ.NEXTVAL
+			    , #{evaluFormNo}
+			    , u.user_no
+			FROM EMPLOYEE u 
+			JOIN TEAM t ON u.team_no = t.team_no
+			WHERE t.team_no = #{evaluateeGroupId}
 	</insert>
 </mapper>

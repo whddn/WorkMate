@@ -33,7 +33,7 @@ public class MailController {
         int userNo = loginUser.getUserVO().getUserNo(); // ✅ userMail 가져오기
 
         // 받은 메일 조회
-        List<MailVO> receivedMails = mailService.getReceivedMails(userNo); // ✅ 이메일 기준 조회
+        List<MailVO> receivedMails = mailService.findReceivedMailsList(userNo); // ✅ 이메일 기준 조회
 
         // 모델 데이터 추가
         model.addAttribute("receivedMails", receivedMails);
@@ -44,7 +44,7 @@ public class MailController {
  // 메일 단건 조회
     @GetMapping("mail/view")
     public String viewMail(@RequestParam("mailId") int mailId, Model model) {
-        MailVO mail = mailService.getMailById(mailId);
+        MailVO mail = mailService.findMailById(mailId);
         model.addAttribute("mail", mail);
         return "mail/view";
     }
@@ -75,11 +75,12 @@ public class MailController {
             return "전송 실패: " + e.getMessage();
         }
     }
+    //보낸 메일함 전쳊
     @GetMapping("mail/sent")
     public String sentMailList(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
         int userNo = loginUser.getUserVO().getUserNo();
 
-        List<MailVO> sentMails = mailService.getSentMails(userNo);
+        List<MailVO> sentMails = mailService.findSentMailsList(userNo);
         model.addAttribute("sentMails", sentMails);
 
         return "mail/sent";
@@ -87,8 +88,16 @@ public class MailController {
  // 보낸 메일 상세 
     @GetMapping("mail/sentview")
     public String viewSentMail(@RequestParam("mailId") int mailId, Model model) {
-        MailVO mail = mailService.getMailById(mailId);
+        MailVO mail = mailService.findSentMailById(mailId);
         model.addAttribute("mail", mail);
         return "mail/sentview";
     }
+    
+ // **외부 메일 수신 (IMAP) 추가**
+    @GetMapping("/mail/fetchAndStore")
+    public String fetchAndStoreEmails() {
+        mailService.fetchAndStoreEmails();
+        return "redirect:/mail/mailmain"; // 받은 메일함으로 이동
+    }
+ 
 }
