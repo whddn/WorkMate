@@ -25,26 +25,26 @@ public class AdminServiceImpl implements AdminService {
 
 	// 공용품 전체조회
 	@Override
-	public List<CommonItemVO> selectItemList() {
+	public List<CommonItemVO> findItemList() {
 		return commonitemMapper.selectItemList();
 	}
 
 	// 공용품 단건조회
 	@Override
-	public CommonItemVO findItemInfo(CommonItemVO commonitemVO) {
+	public CommonItemVO findItemById(CommonItemVO commonitemVO) {
 		return commonitemMapper.selectItemById(commonitemVO);
 	}
 
 	// 공용품생성
 	@Override
-	public int createCommonItemInfo(CommonItemVO commonitemVO) {
+	public int inputCommonItem(CommonItemVO commonitemVO) {
 		int result = commonitemMapper.insertCommonItemInfo(commonitemVO);
 		return result == 1 ? commonitemVO.getCommonNo() : -1;
 	}
 
 	// 공용품수정
 	@Override
-	public Map<String, Object> modifyItemInfo(CommonItemVO commonitemVO) {
+	public Map<String, Object> modifyItem(CommonItemVO commonitemVO) {
 		Map<String, Object> map = new HashMap<>();
 		boolean isSuccessed = false;
 		int result = commonitemMapper.updateItemInfo(commonitemVO);
@@ -59,7 +59,7 @@ public class AdminServiceImpl implements AdminService {
 
 	// 공용품삭제
 	@Override
-	public Map<String, Object> removeItemInfo(int commonNo) {
+	public Map<String, Object> dropItem(int commonNo) {
 		Map<String, Object> map = new HashMap<>();
 		int result = commonitemMapper.deleteItemInfo(commonNo);
 		if(result == 1) {

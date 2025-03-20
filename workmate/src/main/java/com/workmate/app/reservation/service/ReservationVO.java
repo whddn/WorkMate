@@ -22,7 +22,7 @@ public class ReservationVO {
 	private LocalTime reserEndTime;		// 예약종료시간
 	private String reserAvailability;	// 예약가능여부
 	private String content;				// 내용
-	private String commonNo;			// 공용품번호
+	private Integer commonNo;			// 공용품번호
 	private String image;				// 이미지
 	private String usageStatus;			// 사용여부
 	

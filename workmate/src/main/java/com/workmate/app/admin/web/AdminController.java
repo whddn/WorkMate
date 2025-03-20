@@ -38,7 +38,7 @@ public class AdminController {
 	// 공용품 관리
 	@GetMapping("admin/commonItemList")
 	public String commonItemList(Model model) {
-		List<CommonItemVO> list = adminService.selectItemList();
+		List<CommonItemVO> list = adminService.findItemList();
 		model.addAttribute("item", list);
 		return "admin/commonItemList";
 	}
@@ -82,7 +82,7 @@ public class AdminController {
 		try {
 			file.transferTo(dest);
 			commonItemVO.setImage(subDir + uniqueFileName); // DB에 저장될 경로
-			adminService.createCommonItemInfo(commonItemVO);
+			adminService.inputCommonItem(commonItemVO);
 		} catch (IOException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", "🚨 파일 저장 중 오류 발생!");
 			return "redirect:commonItemList";
@@ -94,7 +94,7 @@ public class AdminController {
 	// 공용품 수정 - 페이지
 	@GetMapping("admin/commonItemUpdate")
 	public String ItemUpdate(CommonItemVO commonItemVO, Model model) {
-		CommonItemVO updateVO = adminService.findItemInfo(commonItemVO);
+		CommonItemVO updateVO = adminService.findItemById(commonItemVO);
 		model.addAttribute("commonItemVO", updateVO);
 		return "admin/commonItemUpdate";
 	}
@@ -106,7 +106,7 @@ public class AdminController {
 			RedirectAttributes redirectAttributes) {
 
 		// ✅ 1. 기존 데이터 조회
-		CommonItemVO existingItem = adminService.findItemInfo(commonItemVO);
+		CommonItemVO existingItem = adminService.findItemById(commonItemVO);
 
 		// ✅ 2. 새 파일이 업로드된 경우 처리
 		if (file != null && !file.isEmpty()) {
@@ -150,14 +150,14 @@ public class AdminController {
 		}
 
 		// ✅ 4. DB 업데이트 실행
-		adminService.modifyItemInfo(commonItemVO);
+		adminService.modifyItem(commonItemVO);
 		return "redirect:commonItemList";
 	}
 
 	// 공용품 삭제 - 처리
 	@GetMapping("admin/commonItemDelete")
 	public String commonItemDelete(Integer commonNo) {
-		adminService.removeItemInfo(commonNo);
+		adminService.dropItem(commonNo);
 		return "redirect:commonItemList";
 	}
 

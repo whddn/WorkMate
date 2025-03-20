@@ -20,20 +20,17 @@ public class RestReservationController {
 	private final ReservationService reservationService;
 
 	// 예약목록 전체조회 - api요청
-	@GetMapping("api/reservation")
+	@GetMapping("api/reservation/main")
 	public List<ReservationVO> ReserList() {
 		return reservationService.findAllReserList();
 	}
 
 	// 예약목록 단건조회
-	@GetMapping("api/reservationDetail/{reserNo}")
-	public ResponseEntity<ReservationVO> getReservationDetail(@PathVariable("reserNo") int reserNo) {
-		ReservationVO reservation = reservationService.findReserInfo(reserNo);
-		if (reservation != null) {
-			return ResponseEntity.ok(reservation);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+	@GetMapping("api/reservation/detail/{commonNo}")
+	public ReservationVO ReserDetail(@PathVariable Integer commonNo) {
+		ReservationVO reservationVO = new ReservationVO();
+		reservationVO.setCommonNo(commonNo);
+		return reservationService.findReserById(reservationVO);
 	}
 
 	// 예약 입력
