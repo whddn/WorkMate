@@ -21,6 +21,8 @@ public class WorkVO {
 		private double addWorkTime; //연장근무시간
 		private Integer userNo;		//사원번호
 		private String userName;		//사원번호
+		private String userId;		//사원아이디
+		private String teamName;		//사원아이디
 		
 		private double totalWorkTime; // 현재달 총 근무시간 
 		private double remainWorkTime; // 남은 근무시간
