@@ -15,8 +15,11 @@ import lombok.Getter;
 
 @RequiredArgsConstructor
 @Getter
-public class LoginUserVO implements UserDetails {
-	private final UserVO userVO;
+
+public class LoginUserVO implements UserDetails{
+	
+	private final EmpVO userVO;
+
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
