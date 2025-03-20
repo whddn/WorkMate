@@ -66,21 +66,25 @@ public class ApprovalController {
 	// 결재를 기다리는 문서 리스트를 보여준다
 	@GetMapping("approval/waiting")
 	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam String standard) {
-		model.addAttribute("waitingList", approvalService.findApprovalList(approvalVO, standard));
+		approvalVO.setApprStatus("a1");
+		approvalVO.setStandard(standard);
+		model.addAttribute("waitingList", approvalService.findApprovalList(approvalVO));
 		return "approval/waiting";
 	}
 	
 	// 결재 승인받은 문서 리스트를 보여준다
 	@GetMapping("approval/allowance")
 	public String getAllowance(Model model, ApprovalVO approvalVO) {
-		model.addAttribute("allowanceList", approvalService.findApprovalList(approvalVO, "allow"));
+		approvalVO.setApprStatus("a2");
+		model.addAttribute("allowanceList", approvalService.findApprovalList(approvalVO));
 		return "approval/allowance";
 	}
 	
 	// 결재 반려된 문서 리스트를 보여준다
 	@GetMapping("approval/rejection")
 	public String getRejection(Model model, ApprovalVO approvalVO) {
-		model.addAttribute("rejectionList", approvalService.findApprovalList(approvalVO, "reject"));
+		approvalVO.setApprStatus("a3");
+		model.addAttribute("rejectionList", approvalService.findApprovalList(approvalVO));
 		return "approval/rejection";
 	}
 	
