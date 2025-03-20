@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
-<head>
-    <meta charset="UTF-8">
+<html xmlns:th="https://www.thymeleaf.org/"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나의 평가 조회</title>
+    <title>입출금 리포트 조회</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -130,7 +129,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>나의 평가 조회</h1>
+        <h1>입출금 리포트 조회</h1>
 
         <!-- 기간 및 검색창 -->
         <div class="search-bar">
@@ -164,60 +163,36 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" name="postSelection"></th>
-                    <th>평가 제목</th>
+                    <th>제목</th>
                     <th>상태</th>
-                    <th>피평가자</th>
-                    <th>평가 날짜(시작~종료)</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
                     <th>비고</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">25년 03월 평가</a></td>
-                    <td>종료</td>
+                    <td><a href="#">리포트 제목 1</a></td>
+                    <td>완료</td>
                     <td>홍길동</td>
-                    <td>2025-03-13 ~ 2025-03-20</td>
+                    <td>2025-03-13</td>
                     <td>추가 설명</td>
                 </tr>
                 <tr>
                     <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">25년 03월 평가</a></td>
-                    <td>종료</td>
-                    <td>홍길동</td>
-                    <td>2025-03-13 ~ 2025-03-20</td>
+                    <td><a href="#">리포트 제목 2</a></td>
+                    <td>진행 중</td>
+                    <td>이순신</td>
+                    <td>2025-03-12</td>
                     <td>추가 설명</td>
                 </tr>
                 <tr>
                     <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">25년 03월 평가</a></td>
-                    <td>종료</td>
-                    <td>홍길동</td>
-                    <td>2025-03-13 ~ 2025-03-20</td>
-                    <td>추가 설명</td>
-                </tr>
-                                <tr>
-                    <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">25년 03월 평가</a></td>
-                    <td>종료</td>
-                    <td>홍길동</td>
-                    <td>2025-03-13 ~ 2025-03-20</td>
-                    <td>추가 설명</td>
-                </tr>
-                                <tr>
-                    <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">25년 03월 평가</a></td>
-                    <td>종료</td>
-                    <td>홍길동</td>
-                    <td>2025-03-13 ~ 2025-03-20</td>
-                    <td>추가 설명</td>
-                </tr>
-                                <tr>
-                    <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">25년 03월 평가</a></td>
-                    <td>종료</td>
-                    <td>홍길동</td>
-                    <td>2025-03-13 ~ 2025-03-20</td>
+                    <td><a href="#">리포트 제목 3</a></td>
+                    <td>완료</td>
+                    <td>김개발</td>
+                    <td>2025-03-11</td>
                     <td>추가 설명</td>
                 </tr>
             </tbody>
