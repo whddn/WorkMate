@@ -15,9 +15,9 @@ import com.workmate.app.reservation.service.ReservationVO;
 public class ReservationImpl implements ReservationService {
 
 	private ReservationMapper reservationMapper;
-	
+
 	@Autowired
-	ReservationImpl(ReservationMapper reservationMapper){
+	ReservationImpl(ReservationMapper reservationMapper) {
 		this.reservationMapper = reservationMapper;
 	}
 
@@ -28,33 +28,37 @@ public class ReservationImpl implements ReservationService {
 	}
 
 	// 단건
-	@Override
-	public ReservationVO findReserInfo(int reserNo) {
-		return reservationMapper.selectReservationById(reserNo);
+	public ReservationVO findReserById(ReservationVO reservationVO) {
+		return reservationMapper.selectReservationById(reservationVO);
 	}
 
 	// 예약 등록
 	@Override
-	public int createReserInfo(ReservationVO reservationVO) {
+	public int inputReserInfo(ReservationVO reservationVO) {
 		return reservationMapper.insertReservationInfo(reservationVO);
 	}
 
 	// 수정
 	@Override
-	public int modifyReserInfo(ReservationVO reservationVO) {
+	public Map modifyReserInfo(ReservationVO reservationVO) {
+		Map<String, Object> map = new HashMap<>();
+		boolean isSuccessed = false;
 		int result = reservationMapper.updateReservationInfo(reservationVO);
-		if(result < 1) {
-			return 0;
+		if(result == 1) {
+			isSuccessed = true;
 		}
-		return reservationMapper.updateReservationInfo(reservationVO);
+		map.put("result", isSuccessed);
+		map.put("target", reservationVO);
+		
+		return map;
 	}
 
 	// 삭제
 	@Override
-	public Map<String, Object> removeReserInfo(int commonNo) {
+	public Map<String, Object> dropReserInfo(int commonNo) {
 		Map<String, Object> map = new HashMap<>();
 		int result = reservationMapper.deleteReservationInfo(commonNo);
-		if(result == 1) {
+		if (result == 1) {
 			map.put("commonNo", commonNo);
 		}
 		return map;

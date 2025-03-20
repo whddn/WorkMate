@@ -13,7 +13,7 @@
 		order by common_no
 	</select>
 	<!-- 공용품 단건조회 -->
-	<select id="selectItemInfoById" resultType="CommonItemVO" parameterType="CommonItemVO">
+	<select id="selectItemById" resultType="CommonItemVO" parameterType="CommonItemVO">
 		select common_no
 		  ,common_kind
 	      ,name

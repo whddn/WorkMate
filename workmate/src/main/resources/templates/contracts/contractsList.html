@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/contracts_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>전자 계약</title>
+</head>
+
+<body>
+	<h3>결재 계약</h3>
+	<span>
+		<select>
+			<option value="formName" selected>계약명</option>
+			<option value="dept">이름</option>
+			<option value="manager">계약번호</option>
+		</select>
+		<input>
+		<button><i class="fas fa-search"></i></button>
+	</span>
+	<table id="FormsTable" class="display">
+		<thead>
+			<tr>
+				<th>NO</th>
+				<th>양식명</th>
+				<th>담당부서</th>
+				<th>담당자</th>
+			</tr>
+		</thead>
+		<tbody>
+			<th:block th:each="form, sts : ${formList}">
+				<tr th:onclick="| location.href = '@{/approval/write(apprType=${form.apprType})}' |">
+					<td>[[ ${sts.count} ]]</td>
+					<td>[[ ${form.formName} ]]</td>
+					<td>[[ ${form.departmentName} ]]</td>
+					<td>[[ ${form.userName} ]]</td>
+				</tr>
+			</th:block>
+		</tbody>
+	</table>
+</body>
+
+<script>
+	$(document).ready(function() {
+		$('#FormsTable').DataTable();
+	});
+</script>
+
+</html>
