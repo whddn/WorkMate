@@ -16,7 +16,7 @@
 		    LEFT JOIN department
 		    ON team.department_id=department.department_id
 	</select>
-	<select id="selectApprForm" parameterType="ApprFormVO" resultType="ApprFormVO">
+	<select id="selectApprFormById" parameterType="ApprFormVO" resultType="ApprFormVO">
 		SELECT appr_type
 			, form_name
 			, form_path

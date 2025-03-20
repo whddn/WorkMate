@@ -20,7 +20,7 @@ public class ReportAttachServiceImpl implements ReportAttachService {
 	}
 
 	@Override
-	public List<ReportAttachVO> selectApprovalRAList(ApprovalVO approvalVO) {
+	public List<ReportAttachVO> findApprovalRAList(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
 		return reportAttachMapper.selectApprovalRAList(approvalVO);
 	}

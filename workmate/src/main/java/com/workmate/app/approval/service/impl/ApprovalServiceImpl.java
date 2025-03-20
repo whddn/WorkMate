@@ -1,5 +1,6 @@
 package com.workmate.app.approval.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,25 +20,36 @@ public class ApprovalServiceImpl implements ApprovalService {
 	}
 	
 	@Override
-	public List<ApprovalVO> selectApprovalList(ApprovalVO approvalVO) {
+	public List<ApprovalVO> findApprovalList(ApprovalVO approvalVO, String standard) {
 		// TODO Auto-generated method stub
-		return approvalMapper.selectApprovalList(approvalVO);
+		List<ApprovalVO> result = new ArrayList<>();
+		if(standard.equals("fromMe"))
+			result = approvalMapper.selectApprovalListFromMe(approvalVO);
+		else if(standard.equals("toMe"))
+			result = approvalMapper.selectApprovalListToMe(approvalVO);
+		else if(standard.equals("refMe"))
+			result = approvalMapper.selectApprovalListRefMe(approvalVO);
+		else if(standard.equals("allow"))
+			result = approvalMapper.selectApprovalListAllow(approvalVO);
+		else if(standard.equals("reject"))
+			result = approvalMapper.selectApprovalListReject(approvalVO);
+		return result;
 	}
 
 	@Override
-	public ApprovalVO selectApproval(ApprovalVO approvalVO) {
+	public ApprovalVO findApprovalById(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
-		return approvalMapper.selectApproval(approvalVO);
+		return approvalMapper.selectApprovalById(approvalVO);
 	}
 
 	@Override
-	public int insertApproval(ApprovalVO approvalVO) {
+	public int inputApproval(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
 		return approvalMapper.insertApproval(approvalVO);
 	}
 
 	@Override
-	public int updateApproval(ApprovalVO approvalVO) {
+	public int modifyApproval(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
 		int result = approvalMapper.updateApprovalStatus(approvalVO);
 		if(result < 1) {
@@ -47,7 +59,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 	}
 
 	@Override
-	public int deleteApproval(ApprovalVO approvalVO) {
+	public int dropApproval(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
 		return approvalMapper.deleteApproval(approvalVO);
 	}

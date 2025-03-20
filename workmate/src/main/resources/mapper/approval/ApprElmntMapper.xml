@@ -56,5 +56,6 @@
 			, sign_no = #{signNo}
 		WHERE approver = #{approver}
 			AND appr_no = #{apprNo}
+			AND appr_result = 'a1'
 	</update>
 </mapper>

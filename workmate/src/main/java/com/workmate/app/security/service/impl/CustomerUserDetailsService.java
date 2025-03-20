@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.workmate.app.security.mapper.UserMapper;
 import com.workmate.app.security.service.UserVO;
 import com.workmate.app.security.service.LoginUserVO;
+import com.workmate.app.employee.service.EmpVO;
+
 @Service
 public class CustomerUserDetailsService implements UserDetailsService{
 	private UserMapper userMapper;
