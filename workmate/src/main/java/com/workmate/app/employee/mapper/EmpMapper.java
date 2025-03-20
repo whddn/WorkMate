@@ -24,7 +24,8 @@ public interface EmpMapper {
 	
 	// 사원 수정
 	public int updateEmployee(EmpVO empVO);
-		// 평가 양식 조회
+	
+	// 평가 양식 조회 (평가해야 할 페이지)
 	public List<EvaluVO> selectEvaluList(EvaluVO evaluVO);
 	
 	// 지난 평가 결과 전체 조회 (관리자)
@@ -55,4 +56,12 @@ public interface EmpMapper {
 	// 평가 포맷 등록 기능
 	public int insertEvaluFormat(EvaluVO evaluVO);
 	
+	// 평가자 그룹 등록 기능 
+	public int insertEvaluGroup(EvaluVO evaluVO);
+	
+	// 피평가자 그룹 등록 기능
+	public int insertEvaluateeGroup(EvaluVO evaluVO);
+	
+	// 평가한 거 등록 기능
+	public int insertEvaluScore(EvaluVO evaluVO);
 }
