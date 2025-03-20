@@ -65,7 +65,8 @@ public class ApprovalController {
 	
 	// 결재를 기다리는 문서 리스트를 보여준다
 	@GetMapping("approval/waiting")
-	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam String standard) {
+	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam(defaultValue = "fromMe") String standard) {
+		approvalVO.setUserNo(whoAmI().getUserNo());
 		approvalVO.setApprStatus("a1");
 		approvalVO.setStandard(standard);
 		model.addAttribute("waitingList", approvalService.findApprovalList(approvalVO));
