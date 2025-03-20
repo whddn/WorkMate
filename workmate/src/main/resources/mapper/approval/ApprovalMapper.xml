@@ -61,22 +61,18 @@
 	    )
 	</insert>
 	<update id="updateApprovalStatus" parameterType="ApprovalVO">
-		<selectKey keyProperty="apprNo" resultType="String" order="BEFORE">
-	        SELECT 'YD' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(appr_no, 3))), 0) + 1, 3, '0')
-	        FROM approval
-	    </selectKey>
-	    UPDATE approval a
-	    SET a.appr_status = (
-	        CASE 
-	            WHEN NOT EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a3') 
-	                 AND EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a2') 
-	            THEN 'a2'
-	            WHEN EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a3') 
-	            THEN 'a3'
-	            ELSE a.appr_status
-	        END
-	    )
-	    WHERE a.appr_no = #{apprNo}
+		UPDATE approval a
+		SET a.appr_status = (
+		    CASE 
+		        WHEN NOT EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result != 'a2') 
+		        AND EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo}) 
+		        THEN 'a2' -- 모든 결재자가 승인한 경우
+		        WHEN EXISTS (SELECT 1 FROM appr_elmnt e WHERE e.appr_no = #{apprNo} AND e.appr_result = 'a3') 
+		        THEN 'a3' -- 한 명이라도 반려한 경우
+		        ELSE 'a1' -- 그 외의 경우 (예상치 못한 경우)
+		    END
+		)
+		WHERE a.appr_no = #{apprNo}
 	</update>
 	<update id="updateApprovalDate" parameterType="ApprovalVO">
 		UPDATE approval
