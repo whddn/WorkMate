@@ -25,14 +25,14 @@ public class AdminServiceImpl implements AdminService {
 
 	// 공용품 전체조회
 	@Override
-	public List<CommonItemVO> findAllItem() {
+	public List<CommonItemVO> selectItemList() {
 		return commonitemMapper.selectItemList();
 	}
 
 	// 공용품 단건조회
 	@Override
 	public CommonItemVO findItemInfo(CommonItemVO commonitemVO) {
-		return commonitemMapper.selectItemInfo(commonitemVO);
+		return commonitemMapper.selectItemById(commonitemVO);
 	}
 
 	// 공용품생성

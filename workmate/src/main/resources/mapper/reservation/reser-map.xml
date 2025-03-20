@@ -22,7 +22,7 @@
 	</select>
 
 	<!-- 예약 단건 조회 -->
-	<select id="selectReservationInfo" resultType="ReservationVO" parameterType="ReservationVO">
+	<select id="selectReservationById" resultType="ReservationVO" parameterType="ReservationVO">
 		SELECT
 			 r.user_no
 			,r.reser_no

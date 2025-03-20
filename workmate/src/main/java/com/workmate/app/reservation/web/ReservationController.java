@@ -19,7 +19,7 @@ public class ReservationController {
 	private final ReservationService reservationService;
 
 	// 예약 리스트 페이지
-	@GetMapping("reservation")
+	@GetMapping("reservation/main")
 	public String ReserList(Model model) {
 		List<ReservationVO> list = reservationService.findAllReserList();
 		model.addAttribute("reser", list);
@@ -27,7 +27,7 @@ public class ReservationController {
 	}
 
 	// 예약 상세 페이지
-	@GetMapping("reservationDetail/{reserNo}")
+	@GetMapping("reservation/Detail/{reserNo}")
 	public String reservationDetail(@PathVariable("reserNo") int reserNo, Model model) {
 		ReservationVO reservation = reservationService.findReserInfo(reserNo);
 		model.addAttribute("reser", reservation);
