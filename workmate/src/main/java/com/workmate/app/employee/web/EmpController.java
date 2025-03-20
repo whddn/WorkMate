@@ -1,6 +1,8 @@
 package com.workmate.app.employee.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
@@ -104,15 +105,20 @@ public class EmpController {
 		model.addAttribute("teams", empService.findTeamList());
 		model.addAttribute("content", empService.findEvaluContentList(evaluVO));
 		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명 
+		 
 		return "employees/newEvalu";
 	}
 	
-	// 평가 등록 AJAX (관리자)
 	@PostMapping("emp/neweva")
-	public String evaluInsertAJAX(@RequestBody EvaluVO evaluVO) {
-		empService.inputNewEvaluForm(evaluVO);
-		return "redirect:/emp/neweva";
-	} 
+	public ResponseEntity<?> evaluInsertAJAX(@RequestBody EvaluVO evaluVO) {
+	    // 서비스 로직 실행
+	    empService.inputNewEvaluForm(evaluVO);
+	    // 성공 메시지 또는 처리된 데이터를 JSON 형식으로 반환
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "성공적으로 등록되었습니다.");
+	    
+	    return ResponseEntity.ok(response);  // JSON 응답을 반환
+	}
 	
 	// 사원 등록 페이지 
 	@GetMapping("emp/newemp") 
