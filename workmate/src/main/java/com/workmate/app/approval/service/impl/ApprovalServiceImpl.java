@@ -20,20 +20,9 @@ public class ApprovalServiceImpl implements ApprovalService {
 	}
 	
 	@Override
-	public List<ApprovalVO> findApprovalList(ApprovalVO approvalVO, String standard) {
+	public List<ApprovalVO> findApprovalList(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
-		List<ApprovalVO> result = new ArrayList<>();
-		if(standard.equals("fromMe"))
-			result = approvalMapper.selectApprovalListFromMe(approvalVO);
-		else if(standard.equals("toMe"))
-			result = approvalMapper.selectApprovalListToMe(approvalVO);
-		else if(standard.equals("refMe"))
-			result = approvalMapper.selectApprovalListRefMe(approvalVO);
-		else if(standard.equals("allow"))
-			result = approvalMapper.selectApprovalListAllow(approvalVO);
-		else if(standard.equals("reject"))
-			result = approvalMapper.selectApprovalListReject(approvalVO);
-		return result;
+		return approvalMapper.selectApprovalList(approvalVO);
 	}
 
 	@Override

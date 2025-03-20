@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.workmate.app.approval.mapper.ApprovalMapper">
-	<select id="selectApprovalListFromMe" parameterType="ApprovalVO" resultType="ApprovalVO">
+	<select id="selectApprovalList" parameterType="ApprovalVO" resultType="ApprovalVO">
 		SELECT appr_no
 		    , form_name
 		    , appr_title
@@ -16,7 +16,7 @@
 		    ON approval.user_no=employee.user_no
 		    LEFT JOIN department
 		    ON approval.dept_no=department.department_id
-		WHERE appr_status='a1'
+		WHERE appr_status=#{apprStatus}
 		    AND approval.user_no=#{userNo}
 	</select>
 	<select id="selectApprovalById" parameterType="ApprovalVO" resultType="ApprovalVO">
