@@ -15,6 +15,7 @@ public class DocVO {
 	private Date fileRegDate; //등록날짜
 	private String	fileTag; //태그
 	private Integer userNo;
+	private String userId;
 	private Integer downUser; //다운로드사원
 	private Integer updateUser; //등록한 사원
 	

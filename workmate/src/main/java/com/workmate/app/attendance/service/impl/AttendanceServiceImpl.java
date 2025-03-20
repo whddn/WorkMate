@@ -20,7 +20,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	//월별
 	@Override
 	public List<WorkVO> findMonthWork(int userNo) {
-		return attendMapper.selectWorkList();
+		return attendMapper.selectWorkList(userNo);
 	}
 	//전체
 	@Override
@@ -59,6 +59,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Override
 	public List<WorkVO> findAllAnnual(WorkVO workVO) {
 		return attendMapper.allAnnualList(workVO);
+	}
+	@Override
+	public List<WorkVO> findAllEmpWork(WorkVO workVO) {
+		return attendMapper.selectAllEmpList();
 	}	
 
 	
