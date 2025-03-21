@@ -96,23 +96,23 @@
                 <div class="collapse" id="sidebarLayouts" style="">
                   <ul class="nav nav-collapse">
                     <li>
-                      <a th:href="@{waiting}">
+                      <a th:href="@{waiting?standard=fromMe}">
+                        <span class="sub-item">결재 진행</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a th:href="@{waiting?standard=toMe}">
                         <span class="sub-item">결재 대기</span>
                       </a>
                     </li>
                     <li>
-                      <a th:href="@{waiting}">
-                        <span class="sub-item">결재 진행</span>
+                      <a th:href="@{waiting?standard=refMe}">
+                        <span class="sub-item">참조 문서</span>
                       </a>
                     </li>
                     <li>
                       <a th:href="@{allowance}">
                         <span class="sub-item">완료 문서</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a th:href="@{allowance}">
-                        <span class="sub-item">참조 문서</span>
                       </a>
                     </li>
                     <li>
