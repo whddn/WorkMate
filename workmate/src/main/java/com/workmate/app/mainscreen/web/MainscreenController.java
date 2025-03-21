@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.workmate.app.approval.service.ApprovalService;
+import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.common.WhoAmI;
 import com.workmate.app.mainscreen.service.MenuService;
 import com.workmate.app.mainscreen.service.MenuVO;
 
@@ -18,9 +21,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MainscreenController {
 	private final MenuService menuService;
+	private final ApprovalService approvalService;
+	private final WhoAmI whoAmI = new WhoAmI();
 	
 	@GetMapping("/")
 	public String base(Model model) {
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setUserNo(whoAmI.whoAmI().getUserNo());
+		approvalVO.setApprStatus("a1");
+		approvalVO.setStandard("toMe");
+		model.addAttribute("waitingList", approvalService.findApprovalList(approvalVO));
 		return "mainscreen/main";
 	}
 	

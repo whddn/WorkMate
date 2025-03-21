@@ -58,16 +58,18 @@ public class ApprovalController {
 	private final FileHandler fileHandler = new FileHandler();
 	private final WhoAmI whoAmI = new WhoAmI();
 	
+	/*
 	private EmpVO whoAmI() {
 		EmpVO empVO = new EmpVO();
 		empVO.setUserNo(whoAmI.whoAmI().getUserNo());
 		return empService.findEmpByEmpNo(empVO);
 	}
+	*/
 	
-	// 결재를 기다리는 문서 리스트를 보여준다
+	// 결재를 기다리는 문서 리스트를 보여준다(자신과 관련된)
 	@GetMapping("approval/waiting")
 	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam(defaultValue = "fromMe") String standard) {
-		approvalVO.setUserNo(whoAmI().getUserNo());
+		approvalVO.setUserNo(whoAmI.whoAmI().getUserNo());
 		approvalVO.setApprStatus("a1");
 		approvalVO.setStandard(standard);
 		model.addAttribute("waitingList", approvalService.findApprovalList(approvalVO));
@@ -104,7 +106,7 @@ public class ApprovalController {
 		apprFormVO.setApprType(apprType);
 		model.addAttribute("apprForm", apprFormService.findFormById(apprFormVO));
 		
-		EmpVO myself = whoAmI();
+		EmpVO myself = whoAmI.whoAmI();
 		model.addAttribute("creator", empService.findEmpByEmpNo(myself));
 		model.addAttribute("apprLineList", apprLineService.findApprLineList(myself));
 		
@@ -124,9 +126,7 @@ public class ApprovalController {
 		System.out.println(approvalVO);
 		
 		// 결재문서를 DB에 등록
-		EmpVO myself = whoAmI();
-		myself.setUserNo(whoAmI.whoAmI().getUserNo());
-		myself = empService.findEmpByEmpNo(myself);
+		EmpVO myself = whoAmI.whoAmI();
 		
 		approvalVO.setUserNo(myself.getUserNo());
 		approvalVO.setDeptNo(myself.getDepartmentId());
@@ -196,7 +196,7 @@ public class ApprovalController {
 	// 작성한 결재문서 읽는 페이지를 보여준다.
 	@GetMapping("approval/read")
 	public String getRead(Model model, @RequestParam String apprNo) {
-		EmpVO myself = whoAmI();
+		EmpVO myself = whoAmI.whoAmI();
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
 		model.addAttribute("approval", approvalService.findApprovalById(approvalVO));
@@ -213,7 +213,7 @@ public class ApprovalController {
 	public ResponseEntity<Map<String, Object>> putRead(@RequestBody ApprElmntVO apprElmntVO) 
 	throws IOException {
 		// 결재결과를 수정
-		EmpVO myself = whoAmI();
+		EmpVO myself = whoAmI.whoAmI();
 		apprElmntVO.setApprover(myself.getUserNo());
 		
 		Map<String, Object> response = new HashMap<>();
@@ -239,7 +239,7 @@ public class ApprovalController {
 	@DeleteMapping("approval/read/{apprNo}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteRead(@PathVariable String apprNo) {
-		EmpVO myself = whoAmI();
+		EmpVO myself = whoAmI.whoAmI();
 		
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
@@ -294,7 +294,7 @@ public class ApprovalController {
 	// 서명, 즐겨찾기 결재선을 관리하는 페이지를 보여준다.
 	@GetMapping("approval/manage")
 	public String getManage(Model model) {
-		EmpVO myself = whoAmI();
+		EmpVO myself = whoAmI.whoAmI();
 		model.addAttribute("signs", signService.findSignList(myself));
 		model.addAttribute("apprLines", apprLineService.findApprLineList(myself));
 		
@@ -308,7 +308,7 @@ public class ApprovalController {
         if (file != null) {
         	String filePath = fileHandler.fileUpload(file, "C://workmate/sign/");
             
-            EmpVO myself = whoAmI();
+            EmpVO myself = whoAmI.whoAmI();
             SignVO signVO = new SignVO();
             signVO.setSignTitle(file.getOriginalFilename());
             signVO.setSignPath(filePath);
@@ -325,7 +325,7 @@ public class ApprovalController {
 	public ResponseEntity<Map<String, Object>> deleteSign(@PathVariable Integer signNo) {
 		Map<String, Object> response = new HashMap<>();
 		
-		EmpVO myself = whoAmI();
+		EmpVO myself = whoAmI.whoAmI();
 		SignVO signVO = new SignVO();
 		signVO.setSignNo(signNo);
 		signVO.setUserNo(myself.getUserNo());
