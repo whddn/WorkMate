@@ -34,10 +34,10 @@ public class ReservationController {
 	}
 	
 	
-	
-//	@GetMapping("reservationList")
-//	public String reservationList(Model model) {
-//		return "reservation/reservationList";
-//	}
+	// 예약 현황 페이지
+	@GetMapping("reservation/List")
+	public String myReserList(Model model) {
+		return "reservation/reservationList";
+	}
 
 }

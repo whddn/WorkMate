@@ -40,6 +40,11 @@
 			LEFT JOIN employee e ON r.user_no = e.user_no
 		 WHERE c.common_no = #{commonNo}
 	</select>
+	
+	<!-- 예약내역 조회 -->
+	<select id="">
+	
+	</select>
 
 	<!-- 예약신청 -->
 
