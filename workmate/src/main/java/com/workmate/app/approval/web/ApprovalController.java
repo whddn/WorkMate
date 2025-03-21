@@ -1,7 +1,6 @@
 package com.workmate.app.approval.web;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -10,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -119,6 +120,8 @@ public class ApprovalController {
 	) throws IOException {
 		// JSON 객체에서 공통되는 키의 값만 해당 VO에 전이
 		ApprovalVO approvalVO = objectMapper.readValue(requestString, ApprovalVO.class);
+		System.out.println(requestString);
+		System.out.println(approvalVO);
 		
 		// 결재문서를 DB에 등록
 		EmpVO myself = whoAmI();
@@ -261,7 +264,20 @@ public class ApprovalController {
     	@RequestParam("filePath") String filePath, 
     	@RequestParam("fileName") String fileName
     ) throws IOException {
-        return fileHandler.fileDownload(fileName, filePath);
+		FileSystemResource resource = fileHandler.fileDownload(fileName, filePath);
+		
+		if(!resource.exists()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+		
+		return ResponseEntity.ok()
+				.headers(headers)
+				.contentLength(resource.contentLength())
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(resource);
     }
 
 	// 결재문서의 PDF버전을 보여주고 자동 다운로드한다.
@@ -290,14 +306,12 @@ public class ApprovalController {
 	public ResponseEntity<String> postSign(@RequestParam("file") MultipartFile file) throws IOException {
         // 파일 저장 및 DB에 서명 정보 저장 로직 구현
         if (file != null) {
-        	String fileName = file.getOriginalFilename();
-            Path filePath = Paths.get("C://workmate/sign/" + fileName);
-            fileHandler.fileUpload(file);
+        	String filePath = fileHandler.fileUpload(file, "C://workmate/sign/");
             
             EmpVO myself = whoAmI();
             SignVO signVO = new SignVO();
-            signVO.setSignTitle(fileName);
-            signVO.setSignPath(filePath.toString());
+            signVO.setSignTitle(file.getOriginalFilename());
+            signVO.setSignPath(filePath);
             signVO.setUserNo(myself.getUserNo());
             
             signService.inputSign(signVO);
