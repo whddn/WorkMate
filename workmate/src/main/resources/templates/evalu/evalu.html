@@ -110,12 +110,12 @@
 
 <body>
     <div id="container">
-    <h2>다면평가 양식</h2>
-
+    <h2 th:each="evalu : ${one}">[[ ${evalu.evaluName} ]]</h2>
+	
     <form id="evaluationForm">
       <!-- 1. 평가자 정보 -->
 
-      <h3>1. 평가자 정보</h3>
+      <h3>1. 평가 대상자 정보</h3>
       <table>
         <tr>
           <th>구분</th>
@@ -124,11 +124,12 @@
           <th>성명</th>
         </tr>
         <tr>
-          <td>평가자</td>
+          <td>평가 대상자</td>
           <td><input type="text" name=""></td>
           <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
+          <td><input type="text" name="">[[ ${one} ]]</td>
         </tr>
+
       </table>
 
       <!-- 2. 평가 안내-->
@@ -149,7 +150,7 @@
         </tr>
 
         <!-- 핵심가치 -->
-        <th:block th:each = "e : ${evalu}">
+        <th:block th:each = "e : ${one}">
         <tr>
           <td>[[ ${e.evaluCompet} ]]</td>
           <td>[[ ${e.evaluContent} ]]</td>
