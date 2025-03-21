@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -130,11 +128,8 @@ public class ApprovalController {
 		approvalVO.setUserNo(myself.getUserNo());
 		approvalVO.setDeptNo(myself.getDepartmentId());
 
-		System.out.println(myself);
-		System.out.println(approvalVO);
-		
 		Map<String, Object> response = new HashMap<>();
-		
+        
         int result = approvalService.inputApproval(approvalVO);
         if(result <= 0) {
         	response.put("success", false);
@@ -161,10 +156,12 @@ public class ApprovalController {
         // 파일 업로드 관리
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
-            	String filePath = fileHandler.fileUpload(file, "C://CommonItemImage/apprAttach/");
+            	String fileName = file.getOriginalFilename();
+            	Path filePath = Paths.get("C://workmate/apprAttach/" + fileName);
+            	fileHandler.fileUpload(file, fileName);
                 
                 ReportAttachVO reportAttachVO = new ReportAttachVO();
-                reportAttachVO.setFileName(file.getOriginalFilename());
+                reportAttachVO.setFileName(fileName);
                 reportAttachVO.setFilePath(filePath.toString());
                 reportAttachVO.setApprNo(approvalVO.getApprNo());
                 
@@ -264,20 +261,7 @@ public class ApprovalController {
     	@RequestParam("filePath") String filePath, 
     	@RequestParam("fileName") String fileName
     ) throws IOException {
-		FileSystemResource resource = fileHandler.fileDownload(fileName, filePath);
-		
-		if (!resource.exists()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(resource.contentLength())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        return fileHandler.fileDownload(fileName, filePath);
     }
 
 	// 결재문서의 PDF버전을 보여주고 자동 다운로드한다.
@@ -306,11 +290,13 @@ public class ApprovalController {
 	public ResponseEntity<String> postSign(@RequestParam("file") MultipartFile file) throws IOException {
         // 파일 저장 및 DB에 서명 정보 저장 로직 구현
         if (file != null) {
-            String filePath = fileHandler.fileUpload(file, "C://CommonItemImage/sign/");
+        	String fileName = file.getOriginalFilename();
+            Path filePath = Paths.get("C://workmate/sign/" + fileName);
+            fileHandler.fileUpload(file);
             
             EmpVO myself = whoAmI();
             SignVO signVO = new SignVO();
-            signVO.setSignTitle(file.getOriginalFilename());
+            signVO.setSignTitle(fileName);
             signVO.setSignPath(filePath.toString());
             signVO.setUserNo(myself.getUserNo());
             
