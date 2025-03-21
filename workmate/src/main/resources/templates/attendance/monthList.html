@@ -4,95 +4,96 @@
 	layout:decorate="~{common/layouts/attendance_layout}"
 	layout:fragment="content">
 <head>
-<meta charset="UTF-8">
-<title>근태관리</title>
-<style>
-/* 전체 컨테이너를 세로 배치 */
-.main-container {
-	display: flex;
-	width: 100%;
-}
+	<meta charset="UTF-8">
+	<title>근태관리</title>
+	<style>
+	.main-container {
+		display: flex;
+		width: 100%;
+		align-items: stretch;
+	}
 
-#card-left {
-	width: 400px;
-	height: 100vh;
-	padding: 30px;
-	margin: 30px;
-	position: sticky;
-	top: 0;
-	flex-shrink: 0;
-}
+	#card-left {
+		width: 400px;
+		padding: 30px;
+		margin: 30px;
+		flex-shrink: 0;
+		box-sizing: border-box;
+	}
 
-/* 오른쪽 컨테이너 (카드들을 세로 정렬) */
-.right-container {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	padding: 20px;
-}
+	.right-container {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		padding: 20px;
+		box-sizing: border-box;
+	}
 
-#card-center, #card-right {
-	width: 100%;
-	padding: 20px;
-	margin: 10px 0; /* 상하 간격 추가 */
-	flex-grow: 1;
-}
+	#card-center {
+		width: 100%;
+		padding: 20px;
+		margin-bottom: 20px;
+		flex-grow: 1;
+		box-sizing: border-box;
+	}
 
-.date-box {
-	font-size: 20px;
-	margin-bottom: 0px;
-	margin-top: 30px;
-}
+	#card-right {
+		width: calc(100% - 50px); /* 전체 카드 너비: card-left + card-center 가정 */
+		margin: 0 auto 30px auto;
+		padding: 20px;
+		box-sizing: border-box;
+	}
 
-.time-box {
-	font-size: 40px;
-	margin-bottom: 10px;
-}
+	.date-box {
+		font-size: 20px;
+		margin-top: 30px;
+	}
 
-.content {
-	flex: 1;
-	padding: 20px;
-}
+	.time-box {
+		font-size: 40px;
+		margin-bottom: 10px;
+	}
 
-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 20px;
-}
-#card-work {
-	padding : 40px;
-	border: 1px solid  #ccc;
-}
-.table-container {
-	max-height: 300px;
-	overflow-y: auto;
-	border: 1px solid #ccc;
-	display: block;
-}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 20px;
+	}
 
-.dropdown-work {
+	#card-work {
+		padding: 40px;
+		border: 2px solid #eee;
+	}
 
-	margin-top: 80px; 
-}
+	.table-container {
+		max-height: 300px;
+		overflow-y: auto;
+		border: 1px solid #ccc;
+		display: block;
+	}
 
-.table-responsive {
-	max-height: 400px; 
-	overflow-y: auto;
-}
-.inline-list {
-    list-style-type: none; 
-    padding: 0;
-    margin: 0;
-    display: flex;
-    gap: 10px;
-}
+	.dropdown-work {
+		margin-top: 80px;
+	}
 
-.inline-list li {
-    display: inline-flex;
-    align-items: center;
-}
+	.table-responsive {
+		max-height: 400px;
+		overflow-y: auto;
+	}
 
-</style>
+	.inline-list {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		gap: 10px;
+	}
+
+	.inline-list li {
+		display: inline-flex;
+		align-items: center;
+	}
+	</style>
 </head>
 <body>
 	<div class="main-container">
@@ -100,151 +101,133 @@ table {
 			<div class="card-body">
 				<h4 class="card-title"><i class="fas fa-user"> [[${userName}]]님, 근태현황</i></h4>
 				<p class="date-box" id="current-date"></p>
-				<p class="time-box" id="current-time"></p>				
-				<p>🕘 <b>출근시간 : </b> <span id="start-time" >[[${attend} != null ? ${#dates.format(attend.startWork, 'HH:mm')} : 미등록 ]]</span> </p>
-				<p>🕕 <b>퇴근시간 : </b> <span id="end-time">[[${attend} != null ? ${#dates.format(attend.afterWork, 'HH:mm')} : 미등록 ]]</span> </p>
-				
-				<form action="startWork" th:if ="${attend}== null">
+				<p class="time-box" id="current-time"></p>
+				<p>🕘 <b>출근시간 : </b> <span id="start-time">[[${attend} != null ? ${#dates.format(attend.startWork, 'HH:mm')} : 미등록 ]]</span></p>
+				<p>🕕 <b>퇴근시간 : </b> <span id="end-time">[[${attend} != null ? ${#dates.format(attend.afterWork, 'HH:mm')} : 미등록 ]]</span></p>
+
+				<form action="startWork" th:if="${attend} == null">
 					<button class="btn btn-primary btn-fw" id="workStart">출근하기</button>
 				</form>
 				<form action="afterWork" th:if="${attend} != null and ${attend.afterWork} == null">
 					<input type="hidden" name="workNo" th:value="${attend.workNo}">
 					<button class="btn btn-secondary btn-fw">퇴근하기</button>
 				</form>
-				<div class="dropdown-work" style="display: inline-flex; align-items: center; gap: 10px;">				
+
+				<div class="dropdown-work" style="display: inline-flex; align-items: center; gap: 10px;">
 					<select id="work-type" class="form-select input-fixed">
 						<option value="">근무타입선택</option>
 						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">연차</option>
 						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">재택</option>
 						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">출장</option>
 					</select>
-					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청</button>				
+					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청</button>
 				</div>
 			</div>
 		</div>
 
-		<!-- 오른쪽 컨테이너 -->
+		<!-- 오른쪽 (center card) -->
 		<div class="right-container">
 			<div class="card" id="card-center">
 				<div class="card-body">
-					<!-- 내용 추가 -->
-    <div class="container mt-4">         
-        <div class="user-icon"> 
-        	<h4 class="card-title">이번달 근무 시간 </h4>
-        	<p class="text-muted">선택적 근로시간 [9:00 ~ 18:00]</p>
-					
-		</div>	
-            <div class="col-10">
-                <div class="card" id="card-work">
-                    <div class="card-body">
-                        <strong><h2 id="current-month"></h2></strong>
-                        <p> [주 52시간 기준 주간 근무실적]</p>
-                        <div class="d-flex justify-content-between">
-                            <h3 class="text-info fw-bold">월 근무시간</h3>
-                            <h1 class="text-info fw-bold"  th:text="${totalWorkTime} + 'h'"></h1>
-                        </div>
-                        <div class="progress progress-sm" style="height: 22px;" >
-						      <div class="progress-bar bg-info"
-						         role="progressbar"
-						         th:style="'width:' + ((${totalWorkTime} - ${addWorkTime}) / 208.0 * 100) + '%'"
-						         th:aria-valuenow="${totalWorkTime} - ${addWorkTime}" 
-						         aria-valuemin="0"
-						         aria-valuemax="208">
-						    </div>
-						    <div class="progress-bar bg-success" 
-						         role="progressbar" 
-						         th:style="'width:' + (${addWorkTime} / 208.0 * 100) + '%'"
-						         th:aria-valuenow="${addWorkTime}" 
-						         aria-valuemin="0" 
-						         aria-valuemax="208">
-						    </div>						    
-                        </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <p class="text-muted mb-0"><b>남은 근무시간</b></p>
-                            <p class="text-muted mb-0" th:text="${remainWorkTime} + 'h ' + '/ 208h'"></p>
-                        </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <p class="text-muted mb-0"><b>지각 / 조퇴 횟수</b></p>
-                            <p class="text-primary"><span th:if="${not #lists.isEmpty(works)}" th:text="${works[0].statusCount} + '번'"></span></p>
-                        </div>
-                    </div>
-                    <div id="work-info">
-                    <hr>
-                	<ul class="inline-list">
-                		<li><p class="text-primary">● </p> 정상근무</li>
-                		<li><p class="text-success">● </p> 연장근무</li>
-                	</ul>
-                </div>
-                </div>
-
-            </div>
-     
-    </div>
-				</div>
-			</div>
-			<div class="card" id="card-right">
-				<div class="card-body">
-					<!-- 근태 현황 테이블 -->
-					<div class="content">
-					<h4 class="card-title">이번달 근태 현황</h4>							
-					</div>						
-						<div class="table-responsive">
-							<table class="table">
-								<thead>
-									<tr>
-										<th>날짜</th>
-										<th>출근시간</th>
-										<th>퇴근시간</th>
-										<th>근무시간</th>
-										<th>연장근무시간</th>
-										<th>근무상태</th>
-									</tr>
-								</thead>
-								<tbody>
-									<!-- 단건 : 배열 -->
-									<tr th:each="work : ${works}">
-										<td>[[ ${#dates.format(work.startWork, 'yyyy/MM/dd')} ]]</td>
-										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
-										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
-										<td>[[ ${work.workTime} ]] h</td>
-										<td>[[ ${work.addWorkTime} ]] h</td>
-										<td>[[ ${work.workStatus} ]]</td>
-									</tr>
-								</tbody>
-							</table>
+					<div class="container mt-4">
+						<div class="user-icon">
+							<h4 class="card-title">이번달 근무 시간 </h4>
+							<p class="text-muted">선택적 근로시간 [9:00 ~ 18:00]</p>
 						</div>
-
-					</div>
+						<div class="col-10">
+							<div class="card" id="card-work">
+								<div class="card-body">
+									<strong><h2 id="current-month"></h2></strong>
+									<p> [주 52시간 기준 주간 근무실적]</p>
+									<div class="d-flex justify-content-between">
+										<h3 class="text-info fw-bold">월 근무시간</h3>
+										<h1 class="text-info fw-bold" th:text="${totalWorkTime} + 'h'"></h1>
+									</div>
+									<div class="progress progress-sm" style="height: 22px;">
+										<div class="progress-bar bg-info" role="progressbar"
+											th:style="'width:' + ((${totalWorkTime} - ${addWorkTime}) / 208.0 * 100) + '%'"
+											th:aria-valuenow="${totalWorkTime} - ${addWorkTime}" aria-valuemin="0" aria-valuemax="208">
+										</div>
+										<div class="progress-bar bg-success" role="progressbar"
+											th:style="'width:' + (${addWorkTime} / 208.0 * 100) + '%'"
+											th:aria-valuenow="${addWorkTime}" aria-valuemin="0" aria-valuemax="208">
+										</div>
+									</div>
+									<div class="d-flex justify-content-between mt-2">
+										<p class="text-muted mb-0"><b>남은 근무시간</b></p>
+										<p class="text-muted mb-0" th:text="${remainWorkTime} + 'h / 208h'"></p>
+									</div>
+									<div class="d-flex justify-content-between mt-2">
+										<p class="text-muted mb-0"><b>지각 / 조퇴 횟수</b></p>
+										<p class="text-primary">
+											<span th:if="${not #lists.isEmpty(works)}" th:text="${works[0].statusCount} + '번'"></span>
+										</p>
+									</div>
+								</div>
+								<div id="work-info">
+									<hr>
+									<ul class="inline-list">
+										<li><p class="text-primary">● </p> 정상근무</li>
+										<li><p class="text-success">● </p> 연장근무</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>				
 				</div>
 			</div>
 		</div>
 	</div>
-</body>
-<script>
- 	//현재 시간 출력
-	function currentDate() {
-		const now = new Date();
-		document.getElementById("current-date").innerText = now.toISOString()
-				.split('T')[0];
-		document.getElementById("current-month").innerText = now.toISOString()
-		.split('-')[1]+"월";
-		document.getElementById("current-time").innerText = now
-				.toLocaleTimeString();
-	}
-	setInterval(currentDate, 1000);
-	currentDate();
-	
-	//근무타입신청
-	function applyWorkType() {
-		var selectedUrl = document.getElementById("work-type").value;
-		console.log("이벤트");
-		if(!selectedUrl){
-	        alert("근무 타입을 선택하세요!");
-	        return;
+
+	<!-- card-right는 main-container 아래 전체 너비로 배치 -->
+	<div class="card" id="card-right">
+		<div class="card-body">
+			<h4 class="card-title">이번달 근태 현황</h4>
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>날짜</th>
+							<th>출근시간</th>
+							<th>퇴근시간</th>
+							<th>근무시간</th>
+							<th>연장근무시간</th>
+							<th>근무상태</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="work : ${works}">
+							<td>[[ ${#dates.format(work.startWork, 'yyyy-MM-dd')} ]]</td>
+							<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
+							<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
+							<td>[[ ${work.workTime} ]] h</td>
+							<td>[[ ${work.addWorkTime} ]] h</td>
+							<td>[[ ${work.workStatus} ]]</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		function currentDate() {
+			const now = new Date();
+			document.getElementById("current-date").innerText = now.toISOString().split('T')[0];
+			document.getElementById("current-month").innerText = now.toISOString().split('-')[1] + "월";
+			document.getElementById("current-time").innerText = now.toLocaleTimeString();
 		}
-	    // 선택된 URL로 이동
-	    window.location.href = selectedUrl;
-	}
-	
-</script>
+		setInterval(currentDate, 1000);
+		currentDate();
+
+		function applyWorkType() {
+			var selectedUrl = document.getElementById("work-type").value;
+			if (!selectedUrl) {
+				alert("근무 타입을 선택하세요!");
+				return;
+			}
+			window.location.href = selectedUrl;
+		}
+	</script>
+</body>
 </html>

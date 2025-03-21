@@ -60,9 +60,15 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public List<WorkVO> findAllAnnual(WorkVO workVO) {
 		return attendMapper.allAnnualList(workVO);
 	}
+	// 전체사원 근태 조회
 	@Override
 	public List<WorkVO> findAllEmpWork(WorkVO workVO) {
-		return attendMapper.selectAllEmpList();
+		return attendMapper.selectAllEmpList(workVO);
+	}
+	// 전체사원 이번달 근태 수
+	@Override
+	public List<WorkVO> findMothEmpWork(WorkVO workVO) {
+		return attendMapper.selectMonthEmpList();
 	}	
 
 	

@@ -29,7 +29,10 @@ public interface AttendMapper {
 	// 연차 사용내역 전체 조회
 	public List<WorkVO> allAnnualList(WorkVO workVO);
 	
+	// 전체사원 이번달 근태 수
+	public List<WorkVO> selectMonthEmpList();
+	
 	// 전체사원 근태 조회
-	public List<WorkVO> selectAllEmpList();
+	public List<WorkVO> selectAllEmpList(WorkVO workVO);
 
 }
