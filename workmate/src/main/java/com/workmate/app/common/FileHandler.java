@@ -12,39 +12,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileHandler {
-	public String fileUpload(MultipartFile file) {
+	public String fileUpload(MultipartFile file, String fileDir) {
 		String fileName = file.getOriginalFilename();
 		try {
-	        Path filePath = Paths.get("C://workmate/" + fileName);
+	        Path filePath = Paths.get(fileDir + fileName);
 	        Files.write(filePath, file.getBytes());
-	        
-	        String result = "파일 저장 완료: " + fileName;
-	        System.out.println(result);
-	        return result;
+	        return filePath.toString();
 		}
 		catch(IOException e) {
-			String result = "파일 저장 실패: " + fileName;
 			e.printStackTrace();
-	        System.out.println(result);
-	        return result;
+	        return "";
 		}
 	}
 	
-	public ResponseEntity<FileSystemResource> fileDownload(String fileName, String filePath) throws IOException {
+	public FileSystemResource fileDownload(String fileName, String filePath) throws IOException {
         Path path = Paths.get(filePath);
-        FileSystemResource resource = new FileSystemResource(path.toFile());
-
-        if (!resource.exists()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(resource.contentLength())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        return new FileSystemResource(path.toFile());
     }
 }
