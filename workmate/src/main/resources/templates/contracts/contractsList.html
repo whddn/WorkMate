@@ -1,43 +1,38 @@
 <!DOCTYPE html>
-<html 
-	xmlns:th="https://www.thymeleaf.org/"
+<html xmlns:th="https://www.thymeleaf.org/"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{common/layouts/contracts_layout}"
-	layout:fragment="content"
-	>
+	layout:fragment="content">
 
 <head>
-	<meta charset="UTF-8">
-	<title>전자 계약</title>
+<meta charset="UTF-8">
+<title>전자 계약</title>
 </head>
 
 <body>
-	<h3>결재 계약</h3>
-	<span>
-		<select>
-			<option value="formName" selected>계약명</option>
-			<option value="dept">이름</option>
-			<option value="manager">계약번호</option>
-		</select>
-		<input>
-		<button><i class="fas fa-search"></i></button>
-	</span>
-	<table id="FormsTable" class="display">
+	<h3>전자 계약</h3>
+	<input type="text" id="min-date" placeholder="시작 날짜 (YYYY-MM-DD)">
+	<input type="text" id="max-date" placeholder="끝 날짜 (YYYY-MM-DD)">
+	<table id="WaitingsTable" class="display">
 		<thead>
 			<tr>
-				<th>NO</th>
-				<th>양식명</th>
-				<th>담당부서</th>
-				<th>담당자</th>
+				<th>계약번호</th>
+				<th>계약명</th>
+				<th>작성자</th>
+				<th>작성일자</th>
+				<th>계약상태</th>
 			</tr>
 		</thead>
 		<tbody>
-			<th:block th:each="form, sts : ${formList}">
-				<tr th:onclick="| location.href = '@{/approval/write(apprType=${form.apprType})}' |">
+			<th:block th:each="waiting, sts : ${waitingList}">
+				<tr
+					th:onclick="| location.href = '@{/approval/read(apprNo=${waiting.apprNo})}' |">
 					<td>[[ ${sts.count} ]]</td>
-					<td>[[ ${form.formName} ]]</td>
-					<td>[[ ${form.departmentName} ]]</td>
-					<td>[[ ${form.userName} ]]</td>
+					<td>[[ ${waiting.apprNo} ]]</td>
+					<td>[[ ${waiting.userName} ]]</td>
+					<td
+						th:text="${#dates.format(waiting.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
+					<td>결재 중</td>
 				</tr>
 			</th:block>
 		</tbody>
@@ -45,9 +40,39 @@
 </body>
 
 <script>
-	$(document).ready(function() {
-		$('#FormsTable').DataTable();
-	});
+	$(document).ready(
+			function() {
+				let table = $('#WaitingsTable').DataTable();
+
+				// 날짜 필터 함수 정의
+				$.fn.dataTable.ext.search.push(function(settings, data,
+						dataIndex) {
+					var minDate = $('#min-date').val();
+					var maxDate = $('#max-date').val();
+					var date = data[6]; // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
+
+					if (!minDate && !maxDate) {
+						return true; // 날짜 입력이 없으면 필터링 없이 표시
+					}
+
+					if (date) {
+						var dateObj = new Date(date);
+						var min = minDate ? new Date(minDate) : null;
+						var max = maxDate ? new Date(maxDate) : null;
+
+						if ((min === null || dateObj >= min)
+								&& (max === null || dateObj <= max)) {
+							return true;
+						}
+					}
+					return false;
+				});
+
+				// 날짜 입력 필드 변경 시 필터 적용
+				$('#min-date, #max-date').on('change', function() {
+					table.draw();
+				});
+			});
 </script>
 
 </html>

@@ -80,7 +80,7 @@ public class AdminController {
 		// ✅ 4. 파일 저장 및 DB 저장
 		try {
 			file.transferTo(dest);
-			commonItemVO.setImage(uniqueFileName); // DB에 저장될 경로
+			commonItemVO.setImage(subDir + uniqueFileName); // DB에 저장될 경로
 			adminService.inputCommonItem(commonItemVO);
 		} catch (IOException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", "🚨 파일 저장 중 오류 발생!");
@@ -135,7 +135,7 @@ public class AdminController {
 
 	        try {
 	            file.transferTo(dest);
-	            commonItemVO.setImage(uniqueFileName); // 새 이미지로 설정
+	            commonItemVO.setImage(subDir + uniqueFileName); // 새 이미지로 설정
 	        } catch (IOException e) {
 	            redirectAttributes.addFlashAttribute("errorMessage", "🚨 파일 저장 중 오류 발생!");
 	            return "redirect:commonItemList";
