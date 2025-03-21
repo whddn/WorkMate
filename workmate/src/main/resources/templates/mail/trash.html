@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{common/layouts/mail_layout}"
+      layout:fragment="content">
+<head>
+    <title>휴지통</title>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="mb-4">휴지통</h2>
+
+    <!-- ✅ 검색창 -->
+    <div class="input-group w-25 mb-3">
+        <input type="text" id="searchBox" class="form-control" placeholder="검색...">
+        <button class="btn btn-secondary" onclick="searchTable()">검색</button>
+    </div>
+
+    <!-- ✅ 삭제 + 이동 버튼 -->
+    <div class="d-flex gap-2 mb-2">
+        <!-- 완전 삭제 버튼 -->
+        <form id="permanentDeleteForm" th:action="@{/mail/permanentDelete}" th:method="post">
+            <button class="btn btn-danger btn-sm" type="button" onclick="submitPermanentDelete()">완전 삭제</button>
+            <input type="hidden" name="mailIds" id="permanentDeleteMailIds">
+        </form>
+
+        <!-- 이동 버튼 (드롭다운) -->
+        <div class="btn-group">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                이동
+            </button>
+            <ul class="dropdown-menu">
+                <!-- 기본 메일함 -->
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1001)">받은메일함</a></li>
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1002)">보낸메일함</a></li>
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1006)">휴지통</a></li>
+                <!-- 내가 만든 폴더들 -->
+                <li th:each="folder : ${myFolders}">
+                    <a class="dropdown-item" href="#"
+                       th:text="${folder.folderName}"
+                       th:onclick="'moveToFolder(' + ${folder.folderId} + ')'"></a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 이동 폼 -->
+        <form id="moveForm" method="post" th:action="@{/mail/moveSelected}">
+            <input type="hidden" name="mailIds" id="moveMailIds">
+            <input type="hidden" name="targetFolderId" id="targetFolderId">
+        </form>
+    </div>
+
+    <!-- ✅ 메일 테이블 -->
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>보낸 사람</th>
+                    <th>제목</th>
+                    <th>수신자</th>
+                    <th>삭제일</th>
+                </tr>
+                </thead>
+                <tbody id="mailBody">
+                <tr th:if="${#lists.isEmpty(trashMails)}">
+                    <td colspan="5" class="text-center">휴지통이 비어있습니다.</td>
+                </tr>
+                <tr th:each="mail : ${trashMails}" class="trash-mail-row">
+                    <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
+                    <td th:text="${mail.recipients}">보낸사람</td>
+                    <td>
+                        <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}">제목</a>
+                    </td>
+                    <td th:text="${mail.recipients}">수신자</td>
+                    <td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}">받은날자</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 스크립트 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAll = document.getElementById("selectAll");
+        const checkboxes = document.querySelectorAll(".mail-checkbox");
+
+        selectAll.addEventListener("change", function () {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        });
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", function () {
+                selectAll.checked = [...checkboxes].every(cb => cb.checked);
+            });
+        });
+    });
+
+    // 검색 기능
+    function searchTable() {
+        let input = document.getElementById("searchBox").value.toLowerCase();
+        let rows = document.querySelectorAll("#mailBody .trash-mail-row");
+
+        rows.forEach(row => {
+            let sender = row.cells[1].textContent.toLowerCase(); // 보낸 사람
+            let subject = row.cells[2].textContent.toLowerCase(); // 제목
+
+            row.style.display = (sender.includes(input) || subject.includes(input)) ? "" : "none";
+        });
+    }
+
+    // 완전 삭제
+    function submitPermanentDelete() {
+        const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
+        if (selected.length === 0) {
+            alert("삭제할 메일을 선택하세요.");
+            return;
+        }
+
+        const ids = selected.map(cb => cb.value).join(",");
+        document.getElementById("permanentDeleteMailIds").value = ids;
+        document.getElementById("permanentDeleteForm").submit();
+    }
+
+    // 폴더 이동
+    function moveToFolder(folderId) {
+        const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
+        if (selected.length === 0) {
+            alert("이동할 메일을 선택하세요.");
+            return;
+        }
+
+        const ids = selected.map(cb => cb.value).join(",");
+        document.getElementById("moveMailIds").value = ids;
+        document.getElementById("targetFolderId").value = folderId;
+        document.getElementById("moveForm").submit();
+    }
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@
       layout:fragment="content">
 <head>
     <meta charset="UTF-8">
-    <title>받은 메일함 | WorkMate</title>
+    <title th:text="${folderName} + ' | KaiAdmin Lite'">메일함</title>
     <style>
         .w-25 {
             margin-left: 70%;
@@ -16,12 +16,11 @@
         }
     </style>
 </head>
-
 <body>
 <div class="container mt-4">
-    <h2 class="mb-4">받은 메일함</h2>
+    <h2 class="mb-4" th:text="${folderName}">내 폴더</h2>
 
-    <!-- 🔍 검색창 -->
+    <!-- 검색창 -->
     <div class="input-group w-25">
         <input type="text" id="searchBox" class="form-control" placeholder="검색...">
         <button class="btn btn-secondary" onclick="searchTable()">검색</button>
@@ -29,7 +28,7 @@
 
     <div class="card mt-3">
         <div class="card-body">
-            <!--  삭제 + 이동 영역 -->
+            <!-- 삭제/이동 버튼 영역 -->
             <div class="asd d-flex gap-2">
                 <!-- 삭제 폼 -->
                 <form id="deleteForm" method="post" th:action="@{/mail/deleteSelected}">
@@ -37,33 +36,35 @@
                     <input type="hidden" name="mailIds" id="selectedMailIds">
                 </form>
 
-                <!--  이동 버튼 (드롭다운) -->
+                <!-- 이동 버튼 (드롭다운) -->
                 <div class="btn-group">
                     <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                         이동
                     </button>
                     <ul class="dropdown-menu">
+                        <!-- 기본 메일함 -->
                         <li><a class="dropdown-item" href="#" onclick="moveToFolder(1001)">받은메일함</a></li>
                         <li><a class="dropdown-item" href="#" onclick="moveToFolder(1002)">보낸메일함</a></li>
                         <li><a class="dropdown-item" href="#" onclick="moveToFolder(1006)">휴지통</a></li>
 
-                        <!--  내가 만든 폴더 추가 -->
+                        <!-- 내가 만든 폴더들 -->
                         <li th:each="folder : ${myFolders}">
                             <a class="dropdown-item" href="#"
                                th:text="${folder.folderName}"
-                               th:onclick="'moveToFolder(' + ${folder.folderId} + ')'"></a>
+                               th:onclick="'moveToFolder(' + ${folder.folderId} + ')'">
+                            </a>
                         </li>
                     </ul>
                 </div>
 
-                <!-- 이동용 폼 -->
+                <!-- 이동 전송용 폼 -->
                 <form id="moveForm" method="post" th:action="@{/mail/moveSelected}">
                     <input type="hidden" name="mailIds" id="moveMailIds">
                     <input type="hidden" name="targetFolderId" id="targetFolderId">
                 </form>
             </div>
 
-            <!--  메일 목록 테이블 -->
+            <!-- 메일 테이블 -->
             <table id="mailTable" class="table table-striped table-bordered mt-2">
                 <thead>
                 <tr>
@@ -75,11 +76,11 @@
                 </tr>
                 </thead>
                 <tbody id="mailBody">
-                <tr th:if="${#lists.isEmpty(receivedMails)}">
-                    <td colspan="5" class="text-center">받은 메일이 없습니다.</td>
+                <tr th:if="${mails == null or #lists.isEmpty(mails)}">
+                    <td colspan="5" class="text-center">메일이 없습니다.</td>
                 </tr>
 
-                <tr th:each="mail : ${receivedMails}" class="mail-row">
+                <tr th:each="mail : ${mails}" class="mail-row">
                     <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
                     <td th:text="${mail.recipients}"></td>
                     <td>
@@ -92,36 +93,33 @@
                 </tbody>
             </table>
 
-            <!-- 📄 페이지네이션 -->
-            <div class="d-flex justify-content-center mt-3">
-                <ul class="pagination">
+            <!-- 페이지네이션 -->
+            <nav th:if="${totalPage > 1}" class="mt-4">
+                <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=1)}">&laquo;</a>
+                        <a class="page-link" th:href="@{/mail/folder/{folderId}(folderId=${folderId}, page=1)}">«</a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${currentPage - 1})}">&lt;</a>
+                        <a class="page-link" th:href="@{/mail/folder/{folderId}(folderId=${folderId}, page=${currentPage - 1})}">‹</a>
                     </li>
-
-                    <!-- 🔢 페이지 블록 단위 출력 -->
-                    <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                        class="page-item"
+                    <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}"
                         th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${i})}" th:text="${i}"></a>
-                    </li>
-
-                    <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${currentPage + 1})}">&gt;</a>
+                        <a class="page-link" th:href="@{/mail/folder/{folderId}(folderId=${folderId}, page=${i})}" th:text="${i}"></a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${totalPage})}">&raquo;</a>
+                        <a class="page-link" th:href="@{/mail/folder/{folderId}(folderId=${folderId}, page=${currentPage + 1})}">›</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
+                        <a class="page-link" th:href="@{/mail/folder/{folderId}(folderId=${folderId}, page=${totalPage})}">»</a>
                     </li>
                 </ul>
-            </div>
+            </nav>
+
         </div>
     </div>
 </div>
 
-<!-- 📜 JavaScript -->
+<!-- 스크립트 -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const selectAllCheckbox = document.getElementById("selectAll");
@@ -140,7 +138,6 @@
         });
     });
 
-    // 🔍 검색
     function searchTable() {
         let input = document.getElementById("searchBox").value.toLowerCase();
         let rows = document.querySelectorAll("#mailBody .mail-row");
@@ -152,25 +149,25 @@
         });
     }
 
-    // 🗑 선택 삭제
     function submitDelete() {
         const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
         if (selected.length === 0) {
             alert("삭제할 메일을 선택하세요.");
             return;
         }
+
         const ids = selected.map(cb => cb.value).join(",");
         document.getElementById("selectedMailIds").value = ids;
         document.getElementById("deleteForm").submit();
     }
 
-    // 📁 선택 이동
     function moveToFolder(folderId) {
         const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
         if (selected.length === 0) {
             alert("이동할 메일을 선택하세요.");
             return;
         }
+
         const ids = selected.map(cb => cb.value).join(",");
         document.getElementById("moveMailIds").value = ids;
         document.getElementById("targetFolderId").value = folderId;
