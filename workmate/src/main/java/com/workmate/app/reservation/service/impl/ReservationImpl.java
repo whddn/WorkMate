@@ -88,5 +88,11 @@ public class ReservationImpl implements ReservationService {
 		}
 		return map;
 	}
+	
+	// 시간 중복 체크
+	@Override
+	public List<ReservationVO> findReservedTimesByCommonNo(Integer commonNo) {
+		return reservationMapper.selectReservedTimes(commonNo);
+	}
 
 }

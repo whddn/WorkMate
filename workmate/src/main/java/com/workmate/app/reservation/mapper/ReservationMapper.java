@@ -18,4 +18,6 @@ public interface ReservationMapper {
 	public int updateReservationInfo(ReservationVO reservationVO);
 	// 예약취소
 	public int deleteReservationInfo(int commonNo);
+	// 시간 중복 체크
+	public List<ReservationVO> selectReservedTimes(Integer commonNo);
 }

@@ -41,6 +41,13 @@
 		 WHERE c.common_no = #{commonNo} AND ROWNUM = 1
 	</select>
 	
+	<!-- 시간 중복체크 -->
+	<select id="selectReservedTimes" resultType="ReservationVO">
+	    SELECT reser_date, reser_start_time, reser_end_time
+	    FROM reser
+	    WHERE common_no = #{commonNo}
+	</select>
+
 	<!-- 예약신청 -->
 	<insert id="insertReservationInfo" parameterType="ReservationVO">
 		<selectKey keyProperty="reserNo" resultType="Integer" order="BEFORE">

@@ -108,7 +108,7 @@
 			<div class="col-md-6">
 				<div class="card shadow-sm">
 					<div class="card-body text-center">
-						<img th:src="|/workmate/upload/${reser.image}|" id="reser-image" alt="예약 이미지">
+						<img th:src="|/workmate/upload/${reser.image}|" name="image" id="reser-image" alt="예약 이미지">
 					</div>
 				</div>
 			</div>
@@ -121,7 +121,9 @@
 							<!-- 서버로 넘겨줄 데이터들 -->
 							<input type="hidden" name="commonNo" id="commonNo" th:value="${reser.commonNo}" />
 							<input type="hidden" name="userNo" id="userNo" th:value="${reser.userNo}" />
-							<input type="hidden" name="reservationTime" id="reservationTime" />
+							<input type="hidden" name="reserStartTime" id="reserStartTime" />
+							<input type="hidden" name="reserEndTime" id="reserEndTime" />
+
 							
 							<div class="mb-3">
 								<label class="form-label">공용품 종류</label>
@@ -135,11 +137,11 @@
 							</div>
 							<div class="mb-3">
 								<label class="form-label">이용 날짜</label>
-								 <input type="date"	class="form-control" name="reservationDate">
+								 <input type="date"	class="form-control" name="reserDate">
 							</div>
 							<div class="mb-3">
 								<label class="form-label">예약 내용</label>
-								<textarea class="form-control" name="reservationDetails"
+								<textarea class="form-control" name="content"
 									rows="3" placeholder="예약 목적을 입력하세요"  th:text="${reser.content}">
 								</textarea>
 							</div>
@@ -190,7 +192,7 @@
 	                });
 	        },
 	        dateClick: function (info) {
-	            document.querySelector('input[name="reservationDate"]').value = info.dateStr;
+	            document.querySelector('input[name="reserDate"]').value = info.dateStr;
 	        }
 	    });
 	    calendar.render();
@@ -213,15 +215,78 @@
             }
         });
     }
-	
-	 // 폼 전송 전에 선택된 시간 값들을 숨은 input에 넣기
-	    document.querySelector("form").addEventListener("submit", function () {
-	        const selectedTimes = Array.from(document.querySelectorAll(".time-slot.selected"))
-	            .map(slot => slot.dataset.value); // "08:00 - 09:00" 등
-	        document.getElementById("reservationTime").value = selectedTimes.join(", ");
-	    });
-
 </script>
+	<!-- ✅ 1. reservedList 넘기기 -->
+	<script th:inline="javascript">
+		let reservedList = [];
+	</script>
+
+	<!-- ✅ 2. 예약 관련 JS -->
+	<script>
+	    document.addEventListener("DOMContentLoaded", function () {
+	        loadCalendar();
+	    });
+	
+	    function loadCalendar() {
+	        // ... 캘린더 설정
+	    }
+	
+	    function toggleTime(element) {
+	        // ... 시간 선택 토글
+	    }
+	
+	    function toggleAllTimes() {
+	        // ... 전체 선택 토글
+	    }
+	
+	    // ✅ 3. 여기 아래에 submit 중복 체크 넣기!
+		    document.querySelector("form").addEventListener("submit", function (event) {
+	    const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected"));
+	
+	    if (selectedSlots.length === 0) {
+	        alert("시간을 선택하세요!");
+	        event.preventDefault();
+	        return;
+	    }
+	
+	    const selectedHours = selectedSlots.map(slot => {
+	        return parseInt(slot.dataset.value.split(":")[0]); // "10:00 - 11:00" → 10
+	    });
+	
+	    const selectedDate = document.querySelector('input[name="reserDate"]').value; // yyyy-MM-dd
+	
+	    // ✅ 예약된 시간과 비교해서 중복 체크
+	    const hasConflict = reservedList.some(res => {
+	        // 날짜가 다르면 통과
+	        if (res.reserDate !== selectedDate) return false;
+	
+	        const start = parseInt(res.reserStartTime.split(":")[0]);
+	        const end = parseInt(res.reserEndTime.split(":")[0]);
+	
+	        // 예약된 시간 범위 중 한 시간이라도 겹치면 → 충돌
+	        for (let h = start; h < end; h++) {
+	            if (selectedHours.includes(h)) return true;
+	        }
+	        return false;
+	    });
+	
+	    if (hasConflict) {
+	        alert("⚠️ 이미 예약된 시간과 겹칩니다.");
+	        event.preventDefault();
+	        return;
+	    }
+	
+	    // ✅ 최종 시작/종료 시간 계산해서 hidden input에 넣기
+	    const minHour = Math.min(...selectedHours);
+	    const maxHour = Math.max(...selectedHours) + 1;
+	
+	    const pad = n => String(n).padStart(2, "0");
+	    document.getElementById("reserStartTime").value = `${pad(minHour)}:00`;
+	    document.getElementById("reserEndTime").value = `${pad(maxHour)}:00`;
+	});
+
+	</script>
+
 
 </body>
 </html>
