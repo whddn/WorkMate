@@ -7,7 +7,7 @@ import com.workmate.app.security.service.LoginUserVO;
 import com.workmate.app.security.service.UserVO;
 
 public class WhoAmI {
-	public UserVO whoAmI() {
+	public EmpVO whoAmI() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		if(principal instanceof LoginUserVO) {
@@ -15,7 +15,7 @@ public class WhoAmI {
 			return loginUserVO.getUserVO();
 		}
 		else {
-			return new UserVO();
+			return new EmpVO();
 		}
 	}
 }
