@@ -28,7 +28,7 @@
 	</select>
 	<insert id="insertApprElmnt" parameterType="ApprElmntVO">
 		<selectKey keyProperty="apprelmntNo" resultType="Integer" order="BEFORE">
-			SELECT COUNT(apprelmnt_no) + 1
+			SELECT NVL(MAX(apprelmnt_no), 0) + 1
 			FROM appr_elmnt
 		</selectKey>
 		INSERT INTO appr_elmnt(apprelmnt_no

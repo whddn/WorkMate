@@ -21,7 +21,7 @@
 	</select>
 	<insert id="insertSign" parameterType="SignVO">
 		<selectKey keyProperty="signNo" resultType="int" order="BEFORE">
-			SELECT COALESCE(MAX(sign_no), 0) + 1
+			SELECT NVL(MAX(sign_no), 0) + 1
 			FROM sign
 		</selectKey>
 		INSERT INTO sign(sign_no
