@@ -32,13 +32,13 @@
             <ul class="nav nav-secondary">
               <!-- 고정 메뉴 -->
               <li class="nav-item">
-                <a th:href="@{/}">
+                <a href="#dashboard">
                   <i class="fas fa-home"></i>
                   <p>메인화면</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a th:href="@{/search}">
+                <a href="#dashboard">
                   <i class="fas fa-search"></i>
                   <p>검색</p>
                 </a>
@@ -49,7 +49,7 @@
                   href="#dashboard"
                   class="collapsed"
                   aria-expanded="false"
-                  >
+                >
                   <i class="fas fa-star"></i>
                   <p>즐겨찾기</p>
                   <span class="caret"></span>
@@ -58,17 +58,17 @@
                   <ul class="nav nav-collapse">
                     <li>
                       <a href="">
-                        <span class="sub-item">즐겨찾기 설정</span>
+                        <span class="sub-item">메인화면</span>
                       </a>
                     </li>
                     <li>
                       <a href="">
-                        <span class="sub-item">즐겨찾기1</span>
+                        <span class="sub-item">검색</span>
                       </a>
                     </li>
                     <li>
                       <a href="">
-                        <span class="sub-item">즐겨찾기2</span>
+                        <span class="sub-item">즐겨찾기</span>
                       </a>
                     </li>
                   </ul>
@@ -79,59 +79,28 @@
                 <span class="sidebar-mini-icon">
                   <i class="fa fa-ellipsis-h"></i>
                 </span>
-                <h4 class="text-section">전자결재</h4>
+                <h4 class="text-section">재정관리</h4>
               </li>
               <li class="nav-item">
-                <a th:href="@{formList}">
+                <a>
                   <i class="fas fa-layer-group"></i>
-                  <p>결재신청</p>
+                  <p>입출금 리포트</p>
                 </a>
               </li>
-              <li class="nav-item submenu">
-                <a data-bs-toggle="collapse" href="#sidebarLayouts" class="" aria-expanded="true">
-                  <i class="fas fa-th-list"></i>
-                  <p>문서</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="sidebarLayouts" style="">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a th:href="@{waiting?standard=fromMe}">
-                        <span class="sub-item">결재 진행</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a th:href="@{waiting?standard=toMe}">
-                        <span class="sub-item">결재 대기</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a th:href="@{waiting?standard=refMe}">
-                        <span class="sub-item">참조 문서</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a th:href="@{allowance}">
-                        <span class="sub-item">완료 문서</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a th:href="@{rejection}">
-                        <span class="sub-item">반려 문서</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>     
               <li class="nav-item">
-                <a th:href="@{manage}">
+                <a>
+                  <i class="fas fa-th-list"></i>
+                  <p>법인 카드</p>
+                </a>
+              </li>              
+              <li class="nav-item">
+                <a>
                   <i class="fas fa-pen-square"></i>
-                  <p>결재관리</p>
+                  <p>개인 경비</p>
                 </a>
               </li>
             </ul>
           </div>
         </div>
       </div>
-
 </div>

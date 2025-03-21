@@ -45,11 +45,14 @@ public interface EmpService {
 	// 지나간 평가 페이지 단순 출력문 
 	//public EvaluVO findEvaluList(EvaluVO evaluVO);
 	
-	// 나의 평가 조회 (페이지)
-	public EvaluVO findMyEvaluList(EvaluVO evaluVO);
-	
-	// 나의 평가 조회 (단건 조회) 
+	// 나의 평가한 리스트 / 평가할 리스트 조회 (페이지)
+	public List<EvaluVO> findMyEvaluList(EvaluVO evaluVO);
+
+	// 나의 평가 진행 중 조회 (단건 조회) 
 	public List<EvaluVO> findMyEvaluById(EvaluVO evaluVO);
+	
+	// 평가 진행 페이지
+	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO);
 	
 	// 평가 등록 (관리자 페이지)
 	public int inputNewEvalu(EvaluVO evaluVO);

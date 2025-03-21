@@ -11,7 +11,7 @@ public class WorkVO {
 	
 		// work table 근태
 		private String workStatus;	//근무상태
-		private int statusCount;	//근무상태		
+		private int statusCount;	//근무상태수	
 		private Date workDate;	    //출근일시   
 		private Date startWork;	    //출근일시   
 		private Date afterWork;		//퇴근일시
@@ -44,6 +44,12 @@ public class WorkVO {
 		private int checkStatus;	//정산여부
 		private int usedAnnualCount;	//사용연차
 		private int remainAnlLeave;		//남은연차
+		
+		// 전체사원페이지
+		private int allStatusCount;	//근무상태수	
+		private int nstartCount;	//출근미체크수	
+		private int nafterCount;	//퇴근미체크수	
+		private int addWorkCount;	//연장근무총합
 		
 		
 		

@@ -13,7 +13,7 @@
 	</select>
 	<insert id="insertApprovalRA" parameterType="ReportAttachVO">
 		<selectKey keyProperty="repattachNo" resultType="int" order="BEFORE">
-			SELECT COALESCE(MAX(repattach_no), 0) + 1
+			SELECT NVL(MAX(repattach_no), 0) + 1
 			FROM report_attach
 		</selectKey>
 		INSERT INTO report_attach

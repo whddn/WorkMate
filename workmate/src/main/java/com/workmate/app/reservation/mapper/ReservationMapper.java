@@ -10,10 +10,14 @@ public interface ReservationMapper {
 	public List<ReservationVO> selectReservationList();
 	// 단건조회 - 예약정보
 	public ReservationVO selectReservationById(ReservationVO reservationVO);
+	// 예약 내역 조회
+	public List<ReservationVO> selectmyReservationList();
 	// 예약신청
 	public int insertReservationInfo(ReservationVO reservationVO);
 	// 예약수정
 	public int updateReservationInfo(ReservationVO reservationVO);
 	// 예약취소
 	public int deleteReservationInfo(int commonNo);
+	// 시간 중복 체크
+	public List<ReservationVO> selectReservedTimes(Integer commonNo);
 }

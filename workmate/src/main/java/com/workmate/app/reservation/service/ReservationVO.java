@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class ReservationVO {
 	private Integer reserNo;			// 예약번호
-	private String name; 				// 이름
+	private String commonName; 				// 이름
 	private Integer userNo;				// 사원번호
 	private String commonKind;			// 공용품종류
 	@DateTimeFormat(pattern = "yyyy-MM-dd")

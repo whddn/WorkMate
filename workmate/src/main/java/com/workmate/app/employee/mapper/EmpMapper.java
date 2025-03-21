@@ -37,17 +37,12 @@ public interface EmpMapper {
 	// 평가자 / 피평가자 정보 조회
 	public List<EvaluVO> selectEvaluInfoById(EvaluVO evaluVO);
 	public List<EvaluVO> selectEvaluateeInfoById(EvaluVO evaluVO);
-	
-	// 나의 평가 관리 페이지 (단순 출력문)
-	public String selectMyEvaluOne(EvaluVO evaluVO);
-	
-	// 나의 평가 단순 조회 
-	public List<EvaluVO> selectMyEvaluResultById(EvaluVO evaluVO);
+
 	
 	// 평가 등록 페이지 (관리자)
 	public int insertOneEvalu(EvaluVO evaluVO);
 	
-	// 평가 항목, 평가 내용 조회 (평가 등록시 필요)
+	// 평가 항목, 평가 내용 조회 (관리자 : 평가 등록시 필요)
 	public List<EvaluVO> selectContentList(EvaluVO evaluVO);
 	
 	// 평가 폼 등록 기능 
@@ -62,6 +57,16 @@ public interface EmpMapper {
 	// 피평가자 그룹 등록 기능
 	public int insertEvaluateeGroup(EvaluVO evaluVO);
 	
-	// 평가한 거 등록 기능
+	// 나의 평가했던 리스트 페이지 전체 조회
+	public List<EvaluVO> selectMyEvaluList(EvaluVO evaluVO);
+	
+	// 나의 평가 단순 조회 단건 조회
+	public List<EvaluVO> selectMyEvaluResultById(EvaluVO evaluVO);
+
+	// 개인 평가 진행 (평가할 페이지 - 쿼리문 없음)
+	public List<EvaluVO> selectOneEvaluById(EvaluVO evaluVO);
+
+	// 평가한 거 등록 기능 (쿼리문 없음)
 	public int insertEvaluScore(EvaluVO evaluVO);
+	
 }

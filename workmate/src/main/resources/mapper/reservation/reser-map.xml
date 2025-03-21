@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper
 	namespace="com.workmate.app.reservation.mapper.ReservationMapper">
-	<!-- 전체조회 -->
+	<!-- 공용품 목록 전체조회 -->
 	<select id="selectReservationList" resultType="ReservationVO">
 		SELECT
 			 r.user_no
 			,r.reser_no
 			,r.usage_status
-			,c.name
+			,c.name as commonName
 			,c.common_no
 			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS reser_start_time
 			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS reser_end_time
@@ -21,13 +21,13 @@
 			LEFT JOIN employee e ON r.user_no = e.user_no
 	</select>
 
-	<!-- 예약 단건 조회 -->
+	<!-- 공용품 목록 단건 조회 -->
 	<select id="selectReservationById" resultType="ReservationVO" parameterType="ReservationVO">
 		SELECT
 			 r.user_no
 			,r.reser_no
 			,r.usage_status
-			,c.name
+			,c.name as commonName
 			,c.common_no
 			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS reser_start_time
 			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS reser_end_time
@@ -38,12 +38,63 @@
 		FROM common_Item c
 			LEFT JOIN reser r ON r.common_no = c.common_no
 			LEFT JOIN employee e ON r.user_no = e.user_no
-		 WHERE c.common_no = #{commonNo}
+		 WHERE c.common_no = #{commonNo} AND ROWNUM = 1
+	</select>
+	
+	<!-- 시간 중복체크 -->
+	<select id="selectReservedTimes" resultType="ReservationVO">
+	    SELECT reser_date, reser_start_time, reser_end_time
+	    FROM reser
+	    WHERE common_no = #{commonNo}
 	</select>
 
 	<!-- 예약신청 -->
-
+	<insert id="insertReservationInfo" parameterType="ReservationVO">
+		<selectKey keyProperty="reserNo" resultType="Integer" order="BEFORE">
+			<!-- keyProperty는 결과를 담을 필드/변수를 뜻한다 -->
+			SELECT reser_no_seq.NEXTVAL
+			FROM dual
+		</selectKey>
+		insert into reser(
+		     reser_no
+		    ,common_name
+		    ,common_kind
+		    ,reser_date
+		    ,reser_start_time
+		    ,reser_end_time
+		    ,reser_availability
+		    ,content
+		    ,user_no
+		    ,common_no
+		    ,usage_status
+		    ,image
+		)values(
+			 #{reserNo}
+			,#{commonName}
+			,#{commonKind}
+			,#{reserDate}
+			,#{reserStartTime}
+			,#{reserEndTime}
+			,#{reserAvailability}
+			,#{content}
+			,#{userNo}
+			,#{commonNo}
+			,#{usageStatus}
+			,#{image}
+		)
+	</insert>
 	<!-- 예약수정 -->
+	<update id="updateReservationInfo" parameterType="ReservationVO">
+		update reser
+		set	 reser_date = #{reserDate}
+		    ,reser_start_time = #{reserStartTime}
+		    ,reser_end_time = #{reserEndTime}
+		    ,reser_availability = #{reserAvailability}
+		    ,content = #{content}
+		    ,usage_status = #{usageStatus}
+		where reser_no = #{reserNo}
+	</update>
+	
 
 	<!-- 예약삭제 -->
 

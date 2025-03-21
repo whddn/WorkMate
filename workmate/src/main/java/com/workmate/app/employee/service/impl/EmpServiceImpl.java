@@ -83,12 +83,12 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.selectBeforeEvaluList(evaluVO);
 	}
 	// 나의 평가 리스트 조회 
-	@Override
-	public EvaluVO findMyEvaluList(EvaluVO evaluVO) {
-		return null;
-	}
+//	@Override
+//	public EvaluVO findMyEvaluList(EvaluVO evaluVO) {
+//		return null;
+//	}
 
-	// 나의 평가 단순 1건 조회
+	// 나의 평가 단순 1건 조회 (링크를 누르면 나와야 하는 페이지)
 	@Override
 	public List<EvaluVO> findMyEvaluById(EvaluVO evaluVO) {
 		return empMapper.selectMyEvaluResultById(evaluVO);
@@ -156,20 +156,31 @@ public class EmpServiceImpl implements EmpService {
 		if (formInsert > 0) { // 폼 등록 성공하면 실행 
 			List<EvaluVO> formatList = evaluVO.getEvaluItem(); // 여러 개의 항목 등록 
 			for (EvaluVO format : formatList) {
-				format.setEvaluFormNo(evaluVO.getEvaluFormNo()); // 등록된 formNo 불러옴
-				format.setEvaluItemNo(evaluVO.getEvaluItemNo());  
+		    format.setEvaluFormNo(evaluVO.getEvaluFormNo()); // 등록된 formNo 불러옴
 				result += empMapper.insertEvaluFormat(format); // 항목 등록 쿼리문 
 			} 
 			
 		} 
 		return result; 
 	}
-	
-	
+
 	// 다면 평가 진행
 	@Override
 	public int inputEvaluResultScore(EvaluVO evaluVO) {
 		return empMapper.insertEvaluScore(evaluVO);
+	}
+
+	// 나의 진행된 평가 리스트 조회
+	@Override
+	public List<EvaluVO> findMyEvaluList(EvaluVO evaluVO) {
+		return empMapper.selectMyEvaluList(evaluVO);
+	}
+	
+	// 평가 (단건 조회)
+	@Override
+	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO) {
+		
+		return empMapper.selectOneEvaluById(evaluVO);
 	} 
 
 	

@@ -114,13 +114,18 @@ public class AttendanceController {
 		return "attendance/annual";
 	}
 	
+	
+	
 	//전체사원 근태조회()
 	@GetMapping("attendance/attendanceManage")
 	public String attendEmpList(Model model, WorkVO workVO) {
 		
+		List<WorkVO> count = attendService.findMothEmpWork(workVO);
 		List<WorkVO> list = attendService.findAllEmpWork(workVO);
 		
 		model.addAttribute("works", list);
+		model.addAttribute("counts", count);
+		
 		return "attendance/attendanceManage";
 	}
 	

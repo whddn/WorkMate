@@ -8,13 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>예약 상세 정보</title>
 
-<!-- KaiAdmin Theme CSS -->
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+<link rel="stylesheet"	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
 
 <style>
 .container {
@@ -74,16 +68,17 @@
 </style>
 </head>
 <body>
-
+<form th:action="@{/reservation/Info}"
+						 method="POST" enctype="multipart/form-data">
 	<div class="container mt-5">
 		<div class="row equal-height">
 			<!-- ✅ 캘린더 영역 -->
 			<div class="col-md-6">
 				<div class="card shadow-sm">
-					<div class="card-header bg-primary text-white text-center">예약
-						진행 중</div>
+					<div class="card-header bg-primary text-white text-center">예약 진행 중</div>
 					<div class="card-body">
-						<div id="calendar"></div>
+						<div id="calendar">
+						</div>
 					</div>
 				</div>
 			</div>
@@ -91,17 +86,15 @@
 			<!-- ✅ 시간 선택 영역 -->
 			<div class="col-md-6">
 				<div class="card shadow-sm">
-					<div class="card-header bg-primary text-white text-center">시간
-						선택</div>
+					<div class="card-header bg-primary text-white text-center">시간 선택</div>
 					<div class="card-body">
-						<button type="button" class="btn btn-outline-primary btn-sm mb-3"
-							onclick="toggleAllTimes()">전체 선택</button>
+						<button type="button" class="btn btn-outline-primary btn-sm mb-3" onclick="toggleAllTimes()">전체 선택</button>
 						<div class="time-table">
 							<th:block th:each="hour : ${#numbers.sequence(6, 23)}">
-								<div class="time-slot" th:id="'time'+${hour}"
-									th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}"
+								<div class="time-slot" th:id="'time'+${hour}" th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}"
 									onclick="toggleTime(this)">
-									<span th:text="${hour + ':00 - ' + (hour+1) + ':00'}"></span>
+									<span th:text="${hour + ':00 - ' + (hour+1) + ':00'}">
+									</span>
 								</div>
 							</th:block>
 						</div>
@@ -115,8 +108,7 @@
 			<div class="col-md-6">
 				<div class="card shadow-sm">
 					<div class="card-body text-center">
-						<img th:src="|/workmate/upload/${reser.image}|" id="reser-image"
-							alt="예약 이미지">
+						<img th:src="|/workmate/upload/${reser.image}|" name="image" id="reser-image" alt="예약 이미지">
 					</div>
 				</div>
 			</div>
@@ -124,54 +116,56 @@
 			<!-- ✅ 예약 정보 입력 영역 -->
 			<div class="col-md-6">
 				<div class="card shadow-sm">
-					<div class="card-header bg-success text-white text-center">예약
-						정보 입력</div>
+					<div class="card-header bg-success text-white text-center">예약 정보 입력</div>
 					<div class="card-body">
-						<form th:action="@{approval}" method="POST"
-							enctype="multipart/form-data">
-							<input type="hidden" name="commonNo" id="commonNo">
+							<!-- 서버로 넘겨줄 데이터들 -->
+							<input type="hidden" name="commonNo" id="commonNo" th:value="${reser.commonNo}" />
+							<input type="hidden" name="userNo" id="userNo" th:value="${reser.userNo}" />
+							<input type="hidden" name="reserStartTime" id="reserStartTime" />
+							<input type="hidden" name="reserEndTime" id="reserEndTime" />
 
+							
 							<div class="mb-3">
-								<label class="form-label">공용품 종류</label> <input type="text"
-									class="form-control" id="reser-category"
-									th:value="${reser.commonKind}" readonly>
+								<label class="form-label">공용품 종류</label>
+								 <input type="text"	class="form-control" name="commonKind"
+								  id="reser-category" th:value="${reser.commonKind}" readonly>
 							</div>
 							<div class="mb-3">
-								<label class="form-label">이름</label> <input type="text"
-									class="form-control" id="reser-name" th:value="${reser.name}"
-									readonly>
+								<label class="form-label">이름</label>
+								 <input type="text" class="form-control" name="commonName"
+								  id="reser-name" th:value="${reser.commonName}" readonly>
 							</div>
 							<div class="mb-3">
-								<label class="form-label">이용 날짜</label> <input type="date"
-									class="form-control" name="reservationDate">
+								<label class="form-label">이용 날짜</label>
+								 <input type="date"	class="form-control" name="reserDate">
 							</div>
 							<div class="mb-3">
 								<label class="form-label">예약 내용</label>
-								<textarea class="form-control" name="reservationDetails"
-									rows="3" placeholder="예약 목적을 입력하세요"></textarea>
+								<textarea class="form-control" name="content"
+									rows="3" placeholder="예약 목적을 입력하세요"  th:text="${reser.content}">
+								</textarea>
 							</div>
 							<div class="text-center">
 								<button type="submit" class="btn btn-success">예약하기</button>
 								<button type="reset" class="btn btn-danger">취소</button>
 							</div>
-						</form>
+						
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
+</form>
 	<!-- ✅ JavaScript -->
 	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
-
-	<!-- ✅ JavaScript -->
 	<script>
     
 	document.addEventListener("DOMContentLoaded", function () {
 	    loadCalendar();
 	});
 	
+	// 캘린더
 	function loadCalendar() {
 	    var calendarEl = document.getElementById('calendar');
 	    var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -181,7 +175,7 @@
 	        editable: false,
 	        height: 350,
 	        events: function (fetchInfo, successCallback, failureCallback) {
-	            fetch('/api/reservations')  // ✅ REST API를 호출하여 예약 데이터 가져오기
+	            fetch(`/api/reservation/main`)  // ✅ REST API를 호출하여 예약 데이터 가져오기
 	                .then(response => response.json())
 	                .then(data => {
 	                    let events = data.map(reservation => ({
@@ -198,16 +192,18 @@
 	                });
 	        },
 	        dateClick: function (info) {
-	            document.querySelector('input[name="reservationDate"]').value = info.dateStr;
+	            document.querySelector('input[name="reserDate"]').value = info.dateStr;
 	        }
 	    });
 	    calendar.render();
 	}
-
+	
+	// 시간 선택
     function toggleTime(element) {
         element.classList.toggle("selected");
     }
 
+	// 모든 시간 선택
     function toggleAllTimes() {
         const timeSlots = document.querySelectorAll(".time-slot");
         const allSelected = Array.from(timeSlots).every(slot => slot.classList.contains("selected"));
@@ -220,6 +216,77 @@
         });
     }
 </script>
+	<!-- ✅ 1. reservedList 넘기기 -->
+	<script th:inline="javascript">
+		let reservedList = [];
+	</script>
+
+	<!-- ✅ 2. 예약 관련 JS -->
+	<script>
+	    document.addEventListener("DOMContentLoaded", function () {
+	        loadCalendar();
+	    });
+	
+	    function loadCalendar() {
+	        // ... 캘린더 설정
+	    }
+	
+	    function toggleTime(element) {
+	        // ... 시간 선택 토글
+	    }
+	
+	    function toggleAllTimes() {
+	        // ... 전체 선택 토글
+	    }
+	
+	    // ✅ 3. 여기 아래에 submit 중복 체크 넣기!
+		    document.querySelector("form").addEventListener("submit", function (event) {
+	    const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected"));
+	
+	    if (selectedSlots.length === 0) {
+	        alert("시간을 선택하세요!");
+	        event.preventDefault();
+	        return;
+	    }
+	
+	    const selectedHours = selectedSlots.map(slot => {
+	        return parseInt(slot.dataset.value.split(":")[0]); // "10:00 - 11:00" → 10
+	    });
+	
+	    const selectedDate = document.querySelector('input[name="reserDate"]').value; // yyyy-MM-dd
+	
+	    // ✅ 예약된 시간과 비교해서 중복 체크
+	    const hasConflict = reservedList.some(res => {
+	        // 날짜가 다르면 통과
+	        if (res.reserDate !== selectedDate) return false;
+	
+	        const start = parseInt(res.reserStartTime.split(":")[0]);
+	        const end = parseInt(res.reserEndTime.split(":")[0]);
+	
+	        // 예약된 시간 범위 중 한 시간이라도 겹치면 → 충돌
+	        for (let h = start; h < end; h++) {
+	            if (selectedHours.includes(h)) return true;
+	        }
+	        return false;
+	    });
+	
+	    if (hasConflict) {
+	        alert("⚠️ 이미 예약된 시간과 겹칩니다.");
+	        event.preventDefault();
+	        return;
+	    }
+	
+	    // ✅ 최종 시작/종료 시간 계산해서 hidden input에 넣기
+	    const minHour = Math.min(...selectedHours);
+	    const maxHour = Math.max(...selectedHours) + 1;
+	
+	    const pad = n => String(n).padStart(2, "0");
+	    document.getElementById("reserStartTime").value = `${pad(minHour)}:00`;
+	    document.getElementById("reserEndTime").value = `${pad(maxHour)}:00`;
+	});
+
+	</script>
+
 
 </body>
 </html>

@@ -1,10 +1,13 @@
 package com.workmate.app.employee.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
+import com.workmate.app.security.service.LoginUserVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,71 +51,6 @@ public class EmpController {
 		header.add("Content-Type", "application/json;charset=UTF-8");
 		return new ResponseEntity<>(userVO, header, HttpStatus.OK); 
 	}
-	
-	// 평가하기 페이지
-	@GetMapping("emp/evalu") 
-	public String empEvaluPage(EvaluVO evaluVO, Model model) {
-		List<EvaluVO> findEvalu = empService.findOneEvaluPage(evaluVO);
-		model.addAttribute("evalu", findEvalu);
-		return "employees/evalu";
-	}
-	
-	@GetMapping("emp/bfevalu") // 지난 평가 리스트 전체 조회 (관리자)
-	public String selectBeforeEvaluListPage(EvaluVO evaluVO, Model model) {
-		List<EvaluVO> findAllEvalu = empService.findBeforeEvaluList(evaluVO);
-		model.addAttribute("list", findAllEvalu);
-		return "employees/evaluBeforeList";
-	}
-	
-	// 지난 평가 리스트 중 단건 조회 (관리자)
-	//@GetMapping("emp/bfoneevalu")
-	@GetMapping("emp/bfoneevalu/{evaluFormNo}")
-	public String selectBeforeEvaluResultById(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
-		evaluVO.setEvaluFormNo(evaluFormNo);
-		List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluById(evaluVO);
-		List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
-		List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
-		model.addAttribute("evalu", evalu); // 평가자 정보 
-		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
-		model.addAttribute("one", findOneEvaluResult);
-		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명 	
-		return "employees/beforeEvaluOneInList"; // 페이지 이동 방식 @PathVariable : 한 건만 넘길 때 / @requestParam : 여러 건 넘길 때
-	}
-	
-	// 내 평가 관리 (일반 사용자)
-	@GetMapping("emp/myEvalu")
-	public String myEvaluListPage(EvaluVO evaluVO) {
-		return "employees/myEvalu";
-	}
-	
-	// 내 평가 단건 조회
-	@GetMapping("emp/result/{evaluFormNo}")
-	public String evaluResultOnePage(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
-		evaluVO.setEvaluFormNo(evaluFormNo);
-		List<EvaluVO> findResult = empService.findMyEvaluById(evaluVO);
-		List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
-		List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
-		model.addAttribute("evalu", evalu); // 평가자 정보 
-		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
-		model.addAttribute("result", findResult);
-		return "employees/evaluMyResult";
-	}
-	
-	// 평가 등록 페이지 (관리자) 
-	@GetMapping("emp/neweva")
-	public String evaluNewOneInsert(EvaluVO evaluVO, Model model) {
-		model.addAttribute("teams", empService.findTeamList());
-		model.addAttribute("content", empService.findEvaluContentList(evaluVO));
-		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명 
-		return "employees/newEvalu";
-	}
-	
-	// 평가 등록 AJAX (관리자)
-	@PostMapping("emp/neweva")
-	public String evaluInsertAJAX(@RequestBody EvaluVO evaluVO) {
-		empService.inputNewEvaluForm(evaluVO);
-		return "redirect:/emp/neweva";
-	} 
 	
 	// 사원 등록 페이지 
 	@GetMapping("emp/newemp") 
@@ -177,8 +115,120 @@ public class EmpController {
 	}
 	
 	
+	/////////////////////// 평가 ////////////////////////// 
 
-
-
+	// 내 평가 리스트 (일반 사용자)
+	@GetMapping("emp/myEvalu")
+	public String myEvaluListPage(EvaluVO evaluVO, Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+		
+		// 로그인한 사용자 정보 
+		if (loginUser == null || loginUser.getUserVO() == null) {
+			return "redirect:/login";
+		}
+		
+		int userNo = loginUser.getUserVO().getUserNo();
+		evaluVO.setUserNo(userNo);
+		
+		List<EvaluVO> oneEvalu = empService.findMyEvaluList(evaluVO);
+		model.addAttribute("evlist", oneEvalu);
+		return "evalu/myEvaluList"; // 나의 평가 조회
+	}
 	
+	// 내 평가 단건 조회
+	@GetMapping("emp/result/{evaluFormNo}")
+	public String evaluResultOnePage(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
+		evaluVO.setEvaluFormNo(evaluFormNo);
+		List<EvaluVO> findResult = empService.findMyEvaluById(evaluVO);
+		List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
+		List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
+		model.addAttribute("evalu", evalu); // 평가자 정보 
+		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
+		model.addAttribute("result", findResult);
+		return "evalu/evaluMyResult";
+	}
+	
+	
+//	// 평가하기 페이지
+//		@GetMapping("emp/evalu") 
+//		public String empEvaluPage(@PathVariable int formNo, EvaluVO evaluVO, Model model) {
+////			evaluVO.setEvaluFormNo(formNo);
+////			List<EvaluVO> findEvalu = empService.findOneEvaluPage(evaluVO);
+////			List<EvaluVO> findOneEvalu = empService.findMyEvaluById(evaluVO);
+////			model.addAttribute("evalu", findOneEvalu);
+////			// model.addAttribute("evalu", findEvalu);
+//			return "employees/evalu";
+//		}
+		
+//		// 평가하기 페이지
+//		@PostMapping("emp/myEvalu/{formNo}") 
+//		public String myempEvaluOnePage(@PathVariable int formNo, EvaluVO evaluVO, Model model) {
+//			evaluVO.setEvaluFormNo(formNo);
+//			List<EvaluVO> findEvalu = empService.findOneEvaluPage(evaluVO);
+//			List<EvaluVO> findOneEvalu = empService.findMyEvaluById(evaluVO);
+//			model.addAttribute("evalu", findOneEvalu);
+//			// model.addAttribute("evalu", findEvalu);
+//			return "evalu/evalu";
+//		}
+		
+		@GetMapping("emp/bfevalu") // 지난 평가 리스트 전체 조회 (관리자)
+		public String selectBeforeEvaluListPage(EvaluVO evaluVO, Model model) {
+			List<EvaluVO> findAllEvalu = empService.findBeforeEvaluList(evaluVO);
+			model.addAttribute("list", findAllEvalu);
+			return "evalu/evaluBeforeList";
+		}
+		
+		// 지난 평가 리스트 중 단건 조회 (관리자)
+		//@GetMapping("emp/bfoneevalu")
+		@GetMapping("emp/bfoneevalu/{evaluFormNo}")
+		public String selectBeforeEvaluResultById(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
+			evaluVO.setEvaluFormNo(evaluFormNo);
+			List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluById(evaluVO);
+			List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
+			List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
+			model.addAttribute("evalu", evalu); // 평가자 정보 
+			model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
+			model.addAttribute("one", findOneEvaluResult);
+			model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명 	
+			return "evalu/beforeEvaluOneInList"; // 페이지 이동 방식 @PathVariable : 한 건만 넘길 때 / @requestParam : 여러 건 넘길 때
+		}
+		
+
+		// 평가 등록 페이지 (관리자) 
+		@GetMapping("emp/neweva")
+		public String evaluNewOneInsert(EvaluVO evaluVO, Model model) {
+			model.addAttribute("teams", empService.findTeamList());
+			model.addAttribute("content", empService.findEvaluContentList(evaluVO));
+			model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명 
+			 
+			return "evalu/newEvalu";
+		}
+		
+		// 평가 등록 AJAX 
+		@PostMapping("emp/neweva")
+		public ResponseEntity<Map<String, String>> evaluInsertAJAX(@RequestBody EvaluVO evaluVO) {
+		    // 서비스 로직 실행
+		    empService.inputNewEvaluForm(evaluVO);
+		    // 성공 메시지 또는 처리된 데이터를 JSON 형식으로 반환
+		    Map<String, String> response = new HashMap<>();
+		    response.put("message", "성공적으로 등록되었습니다.");
+		    return ResponseEntity.ok(response);  // JSON 응답을 반환
+		}
+		
+
+		// 평가 진행 
+		@GetMapping("emp/evalu/{evaNo}")
+		public String evaluOneProcess(EvaluVO evaluVO, Model model, @AuthenticationPrincipal LoginUserVO loginUser, @PathVariable int evaNo) {
+			// 로그인한 사용자 정보 
+			if (loginUser == null || loginUser.getUserVO() == null) {
+				return "redirect:/login";
+			}
+			
+			int userNo = loginUser.getUserVO().getUserNo();
+			evaluVO.setEvaluFormNo(evaNo); 
+			evaluVO.setUserNo(userNo);
+			List<EvaluVO> oneEvalu = empService.findMyEvaluProcess(evaluVO);
+			model.addAttribute("one", oneEvalu);
+			return "evalu/evalu";
+		}
+
 }

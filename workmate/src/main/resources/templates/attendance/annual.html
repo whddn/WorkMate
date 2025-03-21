@@ -48,6 +48,13 @@ table {
 	max-height: 400px; 
 	overflow-y: auto;
 }
+#date-select {
+    padding: 4px;
+    border: 2px solid #ced4da;
+    border-radius: 5px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
 </style>
 </head>
 <body>
@@ -83,11 +90,12 @@ table {
 					<!-- 내용 추가 -->
 					<div class="content">
 						<h4 class="card-title">내 연차 사용내역 조회</h4>	
-						
+					 <input type="hidden" name="stDate" th:value="${#dates.format(workVO.stDate, 'yyyy-MM-dd')}" >
+				     <input type="hidden" name="endDate" th:value="${#dates.format(workVO.endDate, 'yyyy-MM-dd')}">
 					<!-- 년도 월별 조회 기능 -->					
 					<div class="date-select">
-					<label><b>기간 조회: <b></label>				
-					<input type="text" name="daterange"/>						
+					<label><b><i class="fas fa-calendar-alt"></i> 기간 조회 <b></label>			
+					<input type="text" name="daterange" id="date-select"/>						
 				
 					</div>			
 						<div class="table-responsive">
@@ -129,6 +137,17 @@ $('#annualTable').DataTable({
 	info: false,
 });
 
+//datapicker null값 체크
+let start = $('input[name="stDate"]').val();
+let end = $('input[name="endDate"]').val();
+
+if(start == ''  || end == ''){
+	start = moment().format('YYYY-MM-DD');
+	end = moment().format('YYYY-MM-DD');
+	$('input[name="stDate"]').val(start);
+	$('input[name="endDate"]').val(end);
+}
+
 $(function(){
 	// datepicker 설정
 	  $('input[name="daterange"]').daterangepicker({
@@ -153,6 +172,8 @@ $(function(){
 		$('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
 			  const stDate = picker.startDate.format('YYYY-MM-DD');
 			  const endDate = picker.endDate.format('YYYY-MM-DD');
+			  
+			  $('input[name="daterange"]').val(stDate + ' - ' + endDate);
 			  
 			  //상대경로
 			  location.href = `annual?stDate=${stDate}&endDate=${endDate}`;				 
