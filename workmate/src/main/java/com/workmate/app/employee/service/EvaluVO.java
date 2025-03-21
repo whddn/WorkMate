@@ -39,14 +39,15 @@ public class EvaluVO {
 	private Date evaluStart;		// 평가 시작 날짜
 	//@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date evaluEnd;			// 평가 종료 날짜
-	
+	List<EmpVO> empOne;
+	List<TeamVO> teamList;
 	private int userNo;				// 유저 번호 
 	private String userName;		// 유저 이름
 	private String departmentName;	// 부서명
 	private String teamName;		// 팀이름
 	private String teamNo;			// 팀번호
 	private String userPosition;	// 직급
-	List<EvaluVO> evaluItem;		// AJAX로 보낼 배열 이름과 동일하게
+	List<EvaluVO> evaluItem;		// AJAX로 보낼 배열 이름과 동일하게 (폼 양식 등록) 
 	// 평가자 그룹 
 	private String evaluGroupId;		// 평가자 그룹 아이디
 	// 피평가자 그룹 
