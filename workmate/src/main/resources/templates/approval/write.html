@@ -324,6 +324,27 @@
 			console.error('Error:', error);
 			alert('서버 요청 중 오류가 발생했습니다.');
 		});
+		
+		/*
+		$.ajax({
+			url: [[ @{/approval/write} ]],
+			type: 'POST',
+			contentType: 'multipart/form-data'
+			data: formData
+			success: function(response) {
+				if(response.success) {
+					location.href = [[ @{/approval/waiting} ]];
+				}
+				else {
+					alert('결재등록에 실패하였습니다.');
+				}
+			},
+			error: function(error) {
+				console.error('Error : ' + error);
+				alert('서버 요청 중 오류가 발생했습니다.');
+			}
+		});
+		*/
 	});
 	
 	$('#cancelBtn').on('click', function(event) {
