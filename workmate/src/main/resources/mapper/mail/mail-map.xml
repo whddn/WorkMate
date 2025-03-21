@@ -94,4 +94,133 @@
 	<select id="findUserByEmail" resultType="MailVO">
 		SELECT USER_NO FROM EMPLOYEE WHERE USER_MAIL = #{email}
 	</select>
+	<!-- 폴더 전체 조회 -->
+<select id="selectMailFolderList" parameterType="int" resultType="MailFolderVO">
+    SELECT FOLDER_ID, USER_NO, FOLDER_NAME, FOLDER_TYPE, EDITABLE
+    FROM MAIL_FOLDER
+    WHERE USER_NO = #{userNo}
+      AND FOLDER_TYPE = 'TAG' <!-- 유저 생성 폴더만 가져오기 -->
+    ORDER BY FOLDER_ID
+</select>
+
+<!-- 폴더 추가 -->
+<insert id="insertMailFolder" parameterType="MailFolderVO">
+    INSERT INTO MAIL_FOLDER (
+        FOLDER_ID,
+        USER_NO,
+        FOLDER_NAME,
+        FOLDER_TYPE,
+        EDITABLE
+    ) VALUES (
+        MAIL_FOLDER_SEQ.NEXTVAL,
+        #{folder.userNo},
+        #{folder.folderName},
+        #{folder.folderType},
+        #{folder.editable}
+    )
+</insert>
+<!-- 로그인한 본인 폴더만 삭제 가능 -->
+<delete id="deleteMailFolder">
+    DELETE FROM MAIL_FOLDER
+    WHERE FOLDER_ID = #{folderId}
+      AND USER_NO = #{userNo} 
+</delete>
+
+<!-- 특정 폴더에 속한 메일들을 조회 -->
+<select id="selectMailsByFolderId" resultType="MailVO">
+    SELECT
+        M.MAIL_ID,
+        M.USER_NO,
+        M.RECIPIENTS,
+        M.SUBJECT,
+        M.CONTENT,
+        M.SENT_AT,
+        M.STATUS,
+        M.FOLDER_ID,
+        (SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS ATTACHMENT_COUNT
+    FROM MAIL M
+    WHERE M.USER_NO = #{userNo}
+      AND M.FOLDER_ID = #{folderId}
+    ORDER BY M.SENT_AT DESC
+</select>
+<!-- 메일 폴더 이동 -->
+<update id="updateMailFolder">
+    UPDATE MAIL
+    SET FOLDER_ID = #{folderId}
+    WHERE MAIL_ID = #{mailId}
+</update>
+<!--특정 폴더(FOLDER_ID) 안에 있는 메일들만 조회-->
+<select id="selectMailListByFolderId" resultType="MailVO">
+    SELECT
+        M.MAIL_ID,
+        M.USER_NO,
+        M.RECIPIENTS,
+        M.SUBJECT,
+        M.CONTENT,
+        M.SENT_AT,
+        M.STATUS,
+        M.FOLDER_ID,
+        (SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS ATTACHMENT_COUNT
+    FROM MAIL M
+    WHERE M.USER_NO = #{userNo}
+      AND M.FOLDER_ID = #{folderId}
+    ORDER BY M.SENT_AT DESC
+</select>
+<!--특정폴더이름 넘기기(내가만든 폴더)-->
+<select id="selectMailFolderById" resultType="MailFolderVO">
+    SELECT FOLDER_ID, USER_NO, FOLDER_NAME, FOLDER_TYPE, EDITABLE
+    FROM MAIL_FOLDER
+    WHERE FOLDER_ID = #{folderId}
+</select>
+<!--메일 완전삭제-->
+<delete id="deleteMail">
+    DELETE FROM MAIL WHERE MAIL_ID = #{mailId}
+</delete>
+<!-- 페이징된 메일 조회 -->
+<select id="selectMailListPaging" resultType="MailVO">
+    SELECT * FROM (
+        SELECT inner_result.*, ROWNUM rn FROM (
+            SELECT
+                M.MAIL_ID,
+                M.USER_NO,
+                M.RECIPIENTS,
+                M.SUBJECT,
+                M.CONTENT,
+                M.SENT_AT,
+                M.STATUS,
+                M.FOLDER_ID,
+                (SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS ATTACHMENT_COUNT
+            FROM MAIL M
+            WHERE M.USER_NO = #{userNo}
+              AND M.FOLDER_ID = #{folderId}
+            ORDER BY M.SENT_AT DESC
+        ) inner_result
+        WHERE ROWNUM &lt;= #{offset} + #{limit} 
+    )
+    WHERE rn &gt; #{offset}
+</select>
+ 
+<!-- 총 메일 개수 조회 -->
+<select id="countMailsByFolder" resultType="int">
+    SELECT COUNT(*) FROM MAIL
+    WHERE USER_NO = #{userNo}
+      AND FOLDER_ID = #{folderId}
+</select>
+<!-- 임시보관함 -->
+<select id="selectDraftMails" parameterType="int" resultType="MailVO">
+    SELECT
+        M.MAIL_ID,
+        M.USER_NO,
+        M.RECIPIENTS,
+        M.SUBJECT,
+        M.CONTENT,
+        M.SENT_AT,
+        M.STATUS,
+        M.FOLDER_ID,
+        (SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS ATTACHMENT_COUNT
+    FROM MAIL M
+    WHERE M.USER_NO = #{userNo}
+      AND M.FOLDER_ID = 1003
+    ORDER BY M.SENT_AT DESC
+</select>
 </mapper>
