@@ -158,7 +158,7 @@ public class ApprovalController {
             for (MultipartFile file : files) {
             	String fileName = file.getOriginalFilename();
             	Path filePath = Paths.get("C://workmate/apprAttach/" + fileName);
-            	fileHandler.fileUpload(file);
+            	fileHandler.fileUpload(file, fileName);
                 
                 ReportAttachVO reportAttachVO = new ReportAttachVO();
                 reportAttachVO.setFileName(fileName);
