@@ -8,29 +8,67 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>WorkMate</title>
+	<title>검색</title>
 </head>
 
 <body>
 	<h3>검색</h3>
-	<form>
-		<table id="searchResult" class="cell-border">
-			<thead>
-				<input type="text" value="전자">
-				<button class="btn primary-btn"><i></i>검색</button>
-			</thead>
-			<tbody>
-				<tr><td>전자메일</td></tr>
-				<tr><td>전자결재</td></tr>
-			</tbody>
-			<tfoot>
-				<tr><td></td></tr>
-			</tfoot>
-		</table>
-	</form>
-	<script>
+	<table id="searchResult" class="cell-border">
+		<input id="searchKeywordInput" type="text" placeholder="메뉴 관련된 검색어를 입력">
+		<button id="searchMenuBtn" class="btn btn-primary"><i></i>검색</button>
+		<thead>
+			<tr><th>검색결과</th></tr>
+		</thead>
+		<tbody>
+		</tbody>
+		<tfoot>
+			<tr><td>검색결과</td></tr>
+		</tfoot>
+	</table>
+	<script th:inline="javascript">
 		$(document).ready(function() {
-			$('#searchResult').DataTable();
+			$('#searchResult').DataTable({
+		        lengthChange: false, // "Show 10 entries" 선택 상자 숨김
+		        searching: false      // 검색창 숨김
+			});
+		});
+		
+		$('#searchMenuBtn').on('click', function() {
+			let contextPath = [[ @{/} ]];
+			if (contextPath.endsWith('/')) {
+				contextPath = contextPath.slice(0, -1); // 마지막 '/' 제거
+			}
+			
+			$.ajax({
+                url: [[ @{/search/start} ]],
+                type: 'POST',
+                data: JSON.stringify({
+                	searchKeyword: $('#searchKeywordInput').val()
+                }),
+                contentType: 'application/json',
+                success: function(response) {
+                	console.log(response);
+                	
+                	var table = $('#searchResult').DataTable();
+                    table.clear();            // 기존 데이터 삭제
+
+                 	// response가 단일 객체라면 배열로 변환
+					let menuList = Array.isArray(response) ? response : [response];
+                    
+					// 테이블에 데이터 추가
+					menuList.forEach(menu => {
+						table.row.add([
+							`<a href="${contextPath}${menu.menuLink}">${menu.menuTitle}</a>`
+						]);
+					});
+                    
+                    table.draw();
+                },
+                error: function(error) {
+                	console.error('Error : ' + error);
+    				alert('서버 요청 중 오류가 발생했습니다.');
+                }
+            });
 		});
 	</script>
 </body>
