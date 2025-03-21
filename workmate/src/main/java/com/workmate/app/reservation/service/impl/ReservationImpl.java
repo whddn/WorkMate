@@ -4,22 +4,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.workmate.app.approval.mapper.ApprElmntMapper;
+import com.workmate.app.approval.mapper.ApprLineMapper;
+import com.workmate.app.approval.mapper.ApprovalMapper;
+import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.reservation.mapper.ReservationMapper;
 import com.workmate.app.reservation.service.ReservationService;
 import com.workmate.app.reservation.service.ReservationVO;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ReservationImpl implements ReservationService {
 
-	private ReservationMapper reservationMapper;
+	private final ReservationMapper reservationMapper;
+	private final ApprovalMapper approvalMapper;
+	private final ApprLineMapper apprLineMapper;
+	private final ApprElmntMapper apprElmntMapper;
 
-	@Autowired
-	ReservationImpl(ReservationMapper reservationMapper) {
-		this.reservationMapper = reservationMapper;
-	}
 
 	// 전체
 	@Override
@@ -31,11 +37,30 @@ public class ReservationImpl implements ReservationService {
 	public ReservationVO findReserById(ReservationVO reservationVO) {
 		return reservationMapper.selectReservationById(reservationVO);
 	}
-
+	
+	
 	// 예약 등록
+	@Transactional
 	@Override
-	public int inputReserInfo(ReservationVO reservationVO) {
-		return reservationMapper.insertReservationInfo(reservationVO);
+	public ReservationVO inputReserInfo(ReservationVO reservationVO) {
+		// 예약 등록
+		reservationMapper.insertReservationInfo(reservationVO);
+		
+		// 전자결재 등록
+	    ApprovalVO approval = new ApprovalVO();
+	    approval.setApprTitle("공용품 예약 결재 요청");
+	    approval.setApprContent(reservationVO.getContent());
+//	    approval.setCreateDate();
+//	    approval.setExpireDate();
+	    approval.setApprStatus("a1");
+	    approval.setDeptNo("D004");  // 예시: 부서번호 (실제 값에 맞게 설정)
+	    approval.setUserNo(reservationVO.getUserNo());  // 사원번호 전달받았을 경우
+	    approval.setReserNo(reservationVO.getReserNo()); // 예약번호 연결
+	    approval.setApprType("AF004");
+		
+		approvalMapper.insertApproval(approval);
+		
+		return reservationVO;
 	}
 
 	// 수정

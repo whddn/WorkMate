@@ -16,6 +16,7 @@
 	<select id="selectEmpById" resultType="EmpVO">
 		SELECT u.user_name
 		        , d.department_name
+		        , d.department_id
 		        , t.team_name
                 , u.team_no
 		        , u.user_position

@@ -8,12 +8,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>예약 목록</title>
 
-<!-- ✅ KaiAdmin Lite 테마 적용 -->
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/style.css">
-
 <style>
 body {
 	background-color: #f8f9fa;
@@ -74,7 +68,7 @@ body {
                             <div class="card-body">
                                 <p class="card-category">${reser.commonKind}</p>
                                 <h5 class="card-title">
-                                    <a href="${detailPageUrl}" class="text-dark">${reser.name}</a>
+                                    <a href="${detailPageUrl}" class="text-dark">${reser.commonName}</a>
                                 </h5>
                                 <p class="card-text text-muted">${reser.content}</p>
                                 <a href="${detailPageUrl}" class="btn btn-primary btn-sm">예약하기</a>
