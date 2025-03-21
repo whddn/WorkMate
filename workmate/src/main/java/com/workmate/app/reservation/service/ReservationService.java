@@ -16,5 +16,7 @@ public interface ReservationService {
 	public Map<String, Object> modifyReserInfo(ReservationVO reservationVO);
 	// 삭제
 	public Map<String, Object> dropReserInfo(int reserNo);
+	// 시간중복체크
+	public List<ReservationVO> findReservedTimesByCommonNo(Integer commonNo);
 
 }
