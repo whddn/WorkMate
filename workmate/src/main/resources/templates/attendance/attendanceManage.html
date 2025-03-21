@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <title>근태관리</title>
 <!-- daterangepicker CSS -->
+
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.1.0/daterangepicker.min.css" />
 <style>
 /* 전체 컨테이너를 세로 배치 */
@@ -33,7 +35,7 @@
 	padding: 20px;
 }
 .date-select {
-	width: 300px;
+	width: 800px;
 	padding-bottom: 10px;
 }
 table {
@@ -41,13 +43,45 @@ table {
 	border-collapse: collapse;
 	margin-top: 20px;
 }
-
-.table-container {
-	max-height: 300px;
-	overflow-y: auto;
-	border: 1px solid #ccc;
-	display: block;
+.search-container {
+    display: flex; /* 가로로 배치 */
+    gap: 30px; /* 각 입력 필드 사이 간격 */
+    padding: 15px;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    margin-top: 20px;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    flex-wrap: nowrap; /* 입력 박스가 한 줄로 배치되게 설정 */
 }
+
+form {
+    display: flex; /* 가로로 배치 */
+    justify-content: space-between; /* 항목 간의 간격을 자동으로 배치 */
+    gap: 20px; /* 항목 간의 간격을 설정 */
+}
+
+.search-group {
+    display: flex;
+    flex-direction: column; /* 라벨과 입력 필드를 세로로 배치 */
+    width: 30%; /* 각 입력 필드의 너비를 30%로 설정 (3개 항목을 한 줄에 배치) */
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%; /* 입력 필드가 부모 컨테이너에 꽉 차도록 */
+}
+
+button{
+	margin-top: 20px;
+	height: 40px;
+}
+
 
 </style>
 </head>
@@ -58,23 +92,64 @@ table {
 		<div class="container">
 		 	<div class="card" id="card-top">
 				<div class="card-body">
+				<h4 class="card-title">전사 이번달 근태현황</h4>
+				<p class="date-box" id="current-date"></p>
 					<!-- 내용 추가 -->
-
+					<table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+	                      <thead>
+	                        <tr>
+	                          <th scope="col">출근 미체크</th>
+	                          <th scope="col">퇴근 미체크</th>
+	                          <th scope="col">지각/조퇴</th>
+	                          <th scope="col">연장근무</th>
+	                        </tr>
+	                      </thead>
+	                      <tbody>
+	                        <tr th:each="count : ${counts}">
+	                          <td>[[ ${count.nstartCount} ]]</td>
+	                          <td>[[ ${count.nafterCount} ]]</td>
+	                          <td>[[ ${count.allStatusCount} ]]</td>
+	                          <td>[[ ${count.addWorkCount} ]]</td>
+	                        </tr>	                       
+	                      </tbody>
+	                    </table>
 				</div>
 			</div>  
 			<div class="card" id="card-bottom">
 				<div class="card-body">
 					<!-- 내용 추가 -->
 					<h4 class="card-title">사원 근태 조회</h4>						
-					<div class="content">
-					<!-- 년도 월별 조회 기능 -->	
-					<div class="date-select">
-					<label><b>기간 조회: <b></label>				
-					<input type="text" name="daterange"/>
-
-					</div>						
+					<div class="search-container">					
+				    <form>
+				        <input type="hidden" name="stDate" th:value="${#dates.format(workVO.stDate, 'yyyy-MM-dd')}" >
+				        <input type="hidden" name="endDate" th:value="${#dates.format(workVO.endDate, 'yyyy-MM-dd')}">
+				
+				        <!-- 기간 -->
+				        <div class="search-group">
+				            <label><b>기간</b></label>
+				            <input name="searchDate" class="search-input" />
+				        </div>
+				
+				        <!-- 이름 -->
+				        <div class="search-group">
+				            <label for="searchName">이름</label>
+				            <input type="text" id="searchName" name="userName" class="search-input" placeholder="사원이름 입력" th:value="${workVO.userName}">
+				        </div>
+				
+				        <!-- 팀명 -->
+				        <div class="search-group">
+				            <label for="searchTeam">팀명</label>
+				            <input type="text" id="searchTeam" name="teamName" class="search-input" placeholder="팀명 입력" th:value="${workVO.teamName}">
+				        </div>
+				
+				        <button id="searchBtn" class="btn btn-primary"><i class="fas fa-search"></i></button>
+				        <button onclick="resetDate()" type="button" id="searchRe" name="searchRe" class="btn btn-black"><i class="fas fa-undo-alt"></i></button>
+				    </form>
+				    <button class="btn btn-success"><i class="fas fa-file-excel"></i> 엑셀 다운로드</button>
+				</div>
 						<div class="table-responsive">
-							<table id="attendanceTable" class="table">
+							
+							<table id="attendanceAllTable" class="table" >
 								<thead>
 									<tr>
 										<th>날짜</th>
@@ -90,7 +165,7 @@ table {
 								<tbody>
 									<!-- 단건 : 배열 -->
 									<tr th:each="work : ${works}">
-										<td>[[ ${#dates.format(work.startWork, 'yyyy/MM/dd')} ]]</td>
+										<td>[[ ${#dates.format(work.startWork, 'yyyy-MM-dd')} ]]</td>
 										<td>[[ ${work.teamName} ]]</td>
 										<td>[[ ${work.userName} ]]</td>
 										<td>[[ ${#dates.format(work.startWork, 'HH:mm')} ]]</td>
@@ -107,7 +182,7 @@ table {
 				</div>
 			</div>
 		</div>
-	</div>
+	
 </body>
 <!--한국어  달력 쓰려면 추가 로드-->
 <script src="resources/js/plugin/datepicker/bootstrap-datepicker.ko.min.js"></script>
@@ -115,17 +190,34 @@ table {
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <script>
-	$('#attendanceTable').DataTable({
-		order: [ [ 0, "desc" ] ],
-		info: false,
-	});
+
+//테이블 설정
+$('#attendanceAllTable').DataTable({
+	order: [ [ 0, "desc" ] ],
+	info: false,
+	filter: false,
+	searching: false,
+	// 정렬 기능
+	ordering: false,
+	// 정보 표시
+});
+
+//datapicker null값 체크
+let start = $('input[name="stDate"]').val();
+let end = $('input[name="endDate"]').val();
+
+if(start == ''  || end == ''){
+	start = moment().format('YYYY-MM-DD');
+	end = moment().format('YYYY-MM-DD');
+	$('input[name="stDate"]').val(start);
+	$('input[name="endDate"]').val(end);
+}
+
 	
 	$(function(){
 		// datepicker 설정
-		    var start = moment().subtract(29, 'days');
-   			var end = moment();
-    
-		  $('input[name="daterange"]').daterangepicker({
+		      
+		  $('input[name="searchDate"]').daterangepicker({
 			format : "yyyy-MM-dd", 
 			autoclose: true,
 			todayHighlight: true,
@@ -144,12 +236,14 @@ table {
 		  });
 		  
 		// apply event
-			$('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+			$('input[name="searchDate"]').on('apply.daterangepicker', function(ev, picker) {
 				  const stDate = picker.startDate.format('YYYY-MM-DD');
 				  const endDate = picker.endDate.format('YYYY-MM-DD');
 				  
+				  $('input[name="stDate"]').val(stDate)
+				  $('input[name="endDate"]').val(endDate)
 				  //상대경로
-				  location.href = `allList?stDate=${stDate}&endDate=${endDate}`;
+				  //location.href = `attendanceManage?stDate=${stDate}&endDate=${endDate}`;
 				  
 				  //절대경로 하려면 contextpath 추가
 		  });
@@ -157,6 +251,34 @@ table {
 		  
 	}); //end of $(function()
 	
+	//검색 조건 초기화
+	function resetDate() {
+	    // daterangepicker의 날짜 범위 초기화
+	    $('input[name="searchDate"]').data('daterangepicker').setStartDate(moment());
+	    $('input[name="searchDate"]').data('daterangepicker').setEndDate(moment());
+		
+	    
+	    $('#searchName').val('');  // 이름 input 필드 초기화
+	    $('#searchTeam').val('');  // 팀명 input 필드 초기화
+	}
+	
+	 $('#searchRe').on('click', function() {
+         resetDate();
+     });
+		
+	
+			
+	//현재 시간 출력
+	function currentDate() {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+	
+		document.getElementById("current-date").innerText = `${year}-${month}`;
+	}
+	
+	setInterval(currentDate, 1000);
+	currentDate();
 	
 </script>
 

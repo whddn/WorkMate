@@ -119,14 +119,58 @@
 		WHERE TO_NUMBER(a.user_no) = #{userNo}
 		AND 1 = 1
 	<if test="stDate != null and endDate != null">
-        AND appr_date BETWEEN #{stDate} AND #{endDate} + 1
+        AND annual_start BETWEEN #{stDate} AND #{endDate} + 1
     </if>
 		ORDER BY annual_no DESC
 	</select>
 	
+	<!-- 전체사원 이번달 근태 -->
+	<select id="selectMonthEmpList" resultType="WorkVO">
+		SELECT 
+
+    (
+        SELECT COUNT(*) 
+        FROM work 
+        WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+          AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+          AND (work_status LIKE '지각' OR work_status LIKE '조퇴')
+    ) AS all_status_count,
+
+   
+    (
+        SELECT COUNT(*)
+        FROM work
+        WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+          AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+          AND start_work IS NULL
+    ) AS nstart_count,
+
+   
+    (
+        SELECT COUNT(*)
+        FROM work
+        WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+          AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+          AND after_work IS NULL
+    ) AS nafter_count,
+
+   
+    (
+        SELECT COUNT(*)
+        FROM work
+        WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
+          AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
+          AND (add_work_time IS NOT NULL AND add_work_time != 0) 
+    ) AS add_work_count
+
+  FROM dual
+	</select>
+	
+	
+	<!-- 전체사원 근태조회 -->
 	<select id="selectAllEmpList" resultType="WorkVO">
-		SELECT t.TEAM_NAME,               
-		       e.USER_NAME,              
+		SELECT t.team_name,               
+		       e.user_name,              
 		       w.start_work,             
 		       w.after_work,             
 		       w.work_time,
@@ -137,9 +181,15 @@
 		JOIN team t ON e.team_no = t.team_no  
 		WHERE 1 = 1
 		<if test="stDate != null and endDate != null">
-		    AND w.start_work BETWEEN #{stDate} AND #{endDate} + 1
+		    AND w.start_work >= #{stDate} AND w.start_work <![CDATA[<]]> #{endDate} +1
 		</if>
-		ORDER BY w.start_work DESC
+		  <if test="userName != null and userName != ''">
+        	AND e.user_name LIKE '%' || #{userName} || '%'
+	    </if>
+	    <if test="teamName != null and teamName != ''">
+	        AND t.team_name LIKE '%' || #{teamName} || '%'
+	    </if>
+		ORDER BY SYSDATE DESC
 	</select>
 
 </mapper>
