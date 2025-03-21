@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.workmate.app.admin.service.AdminService;
+import com.workmate.app.common.FileHandler;
 import com.workmate.app.reservation.service.CommonItemVO;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 
 	private final AdminService adminService;
+	private final FileHandler fileHandler = new FileHandler();
 
 	// ✅ `application.properties`에서 파일 저장 경로 가져오기
 	@Value("${file.upload-dir}")
@@ -81,7 +83,7 @@ public class AdminController {
 		// ✅ 4. 파일 저장 및 DB 저장
 		try {
 			file.transferTo(dest);
-			commonItemVO.setImage(subDir + uniqueFileName); // DB에 저장될 경로
+			commonItemVO.setImage(uniqueFileName); // DB에 저장될 경로
 			adminService.inputCommonItem(commonItemVO);
 		} catch (IOException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", "🚨 파일 저장 중 오류 발생!");
@@ -107,47 +109,23 @@ public class AdminController {
 
 		// ✅ 1. 기존 데이터 조회
 		CommonItemVO existingItem = adminService.findItemById(commonItemVO);
+		// ✅ 2-2. 기존 파일 삭제 (새 파일 업로드 시)
+		if (existingItem.getImage() != null) {
+			File oldFile = new File(existingItem.getImage());
+			if (oldFile.exists()) {
+				oldFile.delete(); // 기존 파일 삭제
+				System.out.println("🗑 기존 파일 삭제됨: " + oldFile.getAbsolutePath());
+			}
+		}
 
 		// ✅ 2. 새 파일이 업로드된 경우 처리
 		if (file != null && !file.isEmpty()) {
-			try {
-				// ✅ 2-1. 파일명 설정 (UUID 사용)
-				String originalFilename = file.getOriginalFilename();
-				String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
-				List<String> allowedExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif");
-
-				if (!allowedExtensions.contains(fileExtension)) {
-					redirectAttributes.addFlashAttribute("errorMessage", "🚨 허용되지 않은 파일 형식입니다.");
-					return "redirect:commonItemList";
-				}
-
-				// ✅ 2-2. 기존 파일 삭제 (새 파일 업로드 시)
-				if (existingItem.getImage() != null) {
-					File oldFile = new File(existingItem.getImage());
-					if (oldFile.exists()) {
-						oldFile.delete(); // 기존 파일 삭제
-						System.out.println("🗑 기존 파일 삭제됨: " + oldFile.getAbsolutePath());
-					}
-				}
-
-				// ✅ 2-3. 새 파일 저장
-				String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
-				File dest = new File(uploadDir + subDir + uniqueFileName);
-				file.transferTo(dest);
-
-				// ✅ 2-4. 새 파일 경로를 commonItemVO에 저장
-				commonItemVO.setImage(subDir + uniqueFileName);
-				System.out.println("✅ 새 파일 저장 완료: " + commonItemVO.getImage());
-
-			} catch (IOException e) {
-				e.printStackTrace();
-				redirectAttributes.addFlashAttribute("errorMessage", "🚨 파일 저장 중 오류 발생!");
-				return "redirect:commonItemList";
-			}
+			fileHandler.fileUpload(file);
 		} else {
 			// ✅ 3. 새 파일이 없으면 기존 파일 유지
 			commonItemVO.setImage(existingItem.getImage());
 		}
+//		commonItemVO.setImage(uniqueFileName);
 
 		// ✅ 4. DB 업데이트 실행
 		adminService.modifyItem(commonItemVO);

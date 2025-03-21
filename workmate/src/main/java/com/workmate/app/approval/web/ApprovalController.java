@@ -157,7 +157,7 @@ public class ApprovalController {
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
             	String fileName = file.getOriginalFilename();
-            	Path filePath = Paths.get("C://CommonItemImage/apprAttach/" + fileName);
+            	Path filePath = Paths.get("C://workmate/apprAttach/" + fileName);
             	fileHandler.fileUpload(file);
                 
                 ReportAttachVO reportAttachVO = new ReportAttachVO();
@@ -291,7 +291,7 @@ public class ApprovalController {
         // 파일 저장 및 DB에 서명 정보 저장 로직 구현
         if (file != null) {
         	String fileName = file.getOriginalFilename();
-            Path filePath = Paths.get("C://CommonItemImage/sign/" + fileName);
+            Path filePath = Paths.get("C://workmate/sign/" + fileName);
             fileHandler.fileUpload(file);
             
             EmpVO myself = whoAmI();
