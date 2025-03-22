@@ -59,7 +59,7 @@ public class MailController {
             // ✅ 로그인한 사용자의 정보 가져오기
             String senderName = loginUser.getUserVO().getUserName();  // 사원 이름
             String senderEmail = loginUser.getUserVO().getUserMail(); // 사원 이메일
-
+            int userNo = loginUser.getUserVO().getUserNo();
             // ✅ 메일 전송
             mailService.sendEmail(senderName, senderEmail, recipients, subject, content);
 
@@ -149,14 +149,35 @@ public class MailController {
         mailService.moveMailsToTrash(mailIds); // 서비스 호출
         return "redirect:/mail/mailmain"; // 받은메일함으로 리다이렉트
     }
-    //휴지통
+ // 휴지통 (페이징 포함)
     @GetMapping("/mail/trash")
-    public String trashPage(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+    public String trashPage(@RequestParam(defaultValue = "1") int page,
+                            Model model,
+                            @AuthenticationPrincipal LoginUserVO loginUser) {
         int userNo = loginUser.getUserVO().getUserNo();
-        List<MailVO> trashMails = mailService.findTrashMails(userNo); // 폴더 ID 1006번
-        List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo); // 사이드바 폴더 출력용
-        model.addAttribute("trashMails", trashMails); // 반드시 있어야 함
-        model.addAttribute("myFolders", myFolders); // 사이드바에서 사용
+        int folderId = 1006; // 휴지통 폴더 ID
+        int pageSize = 10;
+
+        int totalCount = mailService.countMailsByFolder(userNo, folderId);
+        int totalPage = (int) Math.ceil((double) totalCount / pageSize);
+
+        int blockSize = 5;
+        int currentBlock = (int) Math.ceil((double) page / blockSize);
+        int startPage = (currentBlock - 1) * blockSize + 1;
+        int endPage = Math.min(startPage + blockSize - 1, totalPage);
+
+        int offset = (page - 1) * pageSize;
+
+        List<MailVO> trashMails = mailService.findMailListPaging(userNo, folderId, offset, pageSize);
+        List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
+
+        model.addAttribute("trashMails", trashMails);
+        model.addAttribute("myFolders", myFolders);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPage", totalPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "mail/trash";
     }
     //메일 완전삭제
@@ -242,37 +263,85 @@ public class MailController {
 
         return "redirect:/mail/mailmain";
     }
-    
-    //임시보관함
     @PostMapping("/mail/saveDraft")
-    @ResponseBody
-    public ResponseEntity<String> saveDraft(@RequestBody MailVO draftMail,
-                                            @AuthenticationPrincipal LoginUserVO loginUser) {
+    public String saveDraft(
+            @AuthenticationPrincipal LoginUserVO loginUser,
+            @RequestParam String senderName,
+            @RequestParam String senderEmail,
+            @RequestParam String recipients,
+            @RequestParam(required = false) String ccList,
+            @RequestParam String subject,
+            @RequestParam String content) {
+
         int userNo = loginUser.getUserVO().getUserNo();
 
-        draftMail.setUserNo(userNo);
-        draftMail.setFolderId(1003); // 임시보관함
-        draftMail.setStatus("임시저장");
-        draftMail.setEncrypted("N");
-        draftMail.setIsSpam("N");
-        draftMail.setMailType("임시");
-        draftMail.setSentAt(new Date());
+        MailVO mail = new MailVO();
+        mail.setUserNo(userNo);
+        mail.setRecipients(recipients);
+        mail.setCcList(ccList);
+        mail.setSubject(subject);
+        mail.setContent(content);
+        mail.setSentAt(new Date());
+        mail.setStatus("임시저장");
+        mail.setEncrypted("N");
+        mail.setMailType("내부");
+        mail.setIsSpam("N");
+        mail.setFolderId(1003); // 임시보관함
 
-        mailService.inputMail(draftMail);
-        return ResponseEntity.ok("Draft saved");
+        mailService.inputMail(mail);
+
+        return "redirect:/mail/draft";
     }
+    //임시보관함
     @GetMapping("/mail/draft")
-    public String draftPage(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+    public String draftPage(@AuthenticationPrincipal LoginUserVO loginUser, Model model) {
         int userNo = loginUser.getUserVO().getUserNo();
-        int folderId = 1003;
-
-        List<MailVO> drafts = mailService.findMailListByFolderId(userNo, folderId);
+        List<MailVO> mails = mailService.findMailListByFolderId(userNo, 1003);
         List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
 
-        model.addAttribute("draftMails", drafts); // ✅ draftMails 정확히 전달
+        model.addAttribute("mails", mails);
         model.addAttribute("myFolders", myFolders);
-        model.addAttribute("folderName", "임시보관함");
+        return "mail/draft";
+    }
+    //작성중이던 메일 다시쓰기
+    @GetMapping("/mail/composeDraft")
+    public String composeFromDraft(@RequestParam("mailId") int mailId, Model model) {
+        MailVO draftMail = mailService.findMailById(mailId);
+        model.addAttribute("draft", draftMail);
+        return "mail/compose"; // 기존 작성 페이지로 이동
+    }
+    
+ 
+    
+ // 스팸메일함 페이지
+    @GetMapping("/mail/spam")
+    public String spamPage(@RequestParam(defaultValue = "1") int page,
+                           Model model,
+                           @AuthenticationPrincipal LoginUserVO loginUser) {
+        int userNo = loginUser.getUserVO().getUserNo();
+        int folderId = 1004;
+        int pageSize = 10;
 
-        return "mail/draft"; // ✅ 파일명도 정확
+        int totalCount = mailService.countMailsByFolder(userNo, folderId);
+        int totalPage = (int) Math.ceil((double) totalCount / pageSize);
+
+        int blockSize = 5;
+        int currentBlock = (int) Math.ceil((double) page / blockSize);
+        int startPage = (currentBlock - 1) * blockSize + 1;
+        int endPage = Math.min(startPage + blockSize - 1, totalPage);
+
+        int offset = (page - 1) * pageSize;
+
+        List<MailVO> spamMails = mailService.findMailListPaging(userNo, folderId, offset, pageSize);
+        List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
+
+        model.addAttribute("spamMails", spamMails);
+        model.addAttribute("myFolders", myFolders);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPage", totalPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "mail/spam";
     }
 }
