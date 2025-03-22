@@ -306,31 +306,13 @@
 		for(let file of fileInput.files) {
 			formData.append('files', file);
 		}
-
-		fetch([[ @{/approval/write} ]], {
-			method: 'POST',
-			body: formData
-		})
-		.then(response => response.json())
-		.then(result => {
-			if(result.success) {
-				location.href = [[ @{/approval/waiting} ]];
-			}
-			else {
-				alert('결재등록에 실패하였습니다.');
-			}
-		})
-		.catch(error => {
-			console.error('Error:', error);
-			alert('서버 요청 중 오류가 발생했습니다.');
-		});
 		
-		/*
 		$.ajax({
 			url: [[ @{/approval/write} ]],
 			type: 'POST',
-			contentType: 'multipart/form-data'
-			data: formData
+			processData: false,  // FormData 사용 시 필수!
+		    contentType: false,  // FormData 사용 시 필수!
+			data: formData,
 			success: function(response) {
 				if(response.success) {
 					location.href = [[ @{/approval/waiting} ]];
@@ -344,7 +326,6 @@
 				alert('서버 요청 중 오류가 발생했습니다.');
 			}
 		});
-		*/
 	});
 	
 	$('#cancelBtn').on('click', function(event) {
