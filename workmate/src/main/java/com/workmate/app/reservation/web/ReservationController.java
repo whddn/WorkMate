@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.workmate.app.reservation.service.ReservationService;
 import com.workmate.app.reservation.service.ReservationVO;
@@ -33,34 +34,31 @@ public class ReservationController {
 
 	// 공용품 상세 페이지
 	@GetMapping("/reservation/detail/{commonNo}")
-	public String ReserDetail(@PathVariable Integer commonNo, Model model) throws JsonProcessingException {
+	public String reservationDetail(@PathVariable Integer commonNo, Model model) {
 	    ReservationVO vo = new ReservationVO();
 	    vo.setCommonNo(commonNo);
-	    // 1. 상세조회
+
 	    ReservationVO detailVO = reservationService.findReserById(vo);
 	    model.addAttribute("reser", detailVO);
-	    // 2. 모듈등록
+
 	    List<ReservationVO> reservedList = reservationService.findReservedTimesByCommonNo(commonNo);
-	    ObjectMapper objectMapper = new ObjectMapper();
-	    objectMapper.registerModule(new JavaTimeModule());
-	    String reservedListJson = objectMapper.writeValueAsString(reservedList);
-	    // 3. view로 보여주기
-	    model.addAttribute("reservedListJson", reservedListJson);
+	    model.addAttribute("reservedList", reservedList); // ✅ 바로 넘기기
+
 	    return "reservation/reservationDetail";
 	}
-
 	
 	// 예약 신청
-	@PostMapping("reservation/Info")
+	@PostMapping("reservation/input")
 	public String insertReserInfo(@ModelAttribute ReservationVO reservationVO) {
 	    reservationService.inputReserInfo(reservationVO);
 	    return "redirect:List";
 	}
 	
-	
-	// 예약 현황 페이지
+	// 예약 목록 페이지
 	@GetMapping("reservation/List")
 	public String myReserList(Model model) {
+		List<ReservationVO> list = reservationService.findAllmyReserList();
+		model.addAttribute("reser", list);
 		return "reservation/reservationList";
 	}
 	

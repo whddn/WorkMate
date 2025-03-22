@@ -12,6 +12,8 @@ public interface ReservationService {
 	public ReservationVO findReserById(ReservationVO reservationVO);
 	// 예약 등록
 	public ReservationVO inputReserInfo(ReservationVO reservationVO);
+	// 내 예약 목록 조회
+	public List<ReservationVO> findAllmyReserList();
 	// 수정
 	public Map<String, Object> modifyReserInfo(ReservationVO reservationVO);
 	// 삭제

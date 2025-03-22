@@ -38,7 +38,6 @@ public class ReservationImpl implements ReservationService {
 		return reservationMapper.selectReservationById(reservationVO);
 	}
 	
-	
 	// 예약 등록
 	@Transactional
 	@Override
@@ -80,19 +79,26 @@ public class ReservationImpl implements ReservationService {
 
 	// 삭제
 	@Override
-	public Map<String, Object> dropReserInfo(int commonNo) {
-		Map<String, Object> map = new HashMap<>();
-		int result = reservationMapper.deleteReservationInfo(commonNo);
-		if (result == 1) {
-			map.put("commonNo", commonNo);
-		}
-		return map;
+	public Map<String, Object> dropReserInfo(int reserNo) {
+	    int result = reservationMapper.deleteReservationInfo(reserNo);
+	    if (result > 0) {
+	        return Map.of("result", "success");
+	    } else {
+	        return null;
+	    }
 	}
+
 	
 	// 시간 중복 체크
 	@Override
 	public List<ReservationVO> findReservedTimesByCommonNo(Integer commonNo) {
 		return reservationMapper.selectReservedTimes(commonNo);
+	}
+	
+	// 내 예약 목록 조회
+	@Override
+	public List<ReservationVO> findAllmyReserList() {
+		return reservationMapper.selectmyReservationList();
 	}
 
 }
