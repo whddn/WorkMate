@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/default_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부트스트랩 캘린더</title>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">일정 관리 캘린더</h2>
+        <div id='calendar'></div>
+    </div>
+
+    <!-- 일정 추가 모달 -->
+    <div class="modal fade" id="eventModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">새 일정 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="eventTitle" class="form-control" placeholder="일정 제목">
+                    <input type="hidden" id="eventDate">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveEvent">추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let calendarEl = document.getElementById('calendar');
+            let calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ko',
+                selectable: true,
+                editable: true,
+                events: [],
+                dateClick: function(info) {
+                    document.getElementById('eventDate').value = info.dateStr;
+                    new bootstrap.Modal(document.getElementById('eventModal')).show();
+                },
+                eventClick: function(info) {
+                    if (confirm("이 일정을 삭제하시겠습니까?")) {
+                        info.event.remove();
+                    }
+                }
+            });
+            calendar.render();
+
+            document.getElementById('saveEvent').addEventListener('click', function() {
+                let title = document.getElementById('eventTitle').value;
+                let date = document.getElementById('eventDate').value;
+                if (title) {
+                    calendar.addEvent({ title: title, start: date });
+                    document.getElementById('eventTitle').value = '';
+                    bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
