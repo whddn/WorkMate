@@ -63,7 +63,7 @@ public interface EmpMapper {
 	// 나의 평가 단순 조회 단건 조회
 	public List<EvaluVO> selectMyEvaluResultById(EvaluVO evaluVO);
 
-	// 개인 평가 진행 (평가할 페이지 - 쿼리문 없음)
+	// 개인 평가 진행 (평가할 페이지)
 	public List<EvaluVO> selectOneEvaluById(EvaluVO evaluVO);
 
 	// 평가한 거 등록 기능 (쿼리문 없음)
