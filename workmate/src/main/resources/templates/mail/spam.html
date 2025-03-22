@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{common/layouts/mail_layout}"
+      layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>스팸메일함 | WorkMate</title>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="mb-4">스팸메일함</h2>
+
+    <!-- 검색창 -->
+    <div class="input-group w-25 mb-3">
+        <input type="text" id="searchBox" class="form-control" placeholder="검색...">
+        <button class="btn btn-secondary" onclick="searchTable()">검색</button>
+    </div>
+
+    <!-- 삭제/이동 -->
+    <div class="d-flex gap-2 mb-2">
+        <form id="deleteForm" th:action="@{/mail/deleteSelected}" method="post">
+            <button class="btn btn-danger btn-sm" type="button" onclick="submitDelete()">삭제</button>
+            <input type="hidden" name="mailIds" id="selectedMailIds">
+        </form>
+
+        <div class="btn-group">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                이동
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1001)">받은메일함</a></li>
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1002)">보낸메일함</a></li>
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1006)">휴지통</a></li>
+                <li th:each="folder : ${myFolders}">
+                    <a class="dropdown-item" href="#"
+                       th:text="${folder.folderName}"
+                       th:onclick="'moveToFolder(' + ${folder.folderId} + ')'">
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 이동 폼 -->
+        <form id="moveForm" method="post" th:action="@{/mail/moveSelected}">
+            <input type="hidden" name="mailIds" id="moveMailIds">
+            <input type="hidden" name="targetFolderId" id="targetFolderId">
+        </form>
+    </div>
+
+    <!-- 메일 리스트 -->
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>보낸 사람</th>
+            <th>제목</th>
+            <th>수신자</th>
+            <th>날짜</th>
+        </tr>
+        </thead>
+        <tbody id="mailBody">
+        <tr th:if="${#lists.isEmpty(spamMails)}">
+            <td colspan="5" class="text-center">스팸 메일이 없습니다.</td>
+        </tr>
+        <tr th:each="mail : ${spamMails}" class="mail-row">
+            <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
+            <td th:text="${mail.recipients}"></td>
+            <td><a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}"></a></td>
+            <td th:text="${mail.recipients}"></td>
+            <td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이징 -->
+    <div class="d-flex justify-content-center mt-3">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/mail/spam(page=1)}">&laquo;</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/mail/spam(page=${currentPage - 1})}">&lt;</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/mail/spam(page=${i})}" th:text="${i}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
+                <a class="page-link" th:href="@{/mail/spam(page=${currentPage + 1})}">&gt;</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
+                <a class="page-link" th:href="@{/mail/spam(page=${totalPage})}">&raquo;</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function searchTable() {
+        const keyword = document.getElementById("searchBox").value.toLowerCase();
+        const rows = document.querySelectorAll("#mailBody .mail-row");
+
+        rows.forEach(row => {
+            const sender = row.cells[1].textContent.toLowerCase();
+            const subject = row.cells[2].textContent.toLowerCase();
+            row.style.display = (sender.includes(keyword) || subject.includes(keyword)) ? "" : "none";
+        });
+    }
+
+    function submitDelete() {
+        const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
+        if (selected.length === 0) {
+            alert("삭제할 메일을 선택하세요.");
+            return;
+        }
+        const ids = selected.map(cb => cb.value).join(",");
+        document.getElementById("selectedMailIds").value = ids;
+        document.getElementById("deleteForm").submit();
+    }
+
+    function moveToFolder(folderId) {
+        const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
+        if (selected.length === 0) {
+            alert("이동할 메일을 선택하세요.");
+            return;
+        }
+        const ids = selected.map(cb => cb.value).join(",");
+        document.getElementById("moveMailIds").value = ids;
+        document.getElementById("targetFolderId").value = folderId;
+        document.getElementById("moveForm").submit();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAll = document.getElementById("selectAll");
+        const checkboxes = document.querySelectorAll(".mail-checkbox");
+
+        selectAll.addEventListener("change", function () {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        });
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", function () {
+                selectAll.checked = [...checkboxes].every(cb => cb.checked);
+            });
+        });
+    });
+</script>
+</body>
+</html>

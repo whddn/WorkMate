@@ -58,14 +58,6 @@ public class ApprovalController {
 	private final FileHandler fileHandler = new FileHandler();
 	private final WhoAmI whoAmI = new WhoAmI();
 	
-	/*
-	private EmpVO whoAmI() {
-		EmpVO empVO = new EmpVO();
-		empVO.setUserNo(whoAmI.whoAmI().getUserNo());
-		return empService.findEmpByEmpNo(empVO);
-	}
-	*/
-	
 	// 결재를 기다리는 문서 리스트를 보여준다(자신과 관련된)
 	@GetMapping("approval/waiting")
 	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam(defaultValue = "fromMe") String standard) {

@@ -2,14 +2,15 @@ package com.workmate.app.employee.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.employee.mapper.EmpMapper;
-import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
@@ -176,12 +177,25 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.selectMyEvaluList(evaluVO);
 	}
 	
-	// 평가 (단건 조회)
 	@Override
 	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO) {
-		
-		return empMapper.selectOneEvaluById(evaluVO);
-	} 
+	    List<EvaluVO> evaluList = empMapper.selectOneEvaluById(evaluVO);
 
-	
+	    Set<String> uniqueKeys = new HashSet<>();
+	    List<EvaluVO> uniqueEvaluList = new ArrayList<>();
+
+	    for (EvaluVO evalu : evaluList) {
+	        String uniqueKey = evalu.getEvaluCompet() + "|" + evalu.getEvaluContent();
+
+	        if (uniqueKeys.add(uniqueKey)) { // add()는 중복이면 false 반환
+	            uniqueEvaluList.add(evalu);
+	        }
+	    }
+	    for (EvaluVO vo : uniqueEvaluList) {
+	        System.out.println("🧪 user=" + vo.getUserName() + ", team=" + vo.getTeamName());
+	    }
+
+	    return uniqueEvaluList;
+	}
+
 }

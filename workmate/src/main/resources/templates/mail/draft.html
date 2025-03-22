@@ -5,7 +5,7 @@
       layout:fragment="content">
 <head>
     <meta charset="UTF-8">
-    <title>받은 메일함 | WorkMate</title>
+    <title>임시보관함 | WorkMate</title>
     <style>
         .w-25 {
             margin-left: 70%;
@@ -19,7 +19,7 @@
 
 <body>
 <div class="container mt-4">
-    <h2 class="mb-4">받은 메일함</h2>
+    <h2 class="mb-4">임시보관함</h2>
 
     <!-- 🔍 검색창 -->
     <div class="input-group w-25">
@@ -29,15 +29,15 @@
 
     <div class="card mt-3">
         <div class="card-body">
-            <!--  삭제 + 이동 영역 -->
+            <!-- 삭제 및 이동 -->
             <div class="asd d-flex gap-2">
-                <!-- 삭제 폼 -->
+                <!-- 삭제 -->
                 <form id="deleteForm" method="post" th:action="@{/mail/deleteSelected}">
                     <button class="btn btn-danger btn-sm" type="button" onclick="submitDelete()">삭제</button>
                     <input type="hidden" name="mailIds" id="selectedMailIds">
                 </form>
 
-                <!--  이동 버튼 (드롭다운) -->
+                <!-- 이동 드롭다운 -->
                 <div class="btn-group">
                     <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                         이동
@@ -46,12 +46,11 @@
                         <li><a class="dropdown-item" href="#" onclick="moveToFolder(1001)">받은메일함</a></li>
                         <li><a class="dropdown-item" href="#" onclick="moveToFolder(1002)">보낸메일함</a></li>
                         <li><a class="dropdown-item" href="#" onclick="moveToFolder(1006)">휴지통</a></li>
-
-                        <!--  내가 만든 폴더 추가 -->
                         <li th:each="folder : ${myFolders}">
                             <a class="dropdown-item" href="#"
                                th:text="${folder.folderName}"
-                               th:onclick="'moveToFolder(' + ${folder.folderId} + ')'"></a>
+                               th:onclick="'moveToFolder(' + ${folder.folderId} + ')'">
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -63,96 +62,61 @@
                 </form>
             </div>
 
-            <!--  메일 목록 테이블 -->
-            <table id="mailTable" class="table table-striped table-bordered mt-2">
+            <!-- 메일 리스트 -->
+            <table class="table table-striped table-bordered mt-2" id="mailTable">
                 <thead>
                 <tr>
                     <th><input type="checkbox" id="selectAll"></th>
-                    <th>보낸 사람</th>
+                    <th>받는 사람</th>
                     <th>제목</th>
-                    <th>첨부</th>
-                    <th>날짜</th>
+                    <th>작성 시간</th>
+                    <th>작성 이어하기</th>
                 </tr>
                 </thead>
                 <tbody id="mailBody">
-                <tr th:if="${#lists.isEmpty(receivedMails)}">
-                    <td colspan="5" class="text-center">받은 메일이 없습니다.</td>
+                <tr th:if="${#lists.isEmpty(mails)}">
+                    <td colspan="5" class="text-center">임시 저장된 메일이 없습니다.</td>
                 </tr>
-
-                <tr th:each="mail : ${receivedMails}" class="mail-row">
+                <tr th:each="mail : ${mails}" class="mail-row">
                     <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
-                    <td th:text="${mail.senderEmail}"></td>
-                    <td>
-                        <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}"></a>
-                    </td>
-                    <td th:if="${mail.attachmentCount > 0}">📎</td>
-                    <td th:if="${mail.attachmentCount == 0}"></td>
-                    <td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${mail.recipients}">이메일</td>
+                    <td th:text="${mail.subject}">제목</td>
+                    <td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
+                    <td><a th:href="@{/mail/composeDraft(mailId=${mail.mailId})}" class="btn btn-outline-primary btn-sm">작성 계속</a></td>
                 </tr>
                 </tbody>
             </table>
-
-            <!-- 📄 페이지네이션 -->
-            <div class="d-flex justify-content-center mt-3">
-                <ul class="pagination">
-                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=1)}">&laquo;</a>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${currentPage - 1})}">&lt;</a>
-                    </li>
-
-                    <!-- 🔢 페이지 블록 단위 출력 -->
-                    <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                        class="page-item"
-                        th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${i})}" th:text="${i}"></a>
-                    </li>
-
-                    <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${currentPage + 1})}">&gt;</a>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
-                        <a class="page-link" th:href="@{/mail/mailmain(page=${totalPage})}">&raquo;</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </div>
 </div>
 
-<!-- 📜 JavaScript -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const selectAllCheckbox = document.getElementById("selectAll");
+        const selectAll = document.getElementById("selectAll");
         const checkboxes = document.querySelectorAll(".mail-checkbox");
 
-        selectAllCheckbox.addEventListener("change", function () {
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
-            });
+        selectAll.addEventListener("change", function () {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
         });
 
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener("change", function () {
-                selectAllCheckbox.checked = [...checkboxes].every(cb => cb.checked);
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", function () {
+                selectAll.checked = [...checkboxes].every(cb => cb.checked);
             });
         });
     });
 
-    // 🔍 검색
     function searchTable() {
-        let input = document.getElementById("searchBox").value.toLowerCase();
-        let rows = document.querySelectorAll("#mailBody .mail-row");
+        const keyword = document.getElementById("searchBox").value.toLowerCase();
+        const rows = document.querySelectorAll("#mailBody .mail-row");
 
         rows.forEach(row => {
-            let recipient = row.cells[1].textContent.toLowerCase();
-            let subject = row.cells[2].textContent.toLowerCase();
-            row.style.display = (recipient.includes(input) || subject.includes(input)) ? "" : "none";
+            const recipient = row.cells[1].textContent.toLowerCase();
+            const subject = row.cells[2].textContent.toLowerCase();
+            row.style.display = (recipient.includes(keyword) || subject.includes(keyword)) ? "" : "none";
         });
     }
 
-    // 🗑 선택 삭제
     function submitDelete() {
         const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
         if (selected.length === 0) {
@@ -164,7 +128,6 @@
         document.getElementById("deleteForm").submit();
     }
 
-    // 📁 선택 이동
     function moveToFolder(folderId) {
         const selected = [...document.querySelectorAll(".mail-checkbox:checked")];
         if (selected.length === 0) {

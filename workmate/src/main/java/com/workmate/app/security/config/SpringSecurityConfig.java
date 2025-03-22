@@ -34,7 +34,7 @@ public class SpringSecurityConfig {
 
 
 					.requestMatchers("/admin/**").permitAll() // 권한있는 사용자,관리자 접근 허용
-					.anyRequest().permitAll() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능
+					.anyRequest().authenticated() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능
 
 
 			)                                 //authenticated 넣을시 권한에 따라 페이지 접근 가능 로그인 필수
