@@ -44,4 +44,9 @@ public class MainscreenController {
 	public List<MenuVO> postSearchStart(@RequestBody MenuVO menuVO) {
 		return menuService.findMenuList(menuVO);
 	}
+	
+	@GetMapping("/calendar")
+	public String getCalendar(Model model) {
+		return "mainscreen/calendar";
+	}
 }
