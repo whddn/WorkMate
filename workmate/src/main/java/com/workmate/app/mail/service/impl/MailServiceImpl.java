@@ -51,7 +51,7 @@ public class MailServiceImpl implements MailService {
 
     // 이메일 전송
     @Override
-    public void sendEmail(String senderName, String senderEmail, String toEmail, String subject, String content) throws MessagingException {
+    public void sendEmail(String senderName, String senderEmail,  String toEmail, String subject, String content) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -119,7 +119,7 @@ public class MailServiceImpl implements MailService {
 		return mailMapper.findSentMailById(mailId);
 	}
 	//스프링 스케쥴러
-		//@Scheduled(fixedDelay = 300000) // 5분마다 실행 (ms 단위: 300,000ms = 5분)
+		@Scheduled(fixedDelay = 300000) // 5분마다 실행 (ms 단위: 300,000ms = 5분)
 		public void scheduledFetchEmails() {
 		    System.out.println("⏰ [스케쥴러] 외부 메일 자동 수신 실행 중...");
 		    fetchAndStoreEmails();
@@ -160,18 +160,23 @@ public class MailServiceImpl implements MailService {
 	                System.out.println("⚠️ 사원 찾을 수 없음: " + recipientEmail);
 	                continue;
 	            }
-
+	            // 🔥 스팸 필터링 로직 추가
+	            String content = getContent(message);
+	            String subject = message.getSubject();
+	            boolean isSpam = isSpamMail(subject, content);
+	            String senderEmail = extractEmail(((InternetAddress) message.getFrom()[0]).toString());
 	            // ✅ 해당 사원 메일함에 저장
 	            MailVO mail = new MailVO();
 	            mail.setUserNo(userNo); // ✔️ 해당 사원 번호로 저장
 	            mail.setRecipients(recipientEmail);
+	            mail.setSenderEmail(senderEmail);
 	            mail.setSubject(message.getSubject());
 	            mail.setContent(getContent(message));
 	            mail.setSentAt(message.getSentDate());
 	            mail.setStatus("수신됨");
-	            mail.setFolderId(1001); // 받은메일함
+	            mail.setFolderId(isSpam ? 1004 : 1001); // 스팸이면 1004로 분류
 	            mail.setMailType("외부");
-	            mail.setIsSpam("N");
+	            mail.setIsSpam(isSpam ? "Y" : "N");
 	            mail.setEncrypted("N");
 
 	            mailMapper.insertMail(mail);
@@ -183,12 +188,18 @@ public class MailServiceImpl implements MailService {
 	        System.out.println("❌ 외부메일 수신 실패: " + e.getMessage());
 	    }
 	}
-    
+	// 스팸 판단 메서드 추가
+	private boolean isSpamMail(String subject, String content) {
+	    List<String> spamKeywords = List.of("viagra", "무료", "도박", "카지노", "click here", "성인", "축하합니다");
+	    String combined = (subject + " " + content).toLowerCase();
+	    return spamKeywords.stream().anyMatch(combined::contains);
+	}
 	/**
 	 * 🔹 메일 본문 가져오는 메서드 (텍스트/HTML 처리 가능)
 	 */
 	private String getContent(Message message) {
 	    try {
+	    	System.out.println(message);
 	        if (message.isMimeType("text/plain")) {
 	            return (String) message.getContent();
 	        } else if (message.isMimeType("multipart/*")) {
@@ -287,9 +298,9 @@ public class MailServiceImpl implements MailService {
 	public void inputMail(MailVO mail) {
 	    mailMapper.insertMail(mail);
 	}
-	// 임시보관함 = 1003
+//스팸
 	@Override
-	public List<MailVO> findDraftMails(int userNo) {
-	    return mailMapper.selectDraftMails(userNo); 
+	public List<MailVO> findSpamMails(int userNo) {
+	    return mailMapper.findSpamMails(userNo);
 	}
 }

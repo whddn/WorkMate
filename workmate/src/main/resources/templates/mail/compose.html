@@ -1,112 +1,132 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/mail_layout}"
-	layout:fragment="content">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/mail_layout}"
+      layout:fragment="content">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>메일 쓰기 | KaiAdmin Lite</title>
-<!-- Quill 에디터 -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-<style>
-.form-group {
-	margin-bottom: 15px;
-}
-
-#editor-container {
-	height: 500px;
-	background: white;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>메일 쓰기 | WorkMate</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+        .form-group { margin-bottom: 15px; }
+        #editor-container {
+            height: 500px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-	<div class="container mt-4">
-		<h2 class="mb-4">메일 쓰기</h2>
-		<form id="mailForm" th:action="@{/mail/send}" method="post" enctype="multipart/form-data">
-			<!-- ✅ 보내는 사람 정보 -->
-			<div class="form-group">
-				<label for="senderName">보내는 사람</label>
-				<div class="input-group">
-					<input type="text" id="senderName" name="senderName" class="form-control" 
-						th:value="${#authentication.principal.userVO.userName}" readonly>
-					<input type="text" id="senderEmail" name="senderEmail" class="form-control" 
-						th:value="${#authentication.principal.userVO.userMail}" readonly>
-				</div>
-			</div>
+<div class="container mt-4">
+    <h2 class="mb-4">메일 쓰기</h2>
 
-			<div class="form-group">
-				<label for="recipients">받는 사람</label> 
-				<input type="text" id="recipients" name="recipients" class="form-control" placeholder="쉼표(,)로 구분" required>
-			</div>
-			<div class="form-group">
-				<label for="ccList">참조</label> 
-				<input type="text" id="ccList" name="ccList" class="form-control" placeholder="쉼표(,)로 구분">
-			</div>
-			<div class="form-group">
-				<label for="subject">제목</label> 
-				<input type="text" id="subject" name="subject" class="form-control" required>
-			</div>
-			<div class="mb-3">
-				<label>본문</label>
-				<div id="editor-container"></div>
-				<input type="hidden" id="content" name="content">
-			</div>
-			<div class="form-group">
-				<label for="attachments">첨부 파일</label> 
-				<input type="file" id="attachments" name="attachments" class="form-control" multiple>
-			</div>
-			<button type="submit" class="btn btn-primary">보내기</button>
-			<button type="button" class="btn btn-secondary" onclick="saveDraft()">임시 저장</button>
-		</form>
-	</div>
+    <!-- ✅ 보내기 폼 -->
+    <form id="sendForm" th:action="@{/mail/send}" method="post" enctype="multipart/form-data" onsubmit="return prepareContent('send')">
+        <div class="form-group">
+            <label>보내는 사람</label>
+            <div class="input-group">
+                <input type="text" name="senderName" class="form-control" th:value="${#authentication.principal.userVO.userName}" readonly>
+                <input type="text" name="senderEmail" class="form-control" th:value="${#authentication.principal.userVO.userMail}" readonly>
+            </div>
+        </div>
 
-	<script>
-		// Quill 에디터 초기화
-		var quill = new Quill('#editor-container', {
-			theme: 'snow',
-			placeholder: '메일 내용을 입력하세요...'
-		});
+        <div class="form-group">
+            <label for="recipients">받는 사람</label>
+            <input type="text" id="recipients" name="recipients" class="form-control" placeholder="쉼표(,)로 구분"
+                   th:value="${draft != null} ? ${draft.recipients} : ''" required>
+        </div>
 
-		// 폼 제출 시 에디터 내용을 숨은 필드에 저장
-		document.getElementById('mailForm').addEventListener('submit', function() {
-			document.getElementById('content').value = quill.root.innerHTML;
-		});
+        <div class="form-group">
+            <label for="ccList">참조</label>
+            <input type="text" id="ccList" name="ccList" class="form-control" placeholder="쉼표(,)로 구분"
+                   th:value="${draft != null} ? ${draft.ccList} : ''">
+        </div>
 
-		// 임시 저장 기능
-		function saveDraft() {
-			let senderName = document.getElementById("senderName").value;
-			let senderEmail = document.getElementById("senderEmail").value;
-			let recipients = document.getElementById("recipients").value;
-			let ccList = document.getElementById("ccList").value;
-			let subject = document.getElementById("subject").value;
-			let content = quill.root.innerHTML;
+        <div class="form-group">
+            <label for="subject">제목</label>
+            <input type="text" id="subject" name="subject" class="form-control"
+                   th:value="${draft != null} ? ${draft.subject} : ''" required>
+        </div>
 
-			// AJAX 요청 (임시 저장)
-			fetch('/mail/saveDraft', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					senderName: senderName,
-					senderEmail: senderEmail,
-					recipients: recipients,
-					ccList: ccList,
-					subject: subject,
-					content: content
-				})
-			}).then(response => response.json())
-			.then(data => {
-				alert("임시 저장 완료!");
-			}).catch(error => {
-				console.error('Error:', error);
-				alert("임시 저장 실패!");
-			});
-		}
-	</script>
+        <div class="mb-3">
+            <label>본문</label>
+            <div id="editor-container"></div>
+            <input type="hidden" id="content" name="content" />
+        </div>
+
+        <div class="form-group">
+            <label for="attachments">첨부 파일</label>
+            <input type="file" id="attachments" name="attachments" class="form-control" multiple>
+        </div>
+    </form>
+
+    <!-- ✅ 임시저장 폼 -->
+    <form id="draftForm" th:action="@{/mail/saveDraft}" method="post" enctype="multipart/form-data" onsubmit="return prepareContent('draft')">
+        <input type="hidden" name="senderName" th:value="${#authentication.principal.userVO.userName}" />
+        <input type="hidden" name="senderEmail" th:value="${#authentication.principal.userVO.userMail}" />
+        <input type="hidden" id="draftRecipients" name="recipients">
+        <input type="hidden" id="draftCcList" name="ccList">
+        <input type="hidden" id="draftSubject" name="subject">
+        <input type="hidden" id="draftContent" name="content">
+    </form>
+
+    <!-- ✅ 버튼 영역 -->
+    <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-primary" form="sendForm">보내기</button>
+        <button type="submit" class="btn btn-secondary" form="draftForm">임시 저장</button>
+    </div>
+</div>
+
+<script>
+    // Quill 초기화
+    var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: '메일 내용을 입력하세요...'
+    });
+
+    let isFormDirty = false;
+
+    // ✅ 에디터 내용 세팅 (임시보관 불러오기 시)
+    document.addEventListener("DOMContentLoaded", function () {
+        /* 서버에서 본문 HTML 넘어올 경우 넣기 */
+        const draftContent = /*[[${draft != null} ? ${draft.content} : '']]*/ '';
+        if (draftContent) {
+            quill.root.innerHTML = draftContent;
+        }
+    });
+
+    // 변경 감지
+    document.querySelectorAll('#recipients, #ccList, #subject').forEach(input => {
+        input.addEventListener('input', () => isFormDirty = true);
+    });
+    quill.on('text-change', () => isFormDirty = true);
+
+    // 페이지 이탈 방지
+    window.addEventListener("beforeunload", function (e) {
+        if (isFormDirty) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    function prepareContent(mode) {
+        const html = quill.root.innerHTML;
+
+        if (mode === 'send') {
+            document.getElementById('content').value = html;
+        } else if (mode === 'draft') {
+            document.getElementById('draftRecipients').value = document.getElementById('recipients').value;
+            document.getElementById('draftCcList').value = document.getElementById('ccList').value;
+            document.getElementById('draftSubject').value = document.getElementById('subject').value;
+            document.getElementById('draftContent').value = html;
+        }
+
+        window.removeEventListener("beforeunload", () => {});
+        isFormDirty = false;
+        return true;
+    }
+</script>
 </body>
 </html>

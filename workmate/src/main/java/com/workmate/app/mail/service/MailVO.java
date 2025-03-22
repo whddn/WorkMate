@@ -23,4 +23,5 @@ public class MailVO {
 	private Date reserSendtime; //에약된 발송시간
 	private String reserStatus; //예약상태
 	private int folderId; //폴더ID
+	private String senderEmail;  // 외부 보낸 사람 이메일
 }
