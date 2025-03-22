@@ -1,5 +1,6 @@
 package com.workmate.app.employee.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,7 +228,7 @@ public class EmpController {
 			evaluVO.setEvaluFormNo(evaNo); 
 			evaluVO.setUserNo(userNo);
 			List<EvaluVO> oneEvalu = empService.findMyEvaluProcess(evaluVO);
-			model.addAttribute("one", oneEvalu);
+			model.addAttribute("evaluList", oneEvalu);
 			return "evalu/evalu";
 		}
 
