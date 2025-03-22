@@ -1,49 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper
-	namespace="com.workmate.app.reservation.mapper.ReservationMapper">
+<mapper	namespace="com.workmate.app.reservation.mapper.ReservationMapper">
 	<!-- 공용품 목록 전체조회 -->
 	<select id="selectReservationList" resultType="ReservationVO">
 		SELECT
-			 r.user_no
-			,r.reser_no
-			,r.usage_status
-			,c.name as commonName
-			,c.common_no
-			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS reser_start_time
-			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS reser_end_time
-			,r.reser_date
-			,c.common_kind
-			,c.image
-			,c.content
-		FROM common_Item c
-			LEFT JOIN reser r ON r.common_no = c.common_no
-			LEFT JOIN employee e ON r.user_no = e.user_no
+		     c.common_no,
+		     c.name AS commonName,
+		     c.common_kind,
+		     c.image,
+		     c.content
+		FROM common_item c
+		ORDER BY c.common_no
 	</select>
 
 	<!-- 공용품 목록 단건 조회 -->
 	<select id="selectReservationById" resultType="ReservationVO" parameterType="ReservationVO">
 		SELECT
-			 r.user_no
-			,r.reser_no
-			,r.usage_status
-			,c.name as commonName
-			,c.common_no
-			,TO_CHAR(c.reser_start_time, 'HH24:MI') AS reser_start_time
-			,TO_CHAR(c.reser_end_time, 'HH24:MI') AS reser_end_time
-			,c.date_select
-			,c.common_kind
-			,c.image
-			,c.content
-		FROM common_Item c
-			LEFT JOIN reser r ON r.common_no = c.common_no
-			LEFT JOIN employee e ON r.user_no = e.user_no
-		 WHERE c.common_no = #{commonNo} AND ROWNUM = 1
+		     c.common_no,
+		     c.name AS commonName,
+		     c.common_kind,
+		     c.image,
+		     c.content,
+		     c.date_select
+		FROM common_item c
+		WHERE c.common_no = #{commonNo}
+
+	</select>
+	
+	<!-- 예약 목록 조회 -->
+	<select id="selectmyReservationList" resultType="ReservationVO">
+		SELECT
+		      common_kind
+		      ,common_name
+		      ,reser_date
+		      ,reser_start_time
+		      ,reser_end_time
+		      ,usage_status
+		      ,reser_no
+		      ,content
+		from reser
+		order by reser_start_time
 	</select>
 	
 	<!-- 시간 중복체크 -->
 	<select id="selectReservedTimes" resultType="ReservationVO">
-	    SELECT reser_date, reser_start_time, reser_end_time
+	    SELECT	reser_date
+	     	   ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_start_time
+			   ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_end_time
 	    FROM reser
 	    WHERE common_no = #{commonNo}
 	</select>
@@ -94,8 +97,11 @@
 		    ,usage_status = #{usageStatus}
 		where reser_no = #{reserNo}
 	</update>
-	
 
 	<!-- 예약삭제 -->
+	<delete id="deleteReservationInfo" parameterType="int">
+		delete from reser
+		where reser_no = #{reserNo}
+	</delete>
 
 </mapper>

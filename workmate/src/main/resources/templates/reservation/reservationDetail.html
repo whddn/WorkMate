@@ -7,8 +7,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>예약 상세 정보</title>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
 
-<link rel="stylesheet"	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
 
 <style>
 .container {
@@ -65,224 +66,257 @@
 	background-color: #007bff;
 	color: white;
 }
+
+.time-slot.disabled {
+	background-color: #ddd !important;
+	color: #888;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.fc-daygrid-day {
+	cursor: pointer !important;
+}
 </style>
 </head>
 <body>
-<form th:action="@{/reservation/Info}"
-						 method="POST" enctype="multipart/form-data">
-	<div class="container mt-5">
-		<div class="row equal-height">
-			<!-- ✅ 캘린더 영역 -->
-			<div class="col-md-6">
-				<div class="card shadow-sm">
-					<div class="card-header bg-primary text-white text-center">예약 진행 중</div>
-					<div class="card-body">
-						<div id="calendar">
+	<form th:action="@{/reservation/input}" method="POST"
+		name="reservationForm">
+		<div class="container mt-5">
+			<div class="row equal-height">
+				<!-- ✅ 캘린더 영역 -->
+				<div class="col-md-6">
+					<div class="card shadow-sm">
+						<div class="card-header bg-primary text-white text-center">예약
+							진행 중</div>
+						<div class="card-body">
+							<div id="calendar"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ✅ 시간 선택 영역 -->
+				<div class="col-md-6">
+					<div class="card shadow-sm">
+						<div class="card-header bg-primary text-white text-center">시간
+							선택</div>
+						<div class="card-body">
+							<button type="button" class="btn btn-outline-primary btn-sm mb-3"
+								onclick="toggleAllTimes()">전체 선택</button>
+							<div class="time-table">
+								<th:block th:each="hour : ${#numbers.sequence(6, 23)}">
+									<div class="time-slot" th:id="'time'+${hour}"
+										th:data-value="${hour}" onclick="toggleTime(this)">
+										<span th:text="${hour + ':00 - ' + (hour) + ':59'}">
+										</span>
+									</div>
+								</th:block>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- ✅ 시간 선택 영역 -->
-			<div class="col-md-6">
-				<div class="card shadow-sm">
-					<div class="card-header bg-primary text-white text-center">시간 선택</div>
-					<div class="card-body">
-						<button type="button" class="btn btn-outline-primary btn-sm mb-3" onclick="toggleAllTimes()">전체 선택</button>
-						<div class="time-table">
-							<th:block th:each="hour : ${#numbers.sequence(6, 23)}">
-								<div class="time-slot" th:id="'time'+${hour}" th:data-value="${hour + ':00 - ' + (hour+1) + ':00'}"
-									onclick="toggleTime(this)">
-									<span th:text="${hour + ':00 - ' + (hour+1) + ':00'}">
-									</span>
-								</div>
-							</th:block>
+			<div class="row equal-height mt-3">
+				<!-- ✅ 이미지 영역 -->
+				<div class="col-md-6">
+					<div class="card shadow-sm">
+						<div class="card-body text-center">
+							<img th:src="|/workmate/upload/${reser.image}|" name="image"
+								id="reser-image" alt="예약 이미지">
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
 
-		<div class="row equal-height mt-3">
-			<!-- ✅ 이미지 영역 -->
-			<div class="col-md-6">
-				<div class="card shadow-sm">
-					<div class="card-body text-center">
-						<img th:src="|/workmate/upload/${reser.image}|" name="image" id="reser-image" alt="예약 이미지">
-					</div>
-				</div>
-			</div>
-
-			<!-- ✅ 예약 정보 입력 영역 -->
-			<div class="col-md-6">
-				<div class="card shadow-sm">
-					<div class="card-header bg-success text-white text-center">예약 정보 입력</div>
-					<div class="card-body">
+				<!-- ✅ 예약 정보 입력 영역 -->
+				<div class="col-md-6">
+					<div class="card shadow-sm">
+						<div class="card-header bg-success text-white text-center">예약
+							정보 입력</div>
+						<div class="card-body">
 							<!-- 서버로 넘겨줄 데이터들 -->
-							<input type="hidden" name="commonNo" id="commonNo" th:value="${reser.commonNo}" />
-							<input type="hidden" name="userNo" id="userNo" th:value="${reser.userNo}" />
-							<input type="hidden" name="reserStartTime" id="reserStartTime" />
-							<input type="hidden" name="reserEndTime" id="reserEndTime" />
+							<input type="hidden" name="commonNo" id="commonNo"
+								th:value="${reser.commonNo}" /> <input type="hidden"
+								name="userNo" id="userNo" th:value="${reser.userNo}" /> <input
+								type="hidden" name="reserStartTime" id="reserStartTime" /> <input
+								type="hidden" name="reserEndTime" id="reserEndTime" />
 
-							
 							<div class="mb-3">
-								<label class="form-label">공용품 종류</label>
-								 <input type="text"	class="form-control" name="commonKind"
-								  id="reser-category" th:value="${reser.commonKind}" readonly>
+								<label class="form-label">공용품 종류</label> <input type="text"
+									class="form-control" name="commonKind" id="reser-category"
+									th:value="${reser.commonKind}" readonly>
 							</div>
 							<div class="mb-3">
-								<label class="form-label">이름</label>
-								 <input type="text" class="form-control" name="commonName"
-								  id="reser-name" th:value="${reser.commonName}" readonly>
+								<label class="form-label">이름</label> <input type="text"
+									class="form-control" name="commonName" id="reser-name"
+									th:value="${reser.commonName}" readonly>
 							</div>
 							<div class="mb-3">
-								<label class="form-label">이용 날짜</label>
-								 <input type="date"	class="form-control" name="reserDate">
+								<label class="form-label">이용 날짜</label> <input type="date"
+									class="form-control" name="reserDate">
 							</div>
 							<div class="mb-3">
 								<label class="form-label">예약 내용</label>
-								<textarea class="form-control" name="content"
-									rows="3" placeholder="예약 목적을 입력하세요"  th:text="${reser.content}">
-								</textarea>
+								<textarea class="form-control" name="content" required rows="3" placeholder="예약 목적을 입력하세요"></textarea>
 							</div>
 							<div class="text-center">
 								<button type="submit" class="btn btn-success">예약하기</button>
 								<button type="reset" class="btn btn-danger">취소</button>
 							</div>
-						
+						</div>
 					</div>
 				</div>
+
+
 			</div>
 		</div>
-	</div>
-</form>
+	</form>
 	<!-- ✅ JavaScript -->
-	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
-	<script>
-    
-	document.addEventListener("DOMContentLoaded", function () {
-	    loadCalendar();
-	});
-	
-	// 캘린더
-	function loadCalendar() {
-	    var calendarEl = document.getElementById('calendar');
-	    var calendar = new FullCalendar.Calendar(calendarEl, {
-	        locale: 'ko',
-	        initialView: 'dayGridMonth',
-	        selectable: true,
-	        editable: false,
-	        height: 350,
-	        events: function (fetchInfo, successCallback, failureCallback) {
-	            fetch(`/api/reservation/main`)  // ✅ REST API를 호출하여 예약 데이터 가져오기
-	                .then(response => response.json())
-	                .then(data => {
-	                    let events = data.map(reservation => ({
-	                        title: reservation.title,
-	                        start: reservation.start,
-	                        backgroundColor: '#28a745',
-	                        borderColor: '#28a745'
-	                    }));
-	                    successCallback(events);
-	                })
-	                .catch(error => {
-	                    console.error('예약 데이터를 불러오는 중 오류 발생:', error);
-	                    failureCallback(error);
-	                });
-	        },
-	        dateClick: function (info) {
-	            document.querySelector('input[name="reserDate"]').value = info.dateStr;
-	        }
-	    });
-	    calendar.render();
-	}
-	
-	// 시간 선택
-    function toggleTime(element) {
-        element.classList.toggle("selected");
-    }
+	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
 
-	// 모든 시간 선택
-    function toggleAllTimes() {
-        const timeSlots = document.querySelectorAll(".time-slot");
-        const allSelected = Array.from(timeSlots).every(slot => slot.classList.contains("selected"));
-        timeSlots.forEach(slot => {
-            if (allSelected) {
-                slot.classList.remove("selected");
-            } else {
-                slot.classList.add("selected");
-            }
-        });
-    }
-</script>
 	<!-- ✅ 1. reservedList 넘기기 -->
 	<script th:inline="javascript">
-		let reservedList = [];
+		let reservedList = /*[[${reservedList}]]*/ [];
 	</script>
 
 	<!-- ✅ 2. 예약 관련 JS -->
 	<script>
-	    document.addEventListener("DOMContentLoaded", function () {
+	    
+		// 날짜 포맷 함수 
+	    function formatDate(dateStr) {
+	        const date = new Date(dateStr);
+	        const yyyy = date.getFullYear();
+	        const mm = String(date.getMonth() + 1).padStart(2, '0');
+	        const dd = String(date.getDate()).padStart(2, '0');
+	        return `${yyyy}-${mm}-${dd}`;
+	      }
+	    
+	 	// 캘린더
+		function loadCalendar() {
+		    const calendarEl = document.getElementById('calendar');
+		    const calendar = new FullCalendar.Calendar(calendarEl, {
+		      locale: 'ko',
+		      initialView: 'dayGridMonth',
+		      selectable: true,
+		      editable: false,
+		      height: 500,
+		      
+		      // 날짜 클릭시 시간 비활성화
+		      dateClick: function (info) {
+		        const selectedDate = info.dateStr;
+		        document.querySelector('input[name="reserDate"]').value = selectedDate;
+		        
+		        // 캘린더 내 날짜 배경 초기화
+		        document.querySelectorAll(".fc-daygrid-day").forEach(day => {
+		            day.style.backgroundColor = "";
+		          });
+				
+		     	// ✅ 현재 클릭된 날짜 배경 강조
+		        const clickedCell = document.querySelector(`.fc-daygrid-day[data-date='${selectedDate}']`);
+		        if (clickedCell) {
+		          clickedCell.style.backgroundColor = "#cce5ff"; // 원하는 색상
+		        }
+	
+		        // ✅ 시간 선택 영역 초기화
+		        const timeSlots = document.querySelectorAll(".time-slot");
+		        timeSlots.forEach(slot => {
+		          slot.classList.remove("disabled");
+		          slot.classList.remove("selected");
+		        });
+			
+		        if(reservedList.length > 0){
+		        
+		        	// ✅ 예약된 시간대 비활성화
+			        const reservedTimes = reservedList.filter(res => formatDate(res.reserDate) === selectedDate);
+			
+			        if(reservedTimes.length > 0){
+			        	
+				        reservedTimes.forEach(res => {
+				          const startHour = parseInt(res.reserStartTime.split(":")[0]);
+				          const endHour = parseInt(res.reserEndTime.split(":")[0]);
+				
+				          for (let h = startHour; h < endHour; h++) {
+				            const slot = document.querySelector(`#time${h}`);
+				            if (slot) {
+				              slot.classList.add("disabled");
+				              slot.classList.remove("selected");
+				            }
+				          }
+				        });
+		      	 }
+			   }
+		        
+		      }
+		    });
+		
+		    calendar.render();
+		  }
+	 	
+		console.log(reservedList);
+		
+		document.addEventListener("DOMContentLoaded", function () {
 	        loadCalendar();
 	    });
-	
-	    function loadCalendar() {
-	        // ... 캘린더 설정
-	    }
-	
+	 
+		// 시간 선택
 	    function toggleTime(element) {
-	        // ... 시간 선택 토글
+	    	if (element.classList.contains("disabled")) return; // ❌ 선택 못하게 막기
+	        element.classList.toggle("selected");
 	    }
 	
-	    function toggleAllTimes() {
-	        // ... 전체 선택 토글
-	    }
+		 // 모든 시간 선택
+		function toggleAllTimes() {
+		        const timeSlots = document.querySelectorAll(".time-slot");
+		        const allSelected = Array.from(timeSlots).every(slot => slot.classList.contains("selected"));
+		        timeSlots.forEach(slot => {
+		            if (allSelected) {
+		                slot.classList.remove("selected");
+		            } else {
+		                slot.classList.add("selected");
+		            }
+		        });
+		 }
 	
+		 
 	    // ✅ 3. 여기 아래에 submit 중복 체크 넣기!
-		    document.querySelector("form").addEventListener("submit", function (event) {
-	    const selectedSlots = Array.from(document.querySelectorAll(".time-slot.selected"));
-	
-	    if (selectedSlots.length === 0) {
-	        alert("시간을 선택하세요!");
-	        event.preventDefault();
-	        return;
-	    }
-	
-	    const selectedHours = selectedSlots.map(slot => {
-	        return parseInt(slot.dataset.value.split(":")[0]); // "10:00 - 11:00" → 10
-	    });
-	
-	    const selectedDate = document.querySelector('input[name="reserDate"]').value; // yyyy-MM-dd
-	
-	    // ✅ 예약된 시간과 비교해서 중복 체크
-	    const hasConflict = reservedList.some(res => {
-	        // 날짜가 다르면 통과
-	        if (res.reserDate !== selectedDate) return false;
-	
-	        const start = parseInt(res.reserStartTime.split(":")[0]);
-	        const end = parseInt(res.reserEndTime.split(":")[0]);
-	
-	        // 예약된 시간 범위 중 한 시간이라도 겹치면 → 충돌
-	        for (let h = start; h < end; h++) {
-	            if (selectedHours.includes(h)) return true;
-	        }
-	        return false;
-	    });
-	
-	    if (hasConflict) {
-	        alert("⚠️ 이미 예약된 시간과 겹칩니다.");
-	        event.preventDefault();
-	        return;
-	    }
+		document.querySelector("[name='reservationForm']").addEventListener("submit", function (e) {
+		    const content = document.querySelector("textarea[name='content']").value.trim();
+
+			if (content == "") {
+			  alert("예약 내용을 입력해주세요.");
+			  e.preventDefault(); // 제출 막기
+			}
+		    
+		    // class selected 가져오기
+			let selectedHours = Array.from(document.querySelectorAll(".time-slot.selected")).map(h => parseInt(h.getAttribute('data-value')))
+		    let selectedDate = formatDate(document.querySelector('input[name="reserDate"]').value);
+		    
+		    const hasConflict = reservedList.some(res => {
+		    	if (formatDate(res.reserDate) !== selectedDate) return false;
+			        const start = parseInt(res.reserStartTime.split(":")[0]);
+			        const end = parseInt(res.reserEndTime.split(":")[0]);
+			        return selectedHours.some(h => h >= start && h < end);
+		    });
+		
+		    if (hasConflict) {
+		        alert("⚠️ 이미 예약된 시간과 겹칩니다.");
+		        e.preventDefault();
+		      }
+
+		      if (selectedHours.length === 0) {
+		        alert("❗ 시간을 선택해주세요.");
+		        e.preventDefault();
+		      }
+		
 	
 	    // ✅ 최종 시작/종료 시간 계산해서 hidden input에 넣기
 	    const minHour = Math.min(...selectedHours);
-	    const maxHour = Math.max(...selectedHours) + 1;
+	    const maxHour = Math.max(...selectedHours);
 	
 	    const pad = n => String(n).padStart(2, "0");
 	    document.getElementById("reserStartTime").value = `${pad(minHour)}:00`;
-	    document.getElementById("reserEndTime").value = `${pad(maxHour)}:00`;
+	    document.getElementById("reserEndTime").value = `${pad(maxHour)}:59`;
 	});
 
 	</script>

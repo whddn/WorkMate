@@ -1,18 +1,18 @@
 package com.workmate.app.reservation.web;
 
 import java.util.List;
-
+import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.workmate.app.reservation.service.ReservationService;
 import com.workmate.app.reservation.service.ReservationVO;
-
 import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(origins = "*")
@@ -43,10 +43,25 @@ public class RestReservationController {
 	    reservationService.inputReserInfo(reservationVO);
 	    return ResponseEntity.ok(reservationVO);
 	}
+	
+	// 내 예약 목록 전체 조회
+	@GetMapping("api/reservation/List")
+	public List<ReservationVO> ResermyList() {
+		return reservationService.findAllmyReserList();
+	}
+	
 	// 예약 수정
 
+	
 	// 예약 삭제
-
-	// 예약 목록 전체 조회
+	@DeleteMapping("/api/reservation/Delete/{reserNo}")
+    public ResponseEntity<String> deleteReservation(@PathVariable int reserNo) {
+        Map<String, Object> deleted = reservationService.dropReserInfo(reserNo);
+        if (deleted != null) {
+            return ResponseEntity.ok("삭제 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
+        }
+    }
 
 }

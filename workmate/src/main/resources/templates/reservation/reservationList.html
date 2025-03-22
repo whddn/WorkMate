@@ -7,8 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>예약 리스트</title>
-<link rel="stylesheet"
-	href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 <style>
 body {
 	font-family: Arial, sans-serif;
@@ -16,7 +15,7 @@ body {
 
 .container {
 	width: 80%;
-	margin: 100px auto;
+	margin: 150px auto;
 }
 
 table {
@@ -65,47 +64,18 @@ button:disabled {
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="reservation : ${reservations}">
-					<td th:text="${reservation.title}"></td>
-					<td th:text="${reservation.useDate}"></td>
-					<td th:text="${reservation.requestDate}"></td>
+				<tr th:each="reser : ${reser}">
+					<td th:text="${reser.commonKind}"></td>
+					<td th:text="${reser.commonName}"></td>
+					<td th:text="${reser.reserDate}"></td>
+					<td th:text="(${reser.reserStartTime} + ' ~ ' + ${reser.reserEndTime} + ' 까지')"></td>
 					<td>
-						<button th:if="${reservation.status == '승인중'}"
-							th:onclick="|cancelReservation('${reservation.id}')|">
-							예약취소</button>
+						<button class="btn btn-warning">수정</button>
+						<button class="btn btn-danger" th:onclick="|deleteReservation([[${reser.reserNo}]])|">삭제</button>
+						
 					</td>
 					<td>
-						<button disabled th:text="${reservation.status}"></button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-
-	<div class="container">
-		<h2>내 예약 현황</h2>
-		<table>
-			<thead>
-				<tr>
-					<th>제목</th>
-					<th>사용날짜</th>
-					<th>신청날짜</th>
-					<th>예약취소</th>
-					<th>현황</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="reservation : ${reservations}">
-					<td th:text="${reservation.title}"></td>
-					<td th:text="${reservation.useDate}"></td>
-					<td th:text="${reservation.requestDate}"></td>
-					<td>
-						<button th:if="${reservation.status == '승인중'}"
-							th:onclick="|cancelReservation('${reservation.id}')|">
-							예약취소</button>
-					</td>
-					<td>
-						<button disabled th:text="${reservation.status}"></button>
+					  <span class="badge" th:text="${reser.usageStatus}"></span>
 					</td>
 				</tr>
 			</tbody>
@@ -113,20 +83,27 @@ button:disabled {
 	</div>
 
 	<script>
-    function cancelReservation(reservationId) {
-        if (confirm("정말로 예약을 취소하시겠습니까?")) {
-            fetch('/api/reservations/' + reservationId + '/cancel', {
-                method: 'POST'
-            }).then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert("예약 취소에 실패했습니다.");
-                }
-            });
-        }
-    }
-</script>
+	function deleteReservation(reserNo) {
+	    if (!confirm("정말 삭제하시겠습니까?")) return;
+	
+	    fetch(`/api/reservation/Delete/${reserNo}`, {
+	        method: 'DELETE'
+	    })
+	    .then(res => {
+	        if (!res.ok) throw new Error("삭제 실패");
+	        return res.text();
+	    })
+	    .then(msg => {
+	        alert(msg);
+	        location.reload(); // 삭제 후 새로고침
+	    })
+	    .catch(err => {
+	        alert("⚠️ 오류가 발생했습니다.");
+	        console.error(err);
+	    });
+	}
+	</script>
+
 
 </body>
 </html>

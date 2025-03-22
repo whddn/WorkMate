@@ -11,14 +11,14 @@ import lombok.Data;
 @Data
 public class ReservationVO {
 	private Integer reserNo;			// 예약번호
-	private String commonName; 				// 이름
+	private String commonName; 			// 이름
 	private Integer userNo;				// 사원번호
 	private String commonKind;			// 공용품종류
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate reserDate;		// 예약날짜
-	@DateTimeFormat(pattern = "HH:mm")	
+	@DateTimeFormat(pattern = "HH24:mm")	
 	private LocalTime reserStartTime;	// 예약시작시간
-	@DateTimeFormat(pattern = "HH:mm")
+	@DateTimeFormat(pattern = "HH24:mm")
 	private LocalTime reserEndTime;		// 예약종료시간
 	private String reserAvailability;	// 예약가능여부
 	private String content;				// 내용
