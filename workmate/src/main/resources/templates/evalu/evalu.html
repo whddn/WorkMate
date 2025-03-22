@@ -114,23 +114,21 @@
 	
     <form id="evaluationForm">
       <!-- 1. 평가자 정보 -->
-
-      <h3>1. 평가 대상자 정보</h3>
-      <table>
-        <tr>
-          <th>구분</th>
-          <th>소속</th>
-          <th>직책</th>
-          <th>성명</th>
+<h3>1. 평가 대상자 정보</h3>
+<table>
+    <tr>
+        <th>구분</th>
+        <th>소속</th>
+        <th>직책</th>
+        <th>성명</th>
+    </tr>
+        <tr> 
+            <td>평가 대상자</td>
+            <td></td>
+            <td></td>
+            <td>[[${evaluList[0].teamName}]]</td>
         </tr>
-        <tr>
-          <td>평가 대상자</td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name=""></td>
-          <td><input type="text" name="">[[ ${one} ]]</td>
-        </tr>
-
-      </table>
+</table>
 
       <!-- 2. 평가 안내-->
       <h3>2. 평가 설명</h3>
@@ -138,37 +136,37 @@
         <p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
         <p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
       </div>
+<h3>3. 평가항목 및 채점표</h3>
 
-      <!-- 3. 평가항목 -->
-      <h3>3. 평가항목 및 채점표</h3>
-      <table>
-        <tr>
-          <th>평가분야</th>
-          <th>평가항목</th>
-          <th>평가점수 (1~5)</th>
-          <th>대상자</th>
-        </tr>
+<table border="1">
+  <thead>
+    <tr>
+      <th>평가분야</th>
+      <th>평가항목</th>
+      <th>평가점수 (1~5)</th>
+      <th>대상자</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="evalu : ${evaluList}">
+      <td th:text="${evalu.evaluCompet}">평가분야</td>
+      <td th:text="${evalu.evaluContent}">평가항목</td>
+      <td>
+        <select name="score" th:name="'score_' + ${evalu.evaluItemNo}">
+          <option value="">선택</option>
+          <option value="1">1점</option>
+          <option value="2">2점</option>
+          <option value="3">3점</option>
+          <option value="4">4점</option>
+          <option value="5">5점</option>
+        </select>
+      </td>
+      <td th:text="${evalu.userName}">대상자</td>
+    </tr>
+  </tbody>
+</table>
 
-        <!-- 핵심가치 -->
-        <th:block th:each = "e : ${one}">
-        <tr>
-          <td>[[ ${e.evaluCompet} ]]</td>
-          <td>[[ ${e.evaluContent} ]]</td>
-          <td>
-            <select name="">
-              <option value="">선택</option>
-              <option value="1">1점</option>
-              <option value="2">2점</option>
-              <option value="3">3점</option>
-              <option value="4">4점</option>
-              <option value="5">5점</option>
-            </select>
-          </td>
-          <td>
-          </td>
-        </tr>
-        </th:block>
-      </table>
+
 
 
       <!-- 4. 추가 의견 -->
