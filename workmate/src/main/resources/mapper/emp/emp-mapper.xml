@@ -227,8 +227,7 @@
 	
 	<!-- 진행할 평가 조회 1건 / 내가 평가자 그룹으로 등록되어 있는 폼에 대한 피평가자 정보와 등록된 평가폼 조회 -->
 	<select id="selectOneEvaluById" resultType="EvaluVO">
-		 	SELECT     
-		 	
+		 	SELECT
 			        f.EVALU_FORM_NO
 		            , f.EVALU_NAME                           
 			        , u.USER_NO

@@ -204,33 +204,11 @@
 		    }
 		});
 		
-		fetch([[ @{/approval/read} ]], {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(request)
-		})
-		.then(response => response.json())
-		.then(result => {
-			if(result.success) {
-				location.href = [[ @{/approval/waiting} ]];
-			}
-			else {
-				alert('결재에 실패하였습니다.');
-			}
-		})
-		.catch(error => {
-			console.error('Error:', error);
-			alert('서버 요청 중 오류가 발생했습니다.');
-		});
-		
-		/*
 		$.ajax({
 			url: [[ @{/approval/read} ]],
 			type: 'PUT',
-			contentType: 'application/json'
-			data: JSON.stringify(request)
+			contentType: 'application/json',
+			data: JSON.stringify(request),
 			success: function(response) {
 				if(response.success) {
 					location.href = [[ @{/approval/waiting} ]];
@@ -244,7 +222,7 @@
 				alert('서버 요청 중 오류가 발생했습니다.');
 			}
 		});
-		*/
+		
 	});
 	
 	// 아직 결재 완료가 안된 이 문서를 파기한다
@@ -254,30 +232,11 @@
 		}
 		
 		const path = [[ @{/approval/read} ]];
-		fetch(`${path}/${approval.apprNo}`, {
-			method: 'DELETE'
-		})
-		.then(response => response.json())
-		.then(result => {
-			if(result.success) {
-				alert('문서가 삭제되었습니다.');
-				location.href = [[ @{/approval/waiting} ]];
-			}
-			else {
-				alert('삭제에 실패하였습니다.');
-			}
-		})
-		.catch(error => {
-			console.error('Error:', error);
-			alert('서버 요청 중 오류가 발생했습니다.');
-		});
 		
-		/*
 		$.ajax({
 			url: `${path}/${approval.apprNo}`,
 			type: 'DELETE',
-			contentType: 'application/json'
-			data: JSON.stringify(request)
+			contentType: 'application/json',
 			success: function(response) {
 				if(response.success) {
 					alert('문서가 삭제되었습니다.');
@@ -292,7 +251,7 @@
 				alert('서버 요청 중 오류가 발생했습니다.');
 			}
 		});
-		*/
+		
 	});
 </script>
 
