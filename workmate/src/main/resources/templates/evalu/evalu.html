@@ -14,7 +14,7 @@
   }
   
   #container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
     background-color: #fff;
     border-radius: 8px;
@@ -137,22 +137,22 @@
         <p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
       </div>
 <h3>3. 평가항목 및 채점표</h3>
-
 <table border="1">
   <thead>
     <tr>
       <th>평가분야</th>
       <th>평가항목</th>
-      <th>평가점수 (1~5)</th>
-      <th>대상자</th>
+      <th th:each="user : ${userList}">[[${user.userName}]]</th>
     </tr>
   </thead>
   <tbody>
     <tr th:each="evalu : ${evaluList}">
       <td th:text="${evalu.evaluCompet}">평가분야</td>
       <td th:text="${evalu.evaluContent}">평가항목</td>
-      <td>
-        <select name="score" th:name="'score_' + ${evalu.evaluItemNo}">
+      
+      <!-- 사람 수만큼 반복해서 셀 생성 -->
+      <td th:each="user : ${userList}">
+        <select th:name="'score_' + ${evalu.evaluItemNo} + '_' + ${user}">
           <option value="">선택</option>
           <option value="1">1점</option>
           <option value="2">2점</option>
@@ -161,14 +161,9 @@
           <option value="5">5점</option>
         </select>
       </td>
-      <td th:text="${evalu.userName}">대상자</td>
     </tr>
   </tbody>
 </table>
-
-
-
-
       <!-- 4. 추가 의견 -->
       <h3>4. 추가 의견</h3>
       <table>
