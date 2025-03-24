@@ -38,7 +38,7 @@
 
 - **Frontend**: HTML5, CSS3, JavaScript
 - **Backend**: Java, Spring Framework
-- **Database**: MySQL
+- **Database**: Oracle
 - **Version Control**: Git, GitHub
 
 ---
