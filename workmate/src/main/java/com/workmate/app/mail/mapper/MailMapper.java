@@ -70,4 +70,7 @@ public interface MailMapper {
 	int countMailsByFolder(@Param("userNo") int userNo, @Param("folderId") int folderId);
 	//스팸
 	List<MailVO> findSpamMails(@Param("userNo") int userNo);
+	//메일 중복체크
+	@Select("SELECT COUNT(*) FROM MAIL WHERE MESSAGE_ID = #{messageId}")
+	int countMessageId(@Param("messageId") String messageId);
 }
