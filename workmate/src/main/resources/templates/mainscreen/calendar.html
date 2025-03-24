@@ -9,6 +9,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .fc-event {
+		    color: black;
+		    border: 1px solid gray;
+		    padding: 5px;
+		}
+		
+		.h1 {
+		    background-color: lightblue;
+		}
+		
+		.h2 {
+		    background-color: lightgreen;
+		}
+		
+		.h3 {
+		    background-color: lightcoral;
+		}
+		
+		.default {
+		    background-color: lightgray;
+		}
+    </style>
     <title>부트스트랩 캘린더</title>
 </head>
 
@@ -134,7 +157,12 @@
     	            response.forEach(function(element) {
     	                // 일정 종류에 따라 색상 지정
     	                let color = getColorByType(element.scheduleType);
-    	                addSchedule(element.scheduleNo, element.scheduleContent, element.scheduleStartDate, element.scheduleEndDate, color);
+    	                addSchedule(element.scheduleNo, 
+    	                	element.scheduleContent, 
+    	                	element.scheduleStartDate, 
+    	                	element.scheduleEndDate, 
+    	                	element.scheduleType
+    	                );
     	            });
     	        }
     	    });
@@ -166,7 +194,12 @@
                     success: function(response) {
                         if(response.success) {
                             let schedule = response.result;
-                            addSchedule(schedule.scheduleNo, schedule.scheduleContent, schedule.scheduleStartDate, schedule.scheduleEndDate);
+                            addSchedule(schedule.scheduleNo, 
+                            	schedule.scheduleContent, 
+                            	schedule.scheduleStartDate, 
+                            	schedule.scheduleEndDate, 
+                            	schedule.scheduleType
+                            );
                             alert('일정 등록에 성공했습니다.');
                         }
                     },
@@ -177,17 +210,18 @@
             });
 	    });
 	    
-	    function addSchedule(no, content, start, end, color) {
-	        calendar.addEvent({
-	            id: no,
-	            title: content,
-	            start: start,
-	            end: end,
-	            eventColor: color, // 배경색 지정
-	            textColor: 'white' // 글씨 색 지정
-	        });
-	        $('#eventContent').val('');
-	        $('#eventModal').modal('hide');
+	    function addSchedule(no, content, start, end, type) {
+	    	let color = getColorByType(type); // 일정 종류에 따라 색상 지정
+            calendar.addEvent({
+                id: no,
+                title: content,
+                start: start,
+                end: end,
+                classNames: ['fc-event', type], // 일정 종류에 따른 클래스 추가
+                textColor: 'white' // 글씨 색 지정
+            });
+            $('#eventContent').val('');
+            $('#eventModal').modal('hide');
 	    }
 
 	    // 일정 종류에 따라 색상 반환
