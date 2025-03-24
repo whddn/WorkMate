@@ -180,20 +180,20 @@ public class EmpServiceImpl implements EmpService {
 	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO) {
 	    List<EvaluVO> rawList = empMapper.selectOneEvaluById(evaluVO);
 
-	    Set<String> seen = new HashSet<>();
-	    List<EvaluVO> result = new ArrayList<>();
+	    Set<String> seen = new HashSet<>();	// set : 중복 제거 
+	    List<EvaluVO> result = new ArrayList<>(); // 새 리스트 생성 
 
-	    for (EvaluVO vo : rawList) {
-	        int userNo = vo.getUserNo();
-	        String evaluCompet = vo.getEvaluCompet();
-	        String evaluContent = vo.getEvaluContent();
+	    for (EvaluVO vo : rawList) {	// selectOne의 쿼리값을 모두 반환할 동안 
+	        int userNo = vo.getUserNo();	// 유저 번호 
+	        String evaluCompet = vo.getEvaluCompet();	// 항목 
+	        String evaluContent = vo.getEvaluContent();	// 내용
 
-	        if (evaluCompet == null) continue;
+	        if (evaluCompet == null) continue;	// compet이 null이면 계속 추가 
 
-	        String key = userNo + "|" + evaluCompet.trim() + "|" + evaluContent.trim();
-
-	        if (seen.add(key)) {
-	            result.add(vo);
+	        String key = userNo + "|" + evaluCompet.trim() + "|" + evaluContent.trim(); // key에 userNo, evaluCompet, evaluContent 기준 
+	        						
+	        if (seen.add(key)) {	// seen 리스트에 key 추가 
+	            result.add(vo);		// result 에 vo 추가 
 	        }
 	    }
 

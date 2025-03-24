@@ -1,209 +1,232 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
+<html xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/emp_layout}"
+	layout:fragment="content">
 
 <head>
-  <meta charset="UTF-8">
-  <title>평가</title>
-  <style>
-   body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
-  }
-  
-  #container {
-    max-width: 1000px;
-    margin: 0 auto;
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* 제목 스타일 */
-  h2, h3 {
-    font-weight: 600;
-    color: #333;
-  }
-  
-  /* 테이블 스타일 */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  
-  th, td {
-    padding: 12px;
-    text-align: left;
-    border: 1px solid #ddd;
-  }
-  
-  th {
-    background-color: #f7f7f7;
-    color: #555;
-  }
-  
-  td input, td select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
-  }
-  
-  /* 폼 입력 필드 스타일 */
-  input[type="text"], select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  textarea {
-    height: 100px;
-    resize: vertical;
-  }
-  
-  /* 평가 항목에 대한 선택지 */
-  select {
-    font-size: 14px;
-    background-color: #f9f9f9;
-    border-color: #ddd;
-  }
-  
-  /* ver2 스타일 - 평가 설명 */
-  .ver2 {
-    padding: 12px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 15px;
-    font-size: 14px;
-  }
-  
-  /* 버튼 스타일 */
-  button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  
-  </style>
+<meta charset="UTF-8">
+<title>평가</title>
+<style>
+body {
+	font-family: 'Arial', sans-serif;
+	background-color: #f4f4f4;
+	margin: 0;
+	padding: 20px;
+}
+
+#container {
+	max-width: 1000px;
+	margin: 0 auto;
+	background-color: #fff;
+	border-radius: 8px;
+	padding: 20px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목 스타일 */
+h2, h3 {
+	font-weight: 600;
+	color: #333;
+}
+
+/* 테이블 스타일 */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 20px;
+}
+
+th, td {
+	padding: 12px;
+	text-align: left;
+	border: 1px solid #ddd;
+}
+
+th {
+	background-color: #f7f7f7;
+	color: #555;
+}
+
+td input, td select {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+	font-size: 14px;
+}
+
+/* 폼 입력 필드 스타일 */
+input[type="text"], select, textarea {
+	width: 100%;
+	padding: 10px;
+	margin-top: 8px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
+
+textarea {
+	height: 100px;
+	resize: vertical;
+}
+
+/* 평가 항목에 대한 선택지 */
+select {
+	font-size: 14px;
+	background-color: #f9f9f9;
+	border-color: #ddd;
+}
+
+/* ver2 스타일 - 평가 설명 */
+.ver2 {
+	padding: 12px;
+	background-color: #f9f9f9;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-top: 15px;
+	font-size: 14px;
+}
+
+/* 버튼 스타일 */
+button {
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+	margin-top: 20px;
+}
+
+button:hover {
+	background-color: #0056b3;
+}
+
+.evaluName {
+	width: 85px;
+}
+</style>
 </head>
 
 <body>
-    <div id="container">
-    <h2></h2>
-	
-    <form id="evaluationForm">
-      <!-- 1. 평가자 정보 -->
-<h3>1. 평가 대상자 정보</h3>
-<table>
-    <tr>
-        <th>구분</th>
-        <th>소속</th>
-        <th>직책</th>
-        <th>성명</th>
-    </tr>
-        <tr> 
-            <td>평가 대상자</td>
-            <td></td>
-            <td></td>
-            <td>[[${evaluList[0].teamName}]]</td>
-        </tr>
-</table>
+	<div id="container">
+		<h2></h2>
 
-      <!-- 2. 평가 안내-->
-      <h3>2. 평가 설명</h3>
-      <div class="ver2">
-        <p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
-        <p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
-      </div>
-<h3>3. 평가항목 및 채점표</h3>
-<table border="1">
-  <thead>
-    <tr>
-      <th>평가분야</th>
-      <th>평가항목</th>
-      <th th:each="user : ${userList}">[[${user.userName}]]</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr th:each="evalu : ${evaluList}">
-      <td th:text="${evalu.evaluCompet}">평가분야</td>
-      <td th:text="${evalu.evaluContent}">평가항목</td>
-      
-      <!-- 사람 수만큼 반복해서 셀 생성 -->
-      <td th:each="user : ${userList}">
-        <select th:name="'score_' + ${evalu.evaluItemNo} + '_' + ${user}">
-          <option value="">선택</option>
-          <option value="1">1점</option>
-          <option value="2">2점</option>
-          <option value="3">3점</option>
-          <option value="4">4점</option>
-          <option value="5">5점</option>
-        </select>
-      </td>
-    </tr>
-  </tbody>
-</table>
-      <!-- 4. 추가 의견 -->
-      <h3>4. 추가 의견</h3>
-      <table>
-        <tr>
-          <th>강점</th>
-          <td><input type="text" name=""></td>
-        </tr>
-        <tr>
-          <th>약점</th>
-          <td><input type="text" name=""></td>
-        </tr>
-      </table>
-      <button type="button" id="selectAjax">제출</button>
-    </form>
-  </div>
-  <script>
+		<form id="evaluationForm">
+			<!-- 1. 평가자 정보 -->
+			<h3>1. 평가 대상자 정보</h3>
+			<table>
+				<tr>
+					<th>팀명</th>
+				</tr>
+				<tr>
+					<td>[[${evaluList[0].teamName}]]</td>
+				</tr>
+			</table>
+
+			<!-- 2. 평가 안내-->
+			<h3>2. 평가 설명</h3>
+			<div class="ver2">
+				<p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
+				<p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
+			</div>
+			<h3>3. 평가항목 및 채점표</h3>
+			<table border="1">
+				<thead>
+					<tr>
+						<th>평가분야</th>
+						<th>평가항목</th>
+						<th th:each="user : ${userList}">[[${user.userName}]]</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="evalu : ${evaluList}">
+						<td th:text="${evalu.evaluCompet}">평가분야 </td>
+						<td th:text="${evalu.evaluContent}">평가항목</td>
+						<!-- 사람 수만큼 반복해서 셀 생성 -->
+						<td th:each="user : ${userList}" class="evaluName">
+						<select th:data-evaluitemno="${evalu.evaluItemNo}"  th:data-form="${evalu.evaluFormNo}" 
+						th:data-userno="${user.userNo}" th:data-orderno="${evalu.orderNo}" th:data-teamno="${evalu.teamNo}" 
+						th:data-gid = "${evalu.evaluateeGroupId}" th:data-gd = "${evalu.evaluGroupId}"
+							name="score"
+							id="score-select">
+								<option value="">선택</option>
+								<option value="1">1점</option>
+								<option value="2">2점</option>
+								<option value="3">3점</option>
+								<option value="4">4점</option>
+								<option value="5">5점</option>
+						</select></td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- 4. 추가 의견 -->
+			<h3>4. 추가 의견</h3>
+			<table>
+				<tr>
+					<th>강점</th>
+					<td><input type="text" name=""></td>
+				</tr>
+				<tr>
+					<th>약점</th>
+					<td><input type="text" name=""></td>
+				</tr>
+			</table>
+			<button type="button" id="selectAjax">제출</button>
+		</form>
+	</div>
+	<script>
   	// 평가 채점한 거 제출 AJAX 
   	document.querySelector('#selectAjax').addEventListener('click', e => {
   		evaluAjax();
   	})
   	
   	
-  	let evaluAjax = {
-  	 	
-  	};
-  	
   	function evaluAjax() {
-  		fetch(`/workmate/emp/evalu`, {
-  			method : 'POST',
-  			headers : {
-  				'Content-Type' : 'application/json'
-  			},
-  			body : JSON.stringify(evaluAjax)
-  		})
-  		.then(res => res.json())
-  		.then(result => {
-  			
-  		})
-  		.catch(err => console.log(err));
-  	}
+	    let scoreList = [];
+	  	Array.from(document.querySelectorAll('[name="score"]')).forEach(select => {
+	  		let evaluItemNo = parseInt(select.dataset.evaluitemno);
+	  		let userNo = parseInt(select.dataset.userno);
+	  		let score = parseInt(select.value);
+	  		let orderNo = select.dataset.orderno;
+	  		let evaluateeGroupId = select.dataset.gid;
+	  		let evaluGroupId = select.dataset.gd;
+	  		
+	  		scoreList.push({
+	  			evaluItemNo : evaluItemNo,
+	  			userNo : userNo,
+	  			evaluScore : score,
+	  			orderNo : orderNo,
+	  			evaluateeGroupId : evaluateeGroupId,
+	  			evaluGroupId : evaluGroupId
+	  		})	
+  	})
+	  		console.log("✅ 최종 scoreList:", scoreList);
+	
+let formNo = document.querySelector('[name="score"]').dataset.form;
+  // AJAX 전송
+  fetch(`/workmate/emp/evalu/${formNo}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(scoreList)
+  })
+  .then(res => res.json())
+  .then(result => {
+	  if (result != null) {
+		    alert('평가가 성공적으로 제출되었습니다!');		  
+	  }
+
+  })
+  .catch(err => {
+    console.error('평가 제출 중 오류 발생:', err);
+  });
+}
   	
   </script>
 </body>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>입출금 내역서</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .file-upload {
+            display: none;
+        }
+        .file-label {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .file-label:hover {
+            background-color: #0056b3;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>2025년 2월 입출금 내역서</h2>
+
+    <h3>기본정보</h3>
+    <table>
+        <tr>
+            <th>기간</th>
+            <td>2025-02-01 ~ 2025-02-28</td>
+            <th>부서</th>
+            <td>디자인팀</td>
+        </tr>
+        <tr>
+            <th>직급</th>
+            <td></td>
+            <th>성명</th>
+            <td></td>
+        </tr>
+    </table>
+
+    <h3>입출금 내역</h3>
+    <table>
+        <tr>
+            <th>일자</th>
+            <th>상세내역</th>
+            <th>입금액(원)</th>
+            <th>출금액(원)</th>
+            <th>잔액(원)</th>
+            <th>비고</th>
+        </tr>
+        <tr>
+            <td>1일(토)</td>
+            <td>고객사 결제</td>
+            <td>500,000원</td>
+            <td></td>
+            <td>673,348원</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>2일(일)</td>
+            <td>사무용품 구매</td>
+            <td></td>
+            <td>120,000원</td>
+            <td>553,348원</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>3일(월)</td>
+            <td></td>
+            <td>300,000원</td>
+            <td></td>
+            <td>853,348원</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>4일(화)</td>
+            <td>납부</td>
+            <td></td>
+            <td>300,000원</td>
+            <td>553,348원</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>27일(목)</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>28일(금)</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <h3>월간합계</h3>
+    <table>
+        <tr>
+            <th>입금액(원)</th>
+            <th>출금액(원)</th>
+            <th>잔액(원)</th>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <h3>추가 자료 첨부</h3>
+    <p>사진 / 그래프 등 첨부</p>
+
+    <h3>첨부 파일</h3>
+    <input type="file" id="file1" class="file-upload">
+    <label for="file1" class="file-label">파일 첨부</label>
+
+    <input type="file" id="file2" class="file-upload">
+    <label for="file2" class="file-label">파일 첨부</label>
+
+    <br>
+
+    <button>수정</button>
+    <button class="delete-btn">삭제</button>
+</div>
+</body>
+</html>
