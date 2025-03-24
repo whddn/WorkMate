@@ -69,4 +69,7 @@ public interface EmpMapper {
 	// 평가한 거 등록 기능 (쿼리문 없음)
 	public int insertEvaluScore(EvaluVO evaluVO);
 	
+	// 평가 완료 시 -> 평가 상태를 : 평가 완료로 
+	public int updateEvaluStatus(int formNo);
+	
 }

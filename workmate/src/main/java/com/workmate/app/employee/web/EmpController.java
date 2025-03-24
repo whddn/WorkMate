@@ -295,6 +295,7 @@ public class EmpController {
 			        }
 				 empService.inputEvaluResultScore(vo); // 횟수만큼 insert문 실행
 			 }
+			    empService.modifyEvaluStatus(formNo);	// 모두 추가한 후 평가 상태를 평가 완료로 변경 
 			 return ResponseEntity.ok(response);
 		}
 
