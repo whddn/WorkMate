@@ -2,6 +2,7 @@ package com.workmate.app.reservation.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,7 @@ import com.workmate.app.approval.mapper.ApprLineMapper;
 import com.workmate.app.approval.mapper.ApprovalMapper;
 import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.common.WhoAmI;
+import com.workmate.app.employee.mapper.EmpMapper;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.reservation.mapper.ReservationMapper;
 import com.workmate.app.reservation.service.ReservationService;
@@ -25,6 +27,10 @@ public class ReservationImpl implements ReservationService {
 	private final ApprovalMapper approvalMapper;
 	private final ApprLineMapper apprLineMapper;
 	private final ApprElmntMapper apprElmntMapper;
+	private final EmpMapper empMapper;
+	
+	@Autowired
+	private final WhoAmI whoAmI;
 	
 	// 전체
 	@Override
@@ -42,7 +48,6 @@ public class ReservationImpl implements ReservationService {
 	@Override
 	public ReservationVO inputReserInfo(ReservationVO reservationVO) {
 		// 현재 로그인한 유저 정보 가져오기
-		WhoAmI whoAmI = new WhoAmI();
 		EmpVO currentUser = whoAmI.whoAmI();
 		
 		// ✅ reservationVO에 사원번호 주입
