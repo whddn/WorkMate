@@ -1,8 +1,6 @@
 package com.workmate.app.reservation.service.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +9,8 @@ import com.workmate.app.approval.mapper.ApprElmntMapper;
 import com.workmate.app.approval.mapper.ApprLineMapper;
 import com.workmate.app.approval.mapper.ApprovalMapper;
 import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.common.WhoAmI;
+import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.reservation.mapper.ReservationMapper;
 import com.workmate.app.reservation.service.ReservationService;
 import com.workmate.app.reservation.service.ReservationVO;
@@ -25,8 +25,7 @@ public class ReservationImpl implements ReservationService {
 	private final ApprovalMapper approvalMapper;
 	private final ApprLineMapper apprLineMapper;
 	private final ApprElmntMapper apprElmntMapper;
-
-
+	
 	// 전체
 	@Override
 	public List<ReservationVO> findAllReserList() {
@@ -42,6 +41,15 @@ public class ReservationImpl implements ReservationService {
 	@Transactional
 	@Override
 	public ReservationVO inputReserInfo(ReservationVO reservationVO) {
+		// 현재 로그인한 유저 정보 가져오기
+		WhoAmI whoAmI = new WhoAmI();
+		EmpVO currentUser = whoAmI.whoAmI();
+		
+		// ✅ reservationVO에 사원번호 주입
+	    if (reservationVO.getUserNo() == null) {
+	        reservationVO.setUserNo(currentUser.getUserNo());
+	    }
+		
 		// 예약 등록
 		reservationMapper.insertReservationInfo(reservationVO);
 		
@@ -64,28 +72,19 @@ public class ReservationImpl implements ReservationService {
 
 	// 수정
 	@Override
-	public Map modifyReserInfo(ReservationVO reservationVO) {
-		Map<String, Object> map = new HashMap<>();
-		boolean isSuccessed = false;
-		int result = reservationMapper.updateReservationInfo(reservationVO);
-		if(result == 1) {
-			isSuccessed = true;
-		}
-		map.put("result", isSuccessed);
-		map.put("target", reservationVO);
-		
-		return map;
+	public int modifyReserInfo(ReservationVO reservationVO) {
+		 return reservationMapper.updateReserInfo(reservationVO);
+	}
+	// 수정 전 한건 조회
+	@Override
+	public ReservationVO findReserByNo(int reserNo) {
+	    return reservationMapper.selectReserByNo(reserNo);
 	}
 
 	// 삭제
 	@Override
-	public Map<String, Object> dropReserInfo(int reserNo) {
-	    int result = reservationMapper.deleteReservationInfo(reserNo);
-	    if (result > 0) {
-	        return Map.of("result", "success");
-	    } else {
-	        return null;
-	    }
+	public int dropReserInfo(int reserNo) {
+		 return reservationMapper.deleteReservationInfo(reserNo);
 	}
 
 	
@@ -100,5 +99,7 @@ public class ReservationImpl implements ReservationService {
 	public List<ReservationVO> findAllmyReserList() {
 		return reservationMapper.selectmyReservationList();
 	}
+
+	
 
 }
