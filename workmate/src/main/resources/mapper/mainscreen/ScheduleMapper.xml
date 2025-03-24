@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.workmate.app.mainscreen.mapper.ScheduleMapper">
+	<!-- 일정 목록들을 불러온다 -->
+	<select id="selectScheduleList" parameterType="ScheduleVO" resultType="ScheduleVO">
+		SELECT schedule_no
+		    , schedule_content
+		    , schedule_type
+		    , public_score
+		    , schedule_start_date
+		    , schedule_end_date
+		    , schedule.user_no
+		    , mail_id
+		    , department.department_id
+		FROM schedule
+		    JOIN employee
+		    ON schedule.user_no=employee.user_no
+		    LEFT JOIN team
+		    ON employee.team_no=team.team_no
+		    LEFT JOIN department
+		    ON team.department_id=department.department_id
+		WHERE (public_score = 'c1' AND schedule.user_no = #{userNo}
+		    OR public_score = 'c2' AND department.department_id = #{deptNo}
+		    OR public_score = 'c3')
+		    <if test="unit != null and unit.equals('day')">
+		    AND (schedule_start_date &gt;= TRUNC(SYSDATE)
+				OR schedule_end_date &lt;= TRUNC(SYSDATE))
+		    </if>
+	</select>
+	<!-- 새로운 일정을 추가한다 -->
+	<insert id="insertSchedule" parameterType="ScheduleVO">
+		<selectKey keyProperty="scheduleNo" resultType="String" order="BEFORE">
+			SELECT 'SC' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(schedule_no, 3))), 0) + 1, 5, '0')
+			FROM schedule
+		</selectKey>
+		INSERT INTO schedule(schedule_no
+			, schedule_content
+			, schedule_type
+			, public_score
+			, schedule_start_date
+			, schedule_end_date
+			, user_no
+			, mail_id
+		)
+		VALUES(#{scheduleNo}
+			, #{scheduleContent}
+			, #{scheduleType}
+			, #{publicScore}
+			, #{scheduleStartDate}
+			, #{scheduleEndDate}
+			, #{userNo}
+			, #{mailId}
+		)
+	</insert>
+	<!-- 일정의 시간을 변경한다 -->
+	<update id="updateSchedule" parameterType="ScheduleVO">
+		UPDATE schedule
+		SET schedule_start_date = #{scheduleStartDate}
+			, schedule_end_date = #{scheduleEndDate}
+		WHERE schedule_no = #{scheduleNo}
+			AND user_no = #{userNo}
+	</update>
+	<!-- 일정을 삭제한다 -->
+	<delete id="deleteSchedule" parameterType="ScheduleVO">
+		DELETE FROM schedule
+		WHERE schedule_no = #{scheduleNo}
+			AND user_no = #{userNo}
+	</delete>
+</mapper>
