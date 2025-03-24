@@ -209,6 +209,7 @@
 			        , f.EVALU_FORM_NO
                     , d.department_name
                     , t.team_name
+                    , fm.evalu_no
 			FROM EVALU_FORM f              
 			JOIN EVALUATEE_GROUP g
 			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
@@ -242,6 +243,8 @@
                     , t.TEAM_NO
                     , g.EVALUATEE_GROUP_ID
                     , eg.EVALU_GROUP_ID
+                    , fm.evalu_no
+                    , f.USAGE_STATUS
 			FROM EVALU_FORM f              
 			JOIN EVALUATEE_GROUP g
 			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
@@ -437,9 +440,15 @@
 		       , SYSDATE
 		       , #{evaluGroupId}
 		       , #{evaluateeGroupId}
-		       , EVALU_NO_SEQ.NEXTVAL
+		       , #{evaluNo}
 		       , #{evaluFormNo}
 		       , #{orderNo}
 		       , #{userNo} )
 	</insert>
+	
+	<!-- 평가 제출 후 평가 상태 '평가 완료' 로 수정하는 쿼리문 -->
+	<update id="updateEvaluStatus" parameterType="EvaluVO">
+		UPDATE EVALU_FORM 
+		SET USAGE_STATUS = '평가 완료'
+	</update>
 </mapper>

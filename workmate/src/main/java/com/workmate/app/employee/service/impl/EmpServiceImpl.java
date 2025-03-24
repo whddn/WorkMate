@@ -200,4 +200,9 @@ public class EmpServiceImpl implements EmpService {
 	    return result;
 	}
 
+	@Override
+	public int modifyEvaluStatus(int formNo) {
+		return empMapper.updateEvaluStatus(formNo);
+	}
+
 }

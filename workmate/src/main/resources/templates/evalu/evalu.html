@@ -151,9 +151,9 @@ button:hover {
 						<td th:each="user : ${userList}" class="evaluName">
 						<select th:data-evaluitemno="${evalu.evaluItemNo}"  th:data-form="${evalu.evaluFormNo}" 
 						th:data-userno="${user.userNo}" th:data-orderno="${evalu.orderNo}" th:data-teamno="${evalu.teamNo}" 
-						th:data-gid = "${evalu.evaluateeGroupId}" th:data-gd = "${evalu.evaluGroupId}"
+						th:data-gid = "${evalu.evaluateeGroupId}" th:data-en="${evalu.evaluNo}" th:data-gd="${evalu.evaluGroupId}" 
 							name="score"
-							id="score-select">
+							id="score-select" th:disabled="${evalu.usageStatus == '평가 완료'}">
 								<option value="">선택</option>
 								<option value="1">1점</option>
 								<option value="2">2점</option>
@@ -195,8 +195,10 @@ button:hover {
 	  		let orderNo = select.dataset.orderno;
 	  		let evaluateeGroupId = select.dataset.gid;
 	  		let evaluGroupId = select.dataset.gd;
+	  		let evaluNo = select.dataset.en;
 	  		
 	  		scoreList.push({
+	  			evaluNo : evaluNo,
 	  			evaluItemNo : evaluItemNo,
 	  			userNo : userNo,
 	  			evaluScore : score,
