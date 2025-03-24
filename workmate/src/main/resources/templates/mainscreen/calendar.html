@@ -11,11 +11,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         .fc-event {
-            background-color: lightblue;
-            color: black;
-            border: 1px solid gray;
-            padding: 5px;
-        }
+		    color: black;
+		    border: 1px solid gray;
+		    padding: 5px;
+		}
+		
+		.h1 {
+		    background-color: lightblue;
+		}
+		
+		.h2 {
+		    background-color: lightgreen;
+		}
+		
+		.h3 {
+		    background-color: lightcoral;
+		}
+		
+		.default {
+		    background-color: lightgray;
+		}
     </style>
     <title>부트스트랩 캘린더</title>
 </head>
@@ -202,7 +217,7 @@
                 title: content,
                 start: start,
                 end: end,
-                eventColor: color, // 배경색 지정
+                classNames: ['fc-event', type], // 일정 종류에 따른 클래스 추가
                 textColor: 'white' // 글씨 색 지정
             });
             $('#eventContent').val('');
