@@ -2,8 +2,10 @@ package com.workmate.app.employee.web;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,11 +31,24 @@ import lombok.RequiredArgsConstructor;
 public class EmpController {
 	private final EmpService empService;
 	
+	/** 사원 관리 및 평가 
+	 *  @author 박혜원
+	 *  @since 2025-03-24
+	 */
+	
+	
+	
 //	@Autowired
 //	public EmpController(EmpService empService) {
 //		this.empService = empService;
 //	}
-
+	
+	/**
+	 * 조직도 페이지로 이동
+	 * @param empVO
+	 * @param model
+	 * @return organ
+	 */
 		// 1) 조직도 페이지 (페이지 불러냄)
 	@GetMapping("emp/organ") // 조직도 
 	public String empOrganPage(EmpVO empVO, Model model) {
@@ -44,7 +59,7 @@ public class EmpController {
 	}
 	
 	// 조직도 단건 조회
-	@GetMapping("emp/Organ/{userNo}") // 조직도 AJAX 단건 조회
+	@GetMapping("emp/organ/{userNo}") // 조직도 AJAX 단건 조회
 	public ResponseEntity<EmpVO> selectOrganEmpById(@PathVariable int userNo, EmpVO empVO){
 		empVO.setUserNo(userNo);
 		EmpVO userVO = empService.findEmpByEmpNo(empVO);
@@ -215,21 +230,72 @@ public class EmpController {
 		    return ResponseEntity.ok(response);  // JSON 응답을 반환
 		}
 		
-
-		// 평가 진행 
+		// 평가 진행 페이지 AJAX
 		@GetMapping("emp/evalu/{evaNo}")
-		public String evaluOneProcess(EvaluVO evaluVO, Model model, @AuthenticationPrincipal LoginUserVO loginUser, @PathVariable int evaNo) {
-			// 로그인한 사용자 정보 
-			if (loginUser == null || loginUser.getUserVO() == null) {
-				return "redirect:/login";
-			}
-			
-			int userNo = loginUser.getUserVO().getUserNo();
-			evaluVO.setEvaluFormNo(evaNo); 
-			evaluVO.setUserNo(userNo);
-			List<EvaluVO> oneEvalu = empService.findMyEvaluProcess(evaluVO);
-			model.addAttribute("evaluList", oneEvalu);
-			return "evalu/evalu";
+		public String evaluOneProcess(EvaluVO evaluVO,
+		                               Model model,
+		                               @AuthenticationPrincipal LoginUserVO loginUser,
+		                               @PathVariable int evaNo) {
+
+		    // 로그인 체크
+		    if (loginUser == null || loginUser.getUserVO() == null) {
+		        return "redirect:/login";
+		    }
+
+		    // 기본 정보 세팅
+		    evaluVO.setEvaluFormNo(evaNo);
+		    evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
+
+		    // 전체 평가 항목 조회
+		    List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
+
+		    //  1. 사용자(userNo) 기준 중복 제거된 리스트
+		    Set<Integer> userSet = new HashSet<>();
+		    List<EvaluVO> userList = new ArrayList<>();
+
+		    for (EvaluVO vo : fullList) {
+		        if (userSet.add(vo.getUserNo())) {
+		            userList.add(vo);
+		        }
+		    }
+
+		    //  2. userNo + evaluCompet 기준 평가 항목 중복 제거 리스트
+		    Set<String> keySet = new HashSet<>();
+		    List<EvaluVO> evaluList = new ArrayList<>();
+
+		    for (EvaluVO vo : fullList) {
+		        String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
+		        if (keySet.add(key)) {
+		            evaluList.add(vo);
+		        }
+		    }
+
+		    model.addAttribute("userList", userList);   // 중복 제거된 사용자 목록
+		    model.addAttribute("evaluList", evaluList); // 중복 제거된 평가 항목 목록
+
+		    return "evalu/evalu"; 
+		}
+		
+		@PostMapping("emp/evalu/{formNo}") 
+		public ResponseEntity<Map<String, String>> evaluResultInsert(@RequestBody List<EvaluVO> evaList, @PathVariable int formNo) {
+			 Map<String, String> response = new HashMap<>();
+			    response.put("result", "success");
+			    for (EvaluVO vo : evaList) {
+			        vo.setEvaluFormNo(formNo);
+			        vo.setOrderNo(vo.getOrderNo());
+			        System.out.println("✅ userNo: " + vo.getUserNo());
+
+			        String teamNo = vo.getTeamNo();  // 예: "T001", "팀03"
+			        if (teamNo != null) {
+			            String numeric = teamNo.replaceAll("[^0-9]", ""); // "001"
+			            if (!numeric.isEmpty()) {
+			                vo.setEvaluGroupId(numeric);         // VO 타입이 String이면 그대로 set
+			                vo.setEvaluateeGroupId(numeric);
+			            }
+			        }
+				 empService.inputEvaluResultScore(vo); // 횟수만큼 insert문 실행
+			 }
+			 return ResponseEntity.ok(response);
 		}
 
 }
