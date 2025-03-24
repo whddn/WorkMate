@@ -338,23 +338,23 @@
 
 	<!-- 부서명과 팀명 조회 쿼리문 -->
 	<select id="selectTeamList" resultType="EmpVO">
-				SELECT t.team_no
-				        , t.team_name
-				        , d.department_name
-				        , t.department_id
-				FROM team t 
-				JOIN department d 
-				ON t.department_id = d.department_id
+		SELECT t.team_no
+		        , t.team_name
+		        , d.department_name
+		        , t.department_id
+		FROM team t 
+		JOIN department d 
+		ON t.department_id = d.department_id
 	</select>
 	
 	<!-- 새 평가 등록 : form 부분 -->
 	<insert id="insertEvaluForm" parameterType="EvaluVO">
-			<selectKey keyProperty="evaluFormNo"
-				   resultType="Integer"
-				   order="BEFORE">
-			 SELECT MAX(EVALU_FORM_NO) + 1
-	         FROM EVALU_FORM
-			</selectKey>
+		<selectKey keyProperty="evaluFormNo"
+			   resultType="Integer"
+			   order="BEFORE">
+		 	SELECT MAX(EVALU_FORM_NO) + 1
+       		FROM EVALU_FORM
+		</selectKey>
 		INSERT INTO EVALU_FORM
 					(EVALU_FORM_NO
 		            , EVALU_NAME
@@ -371,18 +371,17 @@
 	</insert>
 	<!-- 새 평가 등록 : format 부분 -->
 	<insert id="insertEvaluFormat" parameterType="EvaluVO">	
-
-        		INSERT INTO EVALU_FORMAT
-					(EVALU_NO
-					, ORDER_NO
-					, EVALU_ITEM_NO
-					, EVALU_FORM_NO)
-					
-				VALUES ( EVALU_NO_SEQ.NEXTVAL
-					, #{orderNo}
-					, #{evaluItemNo}
-					, #{evaluFormNo}
-					)
+      	INSERT INTO EVALU_FORMAT
+			(EVALU_NO
+			, ORDER_NO
+			, EVALU_ITEM_NO
+			, EVALU_FORM_NO)
+			
+		VALUES ( EVALU_NO_SEQ.NEXTVAL
+			, #{orderNo}
+			, #{evaluItemNo}
+			, #{evaluFormNo}
+			)
 	</insert>
 	<!-- 새 평가 등록 : 평가자 그룹 아이디 => 조회는 사원 번호와 평가 폼 번호로 -->
 	<insert id="insertEvaluGroup" parameterType="EvaluVO">
@@ -400,23 +399,21 @@
 			JOIN TEAM t ON u.team_no = t.team_no
 			WHERE t.team_no = #{evaluGroupId}
 	</insert>
-	
 	<!-- 새 평가 등록 : 피평가자 그룹 아이디 -->
 	<insert id="insertEvaluateeGroup" parameterType="EvaluVO">
-	
-			INSERT INTO EVALUATEE_GROUP
-			(
-			    EVALUATEE_GROUP_ID
-			    , EVALU_FORM_NO
-			    , USER_NO                
-			)
-			SELECT 
-			    EVALUATEE_G_ID_SEQ.NEXTVAL
-			    , #{evaluFormNo}
-			    , u.user_no
-			FROM EMPLOYEE u 
-			JOIN TEAM t ON u.team_no = t.team_no
-			WHERE t.team_no = #{evaluateeGroupId}
+		INSERT INTO EVALUATEE_GROUP
+		(
+		    EVALUATEE_GROUP_ID
+		    , EVALU_FORM_NO
+		    , USER_NO                
+		)
+		SELECT 
+		    EVALUATEE_G_ID_SEQ.NEXTVAL
+		    , #{evaluFormNo}
+		    , u.user_no
+		FROM EMPLOYEE u 
+		JOIN TEAM t ON u.team_no = t.team_no
+		WHERE t.team_no = #{evaluateeGroupId}
 	</insert>
 
 </mapper>

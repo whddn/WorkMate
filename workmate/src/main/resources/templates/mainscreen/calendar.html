@@ -27,8 +27,23 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="eventTitle" class="form-control" placeholder="일정 제목">
-                    <input type="hidden" id="eventDate">
+                	<span>
+                		내용 : <input type="text" id="eventContent" class="form-control">
+                	</span>
+                	<span>
+                		범위 : 
+                		<input type="radio" name="publicScore" value="c1">개인
+                		<input type="radio" name="publicScore" value="c2">부서
+                		<input type="radio" name="publicScore" value="c3">전체
+                	</span>
+                	<span>
+                		종류 : 
+                		<input type="radio" name="scheduleType" value="h1">회의
+                		<input type="radio" name="scheduleType" value="h2">미팅
+                		<input type="radio" name="scheduleType" value="h3">출장
+                	</span>
+                    <input type="hidden" id="eventStart">
+                    <input type="hidden" id="eventEnd">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
@@ -38,38 +53,158 @@
         </div>
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let calendarEl = document.getElementById('calendar');
-            let calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'ko',
-                selectable: true,
-                editable: true,
-                events: [],
-                dateClick: function(info) {
-                    document.getElementById('eventDate').value = info.dateStr;
-                    new bootstrap.Modal(document.getElementById('eventModal')).show();
-                },
-                eventClick: function(info) {
-                    if (confirm("이 일정을 삭제하시겠습니까?")) {
-                        info.event.remove();
-                    }
-                }
-            });
-            calendar.render();
+    <script th:inline="javascript">
+    	let calendar;
+	    $(document).ready(function() {
+	    	// 캘린더 기본설정
+	        let calendarEl = $('#calendar')[0];
+	        calendar = new FullCalendar.Calendar(calendarEl, {
+	            initialView: 'dayGridMonth',
+	            locale: 'ko',
+	            selectable: true,
+	            editable: true,
+	            events: [],
+	            select: function(info) {
+	            	info.end.setDate(info.end.getDate() - 1);
+	            	info.endStr = info.end.toLocaleDateString('ko-KR', {
+	            	    year: 'numeric',
+	            	    month: '2-digit',
+	            	    day: '2-digit'
+	            	}).replace(/\. /g, '-').replace('.', '');
+	                $('#eventStart').val(info.startStr);
+	                $('#eventEnd').val(info.endStr);
+	                $('#eventModal').modal('show');
+	            },
+	            eventClick: function(info) {
+	                if (!confirm("이 일정을 삭제하시겠습니까?")) {
+	                	return;
+	                }
+	                
+	                $.ajax({
+	                	url: [[ @{/calendar/schedule} ]],
+	                	type: 'DELETE',
+	                	contentType: 'application/json',
+	                	data: JSON.stringify({
+	                		scheduleNo: info.event.id
+	                	}),
+	                	success: function(response) {
+	                		if(response.success) {
+	                			alert('일정 제거에 성공했습니다.');
+			                info.event.remove();
+	                		}
+	                	},
+	                	error: function(error) {
+	                		alert('일정 제거에 실패하였습니다.');
+	                	}
+	                });
+	            },
+	            eventDrop: function(info) {
+	                let updatedStart = info.event.start.toISOString().split('T')[0];
+	                let updatedEnd = info.event.end ? info.event.end.toISOString().split('T')[0] : updatedStart;
+	                
+	                $.ajax({
+	                    url: [[ @{/calendar/schedule} ]],
+	                    type: 'PUT',
+	                    contentType: 'application/json',
+	                    data: JSON.stringify({
+	                        scheduleNo: info.event.id,
+	                        scheduleStartDate: updatedStart,
+	                        scheduleEndDate: updatedEnd
+	                    }),
+	                    success: function(response) {
+	                        if(response.success) {
+	                            alert('일정이 수정되었습니다.');
+	                        }
+	                    },
+	                    error: function(error) {
+	                        alert('일정 수정에 실패하였습니다.');
+	                        info.revert(); // 실패 시 원래 위치로 복구
+	                    }
+	                });
+	            }
+	        });
+	        calendar.render();
 
-            document.getElementById('saveEvent').addEventListener('click', function() {
-                let title = document.getElementById('eventTitle').value;
-                let date = document.getElementById('eventDate').value;
-                if (title) {
-                    calendar.addEvent({ title: title, start: date });
-                    document.getElementById('eventTitle').value = '';
-                    bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
+    	    // 일정 불러오기
+    	    $.ajax({
+    	        url: [[ @{/calendar/schedule} ]],
+    	        type: 'GET',
+    	        contentType: 'application/json',
+    	        success: function(response) {
+    	            response.forEach(function(element) {
+    	                // 일정 종류에 따라 색상 지정
+    	                let color = getColorByType(element.scheduleType);
+    	                addSchedule(element.scheduleNo, element.scheduleContent, element.scheduleStartDate, element.scheduleEndDate, color);
+    	            });
+    	        }
+    	    });
+	        
+	        
+            // 일정 추가
+            $('#saveEvent').click(function() {
+                let scheduleContent = $('#eventContent').val();
+                let publicScore = $('input[name="publicScore"]:checked').val();
+                let scheduleType = $('input[name="scheduleType"]:checked').val();
+                let scheduleStartDate = $('#eventStart').val();
+                let scheduleEndDate = $('#eventEnd').val();
+
+                if(scheduleContent == null || scheduleContent == '') {
+                	return;
                 }
+                
+                $.ajax({
+                    url: [[ @{/calendar/schedule} ]],
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        scheduleContent: scheduleContent,
+                        publicScore: publicScore,
+                        scheduleType: scheduleType,
+                        scheduleStartDate: scheduleStartDate,
+                        scheduleEndDate: scheduleEndDate
+                    }),
+                    success: function(response) {
+                        if(response.success) {
+                            let schedule = response.result;
+                            addSchedule(schedule.scheduleNo, schedule.scheduleContent, schedule.scheduleStartDate, schedule.scheduleEndDate);
+                            alert('일정 등록에 성공했습니다.');
+                        }
+                    },
+                    error: function(error) {
+                        alert('일정 등록에 실패하였습니다.');
+                    }
+                });
             });
-        });
+	    });
+	    
+	    function addSchedule(no, content, start, end, color) {
+	        calendar.addEvent({
+	            id: no,
+	            title: content,
+	            start: start,
+	            end: end,
+	            eventColor: color, // 배경색 지정
+	            textColor: 'white' // 글씨 색 지정
+	        });
+	        $('#eventContent').val('');
+	        $('#eventModal').modal('hide');
+	    }
+
+	    // 일정 종류에 따라 색상 반환
+	    function getColorByType(type) {
+	        switch (type) {
+	            case 'h1': // 회의
+	                return 'lightblue';
+	            case 'h2': // 미팅
+	                return 'lightgreen';
+	            case 'h3': // 출장
+	                return 'lightcoral';
+	            default:
+	                return 'lightgray';
+	        }
+	    }
     </script>
 </body>
 
 </html>
+

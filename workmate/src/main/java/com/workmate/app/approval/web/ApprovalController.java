@@ -42,8 +42,18 @@ import com.workmate.app.common.FileHandler;
 import com.workmate.app.common.WhoAmI;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
+
 import lombok.RequiredArgsConstructor;
 
+/** 전자결재
+ * @author 이지응
+ * @since 2025-03-10
+ * <pre>
+ * <pre>
+ * 수정일자 수정자 수정내용
+ * -----------------
+ * </pre>
+ */
 @Controller
 @RequiredArgsConstructor
 public class ApprovalController {
@@ -55,10 +65,16 @@ public class ApprovalController {
 	private final SignService signService;
 	private final EmpService empService;
 	private final ObjectMapper objectMapper;
-	private final FileHandler fileHandler = new FileHandler();
-	private final WhoAmI whoAmI = new WhoAmI();
+	private final FileHandler fileHandler;
+	private final WhoAmI whoAmI;
 	
-	// 결재를 기다리는 문서 리스트를 보여준다(자신과 관련된)
+	/**
+	 * 결재를 기다리는 문서 리스트를 보여준다(자신과 관련된)
+	 * @param model
+	 * @param approvalVO
+	 * @param standard
+	 * @return 결재 진행목록 페이지명
+	 */
 	@GetMapping("approval/waiting")
 	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam(defaultValue = "fromMe") String standard) {
 		approvalVO.setUserNo(whoAmI.whoAmI().getUserNo());
