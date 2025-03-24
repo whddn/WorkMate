@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import com.workmate.app.mail.service.AttachmentVO;
 import com.workmate.app.mail.service.MailFolderVO;
 import com.workmate.app.mail.service.MailVO;
 
@@ -73,4 +74,5 @@ public interface MailMapper {
 	//메일 중복체크
 	@Select("SELECT COUNT(*) FROM MAIL WHERE MESSAGE_ID = #{messageId}")
 	int countMessageId(@Param("messageId") String messageId);
+
 }

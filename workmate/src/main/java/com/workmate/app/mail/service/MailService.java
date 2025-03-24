@@ -2,6 +2,8 @@ package com.workmate.app.mail.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.mail.MessagingException;
 
 public interface MailService {
@@ -64,4 +66,18 @@ public interface MailService {
 	void inputMail(MailVO mail);
 	//스팸
 	List<MailVO> findSpamMails(int userNo);
+	// 첨부파일 저장
+	void inputAttachments(List<AttachmentVO> files);
+
+	// 메일 ID로 첨부파일 목록 조회
+	List<AttachmentVO> findAttachmentsByMailId(int mailId);
+
+	// 파일 ID로 단일 파일 정보 조회
+	AttachmentVO findAttachmentById(Long fileId);
+	
+	MailVO sendEmailReturnSaved(String senderName, String senderEmail, String recipients, String ccList, String subject, String content) throws MessagingException;
+	//첨부파일 리스트 DB 저장
+	void inputAttachmentList(List<AttachmentVO> attachList);
+	// 첨부파일 포함 이메일 전송
+	void sendMailWithAttachment(String senderName, String senderEmail, String recipients, String ccList, String subject, String content, MultipartFile[] attachments) throws MessagingException;
 }
