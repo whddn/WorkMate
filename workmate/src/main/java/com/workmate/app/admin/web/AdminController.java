@@ -19,6 +19,22 @@ import com.workmate.app.common.FileHandler;
 import com.workmate.app.reservation.service.CommonItemVO;
 import lombok.RequiredArgsConstructor;
 
+/** 공용품 관리 페이지
+ * @author 이종우
+ * @since 2025-03-10
+ * <pre>
+ * <pre>
+ * 수정일자	수정자	수정내용
+ * -------------------------
+ * 03-13	이종우	공용품추가기능
+ * 03-14	이종우	수정기능
+ * 03-17	이종우	삭제,목록기능
+ * 03-19	이종우	사진/날짜 추가
+ * 
+ * 
+ * </pre>
+ */
+
 @Controller
 @RequiredArgsConstructor
 public class AdminController {
@@ -29,11 +45,15 @@ public class AdminController {
 	// ✅ `application.properties`에서 파일 저장 경로 가져오기
 	@Value("${file.upload-dir}")
 	private String uploadDir;
-
 	private String subDir ="CommonItemImage/";
 	
 	// 전자결재 관리
-
+	
+	/**
+	 * 공용품 전체보기 페이지로 이동
+	 * @param model
+	 * @return 조회페이지명
+	 */
 	// 공용품 관리
 	@GetMapping("admin/commonItemList")
 	public String commonItemList(Model model) {

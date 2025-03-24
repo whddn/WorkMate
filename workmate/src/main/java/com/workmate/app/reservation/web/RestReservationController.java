@@ -1,7 +1,6 @@
 package com.workmate.app.reservation.web;
 
 import java.util.List;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -54,14 +53,15 @@ public class RestReservationController {
 
 	
 	// 예약 삭제
-	@DeleteMapping("/api/reservation/Delete/{reserNo}")
-    public ResponseEntity<String> deleteReservation(@PathVariable int reserNo) {
-        Map<String, Object> deleted = reservationService.dropReserInfo(reserNo);
-        if (deleted != null) {
-            return ResponseEntity.ok("삭제 성공");
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
-        }
-    }
+	@DeleteMapping("/reservation/Delete/{reserNo}")
+	public ResponseEntity<String> deleteReservation(@PathVariable int reserNo) {
+	    int result = reservationService.dropReserInfo(reserNo);
+	    if (result > 0) {
+	        return ResponseEntity.ok("삭제 성공");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
+	    }
+	}
+
 
 }

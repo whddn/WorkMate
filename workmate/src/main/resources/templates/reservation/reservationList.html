@@ -70,9 +70,8 @@ button:disabled {
 					<td th:text="${reser.reserDate}"></td>
 					<td th:text="(${reser.reserStartTime} + ' ~ ' + ${reser.reserEndTime} + ' 까지')"></td>
 					<td>
-						<button class="btn btn-warning">수정</button>
-						<button class="btn btn-danger" th:onclick="|deleteReservation([[${reser.reserNo}]])|">삭제</button>
-						
+						<button class="btn btn-warning" th:onclick="|location.href='@{/reservation/edit/{reserNo}(reserNo=${reser.reserNo})}'|">수정</button>
+						<button class="btn btn-danger" th:onclick="|deleteReservation(${reser.reserNo})|">삭제</button>
 					</td>
 					<td>
 					  <span class="badge" th:text="${reser.usageStatus}"></span>
@@ -84,9 +83,11 @@ button:disabled {
 
 	<script>
 	function deleteReservation(reserNo) {
+		const contextPath = '/workmate';
+		
 	    if (!confirm("정말 삭제하시겠습니까?")) return;
 	
-	    fetch(`/api/reservation/Delete/${reserNo}`, {
+	    fetch(`${contextPath}/reservation/Delete/${reserNo}`, {
 	        method: 'DELETE'
 	    })
 	    .then(res => {
