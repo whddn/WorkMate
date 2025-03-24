@@ -145,6 +145,15 @@ public class MailServiceImpl implements MailService {
 	        Message[] messages = inbox.getMessages();
 
 	        for (Message message : messages) {
+	        	// Message-ID 가져오기
+	        	String messageId = ((MimeMessage) message).getMessageID();
+	        	if (mailMapper.countMessageId(messageId) > 0) {
+	        	    System.out.println("⚠️ 이미 저장된 메일입니다: " + messageId);
+	        	    continue;
+	        	}//
+	        	
+	        	
+	        	
 	            Address[] toAddresses = message.getRecipients(Message.RecipientType.TO);
 	            if (toAddresses == null || toAddresses.length == 0) continue;
 
@@ -194,6 +203,7 @@ public class MailServiceImpl implements MailService {
 	    String combined = (subject + " " + content).toLowerCase();
 	    return spamKeywords.stream().anyMatch(combined::contains);
 	}
+	
 	/**
 	 * 🔹 메일 본문 가져오는 메서드 (텍스트/HTML 처리 가능)
 	 */
@@ -303,4 +313,5 @@ public class MailServiceImpl implements MailService {
 	public List<MailVO> findSpamMails(int userNo) {
 	    return mailMapper.findSpamMails(userNo);
 	}
+	
 }

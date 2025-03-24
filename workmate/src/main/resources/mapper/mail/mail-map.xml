@@ -43,11 +43,11 @@
 	<!-- 보낸메일 저장 -->
 	<insert id="insertMail" parameterType="MailVO">
 		INSERT INTO MAIL
-		( MAIL_ID, SENDER_EMAIL,
+		( MAIL_ID, SENDER_EMAIL, MESSAGE_ID,
 		USER_NO, RECIPIENTS, CC_LIST, SUBJECT, CONTENT, SENT_AT, STATUS,
 		FOLDER_ID, ENCRYPTED, MAIL_TYPE, IS_SPAM)
 		VALUES
-		(MAIL_SEQ.NEXTVAL,#{mail.senderEmail},
+		(MAIL_SEQ.NEXTVAL,#{mail.senderEmail}, #{mail.messageId},
 		#{mail.userNo}, #{mail.recipients}, #{mail.ccList}, #{mail.subject},
 		#{mail.content}, SYSDATE, #{mail.status}, #{mail.folderId},
 		#{mail.encrypted}, #{mail.mailType}, #{mail.isSpam})
@@ -215,4 +215,5 @@
       AND FOLDER_ID = 1004
     ORDER BY SENT_AT DESC
 </select>
+
 </mapper>
