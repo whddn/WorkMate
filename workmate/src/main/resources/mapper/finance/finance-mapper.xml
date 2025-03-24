@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="package com.workmate.app.finance.mapper.FinanceMapper">
-
+<mapper namespace="com.workmate.app.finance.mapper.FinanceMapper">
+	<!-- 보고서 전체 조회 -->
+	<select id="selectReportList" resultType="FinanceVO">
+		SELECT 
+		        r.report_title
+		        , r.report_status
+		        , u.user_name
+		        , r.write_date
+		        , r.report_note
+		FROM report r 
+		JOIN employee u
+		ON u.user_NO = r.user_no 
+	</select>
+	
+	<select id="selectReportById" resultType="FinanceVO">
+		SELECT 	
+				report_no
+				, report_title
+				, report_status
+				, write_date
+				, deposit
+				, withdrawal
+				, balance
+				, userPosition
+				, user_no
+		FROM report
+		WHERE report_no = #{reportNo}
+	</select>
 </mapper>

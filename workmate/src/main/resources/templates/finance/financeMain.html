@@ -172,30 +172,17 @@
                 </tr>
             </thead>
             <tbody>
+            	<th:block th:each="report : ${report}">
                 <tr>
                     <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">리포트 제목 1</a></td>
-                    <td>완료</td>
-                    <td>홍길동</td>
-                    <td>2025-03-13</td>
-                    <td>추가 설명</td>
+                    <td><a href="#">[[ ${report.reportTitle} ]]</a></td>
+                    <td>[[ ${report.reportStatus} ]]</td>
+                    <td>[[ ${report.userName} ]]</td>
+                    <td th:text="${#dates.format(report.writeDate, 'yyyy-MM-dd')}"></td>
+                    <td>[[ ${report.reportNote} ]]</td>
                 </tr>
-                <tr>
-                    <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">리포트 제목 2</a></td>
-                    <td>진행 중</td>
-                    <td>이순신</td>
-                    <td>2025-03-12</td>
-                    <td>추가 설명</td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" name="postSelection"></td>
-                    <td><a href="#">리포트 제목 3</a></td>
-                    <td>완료</td>
-                    <td>김개발</td>
-                    <td>2025-03-11</td>
-                    <td>추가 설명</td>
-                </tr>
+                </th:block>
+
             </tbody>
         </table>
 

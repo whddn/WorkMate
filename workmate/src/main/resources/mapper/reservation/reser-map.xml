@@ -30,16 +30,22 @@
 	<!-- 예약 목록 조회 -->
 	<select id="selectmyReservationList" resultType="ReservationVO">
 		SELECT
-		      common_kind
-		      ,common_name
-		      ,reser_date
-		      ,reser_start_time
-		      ,reser_end_time
-		      ,usage_status
-		      ,reser_no
-		      ,content
-		from reser
-		order by reser_start_time
+		    r.common_kind,
+		    r.common_name,
+		    r.reser_date,
+		    r.reser_start_time,
+		    r.reser_end_time,
+		    r.usage_status,
+		    r.reser_no,
+		    r.content,
+		    c.image
+		FROM 
+		    reser r
+		JOIN 
+		    common_item c ON r.common_no = c.common_no
+		ORDER BY 
+		    r.reser_date DESC
+
 	</select>
 	
 	<!-- 시간 중복체크 -->
@@ -49,6 +55,9 @@
 			   ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_end_time
 	    FROM reser
 	    WHERE common_no = #{commonNo}
+	    <if test="reserNo != null">
+        	AND reser_no != #{reserNo}
+    	</if>
 	</select>
 
 	<!-- 예약신청 -->
@@ -86,13 +95,26 @@
 			,#{image}
 		)
 	</insert>
+	
+	<!-- 예약 수정 전 한건 조회 -->
+	<select id="selectReserByNo" resultType="ReservationVO">
+	    SELECT 
+		    r.*, 
+		    c.image 
+		FROM 
+		    reser r
+		JOIN 
+		    common_item c ON r.common_no = c.common_no
+		WHERE 
+		    r.reser_no = #{reserNo}
+	</select>
+	
 	<!-- 예약수정 -->
-	<update id="updateReservationInfo" parameterType="ReservationVO">
+	<update id="updateReserInfo" parameterType="ReservationVO">
 		update reser
 		set	 reser_date = #{reserDate}
 		    ,reser_start_time = #{reserStartTime}
 		    ,reser_end_time = #{reserEndTime}
-		    ,reser_availability = #{reserAvailability}
 		    ,content = #{content}
 		    ,usage_status = #{usageStatus}
 		where reser_no = #{reserNo}

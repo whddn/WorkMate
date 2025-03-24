@@ -24,4 +24,5 @@ public class MailVO {
 	private String reserStatus; //예약상태
 	private int folderId; //폴더ID
 	private String senderEmail;  // 외부 보낸 사람 이메일
+	private String messageId; //메세지 중복방지
 }
