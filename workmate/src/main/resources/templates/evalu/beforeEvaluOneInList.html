@@ -112,7 +112,7 @@
     <form id="evaluationForm">
       <!-- 1. 평가자 정보 -->
 	
-      <h3>1. 평가자 정보</h3>
+      <b>평가자 정보</b>
       <table>
         <tr>
           <th>구분</th>
@@ -122,31 +122,28 @@
         </tr>
         <tr>
          <td>평가자</td>
+         <td th:text="${one[0].departmentName}"></td>
+         <td th:text="${one[0].teamName}"></td>
          <td>
-         <select>
-         	<option th:each="evalu : ${evalu}" th:text="${evalu.userName}"></option>
-         </select>
-         </td>
-        </tr>
-        <tr>
-          <td>피평가자</td>
-          <td>
-          <select>
-         	<option th:each="evaluatee : ${evaluatee}" th:text="${evaluatee.userName}"></option>
-         </select>
+          <select id="userSelect">
+		      <option value="">-- 사원 선택 --</option>
+		      <option th:each="e : ${one}"
+		              th:value="${e.userNo}"
+		              th:text="${e.userName}">
+		      </option>
          </td>
         </tr>
       </table>
 
       <!-- 2. 평가 안내-->
-      <h3>2. 평가 설명</h3>
+      <b>평가 설명</b>
       <div class="ver2">
         <p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
         <p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
       </div>
 
       <!-- 3. 평가항목 -->
-      <h3>3. 평가항목 및 채점표</h3>
+      <b>평가항목 및 채점표</b>
       <table>
         <tr>
           <th>평가분야</th>
@@ -154,7 +151,7 @@
           <th>평가점수 (1~5)</th>
         </tr>
 
-        <!-- 핵심가치 -->
+      
      <th:block th:each="one : ${one}">
         <tr>
           <td>[[ ${one.evaluCompet} ]]</td>
@@ -165,7 +162,7 @@
 	 </th:block>
 
       <!-- 4. 추가 의견 -->
-      <h3>4. 추가 의견</h3>
+      <h5>추가 의견</h5>
       <table>
         <tr>
           <th>강점</th>
@@ -176,10 +173,8 @@
           <td><input type="text" name=""></td>
         </tr>
       </table>
-      <button type="submit">제출</button>
+      <button type="button" th:onclick="|location.href='@{/emp/bfevalu}'|">목록으로</button>
     </form>
-
   </div>
 </body>
-
 </html>

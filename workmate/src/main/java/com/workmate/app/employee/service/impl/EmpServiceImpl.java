@@ -89,11 +89,6 @@ public class EmpServiceImpl implements EmpService {
 		}
 		return uniqueTeam;
 	}
-	// 나의 평가 리스트 조회
-//	@Override
-//	public EvaluVO findMyEvaluList(EvaluVO evaluVO) {
-//		return null;
-//	}
 
 	// 내가 진행한 평가 단건 조회 
 	@Override
@@ -114,6 +109,8 @@ public class EmpServiceImpl implements EmpService {
 	        if (seen.add(key)) {	// seen 리스트에 key 추가 
 	            result.add(vo);		// result 에 vo 추가 
 	        }
+
+
 	    }
 
 	    return result;
@@ -122,26 +119,48 @@ public class EmpServiceImpl implements EmpService {
 	// 지나간 평가 단건 조회 (관리자 - 단건 조회)
 	@Override
 	public List<EvaluVO> findBeforeEvaluById(EvaluVO evaluVO) {
-		 List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
-		    Set<String> seen = new HashSet<>();	// set : 중복 제거 
-		    List<EvaluVO> result = new ArrayList<>(); // 새 리스트 생성 
+	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
+	    Set<String> seen = new HashSet<>();
+	    List<EvaluVO> result = new ArrayList<>();
 
-		    for (EvaluVO vo : rawList) {	// selectOne의 쿼리값을 모두 반환할 동안 
-		        int userNo = vo.getUserNo();	// 유저 번호 
-		        String evaluCompet = vo.getEvaluCompet();	// 항목 
-		        String evaluContent = vo.getEvaluContent();	// 내용
+	    for (EvaluVO vo : rawList) {
+	        String deptName = vo.getDepartmentName();
+	        String teamName = vo.getTeamName();
+	        int userNo = vo.getUserNo();
 
-		        if (evaluCompet == null) continue;	// compet이 null이면 계속 추가 
+	        if (deptName == null || teamName == null) continue;
 
-		        String key = userNo + "|" + evaluCompet.trim() + "|" + evaluContent.trim(); // key에 userNo, evaluCompet, evaluContent 기준 
-		        						
-		        if (seen.add(key)) {	// seen 리스트에 key 추가 
-		            result.add(vo);		// result 에 vo 추가 
-		        }
-		    }
-		    return result;
+	        String key = deptName.trim().toLowerCase() + "|" +
+	                     teamName.trim().toLowerCase() + "|" +
+	                     userNo;
+
+	        if (seen.add(key)) {
+	            result.add(vo);
+	        }
+	    }
+	    return result;
+	}
+	// 관리자 단건 조회 항목 / 컨텐츠 중복 제거 
+	@Override
+	public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO param) {
+	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(param); // 기존 쿼리 재활용
+	    Set<String> seen = new HashSet<>();
+	    List<EvaluVO> result = new ArrayList<>();
+
+	    for (EvaluVO vo : rawList) {
+	        if (vo.getUserNo() != param.getUserNo()) continue;
+
+	        String key = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
+	        if (seen.add(key)) {
+	            result.add(vo);
+	        }
+	    }
+	    return result;
 	}
 
+	
+	
+	
 	// 평가 등록 페이지
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {
@@ -214,19 +233,18 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.selectMyEvaluList(evaluVO);
 	}
 
-	// 평가 진행 상세 페이지
+	// 내가 평가자로 지정된 평가 확인 (내가 제출한 평가) 
 	@Override
 	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO) {
-	    List<EvaluVO> rawList = empMapper.selectOneEvaluById(evaluVO);
+	    List<EvaluVO> rawList = empMapper.selectMyEvaluingById(evaluVO);
 
 	    Set<String> seen = new HashSet<>();	// set : 중복 제거 
 	    List<EvaluVO> result = new ArrayList<>(); // 새 리스트 생성 
-
+	    System.out.println("🔍 rawList size: " + rawList.size());
 	    for (EvaluVO vo : rawList) {	// selectOne의 쿼리값을 모두 반환할 동안 
 	        int userNo = vo.getUserNo();	// 유저 번호 
 	        String evaluCompet = vo.getEvaluCompet();	// 항목 
 	        String evaluContent = vo.getEvaluContent();	// 내용
-
 	        if (evaluCompet == null) continue;	// compet이 null이면 계속 추가 
 
 	        String key = userNo + "|" + evaluCompet.trim() + "|" + evaluContent.trim(); // key에 userNo, evaluCompet, evaluContent 기준 
@@ -273,7 +291,7 @@ public class EmpServiceImpl implements EmpService {
 	// 내가 받은 평가 점수 확인 (단건)
 	@Override
 	public List<EvaluVO> findMyEvaluScoreResultById(EvaluVO evaluVO) {
-		return empMapper.selectMyEvaluResultById(evaluVO);
+		return empMapper.selectMyEvaluScoreResultById(evaluVO);
 	}
 
 

@@ -3,6 +3,7 @@ package com.workmate.app.employee.web;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -132,7 +133,6 @@ public class EmpController {
 		return ResponseEntity.ok(updatedEmp); // 수정된 사원 정보 반환
 	}
 
-	/////////////////////// 평가 //////////////////////////
 
 	// 내 평가 리스트 (일반 사용자)
 	@GetMapping("emp/myEvalu")
@@ -148,7 +148,7 @@ public class EmpController {
 
 		List<EvaluVO> oneEvalu = empService.findMyEvaluList(evaluVO);
 		model.addAttribute("evlist", oneEvalu);
-		return "evalu/myEvaluList"; // 나의 평가 조회
+		return "evalu/myEvaluList"; 
 	}
 
 	@GetMapping("emp/bfevalu") // 지난 평가 리스트 전체 조회 (관리자)
@@ -163,13 +163,20 @@ public class EmpController {
 	@GetMapping("emp/bfoneevalu/{evaluFormNo}")
 	public String selectBeforeEvaluResultById(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
 		evaluVO.setEvaluFormNo(evaluFormNo);
-		List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluById(evaluVO);
+		List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluById(evaluVO); // 지난 평가 단건 조회
 		List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
 		List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
+		List<EvaluVO> deptList = empService.findBeforeEvaluById(new EvaluVO());
+		model.addAttribute("evaluList", deptList);
 		model.addAttribute("evalu", evalu); // 평가자 정보
 		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
 		model.addAttribute("one", findOneEvaluResult);
 		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
+		
+		EvaluVO param = new EvaluVO();
+		List<EvaluVO> detailList = empService.getEvaluItemsUniqueByUser(param);
+		 model.addAttribute("evaluDetail", detailList);
+		    
 		return "evalu/beforeEvaluOneInList"; // 페이지 이동 방식 @PathVariable : 한 건만 넘길 때 / @requestParam : 여러 건 넘길 때
 	}
 
@@ -215,12 +222,17 @@ public class EmpController {
 			List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
 			List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
 			List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
+			
 			// 1) 사용자 중복 제거
 			Set<Integer> userSet = new HashSet<>();
 			List<EvaluVO> userList = new ArrayList<>();
 			for (EvaluVO vo : fullList) {
 				if (userSet.add(vo.getUserNo())) {
 					userList.add(vo);
+					System.out.println("userList: ");
+					System.out.println("fullList size: " + fullList.size());
+					System.out.println(userList);
+					System.out.println("UserNo: " + vo.getUserNo());
 				}
 			}
 
@@ -233,20 +245,35 @@ public class EmpController {
 					evaluList.add(vo);
 				}
 			}
-			// 점수 Map 방식
-			Map<String, Integer> scoreMap = new HashMap<>();
+			
+			// 3) 사용자별 항목 - 점수 정보 매핑 
+			Map<Integer, Map<String, Integer>> userScore = new LinkedHashMap<>();
+			List<EvaluVO> rawList = empService.findMyEvaluProcess(evaluVO);
+			
+			for(EvaluVO vo : rawList) {
+				int userNo = vo.getUserNo();
+				String key = vo.getEvaluCompet().trim() + " - " + vo.getEvaluContent().trim();
+				int score = vo.getEvaluScore();
+				List<EvaluVO> list = empService.findMyEvaluProcess(evaluVO);
 
-			for (EvaluVO vo : findResult) {
-				String key = vo.getUserNo() + "|" + vo.getEvaluItemNo() + "|" + vo.getEvaluCompet();
-				scoreMap.put(key, vo.getEvaluScore());
+				Map<String, Integer> scoreMap = userScore.get(userNo);
+				
+				if (scoreMap == null) {
+					scoreMap = new LinkedHashMap<>();
+					userScore.put(userNo, scoreMap);
+				}
+				scoreMap.put(key, score);
+			    // 디버깅 로그 추가: 점수 매핑 확인
 			}
-
-			model.addAttribute("scoreMap", scoreMap);
+			
+			model.addAttribute("score", userScore);
 			model.addAttribute("userList", userList);
+			model.addAttribute("evaluList", evaluList);
+			
 			model.addAttribute("result", findResult);
 			model.addAttribute("evalu", evalu);
 			model.addAttribute("evaluatee", evaluatee);
-			model.addAttribute("evaluList", evaluList);
+			
 			return "evalu/evaluMyResult";
 
 		} else {
@@ -275,6 +302,7 @@ public class EmpController {
 					evaluList.add(vo);
 				}
 			}
+			
 
 			model.addAttribute("userList", userList);
 			model.addAttribute("evaluList", evaluList);

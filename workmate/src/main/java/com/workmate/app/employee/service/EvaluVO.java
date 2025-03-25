@@ -42,7 +42,8 @@ public class EvaluVO {
 	private Date evaluEnd;			// 평가 종료 날짜
 	List<EmpVO> empOne;
 	List<TeamVO> teamList;
-	private int userNo;				// 유저 번호 
+	private Integer userNo;				// 유저 번호 
+//	private int userNo;	
 	private String userName;		// 유저 이름
 	private String departmentName;	// 부서명
 	private String teamName;		// 팀이름
@@ -55,5 +56,4 @@ public class EvaluVO {
 	private String evaluateeGroupId;	// 피평가자 그룹 아이디
 	// 평가 결과 테이블
 	private String evaluResultId; 	//
-	private int evaluResScore;
 }
