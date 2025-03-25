@@ -29,10 +29,19 @@ public interface AttendMapper {
 	// 연차 사용내역 전체 조회
 	public List<WorkVO> allAnnualList(WorkVO workVO);
 	
+	// 연차 업데이트
+	public int updateOccList(int userNo);
+	
 	// 전체사원 이번달 근태 수
 	public List<WorkVO> selectMonthEmpList();
 	
 	// 전체사원 근태 조회
 	public List<WorkVO> selectAllEmpList(WorkVO workVO);
+	
+	// 전체사원 필터 엑셀 목록
+	public List<WorkVO> selectFilterEmpList(@Param("stDate") String stDate,
+								            @Param("endDate") String endDate,
+								            @Param("name") String userName,
+								            @Param("team") String teamName);
 
 }

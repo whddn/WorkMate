@@ -121,7 +121,12 @@
 			<version>9.1.20</version>
 		</dependency>
 
-		
+		<!-- exel download-->
+		<dependency>
+		  <groupId>org.apache.poi</groupId>
+		  <artifactId>poi-ooxml</artifactId>
+		  <version>5.2.2</version>
+		</dependency>
 
 		<dependency>
 		    <groupId>com.fasterxml.jackson.datatype</groupId>

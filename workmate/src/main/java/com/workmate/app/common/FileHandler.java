@@ -8,8 +8,10 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+@Component
 public class FileHandler {
 	public String fileUpload(MultipartFile file, String fileDir) {
 		String fileName = file.getOriginalFilename();

@@ -6,6 +6,7 @@
 	<select id="selectFileList" resultType="DocVO">	
 		SELECT d.file_tag
 				, d.file_name
+				, d.file_desc
 		        , d.file_size
 		        , d.document_no
 		        , d.extenstion
@@ -21,6 +22,7 @@
 		INSERT INTO document (
         DOCUMENT_NO
         , FILE_NAME
+        , FILE_DESC
         , FILE_SIZE
         , ATTACHMENT
         , EXTENSTION
@@ -31,12 +33,13 @@
     ) VALUES (
         (SELECT NVL(MAX(DOCUMENT_NO), 0) + 1 FROM document), 
         #{fileName}, 
+        #{fileDesc},
         #{fileSize}, 
         #{attachment}, 
-        #{extension}, 
+        #{extenstion}, 
         SYSDATE, 
         #{fileTag}, 
-        #{userNo}, 
+        #{userNo}
     )	
 	</insert>
 		

@@ -99,7 +99,7 @@
                   <p>내 연차 내역</p>
                 </a>
               </li>
-               <li class="nav-item">
+               <li class="nav-item"  th:if="${teamNo == 'ROLE_T001'}">
                 <a th:href="@{attendanceManage}">
                   <i class="fas fa-address-book"></i>
                   <p>사원 근태관리</p>

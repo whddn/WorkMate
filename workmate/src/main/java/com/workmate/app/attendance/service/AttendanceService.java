@@ -30,5 +30,8 @@ public interface AttendanceService {
 	
 	//전체사원 근태조회
 	public List<WorkVO> findAllEmpWork(WorkVO workVO);
+	
+	//필터링된 전체사원 엑셀
+	public List<WorkVO> getFilterAttend(String stDate, String endDate, String userName, String teamName);
 
 }
