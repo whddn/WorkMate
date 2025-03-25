@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.http.HttpHeaders;
@@ -149,42 +150,7 @@ public class EmpController {
 		model.addAttribute("evlist", oneEvalu);
 		return "evalu/myEvaluList"; // 나의 평가 조회
 	}
-	
-	// 내 평가 단건 조회
-	@GetMapping("emp/result/{evaluFormNo}")
-	public String evaluResultOnePage(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
-		evaluVO.setEvaluFormNo(evaluFormNo);
-		List<EvaluVO> findResult = empService.findMyEvaluById(evaluVO);
-		List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
-		List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
-		model.addAttribute("evalu", evalu); // 평가자 정보 
-		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
-		model.addAttribute("result", findResult);
-		return "evalu/evaluMyResult";
-	}
-	
-	
-//	// 평가하기 페이지
-//		@GetMapping("emp/evalu") 
-//		public String empEvaluPage(@PathVariable int formNo, EvaluVO evaluVO, Model model) {
-////			evaluVO.setEvaluFormNo(formNo);
-////			List<EvaluVO> findEvalu = empService.findOneEvaluPage(evaluVO);
-////			List<EvaluVO> findOneEvalu = empService.findMyEvaluById(evaluVO);
-////			model.addAttribute("evalu", findOneEvalu);
-////			// model.addAttribute("evalu", findEvalu);
-//			return "employees/evalu";
-//		}
-		
-//		// 평가하기 페이지
-//		@PostMapping("emp/myEvalu/{formNo}") 
-//		public String myempEvaluOnePage(@PathVariable int formNo, EvaluVO evaluVO, Model model) {
-//			evaluVO.setEvaluFormNo(formNo);
-//			List<EvaluVO> findEvalu = empService.findOneEvaluPage(evaluVO);
-//			List<EvaluVO> findOneEvalu = empService.findMyEvaluById(evaluVO);
-//			model.addAttribute("evalu", findOneEvalu);
-//			// model.addAttribute("evalu", findEvalu);
-//			return "evalu/evalu";
-//		}
+
 		
 		@GetMapping("emp/bfevalu") // 지난 평가 리스트 전체 조회 (관리자)
 		public String selectBeforeEvaluListPage(EvaluVO evaluVO, Model model) {
@@ -230,73 +196,151 @@ public class EmpController {
 		    return ResponseEntity.ok(response);  // JSON 응답을 반환
 		}
 		
-		// 평가 진행 페이지 AJAX
-		@GetMapping("emp/evalu/{evaNo}")
-		public String evaluOneProcess(EvaluVO evaluVO,
-		                               Model model,
-		                               @AuthenticationPrincipal LoginUserVO loginUser,
-		                               @PathVariable int evaNo) {
-
-		    // 로그인 체크
+		
+		// 평가 상세 페이지 진입 (평가 진행 전 : evalu 로 / 진행 후 : result)
+		@GetMapping("emp/evalu/{formNo}")
+		public String routeEvaluPage(@PathVariable int formNo,
+		                             EvaluVO evaluVO,
+		                             Model model,
+		                             @AuthenticationPrincipal LoginUserVO loginUser) {
+		    
+		    // 1. 로그인 체크
 		    if (loginUser == null || loginUser.getUserVO() == null) {
 		        return "redirect:/login";
 		    }
 
-		    // 기본 정보 세팅
-		    evaluVO.setEvaluFormNo(evaNo);
-		    evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
+		    // 2. 상태 조회
+		    String status = Optional.ofNullable(empService.findEvaluStatus(formNo)).orElse("진행 중");
 
-		    // 전체 평가 항목 조회
-		    List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
+		    if ("평가 완료".equals(status)) {
+		        evaluVO.setEvaluFormNo(formNo);
+		        evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
 
-		    //  1. 사용자(userNo) 기준 중복 제거된 리스트
-		    Set<Integer> userSet = new HashSet<>();
-		    List<EvaluVO> userList = new ArrayList<>();
-
-		    for (EvaluVO vo : fullList) {
-		        if (userSet.add(vo.getUserNo())) {
-		            userList.add(vo);
+		        List<EvaluVO> findResult = empService.findMyEvaluById(evaluVO);
+		        List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
+		        List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
+		        List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
+		        // 1) 사용자 중복 제거
+		        Set<Integer> userSet = new HashSet<>();
+		        List<EvaluVO> userList = new ArrayList<>();
+		        for (EvaluVO vo : fullList) {
+		            if (userSet.add(vo.getUserNo())) {
+		                userList.add(vo);
+		            }
 		        }
-		    }
 
-		    //  2. userNo + evaluCompet 기준 평가 항목 중복 제거 리스트
-		    Set<String> keySet = new HashSet<>();
-		    List<EvaluVO> evaluList = new ArrayList<>();
-
-		    for (EvaluVO vo : fullList) {
-		        String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
-		        if (keySet.add(key)) {
-		            evaluList.add(vo);
+		        // 2) 평가 항목 중복 제거 (compet + content 기준)
+		        Set<String> keySet = new HashSet<>();
+		        List<EvaluVO> evaluList = new ArrayList<>();
+		        for (EvaluVO vo : fullList) {
+		            String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
+		            if (keySet.add(key)) {
+		                evaluList.add(vo);
+		            }
 		        }
+		        // 점수 Map 방식
+		        Map<String, Integer> scoreMap = new HashMap<>();
+
+		        for (EvaluVO vo : findResult) {
+		            String key = vo.getUserNo() + "|" + vo.getEvaluItemNo() + "|" + vo.getEvaluCompet(); 
+		            scoreMap.put(key, vo.getEvaluScore());
+		        }
+
+		        model.addAttribute("scoreMap", scoreMap);
+		        model.addAttribute("userList", userList);
+		        model.addAttribute("result", findResult);
+		        model.addAttribute("evalu", evalu);
+		        model.addAttribute("evaluatee", evaluatee);
+		        model.addAttribute("evaluList", evaluList);
+		        return "evalu/evaluMyResult";
+
+		    } else {
+		        // 평가 진행 페이지 (제출 전)
+
+		        evaluVO.setEvaluFormNo(formNo);
+		        evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
+
+		        List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
+			   
+		        // 1) 사용자 중복 제거
+		        Set<Integer> userSet = new HashSet<>();
+		        List<EvaluVO> userList = new ArrayList<>();
+		        for (EvaluVO vo : fullList) {
+		            if (userSet.add(vo.getUserNo())) {
+		                userList.add(vo);
+		            }
+		        }
+
+		        // 2) 평가 항목 중복 제거 (compet + content 기준)
+		        Set<String> keySet = new HashSet<>();
+		        List<EvaluVO> evaluList = new ArrayList<>();
+		        for (EvaluVO vo : fullList) {
+		            String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
+		            if (keySet.add(key)) {
+		                evaluList.add(vo);
+		            }
+		        }
+
+		        model.addAttribute("userList", userList);
+		        model.addAttribute("evaluList", evaluList);
+
+		        return "evalu/evalu"; // 평가 작성 페이지
 		    }
-
-		    model.addAttribute("userList", userList);   // 중복 제거된 사용자 목록
-		    model.addAttribute("evaluList", evaluList); // 중복 제거된 평가 항목 목록
-
-		    return "evalu/evalu"; 
 		}
-		
+
+		// AJAX 결과
 		@PostMapping("emp/evalu/{formNo}") 
-		public ResponseEntity<Map<String, String>> evaluResultInsert(@RequestBody List<EvaluVO> evaList, @PathVariable int formNo) {
+		public ResponseEntity<Map<String, String>> evaluResultInsert(@RequestBody List<EvaluVO> evaList, @PathVariable int formNo,  @AuthenticationPrincipal LoginUserVO loginUser) {
 			 Map<String, String> response = new HashMap<>();
 			    response.put("result", "success");
+			    int evaluatorUserNo = loginUser.getUserVO().getUserNo();
 			    for (EvaluVO vo : evaList) {
 			        vo.setEvaluFormNo(formNo);
 			        vo.setOrderNo(vo.getOrderNo());
-			        System.out.println("✅ userNo: " + vo.getUserNo());
-
-			        String teamNo = vo.getTeamNo();  // 예: "T001", "팀03"
+			        vo.setUserNo(evaluatorUserNo);
+			        String teamNo = vo.getTeamNo();  
 			        if (teamNo != null) {
 			            String numeric = teamNo.replaceAll("[^0-9]", ""); // "001"
 			            if (!numeric.isEmpty()) {
 			                vo.setEvaluGroupId(numeric);         // VO 타입이 String이면 그대로 set
 			                vo.setEvaluateeGroupId(numeric);
 			            }
+
 			        }
-				 empService.inputEvaluResultScore(vo); // 횟수만큼 insert문 실행
 			 }
+			    empService.inputEvaluResultScore(evaList); // 횟수만큼 insert문 실행
 			    empService.modifyEvaluStatus(formNo);	// 모두 추가한 후 평가 상태를 평가 완료로 변경 
+			    
 			 return ResponseEntity.ok(response);
+		}
+		// 내가 평가받은 평가 리스트 (일반 사용자)
+		@GetMapping("emp/myResult")
+		public String myEvaluateeResultListPage(EvaluVO evaluVO, Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+			
+			// 로그인한 사용자 정보 
+			if (loginUser == null || loginUser.getUserVO() == null) {
+				return "redirect:/login";
+			}
+			
+			int userNo = loginUser.getUserVO().getUserNo();
+			evaluVO.setUserNo(userNo);
+			List<EvaluVO> oneEvalu = empService.findMyEvaluResultList(evaluVO);
+			model.addAttribute("evlist", oneEvalu);
+			return "evalu/myEvaluateeResultList"; // 내가 피평가자로 소속된 평가에 대한 리스트
+		}
+		
+		// 내가 평가 받은 평가 단건 조회 (일반 사용자) 
+		@GetMapping("emp/myResult/{formNo}")
+		public String myEvaluScoreResultByIdPage(EvaluVO evaluVO, Model model, @PathVariable int formNo, @AuthenticationPrincipal LoginUserVO loginUser) {
+			 // 1. 로그인 유저 정보 세팅
+		    int userNo = loginUser.getUserVO().getUserNo();
+		    evaluVO.setUserNo(userNo);
+		    evaluVO.setEvaluFormNo(formNo);
+		    // 2. 점수 조회 (항목별 평균)
+		    List<EvaluVO> myEvaluResult = empService.findMyEvaluScoreResultById(evaluVO);
+		    // 3. view 에 보내기
+		    model.addAttribute("result", myEvaluResult);
+		    return "evalu/myEvaluateeResultById"; 
 		}
 
 }

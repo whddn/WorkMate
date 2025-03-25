@@ -3,8 +3,8 @@
 <mapper namespace="com.workmate.app.finance.mapper.FinanceMapper">
 	<!-- 보고서 전체 조회 -->
 	<select id="selectReportList" resultType="FinanceVO">
-		SELECT 
-		        r.report_title
+		SELECT 	r.report_no
+		        , r.report_title
 		        , r.report_status
 		        , u.user_name
 		        , r.write_date
@@ -13,7 +13,7 @@
 		JOIN employee u
 		ON u.user_NO = r.user_no 
 	</select>
-	
+	<!-- 입출금 보고서 단건 조회 -->
 	<select id="selectReportById" resultType="FinanceVO">
 		SELECT 	
 				report_no
@@ -23,7 +23,7 @@
 				, deposit
 				, withdrawal
 				, balance
-				, userPosition
+				, user_Position
 				, user_no
 		FROM report
 		WHERE report_no = #{reportNo}

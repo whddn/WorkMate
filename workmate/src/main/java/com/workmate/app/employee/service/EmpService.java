@@ -64,8 +64,17 @@ public interface EmpService {
 	public int inputNewEvaluForm(EvaluVO evaluVO);
 	
 	// 평가한 결과 값 서버에 등록하는 AJAX (result 테이블)
-	public int inputEvaluResultScore(EvaluVO evaluVO);
+	public int inputEvaluResultScore(List<EvaluVO> evaluList);
 	
 	// 평가 보내고 나면 상태를 평가 완료로 바꿈 
 	public int modifyEvaluStatus(int formNo);
+	
+	// 평가 상태 조회 쿼리
+	public String findEvaluStatus(int formNo);
+
+	// 내가 피평가자로 속해 있는 평가 리스트 (받은 평가 리스트)
+	public List<EvaluVO> findMyEvaluResultList(EvaluVO evaluVO);
+	
+	// 내가 받은 평가 점수 확인 (단건 조회)
+	public List<EvaluVO> findMyEvaluScoreResultById(EvaluVO evaluVO);
 }
