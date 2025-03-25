@@ -13,7 +13,7 @@ public interface ReservationService {
 	// 예약 등록
 	public ReservationVO inputReserInfo(ReservationVO reservationVO);
 	// 내 예약 목록 조회
-	public List<ReservationVO> findAllmyReserList();
+	public List<ReservationVO> findAllmyReserList(int userNo);
 	// 수정
 	public int modifyReserInfo(ReservationVO reservationVO);
 	// 수정 전 한건 조회

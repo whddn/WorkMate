@@ -9,7 +9,9 @@ import com.workmate.app.approval.mapper.ApprElmntMapper;
 import com.workmate.app.approval.mapper.ApprLineMapper;
 import com.workmate.app.approval.mapper.ApprovalMapper;
 import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.common.FileHandler;
 import com.workmate.app.common.WhoAmI;
+import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.reservation.mapper.ReservationMapper;
 import com.workmate.app.reservation.service.ReservationService;
@@ -25,6 +27,9 @@ public class ReservationImpl implements ReservationService {
 	private final ApprovalMapper approvalMapper;
 	private final ApprLineMapper apprLineMapper;
 	private final ApprElmntMapper apprElmntMapper;
+	private final EmpService empService;
+	private final FileHandler fileHandler = new FileHandler();
+	private final WhoAmI whoAmI = new WhoAmI();
 	
 	// 전체
 	@Override
@@ -96,8 +101,8 @@ public class ReservationImpl implements ReservationService {
 	
 	// 내 예약 목록 조회
 	@Override
-	public List<ReservationVO> findAllmyReserList() {
-		return reservationMapper.selectmyReservationList();
+	public List<ReservationVO> findAllmyReserList(int userNo) {
+		return reservationMapper.selectmyReservationList(userNo);
 	}
 
 	

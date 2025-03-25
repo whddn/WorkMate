@@ -43,6 +43,7 @@
 		    reser r
 		JOIN 
 		    common_item c ON r.common_no = c.common_no
+		WHERE user_no = #{userNo}
 		ORDER BY 
 		    r.reser_date DESC
 
@@ -50,13 +51,17 @@
 	
 	<!-- 시간 중복체크 -->
 	<select id="selectReservedTimes" resultType="ReservationVO">
-	    SELECT	reser_date
-	     	   ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_start_time
-			   ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_end_time
-	    FROM reser
-	    WHERE common_no = #{commonNo}
+	    SELECT	r.reser_date
+	     	   ,TO_CHAR(r.reser_start_time, 'HH24:MI') AS reser_start_time
+			   ,TO_CHAR(r.reser_end_time, 'HH24:MI') AS reser_end_time
+			   ,c.image 
+	    FROM reser r
+	    JOIN 
+		    common_item c ON r.common_no = c.common_no
+	    WHERE c.common_no = #{commonNo}
+	    and	reser_start_time >= trunc(sysdate)
 	    <if test="reserNo != null">
-        	AND reser_no != #{reserNo}
+        	AND r.reser_no != #{reserNo}
     	</if>
 	</select>
 

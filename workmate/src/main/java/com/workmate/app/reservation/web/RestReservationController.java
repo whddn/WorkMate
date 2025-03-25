@@ -43,15 +43,6 @@ public class RestReservationController {
 	    return ResponseEntity.ok(reservationVO);
 	}
 	
-	// 내 예약 목록 전체 조회
-	@GetMapping("api/reservation/List")
-	public List<ReservationVO> ResermyList() {
-		return reservationService.findAllmyReserList();
-	}
-	
-	// 예약 수정
-
-	
 	// 예약 삭제
 	@DeleteMapping("/reservation/Delete/{reserNo}")
 	public ResponseEntity<String> deleteReservation(@PathVariable int reserNo) {

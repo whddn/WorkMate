@@ -11,7 +11,7 @@ public interface ReservationMapper {
 	// 공용품 목록 단건 조회(공용품 번호로 조회)
 	public ReservationVO selectReservationById(ReservationVO reservationVO);
 	// 내 예약 목록 조회
-	public List<ReservationVO> selectmyReservationList();
+	public List<ReservationVO> selectmyReservationList(int userNo);
 	// 예약신청
 	public int insertReservationInfo(ReservationVO reservationVO);
 	// 예약수정

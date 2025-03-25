@@ -1,23 +1,24 @@
 package com.workmate.app.reservation.web;
 
 import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import com.workmate.app.common.FileHandler;
+import com.workmate.app.common.WhoAmI;
+import com.workmate.app.employee.service.EmpService;
+import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.reservation.service.ReservationService;
 import com.workmate.app.reservation.service.ReservationVO;
+
 import lombok.RequiredArgsConstructor;
-/** 예약 페이지
+/** 공용품 예약 관리 페이지
  * @author 이종우
  * @since 2025-03-20
- * <pre>
  * <pre>
  * 수정일자	수정자	수정내용
  * -------------------------
@@ -34,6 +35,9 @@ import lombok.RequiredArgsConstructor;
 public class ReservationController {
 
 	private final ReservationService reservationService;
+	private final EmpService empService;
+	private final FileHandler fileHandler = new FileHandler();
+	private final WhoAmI whoAmI = new WhoAmI();
 
 	// 공용품 리스트 페이지
 	@GetMapping("reservation/main")
@@ -49,9 +53,11 @@ public class ReservationController {
 	    ReservationVO vo = new ReservationVO();
 	    vo.setCommonNo(commonNo);
 
+	    // 공용품 정보 단건 조회
 	    ReservationVO detailVO = reservationService.findReserById(vo);
 	    model.addAttribute("reser", detailVO);
-
+	    
+	    // 예약리스트
 	    List<ReservationVO> reservedList = reservationService.findReservedTimesByCommonNo(commonNo);
 	    model.addAttribute("reservedList", reservedList);
 
@@ -60,7 +66,7 @@ public class ReservationController {
 	
 	// 예약 신청
 	@PostMapping("reservation/input")
-	public String saveReservation(@ModelAttribute ReservationVO reservationVO) {
+	public String saveReservation(ReservationVO reservationVO) {
 	    if (reservationVO.getReserNo() == null) {
 	        // 등록
 	        reservationService.inputReserInfo(reservationVO);
@@ -72,10 +78,12 @@ public class ReservationController {
 	}
 
 	
-	// 예약 목록 페이지
+	// 내 예약 목록 페이지
 	@GetMapping("reservation/List")
 	public String myReserList(Model model) {
-		List<ReservationVO> list = reservationService.findAllmyReserList();
+		EmpVO vo =whoAmI.whoAmI();
+		
+		List<ReservationVO> list = reservationService.findAllmyReserList(vo.getUserNo());
 		model.addAttribute("reser", list);
 		return "reservation/reservationList";
 	}
