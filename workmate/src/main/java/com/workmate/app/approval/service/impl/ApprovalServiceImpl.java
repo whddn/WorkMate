@@ -49,7 +49,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 		// 최종 결재 완료 후 휴가/연차 인 경우 연차갯수 차감
 		ApprovalVO approval = approvalMapper.selectApprovalById(approvalVO);
 		if ( "a2".equals(approval.getApprStatus())  && "AF001".equals(approval.getApprType()) ) {
-			attendMapper.updateOccList(approvalVO.getUserNo());
+			attendMapper.updateOccList(approvalVO.getUserNo()); //연차수 업데이트
 		}
 		return approvalMapper.updateApprovalDate(approvalVO);
 	}
