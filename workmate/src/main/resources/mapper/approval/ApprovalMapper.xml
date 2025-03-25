@@ -97,7 +97,7 @@
 		UPDATE approval
 		SET appr_date = SYSDATE
 		WHERE appr_no = #{apprNo} 
-    		AND appr_status IN ('a2', 'a3')
+    		AND appr_status IN ('a2', 'a3', 'a4')
 	</update>
 	<delete id="deleteApproval" parameterType="ApprovalVO">
 		DELETE FROM approval

@@ -35,7 +35,7 @@
 		    r.reser_date,
 		    r.reser_start_time,
 		    r.reser_end_time,
-		    r.usage_status,
+		    FIND_CODE(r.USAGE_STATUS) USAGE_STATUS, 
 		    r.reser_no,
 		    r.content,
 		    c.image
@@ -43,6 +43,7 @@
 		    reser r
 		JOIN 
 		    common_item c ON r.common_no = c.common_no
+		WHERE user_no = #{userNo}
 		ORDER BY 
 		    r.reser_date DESC
 
@@ -50,13 +51,17 @@
 	
 	<!-- 시간 중복체크 -->
 	<select id="selectReservedTimes" resultType="ReservationVO">
-	    SELECT	reser_date
-	     	   ,TO_CHAR(reser_start_time, 'HH24:MI') AS reser_start_time
-			   ,TO_CHAR(reser_end_time, 'HH24:MI') AS reser_end_time
-	    FROM reser
-	    WHERE common_no = #{commonNo}
+	    SELECT	r.reser_date
+	     	   ,TO_CHAR(r.reser_start_time, 'HH24:MI') AS reser_start_time
+			   ,TO_CHAR(r.reser_end_time, 'HH24:MI') AS reser_end_time
+			   ,c.image 
+	    FROM reser r
+	    JOIN 
+		    common_item c ON r.common_no = c.common_no
+	    WHERE c.common_no = #{commonNo}
+	    and	r.reser_start_time >= trunc(sysdate)
 	    <if test="reserNo != null">
-        	AND reser_no != #{reserNo}
+        	AND r.reser_no != #{reserNo}
     	</if>
 	</select>
 
@@ -79,7 +84,6 @@
 		    ,user_no
 		    ,common_no
 		    ,usage_status
-		    ,image
 		)values(
 			 #{reserNo}
 			,#{commonName}
@@ -92,15 +96,24 @@
 			,#{userNo}
 			,#{commonNo}
 			,#{usageStatus}
-			,#{image}
 		)
 	</insert>
 	
 	<!-- 예약 수정 전 한건 조회 -->
 	<select id="selectReserByNo" resultType="ReservationVO">
 	    SELECT 
-		    r.*, 
-		    c.image 
+		    r.COMMON_KIND
+			,r.RESER_DATE
+			,r.RESER_START_TIME
+			,r.RESER_END_TIME
+			,r.RESER_AVAILABILITY
+			,r.CONTENT
+			,r.RESER_NO
+			,r.USER_NO
+			,r.COMMON_NAME
+			,r.COMMON_NO
+			,r.USAGE_STATUS
+		    ,c.image 
 		FROM 
 		    reser r
 		JOIN 
@@ -116,7 +129,6 @@
 		    ,reser_start_time = #{reserStartTime}
 		    ,reser_end_time = #{reserEndTime}
 		    ,content = #{content}
-		    ,usage_status = #{usageStatus}
 		where reser_no = #{reserNo}
 	</update>
 
@@ -125,5 +137,13 @@
 		delete from reser
 		where reser_no = #{reserNo}
 	</delete>
+	
+	<!-- 예약상태값 -> 승인상태로 변경 -->
+	<update id="updateReserStatus" parameterType="int">
+		update reser
+		set	   usage_status = 'a2'
+		WHERE  reser_no = #{reserNo}
+	</update>
+
 
 </mapper>

@@ -11,7 +11,7 @@ public interface ReservationMapper {
 	// 공용품 목록 단건 조회(공용품 번호로 조회)
 	public ReservationVO selectReservationById(ReservationVO reservationVO);
 	// 내 예약 목록 조회
-	public List<ReservationVO> selectmyReservationList();
+	public List<ReservationVO> selectmyReservationList(int userNo);
 	// 예약신청
 	public int insertReservationInfo(ReservationVO reservationVO);
 	// 예약수정
@@ -21,5 +21,7 @@ public interface ReservationMapper {
 	// 예약취소
 	public int deleteReservationInfo(int reserNo);
 	// 시간 중복 체크
-	public List<ReservationVO> selectReservedTimes(Integer commonNo);
+	public List<ReservationVO> selectReservedTimes(@Param("commonNo")Integer commonNo,@Param("reserNo")Integer reserNo);
+	// reser테이블의 상태값을 변경
+	public int updateReserStatus(int userNo);
 }

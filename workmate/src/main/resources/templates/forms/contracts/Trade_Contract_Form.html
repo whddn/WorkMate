@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/contracts_layout}"
+      layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>거래처 계약서</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h4>거래처 계약서</h4>
+    <form id="tradeContractForm" enctype="multipart/form-data">
+        <table class="table table-bordered">
+            <tr><th colspan="4">기본 정보</th></tr>
+            <tr>
+                <th>계약명</th>
+                <td colspan="3"><input type="text" name="contractName" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>계약일자</th>
+                <td colspan="3"><input type="date" name="contractDate" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>계약 기간</th>
+                <td colspan="3">
+                    <input type="date" name="startDate" class="form-control d-inline-block" style="width: 45%;">
+                    ~
+                    <input type="date" name="endDate" class="form-control d-inline-block" style="width: 45%;">
+                </td>
+            </tr>
+
+            <tr><th colspan="4">거래처 정보</th></tr>
+            <tr>
+                <th>거래처명</th>
+                <td colspan="3"><input type="text" name="clientName" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>대표자</th>
+                <td><input type="text" name="ceo" class="form-control"></td>
+                <th>연락처</th>
+                <td><input type="text" name="phone" class="form-control"></td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td colspan="3"><input type="text" name="address" class="form-control"></td>
+            </tr>
+
+            <tr><th colspan="4">계약 내용</th></tr>
+            <tr>
+                <td colspan="4">
+                    <textarea name="contractDetails" rows="6" class="form-control" placeholder="계약 상세 내용을 입력하세요."></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>첨부파일</th>
+                <td colspan="3"><input type="file" name="attachment" class="form-control"></td>
+            </tr>
+        </table>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">등록</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/gh/themewagon/kaiadmin/assets/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#tradeContractForm').submit(function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        $.ajax({
+            url: '/Contracts/insertTrade',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(res) {
+                if (res.success) {
+                    alert('거래처 계약서가 등록되었습니다.');
+                    location.reload();
+                } else {
+                    alert('등록 실패');
+                }
+            },
+            error: function() {
+                alert('오류 발생');
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

@@ -9,11 +9,14 @@ import com.workmate.app.approval.mapper.ApprovalMapper;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.attendance.mapper.AttendMapper;
+import com.workmate.app.reservation.mapper.ReservationMapper;
 
 @Service
 public class ApprovalServiceImpl implements ApprovalService {
 	private ApprovalMapper approvalMapper;
 	private AttendMapper attendMapper;
+	private ReservationMapper reservationMapper;
+  
 	@Autowired
 	ApprovalServiceImpl(ApprovalMapper approvalMapper, AttendMapper attendMapper) {
 		this.approvalMapper = approvalMapper;
@@ -49,8 +52,14 @@ public class ApprovalServiceImpl implements ApprovalService {
 		// 최종 결재 완료 후 휴가/연차 인 경우 연차갯수 차감
 		ApprovalVO approval = approvalMapper.selectApprovalById(approvalVO);
 		if ( "a2".equals(approval.getApprStatus())  && "AF001".equals(approval.getApprType()) ) {
-			attendMapper.updateOccList(approvalVO.getUserNo()); //연차수 업데이트
+			attendMapper.updateOccList(approvalVO.getUserNo());
 		}
+		
+		// 예약 결재 후 / 승인변경
+		if("a2".equals(approval.getApprStatus()) && "AF004".equals(approval.getApprType())) {
+			reservationMapper.updateReserStatus(approvalVO.getReserNo());
+		}
+		
 		return approvalMapper.updateApprovalDate(approvalVO);
 	}
 

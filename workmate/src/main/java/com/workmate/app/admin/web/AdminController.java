@@ -32,10 +32,9 @@ import com.workmate.app.reservation.service.CommonItemVO;
 
 import lombok.RequiredArgsConstructor;
 
-/** 공용품 관리 페이지
+/** 관리자  페이지 : 공용품, 전자결재 템플릿, 부서관리
  * @author 이종우
  * @since 2025-03-10
- * <pre>
  * <pre>
  * 수정일자	수정자	수정내용
  * -------------------------
@@ -62,6 +61,7 @@ public class AdminController {
 	
 	// 전자결재 관리
 	
+	
 	/**
 	 * 공용품 전체보기 페이지로 이동
 	 * @param model
@@ -83,8 +83,9 @@ public class AdminController {
 
 	// 공용품 등록 - 처리
 	@PostMapping("admin/commonItem")
-	public String commonItemInsert(@ModelAttribute CommonItemVO commonItemVO,
-			@RequestParam("itemImage") MultipartFile file, RedirectAttributes redirectAttributes) {
+	public String commonItemInsert( @ModelAttribute CommonItemVO commonItemVO,
+									@RequestParam("itemImage") MultipartFile file, 
+									RedirectAttributes redirectAttributes) {
 
 		// ✅ 1. 파일 저장 폴더가 없으면 생성
 		File dir = new File(uploadDir + subDir);
@@ -131,11 +132,11 @@ public class AdminController {
 		return "admin/commonItemUpdate";
 	}
 
-	// 공용품 수정 - 처리 : AJAX => JSON
+	// 공용품 수정 - 처리
 	@PostMapping("admin/commonItemUpdate")
 	public String ItemUpdateAJAX(@ModelAttribute CommonItemVO commonItemVO,
-			@RequestParam(value = "itemImage") MultipartFile file,
-			RedirectAttributes redirectAttributes) {
+								@RequestParam(value = "itemImage") MultipartFile file,
+								RedirectAttributes redirectAttributes) {
 
 		// ✅ 1. 기존 데이터 조회
 	    CommonItemVO existingItem = adminService.findItemById(commonItemVO);
@@ -186,7 +187,18 @@ public class AdminController {
 	// 공용품 삭제 - 처리
 	@GetMapping("admin/commonItemDelete")
 	public String commonItemDelete(Integer commonNo) {
+		// 1. 기존 데이터 조회
+		CommonItemVO commonItemVO = new CommonItemVO();
+		commonItemVO.setCommonNo(commonNo);
+	    CommonItemVO existingItem = adminService.findItemById(commonItemVO);
+	    // 2. 기존 이미지 삭제
+        if (existingItem.getImage() != null) {
+            File oldFile = new File(uploadDir + subDir + existingItem.getImage());
+            if (oldFile.exists()) oldFile.delete();
+        }
+        
 		adminService.dropItem(commonNo);
+		
 		return "redirect:commonItemList";
 	}
 

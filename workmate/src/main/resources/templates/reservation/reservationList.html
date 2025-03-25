@@ -74,7 +74,7 @@ button:disabled {
 						<button class="btn btn-danger" th:onclick="|deleteReservation(${reser.reserNo})|">삭제</button>
 					</td>
 					<td>
-					  <span class="badge" th:text="${reser.usageStatus}"></span>
+					  <span th:text="${reser.usageStatus}"></span>
 					</td>
 				</tr>
 			</tbody>

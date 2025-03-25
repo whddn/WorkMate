@@ -79,7 +79,13 @@
         </table>
     </div>
     
-    <script>
+    <script th:inline="javascript">
+
+	    const msg = [[ ${errorMessage} ]]
+	    if(msg != null){
+	    	alert(msg);
+	    }
+    
         function toggleAll() {
             var checkboxes = document.querySelectorAll('.item-checkbox');
             var selectAll = document.getElementById('select-all');
