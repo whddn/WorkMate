@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -56,17 +58,9 @@ public class AdminController {
 	// ✅ `application.properties`에서 파일 저장 경로 가져오기
 	@Value("${file.upload-dir}")
 	private String uploadDir;
-	private String subDir = "CommonItemImage/";
-	private final String saveDir = "/src/main/resources/templates/forms/approval/";
+	private final String subDir = "CommonItemImage/";
+	private final String apprFormDir = "forms/approval/";
 	
-	// 전자결재 관리
-	
-	
-	/**
-	 * 공용품 전체보기 페이지로 이동
-	 * @param model
-	 * @return 조회페이지명
-	 */
 	// 공용품 관리
 	@GetMapping("admin/commonItemList")
 	public String commonItemList(Model model) {
@@ -222,7 +216,8 @@ public class AdminController {
 	        
 	        try {
 	        	// HTML 파일 경로 지정
-	        	File file = ResourceUtils.getFile(saveDir + apprFormVO.getFormPath() + ".html");
+	        	Path path = Paths.get(uploadDir, apprFormDir, apprFormVO.getFormPath());
+	        	File file = ResourceUtils.getFile(path.toString());
 	        	
 	        	// 파일 내용을 문자열로 변환
 	        	String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
@@ -242,9 +237,19 @@ public class AdminController {
 	@PostMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> postAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		System.out.print("결과는 ");
-		System.out.println(fileHandler.htmlUpload(apprFormVO.getFormPath(), apprFormVO.getContent(), saveDir));
-
+		Path path = Paths.get(uploadDir, apprFormDir);
+		String fileName = fileHandler.htmlStrUpload(
+			apprFormVO.getFormPath(), 
+			apprFormVO.getContent(), 
+			path.toString(), 
+			true);
+		
+		if(fileName == null || fileName.equals("")) {
+			return ResponseEntity.badRequest().body(false);
+		}
+		
+		apprFormVO.setFormPath(fileName);
+		
 		int result = apprFormService.inputForm(apprFormVO);
 		return ResponseEntity.ok(result > 0);
 	}
@@ -253,7 +258,16 @@ public class AdminController {
 	@PutMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> putAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		fileHandler.htmlUpload(apprFormVO.getFormPath(), apprFormVO.getContent(), saveDir);
+		Path path = Paths.get(uploadDir, apprFormDir);
+		String fileName = fileHandler.htmlStrUpload(
+			apprFormVO.getFormPath(), 
+			apprFormVO.getContent(), 
+			path.toString(), 
+			true);
+		
+		if(fileName == null || fileName.equals("")) {
+			return ResponseEntity.badRequest().body(false);
+		}
 		
 		int result = apprFormService.modifyForm(apprFormVO);
 		return ResponseEntity.ok(result > 0);
