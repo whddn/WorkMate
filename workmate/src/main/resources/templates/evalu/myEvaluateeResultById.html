@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
+<head>
+  <meta charset="UTF-8">
+  <title>평가 결과 조회</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    #container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2, h3 {
+      font-weight: 600;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f7f7f7;
+      color: #555;
+    }
+
+    .ver2 {
+      padding: 12px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    canvas {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <h2>내가 받은 평가 결과</h2>
+
+    <!-- 1. 평가 대상자 정보 -->
+    <h3>1. 피평가자 정보</h3>
+    <table>
+      <tr>
+        <th>성명</th>
+        <th>부서</th>
+        <th>팀</th>
+      </tr>
+      <tr th:each="user : ${evaluatee}">
+        <td th:text="${user.userName}">홍길동</td>
+        <td th:text="${user.departmentName}">기획부</td>
+        <td th:text="${user.teamName}">전략팀</td>
+      </tr>
+    </table>
+
+    <!-- 2. 평가 설명 -->
+    <h3>2. 평가 설명</h3>
+    <div class="ver2">
+      <p>- 이 평가는 다면평가로, 동료 및 상사의 피드백을 기반으로 구성됩니다.</p>
+      <p>- 각 항목은 1~5점 기준으로 평균 점수를 산출합니다.</p>
+    </div>
+
+    <!-- 3. 평가 항목 및 평균 점수 -->
+    <h3>3. 평가 항목 평균 점수</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>평가 분야</th>
+          <th>평가 항목</th>
+          <th>평균 점수</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="one : ${result}">
+          <td th:text="${result.evaluCompet}"></td>
+          <td th:text="${result.evaluContent}"></td>
+          <td th:text="${result.evaluScore}"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 4. 평균 점수 그래프 -->
+    <h3>4. 시각화 차트</h3>
+    <canvas id="scoreChart" width="600" height="300"></canvas>
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const labels = [[${one.*.evaluContent}]];
+    const scores = [[${one.*.evaluScore}]];
+
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '평균 점수',
+          data: scores,
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 5,
+            title: {
+              display: true,
+              text: '점수 (1~5)'
+            }
+          }
+        }
+      }
+    });
+    /*]]>*/
+  </script>
+</body>
+</html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{common/layouts/finance_layout}" layout:fragment="content">
+  layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>입출금 리포트 조회</title>
+    <title>내가 받은 평가</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -128,60 +128,74 @@
 </head>
 <body>
     <div class="container">
-        <h1>입출금 리포트 조회</h1>
+        <h1>내가 피평가자로 속한 평가 리스트</h1>
 
+        <!-- 기간 및 검색창 -->
+        <div class="search-bar">
+
+            <div>
+                <label for="dateRange">기간 선택:</label>
+                <select id="dateRange">
+                    <option value="7">최근 7일</option>
+                    <option value="30">최근 30일</option>
+                    <option value="90">최근 90일</option>
+                    <option value="custom">직접 입력</option>
+                </select>
+                <div id="customDateInput" style="display:none;">
+                    <label for="startDate">시작일:</label>
+                    <input type="date" id="startDate">
+                    <label for="endDate">끝일:</label>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+                <!--직접 입력 버튼을 누르면 시작일과 끝일이 나오게 가렸다가 저쩌고 하게-->
+            
+
+            <div>
+                <input type="text" id="search" placeholder="검색어 입력">
+                <button type="button">검색</button>
+            </div>
+        </div>
         <!-- 게시글 목록 테이블 -->
-        <table class="table-container" id="reportList">
+        <table class="table-container">
             <thead>
                 <tr>
                     <th><input type="checkbox" name="postSelection"></th>
-                    <th>제목</th>
+                    <th>평가 제목</th>
                     <th>상태</th>
-                    <th>작성자</th>
-                    <th>작성일</th>
+                    <th>평가 대상자</th>
+                    <th>평가 기간</th>
                     <th>비고</th>
                 </tr>
             </thead>
             <tbody>
-            	<th:block th:each="report : ${report}">
+                	<th:block th:each="one : ${evlist}" >
                 <tr>
                     <td><input type="checkbox" name="postSelection"></td>
-                    <td><a th:href="@{/finance/reportInfo/{reportNo}(reportNo=${report.reportNo})}">[[ ${report.reportTitle} ]]</a></td>
-                    <td>[[ ${report.reportStatus} ]]</td>
-                    <td>[[ ${report.userName} ]]</td>
-                    <td th:text="${#dates.format(report.writeDate, 'yyyy-MM-dd')}"></td>
-                    <td>[[ ${report.reportNote} ]]</td>
+                    <td><a th:href="@{/emp/evalu/{eva}(eva=${one.evaluFormNo})}">[[ ${one.evaluName} ]]</a></td>
+                    <td>[[ ${one.usageStatus} ]]</td>
+                    <td th:each="team : ${one.teamList}">[[ ${team.teamName} ]]</td>
+                    <td th:text="${#dates.format(one.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(one.evaluEnd, 'yyyy-MM-dd')}"></td>
+                    <td>추가 설명</td>
                 </tr>
-                </th:block>
-
+                    </th:block>
             </tbody>
         </table>
 
+        <!-- 페이징 -->
+        <div class="paging">
+            <a href="#">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+        </div>
+
         <!-- 버튼들 -->
         <div class="button-container">
-            <button type="button" th:onclick="|location.href='@{/finance/reportInsert}'|">작성</button>
+            <button>작성</button>
             <button class="delete">삭제</button>
         </div>
     </div>
-      <script>
-    // 페이징 / 검색
-    $(document).ready(function() {
-      $('#reportList').DataTable({
-        pageLength: 10,
-        lengthChange: false,
-        ordering: true,
-        language: {
-          search: "검색:",
-          lengthMenu: "_MENU_ 개씩 보기",
-          info: "총 _TOTAL_건 중 _START_ ~ _END_",
-          paginate: {
-            previous: "이전",
-            next: "다음"
-          },
-          zeroRecords: "일치하는 데이터가 없습니다."
-        }
-      });
-    });
-    </script>
 </body>
 </html>

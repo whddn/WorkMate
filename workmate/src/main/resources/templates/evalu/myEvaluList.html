@@ -9,9 +9,7 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
+         }
 
         .container {
             max-width: 1000px;
@@ -151,15 +149,10 @@
                 </div>
             </div>
                 <!--직접 입력 버튼을 누르면 시작일과 끝일이 나오게 가렸다가 저쩌고 하게-->
-            
 
-            <div>
-                <input type="text" id="search" placeholder="검색어 입력">
-                <button type="button">검색</button>
-            </div>
         </div>
         <!-- 게시글 목록 테이블 -->
-        <table class="table-container">
+        <table class="table-container" id="evaluTable">
             <thead>
                 <tr>
                     <th><input type="checkbox" name="postSelection"></th>
@@ -184,14 +177,6 @@
             </tbody>
         </table>
 
-        <!-- 페이징 -->
-        <div class="paging">
-            <a href="#">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-        </div>
 
         <!-- 버튼들 -->
         <div class="button-container">
@@ -199,5 +184,26 @@
             <button class="delete">삭제</button>
         </div>
     </div>
+    <script>
+    // 페이징 / 검색
+    $(document).ready(function() {
+      $('#evaluTable').DataTable({
+        pageLength: 10,
+        lengthChange: false,
+        ordering: true,
+        language: {
+          search: "검색:",
+          lengthMenu: "_MENU_ 개씩 보기",
+          info: "총 _TOTAL_건 중 _START_ ~ _END_",
+          paginate: {
+            previous: "이전",
+            next: "다음"
+          },
+          zeroRecords: "일치하는 데이터가 없습니다."
+        }
+      });
+    });
+  </script>
+
 </body>
 </html>

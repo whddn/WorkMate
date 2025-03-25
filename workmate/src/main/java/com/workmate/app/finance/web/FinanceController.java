@@ -1,5 +1,7 @@
 package com.workmate.app.finance.web;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,16 +21,22 @@ public class FinanceController {
 	@GetMapping("finance/report") 
 	public String ReportMainList(FinanceVO financeVO, Model model) {
 		// 2) 서비스 
-		model.addAttribute("report", financeService.findReportList()); // 부서명 
+		model.addAttribute("report", financeService.findReportList(financeVO)); 
 		return "finance/financeMain";
 	}
 	
-//	// 입출금 보고서 단건 조회
-//	@GetMapping("finance/reportInfo/{reportNo}")
-//	public String ReportOneInfo(FinanceVO financeVO, Model model, @PathVariable int reportNo) {
-//		FinanceVO reportInfo = new FinanceVO();
-//		reportNo = reportInfo.getReportNo();
-//		List<EvaluVO> oneReport = financeService.findReportById();
-//		return "finance/reportInfo";
-//	}
+	// 입출금 보고서 단건 조회
+	@GetMapping("finance/reportInfo/{reportNo}")
+	public String ReportOneInfo(FinanceVO financeVO, Model model, @PathVariable int reportNo) {
+		financeVO.setReportNo(reportNo); 
+	    List<FinanceVO> oneReport = financeService.findReportById(financeVO); 
+	    model.addAttribute("one", oneReport);
+	    return "finance/reportInfo"; 
+	}
+	
+	// 입출금 보고서 등록 화면 페이지 
+	@GetMapping("finance/reportInsert")
+	public String ReportInsertPage(FinanceVO financeVO) {
+		return "finance/reportInsert";
+	}
 }

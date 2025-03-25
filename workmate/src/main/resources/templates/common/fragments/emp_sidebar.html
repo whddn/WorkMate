@@ -87,12 +87,28 @@
                   <p>조직도</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a th:href="@{/emp/myEvalu}">
+              
+                           <li class="nav-item submenu">
+                <a data-bs-toggle="collapse" href="#sidebarLayouts" class="" aria-expanded="true">
                   <i class="fas fa-th-list"></i>
-                  <p>나의 평가 관리</p>
+                  <p>평가</p>
+                  <span class="caret"></span>
                 </a>
-              </li>              
+                <div class="collapse" id="sidebarLayouts">
+                  <ul class="nav nav-collapse">
+                    <li>
+                      <a th:href="@{/emp/myEvalu}">
+                        <span class="sub-item">진행한/할 평가</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a th:href="@{/emp/myResult}">
+                        <span class="sub-item">내가 받은 평가</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>      
               <li class="nav-item">
                 <a th:href="@{/emp/bfevalu}">
                   <i class="fas fa-pen-square"></i>
