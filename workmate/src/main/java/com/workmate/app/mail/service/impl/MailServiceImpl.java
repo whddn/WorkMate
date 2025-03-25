@@ -2,7 +2,12 @@ package com.workmate.app.mail.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +21,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.workmate.app.employee.service.DepartmentVO;
+import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
 import com.workmate.app.mail.mapper.AttachmentMapper;
 import com.workmate.app.mail.mapper.MailMapper;
 import com.workmate.app.mail.service.AttachmentVO;
@@ -29,6 +37,7 @@ import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 import jakarta.mail.internet.InternetAddress;
@@ -42,7 +51,24 @@ public class MailServiceImpl implements MailService {
     private final MailMapper mailMapper;
     private final JavaMailSender mailSender;
     private final AttachmentMapper attachmentMapper;
-   
+  
+  //전체부서목록 조회
+    @Override
+    public List<DepartmentVO> findDepartmentList() {
+        return mailMapper.selectDepartmentList();
+    }
+  //특정부서 팀목록
+    @Override
+    public List<TeamVO> findTeamListByDepartment(String departmentId) {
+        return mailMapper.selectTeamListByDepartment(departmentId);
+    }
+  //특정 팀에 속한 사원들의 이메일 주소
+    @Override
+    public List<String> findEmailsByTeam(String teamNo) {
+        return mailMapper.selectEmailsByTeam(teamNo);
+    }
+    
+    
     // 받은 메일 조회1
     @Override
     public List<MailVO> findReceivedMailsList(int userNo) {
@@ -59,57 +85,68 @@ public class MailServiceImpl implements MailService {
 
     // 이메일 전송
     @Override
-    public void sendEmail(String senderName, String senderEmail,  String toEmail, String subject, String content) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    public void sendEmail(String senderName, String senderEmail, String recipients, String subject, String content) throws MessagingException {
+        String[] recipientList = recipients.split(",");
 
-        String fromEmail = "the7100000@gmail.com"; // ✅ 대표 이메일
+        for (String recipient : recipientList) {
+            recipient = recipient.trim();
+            if (recipient.isBlank()) continue;
 
-        // InternetAddress 생성 후 setPersonal 사용
-        InternetAddress fromAddress = new InternetAddress(fromEmail);
-        try {
-            fromAddress.setPersonal(senderName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            String fromEmail = "the7100000@gmail.com";
+            InternetAddress fromAddress = new InternetAddress(fromEmail);
+            try {
+                fromAddress.setPersonal(senderName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            helper.setFrom(fromAddress);
+            helper.setTo(recipient);
+
+            boolean isInternal = mailMapper.findUserByEmail(recipient) != null;
+            String finalSubject = (isInternal ? "[내부] " : "[외부] ") + subject;
+            helper.setSubject(finalSubject);
+            helper.setText(content, true);
+            helper.setReplyTo(senderEmail);
+
+            mailSender.send(message);
+
+            MailVO mail = new MailVO();
+            mail.setUserNo(getUserNoByEmail(senderEmail));
+            mail.setRecipients(recipient);
+            mail.setSubject(finalSubject);
+            mail.setContent(content);
+            mail.setSentAt(new Date());
+            mail.setStatus("발송됨");
+            mail.setEncrypted("N");
+            mail.setMailType(isInternal ? "내부" : "외부");
+            mail.setIsSpam("N");
+            mail.setFolderId(1002);
+            mail.setSenderEmail(senderEmail);
+            mailMapper.insertMail(mail);
+
+            Integer recipientNo = getUserNoByEmail(recipient);
+            if (recipientNo != null) {
+                MailVO receiverMail = new MailVO();
+                receiverMail.setUserNo(recipientNo);
+                receiverMail.setRecipients(senderEmail);
+                receiverMail.setSubject(finalSubject);
+                receiverMail.setContent(content);
+                receiverMail.setSentAt(new Date());
+                receiverMail.setStatus("수신됨");
+                receiverMail.setEncrypted("N");
+                receiverMail.setMailType(isInternal ? "내부" : "외부");
+                receiverMail.setIsSpam("N");
+                receiverMail.setFolderId(1001);
+                receiverMail.setSenderEmail(senderEmail);
+                mailMapper.insertMail(receiverMail);
+            }
         }
-
-        helper.setFrom(fromAddress);
-        helper.setTo(toEmail);
-
-        // ✅ 내부/외부 메일 구분 (DB 조회)
-        boolean isInternal = mailMapper.findUserByEmail(toEmail) != null;
-
-        // ✅ 자동 태그 추가
-        String finalSubject = isInternal ? "[내부] " + subject : "[외부] " + subject;
-        helper.setSubject(finalSubject);
-
-        helper.setText(content, true);
-        helper.setReplyTo(senderEmail);
-
-        // 메일 전송
-        mailSender.send(message);
-
-        // DB에 저장할 메일 객체 생성
-        MailVO mail = new MailVO();
-        mail.setUserNo(getUserNoByEmail(senderEmail)); // 보낸 사람의 사원번호
-        mail.setRecipients(toEmail);
-        mail.setFolderId(1002); // 보낸 메일함 폴더 ID
-        mail.setSubject(finalSubject);
-        mail.setContent(content);
-        mail.setSentAt(new Date());
-        mail.setStatus("발송됨");
-        mail.setEncrypted("N");
-        mail.setMailType(isInternal ? "내부" : "외부"); // 내부/외부 자동 구분
-        mail.setIsSpam("N");
-
-        // 메일을 DB에 저장
-        mailMapper.insertMail(mail);
-        
-        mail.setUserNo(getUserNoByEmail(toEmail)); // 보낸 사람의 사원번호
-        mail.setRecipients(senderEmail);
-        mail.setFolderId(1001); // 보낸 메일함 폴더 ID
-        mailMapper.insertMail(mail);
     }
+
 
     // 이메일을 기반으로 사원번호를 찾는 메서드
     private Integer getUserNoByEmail(String email) {
@@ -133,78 +170,92 @@ public class MailServiceImpl implements MailService {
 		    fetchAndStoreEmails();
 		}
 	// **IMAP을 통한 외부 메일 수신**
-	@Override
-	public void fetchAndStoreEmails() {
-		
-	    try {
-	        Properties properties = new Properties();
-	        properties.put("mail.store.protocol", "imaps");
-	        properties.put("mail.imap.host", "imap.gmail.com");
-	        properties.put("mail.imap.port", "993");
-	        properties.put("mail.imap.ssl.enable", "true");
+		@Override
+		public void fetchAndStoreEmails() {
+		    try {
+		        Properties properties = new Properties();
+		        properties.put("mail.store.protocol", "imaps");
+		        properties.put("mail.imap.host", "imap.gmail.com");
+		        properties.put("mail.imap.port", "993");
+		        properties.put("mail.imap.ssl.enable", "true");
 
-	        Session session = Session.getInstance(properties);
-	        Store store = session.getStore("imaps");
-	        store.connect("imap.gmail.com", "the7100000@gmail.com", "fqepbkpnpxfiasuk"); // 앱 비밀번호 사용
+		        Session session = Session.getInstance(properties);
+		        Store store = session.getStore("imaps");
+		        store.connect("imap.gmail.com", "the7100000@gmail.com", "fqepbkpnpxfiasuk"); // 앱 비밀번호 사용
 
-	        Folder inbox = store.getFolder("INBOX");
-	        inbox.open(Folder.READ_ONLY);
+		        Folder inbox = store.getFolder("INBOX");
+		        inbox.open(Folder.READ_ONLY);
 
-	        Message[] messages = inbox.getMessages();
+		        Message[] messages = inbox.getMessages();
 
-	        for (Message message : messages) {
-	        	// Message-ID 가져오기
-	        	String messageId = ((MimeMessage) message).getMessageID();
-	        	if (mailMapper.countMessageId(messageId) > 0) {
-	        	    System.out.println("⚠️ 이미 저장된 메일입니다: " + messageId);
-	        	    continue;
-	        	}//
-	        	
-	        	
-	        	
-	            Address[] toAddresses = message.getRecipients(Message.RecipientType.TO);
-	            if (toAddresses == null || toAddresses.length == 0) continue;
+		        for (Message message : messages) {
+		            String messageId = ((MimeMessage) message).getMessageID();
+		            if (mailMapper.countMessageId(messageId) > 0) continue;
 
-	            // 🔹 수신자 이메일 추출 및 파싱
-	            String fullAddress = toAddresses[0].toString();
-	            String recipientEmail = extractEmail(fullAddress); // "홍길동 <aaa@bbb.com>" → "aaa@bbb.com"
+		            Address[] toAddresses = message.getRecipients(Message.RecipientType.TO);
+		            if (toAddresses == null || toAddresses.length == 0) continue;
 
-	            // 🔍 사원번호 찾기
-	            Integer userNo = mailMapper.findUserNoByEmail(recipientEmail);
+		            String recipientEmail = extractEmail(toAddresses[0].toString());
+		            Integer userNo = mailMapper.findUserNoByEmail(recipientEmail);
+		            if (userNo == null) continue;
 
-	            // ❌ 해당 메일이 사내 사원 대상이 아니라면 skip
-	            if (userNo == null) {
-	                System.out.println("⚠️ 사원 찾을 수 없음: " + recipientEmail);
-	                continue;
-	            }
-	            // 🔥 스팸 필터링 로직 추가
-	            String content = getContent(message);
-	            String subject = message.getSubject();
-	            boolean isSpam = isSpamMail(subject, content);
-	            String senderEmail = extractEmail(((InternetAddress) message.getFrom()[0]).toString());
-	            // ✅ 해당 사원 메일함에 저장
-	            MailVO mail = new MailVO();
-	            mail.setUserNo(userNo); // ✔️ 해당 사원 번호로 저장
-	            mail.setRecipients(recipientEmail);
-	            mail.setSenderEmail(senderEmail);
-	            mail.setSubject(message.getSubject());
-	            mail.setContent(getContent(message));
-	            mail.setSentAt(message.getSentDate());
-	            mail.setStatus("수신됨");
-	            mail.setFolderId(isSpam ? 1004 : 1001); // 스팸이면 1004로 분류
-	            mail.setMailType("외부");
-	            mail.setIsSpam(isSpam ? "Y" : "N");
-	            mail.setEncrypted("N");
+		            String subject = message.getSubject();
+		            String content = getContent(message);
+		            boolean isSpam = isSpamMail(subject, content);
+		            String senderEmail = extractEmail(((InternetAddress) message.getFrom()[0]).toString());
 
-	            mailMapper.insertMail(mail);
-	        }
+		            MailVO mail = new MailVO();
+		            mail.setUserNo(userNo);
+		            mail.setRecipients(recipientEmail);
+		            mail.setSenderEmail(senderEmail);
+		            mail.setSubject(subject);
+		            mail.setContent(content);
+		            mail.setSentAt(message.getSentDate());
+		            mail.setStatus("수신됨");
+		            mail.setFolderId(isSpam ? 1004 : 1001);
+		            mail.setMailType("외부");
+		            mail.setIsSpam(isSpam ? "Y" : "N");
+		            mail.setEncrypted("N");
+		            mail.setMessageId(messageId);
 
-	        inbox.close(false);
-	        store.close();
-	    } catch (Exception e) {
-	        System.out.println("❌ 외부메일 수신 실패: " + e.getMessage());
-	    }
-	}
+		            mailMapper.insertMail(mail);
+		            System.out.println("📨 메일 저장 완료: " + subject);
+
+		            if (message.isMimeType("multipart/*")) {
+		                Multipart multipart = (Multipart) message.getContent();
+		                for (int i = 0; i < multipart.getCount(); i++) {
+		                    BodyPart part = multipart.getBodyPart(i);
+		                    if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
+		                        String originalFileName = part.getFileName();
+		                        String uuidFileName = UUID.randomUUID() + "_" + originalFileName;
+		                        String fullPath = uploadDir + File.separator + uuidFileName;
+
+		                        File file = new File(fullPath);
+		                        try (InputStream is = part.getInputStream()) {
+		                            Files.copy(is, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		                        }
+
+		                        AttachmentVO att = new AttachmentVO();
+		                        att.setMailId(mail.getMailId());
+		                        att.setFileName(originalFileName);
+		                        att.setFileType(part.getContentType());
+		                        att.setFileSize((long) part.getSize());
+		                        att.setFilePath(fullPath);
+
+		                        attachmentMapper.insertAttachment(att);
+		                        System.out.println("✅ 첨부파일 저장됨: " + originalFileName);
+		                    }
+		                }
+		            }
+		        }
+
+		        inbox.close(false);
+		        store.close();
+		    } catch (Exception e) {
+		        System.out.println("❌ 외부메일 수신 실패: " + e.getMessage());
+		    }
+		}
+
 	// 스팸 판단 메서드 추가
 	private boolean isSpamMail(String subject, String content) {
 	    List<String> spamKeywords = List.of("viagra", "무료", "도박", "카지노", "click here", "성인", "축하합니다");
@@ -415,112 +466,160 @@ public class MailServiceImpl implements MailService {
 	
 	@Override
 	public void sendMailWithAttachment(String senderName, String senderEmail, String recipients, String ccList, String subject, String content, MultipartFile[] attachments) throws MessagingException {
-	    // 1. 메일 객체 생성 및 저장
-	    MimeMessage message = mailSender.createMimeMessage();
-	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
+	    String[] recipientList = recipients.split(",");
 	    String fromEmail = "the7100000@gmail.com";
-	    InternetAddress fromAddress = new InternetAddress(fromEmail);
-	    try {
-	        fromAddress.setPersonal(senderName, "UTF-8");
-	    } catch (UnsupportedEncodingException e) {
-	        e.printStackTrace();
-	    }
 
-	    helper.setFrom(fromAddress);
-	    helper.setTo(recipients);
-	    if (ccList != null && !ccList.isBlank()) {
-	        helper.setCc(ccList.split(",")); // 참조자 분리
-	    }
+	    // ✅ 첨부파일 먼저 저장 (한 번만)
+	    List<AttachmentVO> savedAttachments = new ArrayList<>();
 
-	    // 내부/외부 여부
-	    boolean isInternal = mailMapper.findUserByEmail(recipients) != null;
-	    String finalSubject = (isInternal ? "[내부] " : "[외부] ") + subject;
-	    helper.setSubject(finalSubject);
-	    helper.setText(content, true);
-	    helper.setReplyTo(senderEmail);
-
-	    // 📌 메일 DB 저장용 객체 생성
-	    MailVO mail = new MailVO();
-	    Integer senderNo = getUserNoByEmail(senderEmail);
-
-	    if (senderNo == null) {
-	        throw new IllegalArgumentException("보낸 사람 사원번호를 찾을 수 없습니다.");
-	    }
-
-	    mail.setUserNo(senderNo);
-	    mail.setRecipients(recipients);
-	    mail.setCcList(ccList);
-	    mail.setSubject(finalSubject);
-	    mail.setContent(content);
-	    mail.setSentAt(new Date());
-	    mail.setStatus("발송됨");
-	    mail.setEncrypted("N");
-	    mail.setMailType(isInternal ? "내부" : "외부");
-	    mail.setIsSpam("N");
-	    mail.setFolderId(1002); // 보낸메일함
-	    mail.setSenderEmail(senderEmail);
-	    mail.setMessageId(((MimeMessage) message).getMessageID());
-
-	    // 📥 먼저 메일 저장
-	    mailMapper.insertMail(mail); // mailId 자동 세팅됨
-
-	    // 📎 첨부파일 DB 저장 및 메일에 추가
 	    if (attachments != null && attachments.length > 0) {
 	        for (MultipartFile file : attachments) {
-	        	 String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-	             String fullPath = uploadDir + File.separator + fileName;
+	            if (file.isEmpty()) continue;
 
-	        	AttachmentVO att = new AttachmentVO();
-	        	att.setMailId(mail.getMailId());
-	            att.setFileName(fileName);
-	            att.setFileType(file.getContentType());
-	            att.setFileSize(file.getSize());
-	            att.setFilePath(fileName);
-	        	
-	            att.setMailId(mail.getMailId());
-
+	            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+	            String fullPath = uploadDir + File.separator + fileName;
 	            File localFile = new File(fullPath);
 	            try {
-					file.transferTo(localFile);
-				} catch (IllegalStateException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-	            
-	            if (localFile.exists()) {
-	                helper.addAttachment(att.getFileName(), localFile);
+	                file.transferTo(localFile);
+	            } catch (IOException e) {
+	                e.printStackTrace();
 	            }
-	            
-	            // DB 저장
-	            attachmentMapper.insertAttachment(att);
+
+	            AttachmentVO att = new AttachmentVO();
+	            att.setFileName(file.getOriginalFilename());
+	            att.setFileType(file.getContentType());
+	            att.setFileSize(file.getSize());
+	            att.setFilePath(fullPath);
+
+	            savedAttachments.add(att); // 저장된 첨부파일 목록
 	        }
 	    }
 
-	    // ✉️ SMTP로 메일 전송
-	    mailSender.send(message);
+	    for (String recipient : recipientList) {
+	        recipient = recipient.trim();
+	        if (recipient.isBlank()) continue;
 
-	    // 🔁 수신자 메일함에도 저장 (단, 내부 사용자일 경우만)
-	    Integer recipientNo = getUserNoByEmail(recipients);
-	    if (recipientNo != null) {
-	        MailVO receiverMail = new MailVO();
-	        receiverMail.setUserNo(recipientNo);
-	        receiverMail.setRecipients(senderEmail);
-	        receiverMail.setCcList(ccList);
-	        receiverMail.setSubject(finalSubject);
-	        receiverMail.setContent(content);
-	        receiverMail.setSentAt(new Date());
-	        receiverMail.setStatus("수신됨");
-	        receiverMail.setEncrypted("N");
-	        receiverMail.setMailType(isInternal ? "내부" : "외부");
-	        receiverMail.setIsSpam("N");
-	        receiverMail.setFolderId(1001); // 받은메일함
-	        receiverMail.setSenderEmail(senderEmail);
-	        receiverMail.setMessageId(mail.getMessageId());
+	        MimeMessage message = mailSender.createMimeMessage();
+	        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-	        mailMapper.insertMail(receiverMail);
+	        try {
+	            InternetAddress fromAddress = new InternetAddress(fromEmail, senderName, "UTF-8");
+	            helper.setFrom(fromAddress);
+	        } catch (UnsupportedEncodingException e) {
+	            e.printStackTrace();
+	        }
+
+	        helper.setTo(recipient);
+	        if (ccList != null && !ccList.isBlank()) {
+	            helper.setCc(ccList.split(","));
+	        }
+
+	        boolean isInternal = mailMapper.findUserByEmail(recipient) != null;
+	        String finalSubject = (isInternal ? "[내부] " : "[외부] ") + subject;
+	        helper.setSubject(finalSubject);
+	        helper.setText(content, true);
+	        helper.setReplyTo(senderEmail);
+
+	        // ✅ 파일 다시 첨부 (경로 기준으로 File 객체 만들어서)
+	        for (AttachmentVO att : savedAttachments) {
+	            File fileToAttach = new File(att.getFilePath());
+	            if (fileToAttach.exists()) {
+	                helper.addAttachment(att.getFileName(), fileToAttach);
+	            }
+	        }
+
+	        // ✉️ 전송
+	        mailSender.send(message);
+
+	        // ✅ 보낸 메일함 저장
+	        MailVO mail = new MailVO();
+	        Integer senderNo = getUserNoByEmail(senderEmail);
+	        mail.setUserNo(senderNo);
+	        mail.setRecipients(recipient);
+	        mail.setCcList(ccList);
+	        mail.setSubject(finalSubject);
+	        mail.setContent(content);
+	        mail.setSentAt(new Date());
+	        mail.setStatus("발송됨");
+	        mail.setEncrypted("N");
+	        mail.setMailType(isInternal ? "내부" : "외부");
+	        mail.setIsSpam("N");
+	        mail.setFolderId(1002);
+	        mail.setSenderEmail(senderEmail);
+	        mail.setMessageId(((MimeMessage) message).getMessageID());
+
+	        mailMapper.insertMail(mail);
+
+	        // ✅ 첨부파일 DB에 저장 (mailId 포함)
+	        for (AttachmentVO att : savedAttachments) {
+	            AttachmentVO copy = new AttachmentVO();
+	            copy.setMailId(mail.getMailId());
+	            copy.setFileName(att.getFileName());
+	            copy.setFileType(att.getFileType());
+	            copy.setFileSize(att.getFileSize());
+	            copy.setFilePath(att.getFilePath());
+	            attachmentMapper.insertAttachment(copy);
+	        }
+
+	        // ✅ 수신자 메일함 (내부 사용자일 때만)
+	        Integer recipientNo = getUserNoByEmail(recipient);
+	        if (recipientNo != null) {
+	            MailVO receiverMail = new MailVO();
+	            receiverMail.setUserNo(recipientNo);
+	            receiverMail.setRecipients(senderEmail);
+	            receiverMail.setCcList(ccList);
+	            receiverMail.setSubject(finalSubject);
+	            receiverMail.setContent(content);
+	            receiverMail.setSentAt(new Date());
+	            receiverMail.setStatus("수신됨");
+	            receiverMail.setEncrypted("N");
+	            receiverMail.setMailType(isInternal ? "내부" : "외부");
+	            receiverMail.setIsSpam("N");
+	            receiverMail.setFolderId(1001);
+	            receiverMail.setSenderEmail(senderEmail);
+	            receiverMail.setMessageId(mail.getMessageId());
+
+	            mailMapper.insertMail(receiverMail);
+	        }
 	    }
 	}
 
+
+	//임시저장 첨부파일
+	@Override
+	public void saveDraftMail(MailVO mail, MultipartFile[] attachments) {
+	    // 1. 임시 메일 저장
+	    mailMapper.insertMail(mail); // mailId 자동 생성됨
+
+	    // 2. 첨부파일 처리
+	    if (attachments != null && attachments.length > 0) {
+	        for (MultipartFile file : attachments) {
+	            if (file.isEmpty()) continue;
+
+	            try {
+	                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+	                String fullPath = uploadDir + File.separator + fileName;
+
+	                File dest = new File(fullPath);
+	                file.transferTo(dest);
+
+	                AttachmentVO att = new AttachmentVO();
+	                att.setMailId(mail.getMailId());
+	                att.setFileName(file.getOriginalFilename());
+	                att.setFileType(file.getContentType());
+	                att.setFileSize(file.getSize());
+	                att.setFilePath(fullPath);
+
+	                attachmentMapper.insertAttachment(att);
+	            } catch (IOException e) {
+	                e.printStackTrace(); // 필요시 로그 처리
+	            }
+	        }
+	    }
+	}
+	//특정 팀에 속한 사원들의 정보 전체
+	@Override
+	public List<EmpVO> findEmployeesByTeam(String teamNo) {
+	    return mailMapper.selectEmployeesByTeam(teamNo);
+	}
 }

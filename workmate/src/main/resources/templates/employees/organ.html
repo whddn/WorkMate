@@ -213,7 +213,7 @@
           document.getElementById("detailsBox").style.display = 'block'; // 사원 이름 클릭시 상세 페이지 표시
 
 
-          fetch(`/workmate/emp/Organ/${userNo}`)
+          fetch(`/workmate/emp/organ/${userNo}`)
             .then(res => res.json())
             .then(result => {
               let hireDate = result.hireDate.split('T')[0];

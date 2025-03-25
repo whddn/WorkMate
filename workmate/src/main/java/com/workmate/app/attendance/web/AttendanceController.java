@@ -71,7 +71,7 @@ public class AttendanceController {
 		//2)Service
 		//현재월 근태 데이터 조회
 		List<WorkVO> list = attendService.findMonthWork(userNo);
-		int monthTotal = 208;
+		int monthTotal = 209;
 		double addWorkTime = list.stream().mapToDouble(WorkVO::getAddWorkTime).sum();
 		double totalWorkTime = list.stream().mapToDouble(WorkVO::getWorkTime).sum();
 		double remainWorkTime = monthTotal - totalWorkTime;

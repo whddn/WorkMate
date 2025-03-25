@@ -29,7 +29,10 @@ public interface AttendMapper {
 	// 연차 사용내역 전체 조회
 	public List<WorkVO> allAnnualList(WorkVO workVO);
 	
-	// 연차 업데이트
+	// 연차 목록 업데이트
+	public int insertAnl(int userNo);
+	
+	// 연차 갯수 업데이트
 	public int updateOccList(int userNo);
 	
 	// 전체사원 이번달 근태 수

@@ -50,8 +50,10 @@ import lombok.RequiredArgsConstructor;
  * @since 2025-03-10
  * <pre>
  * <pre>
- * 수정일자 수정자 수정내용
- * -----------------
+ * 수정일자	수정자	수정내용
+ * ----------------------
+ * 03-12	이지응	전자결재 기능 제작 시작
+ * 
  * </pre>
  */
 @Controller

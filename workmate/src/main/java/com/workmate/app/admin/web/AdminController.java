@@ -2,21 +2,32 @@ package com.workmate.app.admin.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.workmate.app.admin.service.AdminService;
+import com.workmate.app.approval.service.ApprFormService;
+import com.workmate.app.approval.service.ApprFormVO;
+import com.workmate.app.common.FileHandler;
 import com.workmate.app.reservation.service.CommonItemVO;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +42,7 @@ import lombok.RequiredArgsConstructor;
  * 03-14	이종우	수정기능
  * 03-17	이종우	삭제,목록기능
  * 03-19	이종우	사진/날짜 추가
- * 
+ * 03-25	이지응	결재문서 양식 조작기능 추가
  * 
  * </pre>
  */
@@ -39,14 +50,14 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class AdminController {
-
 	private final AdminService adminService;
-
+	private final ApprFormService apprFormService;
+	private final FileHandler fileHandler;
 	// ✅ `application.properties`에서 파일 저장 경로 가져오기
 	@Value("${file.upload-dir}")
 	private String uploadDir;
-	
-	private String subDir ="CommonItemImage/";
+	private String subDir = "CommonItemImage/";
+	private final String saveDir = "/src/main/resources/templates/forms/approval/";
 	
 	// 전자결재 관리
 	
@@ -193,4 +204,66 @@ public class AdminController {
 
 	// 부서관리
 
+	// 결재문서 리스트 보기/삭제 페이지
+	@GetMapping("admin/apprFormList")
+	public String getAdminApprFormList(Model model) {
+		model.addAttribute("apprFormList", apprFormService.findFormList());
+		return "admin/apprFormList";
+	}
+	
+	// 결재문서 추가/수정 페이지
+	@GetMapping("admin/apprFormOne")
+	public String getAdminApprFormOne(@RequestParam(required=false) String apprType, Model model) {
+	    ApprFormVO apprFormVO = new ApprFormVO();
+	    if (apprType != null && !apprType.isEmpty()) {
+	        apprFormVO.setApprType(apprType);
+	        apprFormVO = apprFormService.findFormById(apprFormVO);
+	        model.addAttribute("apprForm", apprFormVO);
+	        
+	        try {
+	        	// HTML 파일 경로 지정
+	        	File file = ResourceUtils.getFile(saveDir + apprFormVO.getFormPath() + ".html");
+	        	
+	        	// 파일 내용을 문자열로 변환
+	        	String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+	        	
+	        	// Thymeleaf 모델에 데이터 추가
+	        	model.addAttribute("editorContent", content);
+	        }
+	        catch(IOException e) {
+	        	e.printStackTrace();
+	        	model.addAttribute("editorContent", "파일을 불러오는 데 실패했습니다.");
+	        }
+	    }
+	    return "admin/apprFormOne";
+	}
+	
+	// 결재문서 추가
+	@PostMapping("admin/apprForm")
+	@ResponseBody
+	public ResponseEntity<Boolean> postAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
+		System.out.print("결과는 ");
+		System.out.println(fileHandler.htmlUpload(apprFormVO.getFormPath(), apprFormVO.getContent(), saveDir));
+
+		int result = apprFormService.inputForm(apprFormVO);
+		return ResponseEntity.ok(result > 0);
+	}
+	
+	// 결재문서 수정
+	@PutMapping("admin/apprForm")
+	@ResponseBody
+	public ResponseEntity<Boolean> putAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
+		fileHandler.htmlUpload(apprFormVO.getFormPath(), apprFormVO.getContent(), saveDir);
+		
+		int result = apprFormService.modifyForm(apprFormVO);
+		return ResponseEntity.ok(result > 0);
+	}
+	
+	// 결재문서 삭제
+	@DeleteMapping("admin/apprForm")
+	@ResponseBody
+	public ResponseEntity<Boolean> deleteAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
+		int result = apprFormService.dropForm(apprFormVO);
+		return ResponseEntity.ok(result > 0);
+	}
 }

@@ -16,7 +16,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 	private ApprovalMapper approvalMapper;
 	private AttendMapper attendMapper;
 	private ReservationMapper reservationMapper;
-	
+  
 	@Autowired
 	ApprovalServiceImpl(ApprovalMapper approvalMapper, AttendMapper attendMapper) {
 		this.approvalMapper = approvalMapper;

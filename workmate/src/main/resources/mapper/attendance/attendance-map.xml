@@ -117,12 +117,50 @@
 		ORDER BY annual_no DESC
 	</select>
 	
+	<!-- 연차휴가 신청 내역 등록 -->
+	<insert id="insertAnl" parameterType="WorkVO">
+	   
+	    INSERT INTO annual(
+	        ANNUAL_NO
+	        , ANNUAL_START
+	        , ANNUAL_END
+	        , ANNUAL_COUNT
+	        , ANNUAL_TYPE
+	        , USER_NO        
+	        , APPR_NO
+	        , OCC_ANNUAL_NO
+	    )
+	    VALUES (
+	        MAX(ANNUAL_NO) + 1
+	        , #{annualStart}
+	        , #{annualEnd}
+	        , 
+	        CASE 
+            WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5 --오전반차, 오후반차면 0.5
+            ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
+        END,
+	        , #{annualType}
+	        , #{userNo}
+	        , #{apprNo}
+	        , (SELECT MAX(OCC_ANNUAL_NO) FROM occ_annual WHERE USER_NO = #{userNo})
+	    )
+	</insert>
+	
+	
 	<!-- 연차 업데이트 전자결재 -->
-	<update id="updateOccList" parameterType="int">
+	<update id="updateOccList" parameterType="WorkVO">
 		UPDATE occ_annual
 		SET	
-			update_annual_count = update_annual_count - 1
-			, remain_annual_leave = remain_annual_leave + 1
+			  update_annual_count = update_annual_count - 
+            CASE 
+                WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
+                ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
+            END,
+        remain_annual_leave = remain_annual_leave + 
+            CASE 
+                WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
+                ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
+            END
 		WHERE 	user_no = #{userNo}
 		AND user_annual_year = EXTRACT(YEAR FROM SYSDATE)
 	</update>

@@ -20,14 +20,20 @@ public class FinanceServiceImpl implements FinanceService {
 	
 	// 입출금 리포트 조회
 	@Override
-	public List<FinanceVO> findReportList() {
-		return financeMapper.selectReportList();
+	public List<FinanceVO> findReportList(FinanceVO financeVO) {
+		return financeMapper.selectReportList(financeVO);
 	}
 	
 	// 입출금 리포트 상세 조회
-//	@Override
-//	public List<FinanceVO> findReportById(FinanceVO financeVO) {
-//		return financeMapper.selectReportById(FinanceVO financeVO);
-//	}
+	@Override
+	public List<FinanceVO> findReportById(FinanceVO financeVO) {
+		return financeMapper.selectReportById(financeVO);
+	}
+	
+	// 입출금 리포트 등록
+	@Override
+	public String findReportInsertPage(FinanceVO financeVO) {
+		return financeMapper.selectReportInsertPage(financeVO);
+	}
 
 }

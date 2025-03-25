@@ -56,7 +56,7 @@
 									<h5>내 결재선</h5>										
 									<ul class="list-group">
 										<th:block th:each="apprLine : ${apprLineList}">
-											<li class="list-group-item" th:onclick="|summonApprElmnts(${apprLine.apprlineNo})|">[[ ${apprLine.insertTitle} ]]</li>
+											<li class="list-group-item" th:onclick="| summonApprElmnts(${apprLine.apprlineNo}) |">[[ ${apprLine.insertTitle} ]]</li>
 										</th:block>
 									</ul>
 								</td>

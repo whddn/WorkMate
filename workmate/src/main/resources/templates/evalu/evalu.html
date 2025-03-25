@@ -11,8 +11,7 @@
 body {
 	font-family: 'Arial', sans-serif;
 	background-color: #f4f4f4;
-	margin: 0;
-	padding: 20px;
+
 }
 
 #container {
@@ -124,7 +123,7 @@ button:hover {
 					<th>팀명</th>
 				</tr>
 				<tr>
-					<td>[[${evaluList[0].teamName}]]</td>
+					<td></td>
 				</tr>
 			</table>
 
@@ -151,8 +150,8 @@ button:hover {
 						<td th:each="user : ${userList}" class="evaluName">
 						<select th:data-evaluitemno="${evalu.evaluItemNo}"  th:data-form="${evalu.evaluFormNo}" 
 						th:data-userno="${user.userNo}" th:data-orderno="${evalu.orderNo}" th:data-teamno="${evalu.teamNo}" 
-						th:data-gid = "${evalu.evaluateeGroupId}" th:data-gd = "${evalu.evaluGroupId}"
-							name="score"
+						th:data-gid = "${evalu.evaluateeGroupId}" th:data-en="${evalu.evaluNo}" th:data-gd="${evalu.evaluGroupId}" 
+							name="score" 
 							id="score-select">
 								<option value="">선택</option>
 								<option value="1">1점</option>
@@ -195,17 +194,21 @@ button:hover {
 	  		let orderNo = select.dataset.orderno;
 	  		let evaluateeGroupId = select.dataset.gid;
 	  		let evaluGroupId = select.dataset.gd;
+	  		let evaluNo = select.dataset.en;
+	  		let formNo = select.dataset.form;
 	  		
 	  		scoreList.push({
+	  			evaluNo : evaluNo,
 	  			evaluItemNo : evaluItemNo,
 	  			userNo : userNo,
 	  			evaluScore : score,
 	  			orderNo : orderNo,
 	  			evaluateeGroupId : evaluateeGroupId,
-	  			evaluGroupId : evaluGroupId
+	  			evaluGroupId : evaluGroupId,
+	  			evaluFormNo : formNo
 	  		})	
   	})
-	  		console.log("✅ 최종 scoreList:", scoreList);
+	  		console.log(scoreList);
 	
 let formNo = document.querySelector('[name="score"]').dataset.form;
   // AJAX 전송
@@ -220,7 +223,7 @@ let formNo = document.querySelector('[name="score"]').dataset.form;
   .then(result => {
 	  if (result != null) {
 		    alert('평가가 성공적으로 제출되었습니다!');		  
-	  }
+	  } 
 
   })
   .catch(err => {

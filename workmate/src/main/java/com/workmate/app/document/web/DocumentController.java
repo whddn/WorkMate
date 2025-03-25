@@ -89,11 +89,12 @@ public class DocumentController {
 	
 	//자료 단건 삭제
 	@DeleteMapping("document/delete/{documentNo}")
-	public ResponseEntity<String> documentDelete(@PathVariable Integer documentNo) {
+	public ResponseEntity<String> documentDelete(@PathVariable Integer documentNo, DocVO docVO ) {
 	    try {
 	        if (documentNo == null) {
 	            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
-	        }
+	        }	        
+	      
 	        //DB 삭제
 	        documentService.dropFileInfo(documentNo);
 	        

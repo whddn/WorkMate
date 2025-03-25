@@ -99,7 +99,7 @@
 	                $('#eventModal').modal('show');
 	            },
 	            eventClick: function(info) {
-	                if (!confirm("이 일정을 삭제하시겠습니까?")) {
+	                if(!confirm('이 일정을 삭제하시겠습니까?')) {
 	                	return;
 	                }
 	                
@@ -113,7 +113,7 @@
 	                	success: function(response) {
 	                		if(response.success) {
 	                			alert('일정 제거에 성공했습니다.');
-			                info.event.remove();
+			                	info.event.remove();
 	                		}
 	                	},
 	                	error: function(error) {

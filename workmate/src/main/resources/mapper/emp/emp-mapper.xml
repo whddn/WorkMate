@@ -158,45 +158,49 @@
 				WHERE f.EVALU_FORM_NO = #{evaluFormNo}
 	</select> -->
 
-	
+
 	<!-- 지난 평가 리스트 조회 (전체 출력 / 관리자) -->
 	<select id="selectBeforeEvaluList" resultType="EvaluVO">
-		SELECT EVALU_NAME
-        , USAGE_STATUS 
-        , EVALU_START
-        , EVALU_END
-        , EVALU_FORM_NO
-		FROM EVALU_FORM
+		SELECT f.EVALU_NAME
+            , f.USAGE_STATUS 
+            , f.EVALU_START
+            , f.EVALU_END
+            , f.EVALU_FORM_NO
+            , t.team_name
+            , t.team_no
+		FROM EVALU_FORM f
+        JOIN EVALUATEE_GROUP eg
+        ON eg.EVALU_FORM_NO = f.EVALU_FORM_NO 
+        JOIN EMPLOYEE u
+        ON u.USER_NO = eg.USER_NO
+        JOIN TEAM t
+        ON t.TEAM_NO = u.TEAM_NO
 		ORDER BY EVALU_FORM_NO
 	</select>
-	<!-- 평가 결과 단건 조회 (일반 사용자, 본인 로그인한 userNo, formNo기반) -->
-	<select id="selectMyEvaluResultById" resultType="EvaluVO">
-
-			SELECT f.EVALU_NAME              
-			        , f.EVALU_START          
-			        , g.EVALUATEE_GROUP_ID      
-			        , u.USER_NO
-			        , u.USER_NAME          
-			        , i.EVALU_COMPET       
-			        , i.EVALU_CONTENT
-			        , r.EVALU_SCORE        
-			        , fm.ORDER_NO
-			        , u.TEAM_NO
-			FROM EVALU_FORM f              
-			JOIN EVALUATEE_GROUP g
-			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
-			JOIN EMPLOYEE u
-			ON g.USER_NO = u.USER_NO        
-			JOIN EVALU_FORMAT fm
-			ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO  
-			JOIN EVALU_RESULT r
-			ON r.EVALU_GROUP_ID = g.EVALUATEE_GROUP_ID AND fm.EVALU_NO = r.EVALU_NO 
-			JOIN EVALU_ITEM i
-			ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
-			WHERE f.EVALU_FORM_NO = 1
+	<!-- 내가 평가한 평가 단건 조회 (일반 사용자, 본인 로그인한 userNo, formNo기반) -->
+	<select id="selectMyEvaluingById" resultType="EvaluVO">
+		SELECT 
+		    g.USER_NO AS evaluateeUserNo,     
+		    u.USER_NAME AS evaluateeName,    
+		    i.EVALU_COMPET,                   
+		    i.EVALU_CONTENT,                
+		    r.EVALU_SCORE,                  
+		    fm.ORDER_NO                      
+		FROM EVALU_RESULT r
+		JOIN EVALUATEE_GROUP g 
+		    ON r.EVALUATEE_GROUP_ID = g.EVALUATEE_GROUP_ID
+		JOIN EMPLOYEE u 
+		    ON g.USER_NO = u.USER_NO
+		JOIN EVALU_FORMAT fm 
+		    ON r.EVALU_NO = fm.EVALU_NO
+		JOIN EVALU_ITEM i 
+		    ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+		WHERE r.EVALU_FORM_NO = #{evaluFormNo}
+		  AND r.USER_NO = #{userNo}            
+		ORDER BY u.USER_NO, fm.ORDER_NO
 	</select>
 	<!-- 평가 결과 단순 조회 (관리자, formNo 기반) -->
-		<select id="selectAdminBeforeEvaluList" resultType="EvaluVO">
+		<select id="selectAdminBeforeEvaluById" resultType="EvaluVO">
 			SELECT    
 			    	  f.EVALU_FORM_NO
 					, f.EVALU_NAME              
@@ -209,6 +213,7 @@
 			        , f.EVALU_FORM_NO
                     , d.department_name
                     , t.team_name
+                    , fm.evalu_no
 			FROM EVALU_FORM f              
 			JOIN EVALUATEE_GROUP g
 			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
@@ -242,6 +247,8 @@
                     , t.TEAM_NO
                     , g.EVALUATEE_GROUP_ID
                     , eg.EVALU_GROUP_ID
+                    , fm.evalu_no
+                    , f.USAGE_STATUS
 			FROM EVALU_FORM f              
 			JOIN EVALUATEE_GROUP g
 			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
@@ -258,7 +265,6 @@
             JOIN DEPARTMENT d
             ON t.department_id = d.department_id
             WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-            AND f.USAGE_STATUS = '진행 중'
 			AND f.EVALU_FORM_NO IN ( SELECT EVALU_FORM_NO
 					                 FROM EVALU_GROUP
 					                 WHERE USER_NO = #{userNo})
@@ -267,7 +273,7 @@
 
 		<!-- 내가 평가한 평가 리스트 (전체 조회) -->
 	<select id="selectMyEvaluList" resultMap="formEmpMyList">
-		 			SELECT f.EVALU_NAME
+ 			SELECT f.EVALU_NAME
 		 					, f.EVALU_FORM_NO
 					        , f.EVALU_START
 					        , f.EVALU_END
@@ -437,9 +443,100 @@
 		       , SYSDATE
 		       , #{evaluGroupId}
 		       , #{evaluateeGroupId}
-		       , EVALU_NO_SEQ.NEXTVAL
+		       , #{evaluNo}
 		       , #{evaluFormNo}
 		       , #{orderNo}
 		       , #{userNo} )
 	</insert>
+	
+	<!-- 평가 제출 후 평가 상태 '평가 완료' 로 수정하는 쿼리문 -->
+	<update id="updateEvaluStatus" parameterType="EvaluVO">
+		UPDATE EVALU_FORM 
+		SET USAGE_STATUS = '평가 완료'
+	</update>
+	<!-- 평가 상태 조회 쿼리 -->
+	<select id="getEvaluStatus" resultType="String" parameterType="int">
+	    SELECT USAGE_STATUS
+	    FROM EVALU_FORM
+	    WHERE EVALU_FORM_NO = #{formNo}
+	</select>
+	
+	<!-- 피평가자 : loginUser인 평가(평균) -->
+	<select id="selectMyReceivedAvgScore" resultType="EvaluVO">
+			SELECT
+			    i.EVALU_COMPET,
+			    i.EVALU_CONTENT,
+			    AVG(r.EVALU_SCORE) AS evaluScore,
+			    fm.ORDER_NO
+			FROM EVALU_RESULT r
+			JOIN EVALUATEE_GROUP g
+			    ON r.EVALUATEE_GROUP_ID = g.EVALUATEE_GROUP_ID
+			JOIN EVALU_FORMAT fm
+			    ON r.EVALU_NO = fm.EVALU_NO
+			JOIN EVALU_ITEM i
+			    ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+			WHERE g.USER_NO = #{userNo}               
+			  AND r.EVALU_FORM_NO = #{evaluFormNo}    
+			GROUP BY i.EVALU_COMPET, i.EVALU_CONTENT, fm.ORDER_NO
+			ORDER BY fm.ORDER_NO
+</select>
+<!-- 내가 피평가자로 등록된 평가 리스트 -->
+	<select id="selectMyEvaluResultList" resultMap="myEvaluResultList">
+		SELECT 
+		    f.EVALU_NAME,
+		    f.EVALU_FORM_NO,
+		    f.EVALU_START,
+		    f.EVALU_END,
+		    t.TEAM_NAME,
+		    f.USAGE_STATUS
+		FROM EVALUATEE_GROUP eg
+		JOIN EVALU_FORM f ON eg.EVALU_FORM_NO = f.EVALU_FORM_NO
+		JOIN EMPLOYEE u ON eg.USER_NO = u.USER_NO
+		JOIN TEAM t ON t.TEAM_NO = u.TEAM_NO
+		WHERE eg.USER_NO = #{userNo}
+		ORDER BY f.EVALU_START DESC
+	</select>
+	
+		<resultMap id="myEvaluResultList" type="EvaluVO">
+		<id property="evaluFormNo" column="evalu_form_no" />
+		  <result property="usageStatus" column="usage_status" />
+			<result property="evaluName" column="evalu_name" />
+				<result property="evaluStart" column="evalu_start" />
+				<result property="evaluEnd" column="evalu_end" />
+				<collection property="teamList" ofType="teamVO">
+					<result property="teamName" column="team_name" />
+				</collection>
+	</resultMap>
+	
+	<!-- 내가 평가 받은 평가 단건 조회 -->
+	<select id="selectMyEvaluScoreResultById" resultType="EvaluVO">
+		SELECT 
+		    u.USER_NO,
+		    u.USER_NAME,
+		    i.EVALU_COMPET,
+		    i.EVALU_CONTENT,
+		    AVG(r.EVALU_SCORE) AS AVG_SCORE,
+		    fm.ORDER_NO
+		FROM EVALU_FORM f
+		JOIN EVALUATEE_GROUP g 
+		    ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
+		JOIN EMPLOYEE u 
+		    ON g.USER_NO = u.USER_NO
+		JOIN EVALU_FORMAT fm 
+		    ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO
+		JOIN EVALU_ITEM i 
+		    ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO
+		JOIN EVALU_RESULT r 
+		    ON r.EVALU_NO = fm.EVALU_NO 
+		   AND r.EVALU_GROUP_ID = g.EVALUATEE_GROUP_ID
+		WHERE f.EVALU_FORM_NO = #{evaluFormNo}    
+		  AND u.USER_NO = #{userNo}
+		GROUP BY 
+		    u.USER_NO,
+		    u.USER_NAME,
+		    i.EVALU_COMPET,
+		    i.EVALU_CONTENT,
+		    fm.ORDER_NO
+		ORDER BY fm.ORDER_NO
+	</select>
 </mapper>

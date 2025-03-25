@@ -32,7 +32,7 @@ public interface EmpMapper {
 	public List<EvaluVO> selectBeforeEvaluList(EvaluVO evaluVO);
 	
 	// 지난 평가 단건 조회 (관리자)
-	public List<EvaluVO> selectAdminBeforeEvaluList(EvaluVO evaluVO);
+	public List<EvaluVO> selectAdminBeforeEvaluById(EvaluVO evaluVO);
 	
 	// 평가자 / 피평가자 정보 조회
 	public List<EvaluVO> selectEvaluInfoById(EvaluVO evaluVO);
@@ -60,13 +60,26 @@ public interface EmpMapper {
 	// 나의 평가했던 리스트 페이지 전체 조회
 	public List<EvaluVO> selectMyEvaluList(EvaluVO evaluVO);
 	
-	// 나의 평가 단순 조회 단건 조회
+	// 내가 등록한 평가 단건 조회
 	public List<EvaluVO> selectMyEvaluResultById(EvaluVO evaluVO);
 
 	// 개인 평가 진행 (평가할 페이지)
 	public List<EvaluVO> selectOneEvaluById(EvaluVO evaluVO);
-
-	// 평가한 거 등록 기능 (쿼리문 없음)
+	
+	// 평가한 거 등록 진행 (평가 결과에 insert)
 	public int insertEvaluScore(EvaluVO evaluVO);
 	
+	// 평가 완료 시 -> 평가 상태를 : 평가 완료로 
+	public int updateEvaluStatus(int formNo);
+	
+	// 평가 상태 조회 
+	public String getEvaluStatus(int formNo);
+	
+	// 내가 피평가자로 등록된 평가 리스트 (나의 평가 결과 리스트)
+	public List<EvaluVO> selectMyEvaluResultList(EvaluVO evaluVO);
+	
+	// 내가 받은 평가 단건 (피평가자 : loginUser)
+	public List<EvaluVO> selectMyEvaluScoreResultById(EvaluVO evaluVO);
+	
+
 }
