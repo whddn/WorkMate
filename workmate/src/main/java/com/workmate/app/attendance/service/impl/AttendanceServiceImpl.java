@@ -69,6 +69,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Override
 	public List<WorkVO> findMothEmpWork(WorkVO workVO) {
 		return attendMapper.selectMonthEmpList();
+	}
+	
+	// 전체사원 필터링 > 엑셀다운로드
+	@Override
+	public List<WorkVO> getFilterAttend(String stDate, String endDate, String userName, String teamName) {
+		
+		return attendMapper.selectFilterEmpList(stDate,endDate, userName,teamName);
 	}	
 
 	

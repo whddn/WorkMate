@@ -87,6 +87,12 @@
                   <p>전사 자료실</p>
                 </a>
               </li>
+              <li class="nav-item" th:if="${teamNo == 'ROLE_T001'}">
+                <a th:href="@{list}">
+                  <i class="fas fa-file"></i>
+                  <p>자료 다운로드 이력</p>
+                </a>
+              </li>
             </ul>
           </div>
         </div>

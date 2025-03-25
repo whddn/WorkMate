@@ -6,7 +6,7 @@
 		SELECT user_no, user_id,
 		user_pwd, user_mail, user_position, hire_date,
 		user_name, resign_date, status_user, user_birth, address,
-		user_phone, team_no, user_ip
+		user_phone, 'ROLE_'||team_no  team_no, user_ip
 		FROM employee
 		WHERE user_id = #{id}
 	</select>
