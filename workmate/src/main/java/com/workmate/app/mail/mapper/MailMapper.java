@@ -6,6 +6,9 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import com.workmate.app.employee.service.DepartmentVO;
+import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
 import com.workmate.app.mail.service.AttachmentVO;
 import com.workmate.app.mail.service.MailFolderVO;
 import com.workmate.app.mail.service.MailVO;
@@ -75,4 +78,12 @@ public interface MailMapper {
 	@Select("SELECT COUNT(*) FROM MAIL WHERE MESSAGE_ID = #{messageId}")
 	int countMessageId(@Param("messageId") String messageId);
 
+	//전체부서목록 조회
+	List<DepartmentVO> selectDepartmentList();
+	//특정부서 팀목록
+    List<TeamVO> selectTeamListByDepartment(String departmentId);
+  //특정 팀에 속한 사원들의 이메일 주소
+    List<String> selectEmailsByTeam(String teamNo);
+  //특정 팀에 속한 사원들의 정보 전체
+    List<EmpVO> selectEmployeesByTeam(String teamNo);
 }

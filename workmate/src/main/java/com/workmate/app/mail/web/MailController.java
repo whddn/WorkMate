@@ -29,6 +29,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.workmate.app.employee.service.DepartmentVO;
+import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
 import com.workmate.app.mail.service.AttachmentVO;
 import com.workmate.app.mail.service.MailFolderVO;
 import com.workmate.app.mail.service.MailService;
@@ -41,20 +44,49 @@ import jakarta.mail.MessagingException;
 @Controller
 public class MailController {
 	private final MailService mailService;
-
+	
     @Autowired
     public MailController(MailService mailService) {
         this.mailService = mailService;
     }
-
+  //전체부서목록 조회
+    @GetMapping("/mail/departments") 
+    @ResponseBody
+    public List<DepartmentVO> getDepartments() {
+        return mailService.findDepartmentList();
+    }
+  //특정부서 팀목록
+    @GetMapping("/mail/teams")
+    @ResponseBody
+    public List<TeamVO> getTeams(@RequestParam String departmentId) {
+        return mailService.findTeamListByDepartment(departmentId);
+    }
+  //특정 팀에 속한 사원들의 이메일 주소
+    @GetMapping("/mail/emails")
+    @ResponseBody
+    public List<String> getEmails(@RequestParam String teamNo) {
+        return mailService.findEmailsByTeam(teamNo);
+    }
+  //특정 팀에 속한 사원들의 정보 전체
+    @GetMapping("/mail/employees")
+    @ResponseBody
+    public List<EmpVO> getEmployeesByTeam(@RequestParam String teamNo) {
+        return mailService.findEmployeesByTeam(teamNo);
+    }
+    
     
     
  // 메일 단건 조회
     @GetMapping("mail/view")
     public String viewMail(@RequestParam("mailId") int mailId, Model model) {
         MailVO mail = mailService.findMailById(mailId);
+        List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId);
+        
+        // 🔥 첨부파일 리스트 mail VO에 세팅
+        mail.setAttachmentList(attachments);
+
         model.addAttribute("mail", mail);
-        return "mail/view";  
+        return "mail/view";
     }
     
     //메일 쓰기
@@ -130,7 +162,11 @@ public class MailController {
     @GetMapping("mail/sentview")
     public String viewSentMail(@RequestParam("mailId") int mailId, Model model) {
         MailVO mail = mailService.findSentMailById(mailId);
+        List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId); // ✅ 첨부파일 조회
+
         model.addAttribute("mail", mail);
+        model.addAttribute("attachments", attachments); // ✅ 추가됨
+
         return "mail/sentview";
     }
     
@@ -288,19 +324,17 @@ public class MailController {
         return "redirect:/mail/mailmain";
     }
     @PostMapping("/mail/saveDraft")
-    public String saveDraft(
-            @AuthenticationPrincipal LoginUserVO loginUser,
-            @RequestParam String senderName,
-            @RequestParam String senderEmail,
-            @RequestParam String recipients,
-            @RequestParam(required = false) String ccList,
-            @RequestParam String subject,
-            @RequestParam String content) {
-
-        int userNo = loginUser.getUserVO().getUserNo();
+    public String saveDraft(@AuthenticationPrincipal LoginUserVO loginUser,
+                            @RequestParam String senderName,
+                            @RequestParam String senderEmail,
+                            @RequestParam String recipients,
+                            @RequestParam(required = false) String ccList,
+                            @RequestParam String subject,
+                            @RequestParam String content,
+                            @RequestParam(required = false) MultipartFile[] attachments) {
 
         MailVO mail = new MailVO();
-        mail.setUserNo(userNo);
+        mail.setUserNo(loginUser.getUserVO().getUserNo());
         mail.setRecipients(recipients);
         mail.setCcList(ccList);
         mail.setSubject(subject);
@@ -312,8 +346,7 @@ public class MailController {
         mail.setIsSpam("N");
         mail.setFolderId(1003); // 임시보관함
 
-        mailService.inputMail(mail);
-
+        mailService.saveDraftMail(mail, attachments);
         return "redirect:/mail/draft";
     }
     //임시보관함
@@ -331,6 +364,10 @@ public class MailController {
     @GetMapping("/mail/composeDraft")
     public String composeFromDraft(@RequestParam("mailId") int mailId, Model model) {
         MailVO draftMail = mailService.findMailById(mailId);
+        List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId);
+
+        draftMail.setAttachmentList(attachments); 
+
         model.addAttribute("draft", draftMail);
         return "mail/compose"; // 기존 작성 페이지로 이동
     }
