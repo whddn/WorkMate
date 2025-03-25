@@ -51,8 +51,9 @@ public interface EmpService {
 	// 나의 평가 진행 중 조회 (단건 조회) 
 	public List<EvaluVO> findMyEvaluById(EvaluVO evaluVO);
 	
-	// 평가 진행 페이지
+	// 평가 진행 페이지 (단건...?)
 	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO);
+	//public List<EvaluVO> findMyEvaluingById(EvaluVO evaluVO);
 	
 	// 평가 등록 (관리자 페이지)
 	public int inputNewEvalu(EvaluVO evaluVO);
@@ -77,4 +78,7 @@ public interface EmpService {
 	
 	// 내가 받은 평가 점수 확인 (단건 조회)
 	public List<EvaluVO> findMyEvaluScoreResultById(EvaluVO evaluVO);
+	
+	// 사원 중복 제거 ?? 
+	public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO evaluVO); 
 }

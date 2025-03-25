@@ -61,7 +61,7 @@ public interface EmpMapper {
 	public List<EvaluVO> selectMyEvaluList(EvaluVO evaluVO);
 	
 	// 내가 등록한 평가 단건 조회
-	public List<EvaluVO> selectMyEvaluResultById(EvaluVO evaluVO);
+	public List<EvaluVO> selectMyEvaluingById(EvaluVO evaluVO);
 
 	// 개인 평가 진행 (평가할 페이지)
 	public List<EvaluVO> selectOneEvaluById(EvaluVO evaluVO);
