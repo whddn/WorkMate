@@ -210,7 +210,12 @@
 		</div>
 	</div>
 
-	<script>
+	<script th:inline="javascript">
+		const msg = [[ ${msg} ]]
+		if(msg != null){
+			alert(msg);
+		}
+		
 		function currentDate() {
 			const now = new Date();
 			document.getElementById("current-date").innerText = now.toISOString().split('T')[0];

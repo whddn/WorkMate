@@ -28,10 +28,10 @@ public class SpringSecurityConfig {
 			.authorizeHttpRequests((authrize)  
 				-> authrize
 					//.requestMatchers("/", "/workmate").permitAll()	// 전체 접근 허용
-				.requestMatchers("/header").authenticated()
+				    .requestMatchers("/header").authenticated()
 					.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
-					.requestMatchers("/team/**").hasAuthority("과장")  // 중간 권한
-
+					//.requestMatchers("/team/**").hasAuthority("T001")  // 중간 권한
+					.requestMatchers("/attendance/attendanceManage").hasRole("T001")  // 중간 권한
 
 					.requestMatchers("/admin/**").permitAll() // 권한있는 사용자,관리자 접근 허용
 					.anyRequest().authenticated() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능

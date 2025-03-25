@@ -22,17 +22,6 @@
 		      AND user_no = #{userNo}
 		    ORDER BY start_work DESC
 		</select>
-	<!--<select id="selectWorkList" resultType="WorkVO">	
-		SELECT start_work
-		     , after_work
-		     , work_time
-		     , work_status
-		FROM work
-		WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
-		 AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
-		 ORDER BY start_work DESC
-	</select> -->
-
 	
 	
 	<!-- 전체조회 -->
@@ -46,7 +35,7 @@
 	    WHERE user_no = #{userNo}
 	    AND 1 = 1
     <if test="stDate != null and endDate != null">
-        AND start_work BETWEEN #{stDate} AND #{endDate} + 1
+        AND start_work >= #{stDate} AND  start_work <![CDATA[<]]> #{endDate} + 1
     </if>
 	    ORDER BY start_work DESC
 	</select>
@@ -88,8 +77,12 @@
 	<update id="insertAfterInfo" parameterType="WorkVO">
 		UPDATE WORK
 		SET 
-		    after_work = SYSDATE,
-		    work_time = ROUND((SYSDATE - start_work) * 24 , 1) -1,
+		   after_work = SYSDATE,
+		   work_time = 
+	    	CASE
+	    		WHEN TO_CHAR(SYSDATE, 'HH24') >= '14' THEN ROUND((SYSDATE - start_work) * 24, 1) - 1
+	    		ELSE ROUND((SYSDATE - start_work) * 24, 1)
+	    	END,
 		    add_work_time = F_ADD_WORK_TIME(SYSDATE),
 		    work_status = 
 		    	CASE
@@ -124,6 +117,16 @@
 		ORDER BY annual_no DESC
 	</select>
 	
+	<!-- 연차 업데이트 전자결재 -->
+	<update id="updateOccList" parameterType="int">
+		UPDATE occ_annual
+		SET	
+			update_annual_count = update_annual_count - 1
+			, remain_annual_leave = remain_annual_leave + 1
+		WHERE 	user_no = #{userNo}
+		AND user_annual_year = EXTRACT(YEAR FROM SYSDATE)
+	</update>
+	
 	<!-- 전체사원 이번달 근태 -->
 	<select id="selectMonthEmpList" resultType="WorkVO">
 		SELECT 
@@ -133,7 +136,7 @@
         FROM work 
         WHERE EXTRACT(YEAR FROM start_work) = EXTRACT(YEAR FROM SYSDATE)
           AND EXTRACT(MONTH FROM start_work) = EXTRACT(MONTH FROM SYSDATE)
-          AND (work_status LIKE '지각' OR work_status LIKE '조퇴')
+          AND (work_status = '지각' OR work_status = '조퇴')
     ) AS all_status_count,
 
    
@@ -189,7 +192,33 @@
 	    <if test="teamName != null and teamName != ''">
 	        AND t.team_name LIKE '%' || #{teamName} || '%'
 	    </if>
-		ORDER BY SYSDATE DESC
+		ORDER BY start_work DESC
+	</select>
+	
+	<!-- 필터링 전체사원 -->
+	<select id="selectFilterEmpList" resultType="WorkVO">
+			SELECT t.team_name,               
+		       e.user_name,              
+		       w.start_work,             
+		       w.after_work,             
+		       w.work_time,
+		       w.add_work_time,               
+		       w.work_status              
+		FROM work w
+		JOIN employee e ON w.user_no = e.user_no  
+		JOIN team t ON e.team_no = t.team_no  
+		WHERE 1 = 1
+		<if test="stDate != null and endDate != null">
+		    AND w.start_work >= #{stDate} AND w.start_work <![CDATA[<]]> #{endDate}
+		</if>
+		  <if test="userName != null and userName != ''">
+        	AND e.user_name LIKE '%' || #{userName} || '%'
+	    </if>
+	    <if test="teamName != null and teamName != ''">
+	        AND t.team_name LIKE '%' || #{teamName} || '%'
+	    </if>
+		ORDER BY start_work DESC
+	
 	</select>
 
 </mapper>
