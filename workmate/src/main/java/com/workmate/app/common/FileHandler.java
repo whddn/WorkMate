@@ -23,7 +23,10 @@ public class FileHandler {
 			if (!dir.exists())
 				dir.mkdirs();
 
+			// ✅ 2. 파일 경로 설정
 	        Path filePath = Paths.get(fileDir + uniqueFileName);
+	        
+	        // ✅ 3. 파일로 저장
 	        Files.write(filePath, file.getBytes());
 	        return uniqueFileName;
 		}
@@ -37,4 +40,26 @@ public class FileHandler {
         Path path = Paths.get(filePath);
         return new FileSystemResource(path.toFile());
     }
+	
+	public String htmlUpload(String title, String content, String fileDir) {
+		try {
+			// ✅ 1. 파일 저장 폴더가 없으면 생성
+			File dir = new File(fileDir);
+			if(!dir.exists()) {
+				dir.mkdirs();
+			}
+			
+			// ✅ 2. 파일 경로 설정
+			Path filePath = Paths.get(fileDir + title + ".html");
+			System.out.println(fileDir + title + ".html");
+			
+			// ✅ 3. HTML 문자열을 파일로 저장
+	        Files.write(filePath, content.getBytes());
+	        return title;
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+	        return "";
+		}
+	}
 }

@@ -55,7 +55,7 @@
 		    LEFT JOIN department
 		    ON approval.dept_no=department.department_id
 		WHERE appr_no=#{apprNo}
-		AND	  reser_no=#{reserNo}
+			AND	reser_no=#{reserNo}
 	</select>
 	<insert id="insertApproval" parameterType="ApprovalVO">
 	    <!-- INSERT 전 새 apprNo 생성 -->

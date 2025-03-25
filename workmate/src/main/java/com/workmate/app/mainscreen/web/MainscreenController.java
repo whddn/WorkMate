@@ -25,6 +25,21 @@ import com.workmate.app.mainscreen.service.ScheduleVO;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 메인화면 페이지
+ * @author 이지응
+ * @since 2025-03-10
+ * <pre>
+ * <pre>
+ * 수정일자	수정자	수정내용
+ * -------------------------
+ * 03-21	이지응	검색 화면 제작
+ * 03-22	이지응	캘린더 화면 제작
+ * 03-23	이지응	일정 조정 기능 제작
+ * 
+ * </pre>
+ */
+
 @Controller
 @RequiredArgsConstructor
 public class MainscreenController {

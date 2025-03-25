@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/admin_layout}"
+	layout:fragment="content"
+	>
+
+<head>
+	<meta charset="UTF-8">
+	<title>결재양식 조작</title>
+	<!-- 스마트 에디터 스크립트 추가 -->
+	<script type="text/javascript" th:src="@{/smarteditor/js/HuskyEZCreator.js}" charset="utf-8"></script>
+</head>
+
+<body>
+	<h3>결재양식 추가 및 수정화면</h3>
+	<input id="apprType" type="hidden">
+	<input id="formName" type="text" placeholder="양식 이름">
+	<input id="formPath" type="text" placeholder="양식 영문 이름">
+	<input id="contactNo" type="number" placeholder="담당자 번호">
+	<div id="smarteditor">
+		<textarea 
+			name="editorTxt" 
+			id="editorTxt"
+			rows="20"
+			cols="10"
+			placeholder="내용을 입력하세요"
+			style="width: 750px">
+		</textarea>
+	</div>
+	<button class="btn btn-secondary" id="saveBtn">적용</button>
+	<button class="btn btn-primary" th:onclick="| location.href = '@{/admin/apprFormList}' |">뒤로</button>
+</body>
+
+<script th:inline="javascript">
+	let oEditors = [];
+	
+	smartEditor = function() {
+		console.log('Naver SmartEditor API');
+		nhn.husky.EZCreator.createInIFrame({
+			oAppRef: oEditors,
+			elPlaceHolder: 'editorTxt',
+			sSkinURI: [[ @{/smarteditor/SmartEditor2Skin.html} ]],
+			fCreator: 'createSEditor2'
+		});
+	}
+	
+	$(document).ready(function() {
+		smartEditor();
+		
+		let apprType = [[${apprType}]];
+		if(apprType == undefined || apprType == null || apprType == '') {
+			return;
+		}
+		
+		let apprForm = [[ ${apprForm} ]];
+		$('#apprType').val(apprForm.apprType);
+		$('#formName').val(apprForm.formName);
+		$('#formPath').val(apprForm.formPath);
+		$('#contactNo').val(apprForm.contactNo);
+		
+		let content = [[ ${editorContent} ]];
+		setTimeout(function () {
+		    oEditors.getById['editorTxt'].exec('PASTE_HTML', [content]);
+		}, 500);
+	});
+	
+	$('#saveBtn').on('click', function() {
+		if(!confirm('파일 영문명이 같은게 있으면 덮어쓰게 됩니다! 파일 영문명을 잘 확인하셨습니까?')) {
+	        return;
+	    }
+		
+		const editorField = oEditors.getById['editorTxt'];
+		editorField.exec('UPDATE_CONTENTS_FIELD', []);
+		const content = document.getElementById('editorTxt').value;
+		
+		if(content == '') {
+			alert('내용을 입력하세요');
+			editorField.exec('FOCUS');
+			return;
+		}
+		
+		const apprType = $('#apprType').val();
+		const formName = $('#formName').val();
+		const formPath = $('#formPath').val();
+		const contactNo = $('#contactNo').val();
+		
+		if(apprType == undefined || apprType == null || apprType == '') {
+			$.ajax({
+		        type: 'POST',
+		        url: [[ @{/admin/apprForm} ]],	// Spring Boot 컨트롤러에 요청
+		        contentType: 'application/json',
+		        data: JSON.stringify({
+		        	formName: formName,
+		            formPath: formPath,	// 저장할 파일 이름
+		            contactNo: contactNo,
+		            content: content
+		        }),
+		        success: function(response) {
+		            alert('파일이 성공적으로 등록되었습니다.');
+		        },
+		        error: function(error) {
+		            alert('파일 등록에 실패했습니다.');
+		        }
+		    });
+		}
+		else {
+			$.ajax({
+		        type: 'PUT',
+		        url: [[ @{/admin/apprForm} ]],	// Spring Boot 컨트롤러에 요청
+		        contentType: 'application/json',
+		        data: JSON.stringify({
+		        	apprType: apprType,
+		        	formName: formName,
+		            formPath: formPath,	// 저장할 파일 이름
+		            contactNo: contactNo,
+		            content: content
+		        }),
+		        success: function(response) {
+		            alert('파일이 성공적으로 수정되었습니다.');
+		        },
+		        error: function(error) {
+		            alert('파일 수정에 실패했습니다.');
+		        }
+		    });
+		}
+		
+		location.href = [[ @{/admin/apprFormList} ]];
+	});
+</script>
+
+</html>
