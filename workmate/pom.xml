@@ -133,6 +133,12 @@
 		    <artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 
+		<!-- for htmlStr to MultipartFile -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-test</artifactId>
+		</dependency>
+
 		</dependencies>
 
 	<build>

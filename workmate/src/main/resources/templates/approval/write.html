@@ -274,11 +274,13 @@
 		const formData = new FormData();
 		
 		// 일반 JSON데이터 추가
+		let name;
+		let value;
 		let request = {};
 		
 		$('input[name], select[name], textarea[name], button[name]').each(function() {
-		    let name = $(this).attr('name');
-		    let value = $(this).val();
+		    name = $(this).attr('name');
+		    value = $(this).val();
 		    request[name] = value;
 		});
 		
