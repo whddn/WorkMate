@@ -2,6 +2,7 @@ package com.workmate.app.reservation.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +12,11 @@ import com.workmate.app.approval.mapper.ApprovalMapper;
 import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.common.FileHandler;
 import com.workmate.app.common.WhoAmI;
+<<<<<<< HEAD
 import com.workmate.app.employee.service.EmpService;
+=======
+import com.workmate.app.employee.mapper.EmpMapper;
+>>>>>>> branch 'jongwoo' of https://github.com/whddn/WorkMate.git
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.reservation.mapper.ReservationMapper;
 import com.workmate.app.reservation.service.ReservationService;
@@ -27,9 +32,16 @@ public class ReservationImpl implements ReservationService {
 	private final ApprovalMapper approvalMapper;
 	private final ApprLineMapper apprLineMapper;
 	private final ApprElmntMapper apprElmntMapper;
+<<<<<<< HEAD
 	private final EmpService empService;
 	private final FileHandler fileHandler = new FileHandler();
 	private final WhoAmI whoAmI = new WhoAmI();
+=======
+	private final EmpMapper empMapper;
+	
+	@Autowired
+	private final WhoAmI whoAmI;
+>>>>>>> branch 'jongwoo' of https://github.com/whddn/WorkMate.git
 	
 	// 전체
 	@Override
@@ -47,7 +59,6 @@ public class ReservationImpl implements ReservationService {
 	@Override
 	public ReservationVO inputReserInfo(ReservationVO reservationVO) {
 		// 현재 로그인한 유저 정보 가져오기
-		WhoAmI whoAmI = new WhoAmI();
 		EmpVO currentUser = whoAmI.whoAmI();
 		
 		// ✅ reservationVO에 사원번호 주입

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workmate.app.mail.mapper.AttachmentMapper">
+<!-- 첨부파일 저장 -->
+	<insert id="insertAttachment" parameterType="AttachmentVO">
+        INSERT INTO ATTACHMENT (FILE_ID, MAIL_ID, FILE_NAME, FILE_TYPE, FILE_SIZE, FILE_PATH)
+        VALUES (ATTACHMENT_SEQ.NEXTVAL, #{mailId}, #{fileName}, #{fileType}, #{fileSize}, #{filePath})
+    </insert>
+<!-- 메일 ID로 첨부파일 목록 조회 -->
+    <select id="selectAttachmentsByMailId" resultType="AttachmentVO">
+        SELECT * FROM ATTACHMENT WHERE MAIL_ID = #{mailId}
+    </select>
+<!-- 파일 ID로 단일 파일 정보 조회 -->
+    <select id="selectAttachmentById" resultType="AttachmentVO">
+        SELECT * FROM ATTACHMENT WHERE FILE_ID = #{fileId}
+    </select>
+</mapper>

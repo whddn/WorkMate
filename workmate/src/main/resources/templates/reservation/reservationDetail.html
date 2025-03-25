@@ -133,8 +133,8 @@
 							<!-- 서버로 넘겨줄 데이터들 -->
 							<input type="hidden" name="commonNo" id="commonNo" th:value="${reser.commonNo}" />
 							<input type="hidden" name="userNo" id="userNo" th:value="${reser.userNo}" />
-							<input type="hidden" name="reserStartTime" id="reserStartTime" th:value="${reser.reserStartTime}" />
-							<input type="hidden" name="reserEndTime" id="reserEndTime" th:value="${reser.reserEndTime}" />
+							<input type="hidden" name="reserStartTime" id="reserStartTime" />
+							<input type="hidden" name="reserEndTime" id="reserEndTime" />
 							<input type="hidden" name="reserNo" th:value="${reser.reserNo}" />
 
 							<div class="mb-3">
@@ -151,37 +151,46 @@
 								<label class="form-label">이용 날짜</label>
 								 <input type="date"	class="form-control" name="reserDate" th:value="${reser.reserDate}">
 							</div>
-							<div class="mb-3" th:if="${reser.reserNo} != null">
-								<label class="form-label">예약 시간</label>
-								 <input	class="form-control" th:value="${reser.reserStartTime + ' ~ ' + reser.reserEndTime}">
-							</div>
 							<div class="mb-3">
 								<label class="form-label">예약 내용</label>
 								<textarea class="form-control" name="content" required rows="3" placeholder="예약 목적을 입력하세요"></textarea>
 							</div>
 							<div class="text-center">
 								<button type="submit" class="btn btn-success" th:text="${reser.reserNo != null} ? '수정하기' : '예약하기'">예약하기</button>
-								<button type="reset" class="btn btn-danger">취소</button>
+								<button type="button" class="btn btn-danger"  th:onclick="handleCancel()">취소</button>
 							</div>
 						</div>
 					</div>
 				</div>
 
-
 			</div>
 		</div>
 	</form>
-	
-	<!-- ✅ FullCalendar JS -->
-	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
-	
-	<!-- ✅ reservedList & 예약번호 -->
+	<!-- ✅ JavaScript -->
+	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
+
+	<!-- ✅ 1. reservedList 넘기기 -->
 	<script th:inline="javascript">
 		let reservedList = /*[[${reservedList}]]*/ [];
 		let reserNo = /*[[${reser.reserNo}]]*/ null;
 	</script>
 	
+	<script>
+	  function handleCancel() {
+	    const reserNo = document.querySelector("input[name='reserNo']").value;
+	    if (reserNo) {
+	      // 수정 상태 → 예약 리스트로 이동
+	      window.location.href = '/workmate/reservation/List';
+	    } else {
+	      // 등록 상태 → 예약 메인으로 이동
+	      window.location.href = '/workmate/reservation/main';
+	    }
+	  }
+	</script>
+	
+
+	<!-- ✅ 2. 예약 관련 JS -->
 	<script>
 		function formatDate(dateStr) {
 		  const date = new Date(dateStr);
@@ -190,7 +199,7 @@
 		  const dd = String(date.getDate()).padStart(2, '0');
 		  return `${yyyy}-${mm}-${dd}`;
 		}
-	
+		
 		function loadCalendar(initialDate) {
 		  const calendarEl = document.getElementById('calendar');
 		  const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -199,45 +208,47 @@
 		    selectable: true,
 		    editable: false,
 		    height: 500,
-	
+		
 		    dateClick: function (info) {
 		      const selectedDate = info.dateStr;
 		      const dateInput = document.querySelector('input[name="reserDate"]');
 		      if (!dateInput) return;
 		      dateInput.value = selectedDate;
-	
+		
 		      // 날짜 강조
 		      document.querySelectorAll(".fc-daygrid-day").forEach(day => {
 		        day.style.backgroundColor = "";
 		      });
 		      const clickedCell = document.querySelector(`.fc-daygrid-day[data-date='${selectedDate}']`);
 		      if (clickedCell) clickedCell.style.backgroundColor = "#cce5ff";
-	
+		
 		      // 초기화
 		      document.querySelectorAll(".time-slot").forEach(slot => {
 		        slot.classList.remove("disabled", "selected");
 		      });
-	
+		
 		      const myReserNo = document.querySelector("input[name='reserNo']")?.value || null;
-	
+		
 		      const reservedTimes = reservedList.filter(res => {
 		        const isSameDate = formatDate(res.reserDate) === selectedDate;
-		        if (!res.reserNo || !myReserNo) return isSameDate;
+		        if (!res.reserNo || !myReserNo) {
+		          return isSameDate; // 예약번호 없으면 모두 포함
+		        }
 		        return isSameDate && String(res.reserNo) !== String(myReserNo);
 		      });
-	
-		      // 🔒 시간 슬롯 비활성화
+		
+		      // 🔧 시간 슬롯 기준으로 비활성화 처리
 		      let disabledSlots = new Set();
 		      for (let h = 6; h <= 23; h++) {
 		        const slotStart = h * 60;
 		        const slotEnd = (h + 1) * 60 - 1;
-	
+		
 		        for (const res of reservedTimes) {
 		          const [startH, startM] = res.reserStartTime.split(":").map(Number);
 		          const [endH, endM] = res.reserEndTime.split(":").map(Number);
 		          const startMin = startH * 60 + startM;
 		          const endMin = endH * 60 + endM;
-	
+		
 		          const overlap = !(endMin < slotStart || startMin > slotEnd);
 		          if (overlap) {
 		            disabledSlots.add(h);
@@ -245,79 +256,70 @@
 		          }
 		        }
 		      }
-	
-		      // 🔓 내 예약 시간은 비활성화하지 않음
-		      const myStartTime = document.getElementById("reserStartTime")?.value;
-		      const myEndTime = document.getElementById("reserEndTime")?.value;
-	
-		      let myHours = new Set();
-		      if (myStartTime && myEndTime && selectedDate === formatDate(document.querySelector('input[name="reserDate"]').value)) {
-		        const myStartHour = parseInt(myStartTime.split(":")[0]);
-		        const myEndHour = parseInt(myEndTime.split(":")[0]);
-		        for (let h = myStartHour; h <= myEndHour; h++) {
-		          myHours.add(h);
-		        }
-		      }
-	
-		      // 적용
+		
+		      // 실제 DOM에 반영
 		      disabledSlots.forEach(h => {
-		        if (myHours.has(h)) return;
 		        const slot = document.querySelector(`#time${h}`);
 		        if (slot) {
 		          slot.classList.add("disabled");
 		          slot.classList.remove("selected");
 		        }
 		      });
-	
-		      myHours.forEach(h => {
-		        const slot = document.querySelector(`#time${h}`);
-		        if (slot) {
-		          slot.classList.add("selected");
-		          slot.classList.remove("disabled");
+		
+		      // 🟢 내 예약시간 다시 selected 처리
+		      const myStartTime = document.getElementById("reserStartTime")?.value;
+		      const myEndTime = document.getElementById("reserEndTime")?.value;
+		
+		      if (myStartTime && myEndTime && selectedDate === formatDate(document.querySelector('input[name="reserDate"]').value)) {
+		        const myStartHour = parseInt(myStartTime.split(":")[0]);
+		        const myEndHour = parseInt(myEndTime.split(":")[0]);
+		
+		        for (let h = myStartHour; h <= myEndHour; h++) {
+		          const slot = document.querySelector(`#time${h}`);
+		          if (slot && !slot.classList.contains("disabled")) {
+		            slot.classList.add("selected");
+		          }
 		        }
-		      });
+		      }
+		
 		    }
 		  });
-	
+		
 		  calendar.render();
-	
-		  // 초기 날짜 클릭
+		
 		  if (initialDate) {
-		    setTimeout(() => {
-		      const cell = document.querySelector(`.fc-daygrid-day[data-date='${initialDate}']`);
-		      if (cell) cell.click();
-		    }, 100);
+		    const cell = document.querySelector(`.fc-daygrid-day[data-date='${initialDate}']`);
+		    if (cell) cell.click();
 		  }
 		}
-	
-		// 페이지 로드 후 실행
+		
 		document.addEventListener("DOMContentLoaded", function () {
 		  const dateInput = document.querySelector('input[name="reserDate"]');
 		  const initialDate = dateInput?.value || new Date().toISOString().split("T")[0];
 		  if (dateInput) dateInput.value = initialDate;
-	
+		
 		  loadCalendar(initialDate);
 		});
-	
-		// 시간 토글
+		
+		// 시간 선택 토글
 		function toggleTime(element) {
 		  if (element.classList.contains("disabled")) return;
 		  element.classList.toggle("selected");
 		}
-	
+		
 		// 전체 선택
 		function toggleAllTimes() {
 		  const timeSlots = document.querySelectorAll(".time-slot");
 		  const allSelected = Array.from(timeSlots).every(slot => slot.classList.contains("selected") || slot.classList.contains("disabled"));
-	
+		
 		  timeSlots.forEach(slot => {
 		    if (!slot.classList.contains("disabled")) {
 		      slot.classList.toggle("selected", !allSelected);
 		    }
 		  });
 		}
-	
-		// submit 시 시간 계산 및 유효성 체크
+		
+		// submit 시 유효성 검사 + 시간 계산
 		document.querySelector("[name='reservationForm']").addEventListener("submit", function (e) {
 		  const content = document.querySelector("textarea[name='content']").value.trim();
 		  if (!content) {
@@ -325,14 +327,14 @@
 		    e.preventDefault();
 		    return;
 		  }
-	
+		
 		  const selectedHours = Array.from(document.querySelectorAll(".time-slot.selected")).map(h => parseInt(h.getAttribute("data-value")));
 		  if (selectedHours.length === 0) {
 		    alert("❗ 시간을 선택해주세요.");
 		    e.preventDefault();
 		    return;
 		  }
-	
+		
 		  const selectedDate = formatDate(document.querySelector('input[name="reserDate"]').value);
 		  const hasConflict = reservedList.some(res => {
 		    if (formatDate(res.reserDate) !== selectedDate) return false;
@@ -340,21 +342,22 @@
 		    const end = parseInt(res.reserEndTime.split(":")[0]);
 		    return selectedHours.some(h => h >= start && h < end);
 		  });
-	
+		
 		  if (hasConflict) {
 		    alert("⚠️ 이미 예약된 시간과 겹칩니다.");
 		    e.preventDefault();
 		    return;
 		  }
-	
+		
 		  const minHour = Math.min(...selectedHours);
 		  const maxHour = Math.max(...selectedHours);
-	
+		
 		  const pad = n => String(n).padStart(2, "0");
 		  document.getElementById("reserStartTime").value = `${pad(minHour)}:00`;
 		  document.getElementById("reserEndTime").value = `${pad(maxHour)}:59`;
 		});
 	</script>
+
 
 
 </body>

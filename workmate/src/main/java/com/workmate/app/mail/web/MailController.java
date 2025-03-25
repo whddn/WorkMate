@@ -1,25 +1,40 @@
 package com.workmate.app.mail.web;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.workmate.app.mail.service.AttachmentVO;
 import com.workmate.app.mail.service.MailFolderVO;
 import com.workmate.app.mail.service.MailService;
 import com.workmate.app.mail.service.MailVO;
 import com.workmate.app.security.service.LoginUserVO;
+
 
 import jakarta.mail.MessagingException;
 
@@ -54,18 +69,27 @@ public class MailController {
             @RequestParam String recipients,
             @RequestParam(required = false) String ccList,
             @RequestParam String subject,
-            @RequestParam String content) {
+            @RequestParam String content,
+            @RequestParam(required = false) MultipartFile[] attachments
+    ) {
         try {
-            // ✅ 로그인한 사용자의 정보 가져오기
-            String senderName = loginUser.getUserVO().getUserName();  // 사원 이름
-            String senderEmail = loginUser.getUserVO().getUserMail(); // 사원 이메일
-            int userNo = loginUser.getUserVO().getUserNo();
-            // ✅ 메일 전송
-            mailService.sendEmail(senderName, senderEmail, recipients, subject, content);
+            String senderName = loginUser.getUserVO().getUserName();
+            String senderEmail = loginUser.getUserVO().getUserMail();
 
-            return "redirect:/mail/mailmain"; // 성공 시 받은 메일함으로 이동
-        } catch (MessagingException e) {
-            return "전송 실패: " + e.getMessage();
+            boolean hasAttachment = attachments != null && Arrays.stream(attachments).anyMatch(f -> !f.isEmpty());
+
+            if (hasAttachment) {
+                // 첨부파일이 있을 경우 저장 + 첨부파일 처리 + 전송
+                mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments);
+            } else {
+                // 첨부파일 없으면 일반 전송만
+                mailService.sendEmail(senderName, senderEmail, recipients, subject, content);
+            }
+
+            return "redirect:/mail/mailmain";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "메일 전송 실패: " + e.getMessage();
         }
     }
     //보낸 메일함 전쳊
@@ -344,4 +368,49 @@ public class MailController {
 
         return "mail/spam";
     }
+    
+ // properties에서 설정한 파일 저장 경로 주입
+    @Value("${file.upload-dir}")
+    private String uploadDir; 
+
+    // 파일 업로드 처리 (여러 개 가능)
+    @PostMapping("/mail/uploadFiles")
+    @ResponseBody
+    public List<AttachmentVO> uploadFiles(@RequestParam("files") MultipartFile[] files) throws IOException {
+        List<AttachmentVO> uploaded = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            // UUID로 파일명 중복 방지
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String fullPath = uploadDir + File.separator + fileName;
+
+            File dest = new File(fullPath);
+            file.transferTo(dest);
+
+            AttachmentVO att = new AttachmentVO();
+            att.setFileName(file.getOriginalFilename());
+            att.setFileType(file.getContentType());
+            att.setFileSize(file.getSize());
+            att.setFilePath(fullPath);
+
+            uploaded.add(att); // DB 저장은 메일 전송 시 처리
+        }
+
+        return uploaded;
+    }
+
+    // 첨부파일 다운로드 처리
+    @GetMapping("/mail/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) throws IOException {
+        AttachmentVO file = mailService.findAttachmentById(fileId);
+        Path path = Paths.get(file.getFilePath());
+        Resource resource = new UrlResource(path.toUri()); // ⚠️ 여기 IOException 발생 가능
+
+        String encodedFileName = URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
+            .body(resource);
+    }
+    
 }
