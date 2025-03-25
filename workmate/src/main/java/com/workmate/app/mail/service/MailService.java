@@ -4,6 +4,10 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.workmate.app.employee.service.DepartmentVO;
+import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
+
 import jakarta.mail.MessagingException;
 
 public interface MailService {
@@ -80,4 +84,15 @@ public interface MailService {
 	void inputAttachmentList(List<AttachmentVO> attachList);
 	// 첨부파일 포함 이메일 전송
 	void sendMailWithAttachment(String senderName, String senderEmail, String recipients, String ccList, String subject, String content, MultipartFile[] attachments) throws MessagingException;
+	//임시저장 첨부파일
+	void saveDraftMail(MailVO mail, MultipartFile[] attachments);
+	
+	//전체부서목록 조회
+	List<DepartmentVO> findDepartmentList();
+	//특정부서 팀목록
+    List<TeamVO> findTeamListByDepartment(String departmentId);
+    //특정 팀에 속한 사원들의 이메일 주소
+    List<String> findEmailsByTeam(String teamNo);
+    //특정 팀에 속한 사원들의 정보 전체
+    List<EmpVO> findEmployeesByTeam(String teamNo);
 }
