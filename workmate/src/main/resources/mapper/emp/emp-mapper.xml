@@ -34,7 +34,6 @@
         LEFT JOIN department d 
 		ON t.department_id = d.department_id
 		WHERE u.user_no = #{userNo}
-		    AND u.user_no between 100 AND 300
 	</select>
 	
 

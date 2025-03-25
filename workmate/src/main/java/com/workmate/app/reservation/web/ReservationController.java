@@ -37,7 +37,8 @@ public class ReservationController {
 	private final ReservationService reservationService;
 	private final EmpService empService;
 	private final FileHandler fileHandler = new FileHandler();
-	private final WhoAmI whoAmI = new WhoAmI(null);
+	private final WhoAmI whoAmI;
+	
 
 	// 공용품 리스트 페이지
 	@GetMapping("reservation/main")

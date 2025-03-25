@@ -31,7 +31,7 @@ public class ReservationImpl implements ReservationService {
 	private final ApprElmntMapper apprElmntMapper;
 	private final EmpService empService;
 	private final FileHandler fileHandler = new FileHandler();
-	private final WhoAmI whoAmI = new WhoAmI(null);
+	private final WhoAmI whoAmI;
 	private final EmpMapper empMapper;
 	
 	// 전체
