@@ -41,7 +41,7 @@ public class ContractsController {
 
 	private final ContractsService contractsService;
 	private final EmpService empService;
-	private final WhoAmI whoAmI = new WhoAmI(null);
+	private final WhoAmI whoAmI;
 
 	// 전자계약 조회
 	@GetMapping("/main")
