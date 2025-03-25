@@ -68,7 +68,7 @@ public class DocumentController {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 실패");
 			}
 			String fileName = file.getOriginalFilename();
-			String saveFileName = fileHandler.fileUpload(file, uploadDir + subDir );
+			String saveFileName = fileHandler.fileUpload(file, uploadDir + subDir, false);
 			String fileExtension = fileName.substring(fileName.lastIndexOf(".")+1).toUpperCase();
 			
 			docVO.setFileName(fileName);

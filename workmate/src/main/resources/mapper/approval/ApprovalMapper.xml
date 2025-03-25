@@ -44,7 +44,7 @@
 		    , appr_status
 			, department_name
 			, approval.user_no
-			, appr_type
+			, approval.appr_type
 			, user_name
 			, form_name
 			, form_path

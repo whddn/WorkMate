@@ -37,7 +37,6 @@
 	let oEditors = [];
 	
 	smartEditor = function() {
-		console.log('Naver SmartEditor API');
 		nhn.husky.EZCreator.createInIFrame({
 			oAppRef: oEditors,
 			elPlaceHolder: 'editorTxt',
@@ -61,6 +60,7 @@
 		$('#contactNo').val(apprForm.contactNo);
 		
 		let content = [[ ${editorContent} ]];
+		console.log(content);
 		setTimeout(function () {
 		    oEditors.getById['editorTxt'].exec('PASTE_HTML', [content]);
 		}, 500);
@@ -99,6 +99,7 @@
 		        }),
 		        success: function(response) {
 		            alert('파일이 성공적으로 등록되었습니다.');
+		            location.href = [[ @{/admin/apprFormList} ]];
 		        },
 		        error: function(error) {
 		            alert('파일 등록에 실패했습니다.');
@@ -119,14 +120,13 @@
 		        }),
 		        success: function(response) {
 		            alert('파일이 성공적으로 수정되었습니다.');
+		            location.href = [[ @{/admin/apprFormList} ]];
 		        },
 		        error: function(error) {
 		            alert('파일 수정에 실패했습니다.');
 		        }
 		    });
 		}
-		
-		location.href = [[ @{/admin/apprFormList} ]];
 	});
 </script>
 

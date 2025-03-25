@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -69,6 +70,11 @@ public class ApprovalController {
 	private final ObjectMapper objectMapper;
 	private final FileHandler fileHandler;
 	private final WhoAmI whoAmI;
+	// ✅ `application.properties`에서 파일 저장 경로 가져오기
+	@Value("${file.upload-dir}")
+	private String uploadDir;
+	private final String signDir = "sign/";
+	private final String apprAttachDir = "apprAttach/";
 	
 	/**
 	 * 결재를 기다리는 문서 리스트를 보여준다(자신과 관련된)
@@ -78,7 +84,7 @@ public class ApprovalController {
 	 * @return 결재 진행목록 페이지명
 	 */
 	@GetMapping("approval/waiting")
-	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam(defaultValue = "fromMe") String standard) {
+	public String getWaiting(Model model, ApprovalVO approvalVO, @RequestParam(defaultValue="fromMe") String standard) {
 		approvalVO.setUserNo(whoAmI.whoAmI().getUserNo());
 		approvalVO.setApprStatus("a1");
 		approvalVO.setStandard(standard);
@@ -170,8 +176,8 @@ public class ApprovalController {
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
             	String fileName = file.getOriginalFilename();
-            	Path filePath = Paths.get("C://workmate/apprAttach/" + fileName);
-            	fileHandler.fileUpload(file, fileName);
+            	Path filePath = Paths.get(uploadDir, apprAttachDir);
+            	fileName = fileHandler.fileUpload(file, filePath.toString(), false);
                 
                 ReportAttachVO reportAttachVO = new ReportAttachVO();
                 reportAttachVO.setFileName(fileName);
@@ -209,10 +215,15 @@ public class ApprovalController {
 		EmpVO myself = whoAmI.whoAmI();
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
+		
+		System.out.println(apprNo);
+		
 		model.addAttribute("approval", approvalService.findApprovalById(approvalVO));
 		model.addAttribute("apprLine", apprElmntService.findApprElmntList(approvalVO));
 		model.addAttribute("fileList", reportAttachService.findApprovalRAList(approvalVO));
 		model.addAttribute("mySigns", signService.findSignList(myself));
+		
+		System.out.println(approvalService.findApprovalById(approvalVO));
 		
 		return "approval/read";
 	}
@@ -316,12 +327,14 @@ public class ApprovalController {
 	public ResponseEntity<String> postSign(@RequestParam("file") MultipartFile file) throws IOException {
         // 파일 저장 및 DB에 서명 정보 저장 로직 구현
         if (file != null) {
-        	String filePath = fileHandler.fileUpload(file, "C://workmate/sign/");
+        	String fileName = file.getOriginalFilename();
+        	Path filePath = Paths.get(uploadDir, signDir);
+        	fileName = fileHandler.fileUpload(file, filePath.toString(), false);
             
             EmpVO myself = whoAmI.whoAmI();
             SignVO signVO = new SignVO();
             signVO.setSignTitle(file.getOriginalFilename());
-            signVO.setSignPath(filePath);
+            signVO.setSignPath(filePath.toString());
             signVO.setUserNo(myself.getUserNo());
             
             signService.inputSign(signVO);
