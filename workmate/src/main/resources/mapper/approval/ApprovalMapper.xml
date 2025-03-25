@@ -36,27 +36,29 @@
 			</if>
 	</select>
 	<select id="selectApprovalById" parameterType="ApprovalVO" resultType="ApprovalVO">
-		SELECT appr_no
-			, appr_title
-			, appr_content
-			, create_date
-		    , expire_date
-		    , appr_status
-			, department_name
-			, approval.user_no
-			, approval.appr_type
-			, user_name
-			, form_name
-			, form_path
-		FROM approval
-		    JOIN appr_form
-		    ON approval.appr_type=appr_form.appr_type
-		    JOIN employee
-		    ON approval.user_no=employee.user_no
-		    LEFT JOIN department
-		    ON approval.dept_no=department.department_id
-		WHERE appr_no=#{apprNo}
-			AND	reser_no=#{reserNo}
+			SELECT 
+			a.appr_no,
+			a.appr_title,
+			a.appr_content,
+			a.create_date,
+			a.expire_date,
+			a.appr_status,
+			d.department_name,
+			a.user_no,
+			a.appr_type,
+			e.user_name,
+			f.form_name,
+			f.form_path
+		FROM approval a
+		JOIN appr_form f ON a.appr_type = f.appr_type
+		JOIN employee e ON a.user_no = e.user_no
+		LEFT JOIN department d ON a.dept_no = d.department_id
+		<where>
+			a.appr_no = #{apprNo}
+			<if test="reserNo != null">
+				OR a.reser_no = #{reserNo}
+			</if>
+		</where>
 	</select>
 	<insert id="insertApproval" parameterType="ApprovalVO">
 	    <!-- INSERT 전 새 apprNo 생성 -->
