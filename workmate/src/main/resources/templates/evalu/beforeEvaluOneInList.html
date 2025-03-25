@@ -122,15 +122,19 @@
         </tr>
         <tr>
          <td>평가자</td>
-        <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.departmentName}" readonly></td>
-          <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.teamName}" readonly></td>
-          <td><input type="text" name="" th:each="evalu : ${evalu}" th:value="${evalu.userName}" readonly></td>
+         <td>
+         <select>
+         	<option th:each="evalu : ${evalu}" th:text="${evalu.userName}"></option>
+         </select>
+         </td>
         </tr>
         <tr>
           <td>피평가자</td>
-          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.departmentName}" readonly></td>
-          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.teamName}" readonly></td>
-          <td><input type="text" name="" th:each="evaluatee : ${evaluatee}" th:value="${evaluatee.userName}" readonly></td>
+          <td>
+          <select>
+         	<option th:each="evaluatee : ${evaluatee}" th:text="${evaluatee.userName}"></option>
+         </select>
+         </td>
         </tr>
       </table>
 
