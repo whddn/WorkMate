@@ -21,6 +21,6 @@ public interface ReservationService {
 	// 삭제
 	public int dropReserInfo(int reserNo);
 	// 시간중복체크
-	public List<ReservationVO> findReservedTimesByCommonNo(Integer commonNo);
+	public List<ReservationVO> findReservedTimesByCommonNo(Integer commonNo, Integer reserNo);
 
 }

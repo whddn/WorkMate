@@ -36,13 +36,6 @@ public class RestReservationController {
 		return reservationService.findReserById(reservationVO);
 	}
 
-	// 예약 입력
-	@PostMapping("/api/reservation/Info")
-	public ResponseEntity<?> insertReservation(@RequestBody ReservationVO reservationVO) {
-	    reservationService.inputReserInfo(reservationVO);
-	    return ResponseEntity.ok(reservationVO);
-	}
-	
 	// 예약 삭제
 	@DeleteMapping("/reservation/Delete/{reserNo}")
 	public ResponseEntity<String> deleteReservation(@PathVariable int reserNo) {

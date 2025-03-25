@@ -95,8 +95,8 @@ public class ReservationImpl implements ReservationService {
 	
 	// 시간 중복 체크
 	@Override
-	public List<ReservationVO> findReservedTimesByCommonNo(Integer commonNo) {
-		return reservationMapper.selectReservedTimes(commonNo);
+	public List<ReservationVO> findReservedTimesByCommonNo(Integer commonNo, Integer reserNo) {
+		return reservationMapper.selectReservedTimes(commonNo, reserNo);
 	}
 	
 	// 내 예약 목록 조회

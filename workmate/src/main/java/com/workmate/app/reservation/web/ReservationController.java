@@ -58,7 +58,7 @@ public class ReservationController {
 	    model.addAttribute("reser", detailVO);
 	    
 	    // 예약리스트
-	    List<ReservationVO> reservedList = reservationService.findReservedTimesByCommonNo(commonNo);
+	    List<ReservationVO> reservedList = reservationService.findReservedTimesByCommonNo(commonNo, null);
 	    model.addAttribute("reservedList", reservedList);
 
 	    return "reservation/reservationDetail";
@@ -88,11 +88,11 @@ public class ReservationController {
 		return "reservation/reservationList";
 	}
 	
-	// 예약 수정
+	// 예약 수정 페이지
 	@GetMapping("/reservation/edit/{reserNo}")
 	public String editReservationForm(@PathVariable int reserNo, Model model) {
 	    ReservationVO reser = reservationService.findReserByNo(reserNo); // 조회 메서드로 변경
-	    List<ReservationVO> reservedList = reservationService.findReservedTimesByCommonNo(reser.getCommonNo()); // 기존 예약 목록
+	    List<ReservationVO> reservedList = reservationService.findReservedTimesByCommonNo(reser.getCommonNo(), reserNo); // 기존 예약 목록
 	    
 	    model.addAttribute("reser", reser);
 	    model.addAttribute("reservedList", reservedList);

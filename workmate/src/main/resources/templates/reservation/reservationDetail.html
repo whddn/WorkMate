@@ -151,6 +151,10 @@
 								<label class="form-label">이용 날짜</label>
 								 <input type="date"	class="form-control" name="reserDate" th:value="${reser.reserDate}">
 							</div>
+							<div class="mb-3" th:if="${reser.reserNo} != null">
+								<label class="form-label">예약 시간</label>
+								 <input	class="form-control" th:value="${reser.reserStartTime + ' ~ ' + reser.reserEndTime}">
+							</div>
 							<div class="mb-3">
 								<label class="form-label">예약 내용</label>
 								<textarea class="form-control" name="content" required rows="3" placeholder="예약 목적을 입력하세요"></textarea>

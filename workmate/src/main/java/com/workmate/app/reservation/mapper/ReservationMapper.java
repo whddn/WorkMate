@@ -21,5 +21,7 @@ public interface ReservationMapper {
 	// 예약취소
 	public int deleteReservationInfo(int reserNo);
 	// 시간 중복 체크
-	public List<ReservationVO> selectReservedTimes(Integer commonNo);
+	public List<ReservationVO> selectReservedTimes(@Param("commonNo")Integer commonNo,@Param("reserNo")Integer reserNo);
+	// reser테이블의 상태값을 변경
+	public int updateReserStatus(int userNo);
 }
