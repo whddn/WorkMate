@@ -30,4 +30,22 @@ public class ApprFormServiceImpl implements ApprFormService {
 		return apprFormMapper.selectApprFormById(apprFormVO);
 	}
 
+	@Override
+	public int inputForm(ApprFormVO apprFormVO) {
+		// TODO Auto-generated method stub
+		return apprFormMapper.insertApprForm(apprFormVO);
+	}
+
+	@Override
+	public int modifyForm(ApprFormVO apprFormVO) {
+		// TODO Auto-generated method stub
+		return apprFormMapper.updateApprForm(apprFormVO);
+	}
+
+	@Override
+	public int dropForm(ApprFormVO apprFormVO) {
+		// TODO Auto-generated method stub
+		return apprFormMapper.deleteApprForm(apprFormVO);
+	}
+
 }

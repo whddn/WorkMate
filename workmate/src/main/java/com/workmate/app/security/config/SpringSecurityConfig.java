@@ -5,18 +5,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
 
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
-
 	@Bean // 비밀번호 암호화
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -34,7 +31,7 @@ public class SpringSecurityConfig {
 
 
 					.requestMatchers("/admin/**").permitAll() // 권한있는 사용자,관리자 접근 허용
-					.anyRequest().permitAll() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능
+					.anyRequest().authenticated() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능
 
 
 			)                                 //authenticated 넣을시 권한에 따라 페이지 접근 가능 로그인 필수
@@ -51,6 +48,9 @@ public class SpringSecurityConfig {
 		            .deleteCookies("JSESSIONID")  // 쿠키 삭제
 						.permitAll());
 		http.csrf(csrf -> csrf.disable());
+		http.headers(httpSecurityHeadersConfigurer 
+				-> httpSecurityHeadersConfigurer
+				.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));	// X-Frame-Options 동일 경로에서는 호용
 		return http.build();
 	}
 
@@ -59,6 +59,7 @@ public class SpringSecurityConfig {
 		return (web) -> web.ignoring().requestMatchers("/assets/**", "/images/**", "/js/**", "/css/**"); // 예외처리하고 싶은
 																											// url
 	}
+	
 	/*
 	 * @Bean public UserDetailsService userDetailsService() { PasswordEncoder
 	 * passwordEncoder = new BCryptPasswordEncoder(); UserDetails user =
