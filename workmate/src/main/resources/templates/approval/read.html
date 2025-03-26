@@ -12,7 +12,8 @@
 </head>
 
 <body>
-	<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
+	<!-- 이렇게 변경하세요 -->
+	<div th:insert="~{|/forms/approval/${approval.formPath}|}"></div>
 	<div>
 		<table id="AttachTable" class="display">
 		    <thead>

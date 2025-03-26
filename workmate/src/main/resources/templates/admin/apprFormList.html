@@ -63,7 +63,7 @@
 	    const apprType = $(button).data('appr-type'); // data-* 속성에서 값 가져오기
 
 	    $.ajax({
-	        url: [[ @{admin/apprForm} ]],
+	        url: [[ @{/admin/apprForm} ]],
 	        type: 'DELETE',
 	        contentType: 'application/json',
 	        data: JSON.stringify({
