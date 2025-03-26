@@ -176,7 +176,7 @@ public class MailServiceImpl implements MailService {
 		return mailMapper.findSentMailById(mailId);
 	}
 	//스프링 스케쥴러
-		@Scheduled(fixedDelay = 300000) // 5분마다 실행 (ms 단위: 300,000ms = 5분)
+		//@Scheduled(fixedDelay = 300000) // 5분마다 실행 (ms 단위: 300,000ms = 5분)
 		public void scheduledFetchEmails() {
 		    System.out.println("⏰ [스케쥴러] 외부 메일 자동 수신 실행 중...");
 		    fetchAndStoreEmails();
@@ -640,7 +640,7 @@ public class MailServiceImpl implements MailService {
 	    return mailMapper.selectEmployeesByTeam(teamNo);
 	}
 	// 1분마다 예약된 메일 중 발송 시간이 지난 메일들을 전송 시도
-	@Scheduled(fixedDelay = 60000)
+	//@Scheduled(fixedDelay = 60000)
 	public void sendScheduledMails() {
 	    List<MailVO> scheduledMails = mailMapper.selectScheduledMails();
 
