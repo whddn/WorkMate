@@ -1,94 +1,107 @@
 <!DOCTYPE html>
 <html 
-	xmlns:th="https://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/default_layout}"
-	layout:fragment="content"
-	>
+    xmlns:th="https://www.thymeleaf.org/"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{common/layouts/default_layout}"
+    layout:fragment="content"
+    >
 
 <head>
-	<meta charset="UTF-8">
-	<title>WorkMate</title>
+    <meta charset="UTF-8">
+    <title>WorkMate</title>
 </head>
 
 <body>
-	<!-- 메인 컨텐츠 -->
-	<main>
-		<div class="container card p-3">
-	    	<div class="row">
-	    		<div class="col">
-	    			<div class="row"><div class="col"><h4>현재 시간</h4></div></div>
-			        <div class="row"><div class="col"><h1>2025년 3월 13일</h1></div></div>
-			        <div class="row"><div class="col"><h1 id="current-time">08:45:24</h1></div></div>
-	    		</div>
-	    		<div class="col">
-	    			<div class="row"><div class="col"><button class="btn btn-primary">출근하기</button></div></div>
-			        <div class="row"><div class="col"><button class="btn btn-secondary">퇴근하기</button></div></div>
-	    		</div>
-	    		<div class="col">
-	    			<div class="row"><div class="col">근무타입 신청</div></div>
-	    		</div>
-	    	</div>
-	    </div>
-		
-	    <div class="row mt-4">
-	        <!-- 할 일 목록 -->
-	        <div class="col-md-3">
-	            <div class="card p-3">
-	                <h5>오늘의 할 일</h5>
-	                <ul class="list-group">
-						<li class="list-group-item">업무 확인</li>
-						<li class="list-group-item">회의 준비</li>
-					</ul>
-	            </div>
-	        </div>
-	
-	        <!-- 메일 목록 -->
-	        <div class="col-md-3">
-	            <div class="card p-3">
-	                <h5>메일 목록</h5>
-	                <ul class="list-group">
-						<li class="list-group-item">보고서 확인</li>
-						<li class="list-group-item">회의 일정 조율</li>
-					</ul>
-	            </div>
-	        </div>
-	
-	        <!-- 결재 목록 -->
-	        <div class="col-md-3">
-	            <div class="card p-3">
-	                <h5>결재 목록</h5>
-	                <ul class="list-group">
-	                	<th:block th:each="approval : ${waitingList}">
-							<li th:onclick="| location.href = '@{/approval/read(apprNo=${approval.apprNo})}' |" class="list-group-item">
-								[[ ${approval.apprTitle} ]]
-							</li>
-						</th:block>
-					</ul>
-	            </div>
-	        </div>
-	
-	        <!-- 커뮤니티 -->
-	        <div class="col-md-3">
-	            <div class="card p-3">
-	                <h5>커뮤니티</h5>
-	                <ul class="list-group">
-						<li class="list-group-item">프로젝트 공유</li>
-						<li class="list-group-item">업무 개선 논의</li>
-					</ul>
-	            </div>
-	        </div>
-	    </div>
-	</main>
-	
-	<script>
-	    function updateTime() {
-	        let now = new Date();
-	        document.getElementById("current-time").innerText = now.toLocaleTimeString();
-	    }
-	    setInterval(updateTime, 1000);
-	</script>
-	
+    <main class="container-fluid"> 
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card p-3 mb-4"> 
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col"><h4>현재 시간</h4></div>
+                            </div>
+                            <div class="row">
+                                <div class="col"><h1>2025년 3월 13일</h1></div>
+                            </div>
+                            <div class="row">
+                                <div class="col"><h1 id="current-time">12:50:14</h1></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column justify-content-center align-items-center">
+                            <button class="btn btn-primary mb-2">출근하기</button>
+                            <button class="btn btn-secondary">퇴근하기</button>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center justify-content-center">
+                            <div>근무타입 신청</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card p-3 mb-4">
+                    <h5>오늘의 할 일</h5>
+                    <ul class="list-group">
+                    	<th:block th:each="schedule : ${scheduleList}">
+                    		<li class="list-group-item">
+                    			[[ ${schedule.scheduleContent} ]]
+                    		</li>
+                    	</th:block>
+                    	<li class="list-group-item" th:if="${#lists.size(scheduleList) == 0}">오늘의 일정은 딱히 없습니다</li>
+                    	<li class="list-group-item"><a th:href=@{/calendar}>캘린더로 가기</a></li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div class="col-md-4">
+                <div class="card p-3 mb-4">
+                    <h5>메일 목록</h5>
+                    <ul class="list-group">
+                    	<th:block th:each="mail : ${mailList}">
+                    		<li 
+                    			th:onclick="| location.href = '@{/mail/view(mailId=${mail.mailId})}' |"
+                    			class="list-group-item"
+                    			>
+                    			[[ ${mail.subject} ]]
+                    		</li>
+                    	</th:block>
+                    	<li class="list-group-item" th:if="${#lists.size(mailList) == 0}">받은 메일이 딱히 없습니다</li>
+                    	<li class="list-group-item"><a th:href=@{/mail/departments}>메일함으로 가기</a></li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div class="col-md-4">
+                <div class="card p-3 mb-4">
+                    <h5>결재 목록</h5>
+                    <ul class="list-group">
+                        <th:block th:each="approval : ${approvalList}">
+                            <li 
+                            	th:onclick="| location.href = '@{/approval/read(apprNo=${approval.apprNo})}' |" 
+                            	class="list-group-item"
+                            	>
+                                [[ ${approval.apprTitle} ]]
+                            </li>
+                        </th:block>
+                        <li class="list-group-item" th:if="${#lists.size(approvalList) == 0}">내와 관련된 결재가 없습니다.</li>
+                        <li class="list-group-item"><a th:href=@{/approval/waiting}>전자결재로 가기</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        function updateTime() {
+            let now = new Date();
+            document.getElementById("current-time").innerText = now.toLocaleTimeString();
+        }
+        setInterval(updateTime, 1000);
+    </script>
+    
 </body>
 
 </html>
