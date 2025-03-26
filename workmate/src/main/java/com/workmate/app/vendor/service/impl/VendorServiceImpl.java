@@ -42,23 +42,9 @@ public class VendorServiceImpl implements VendorService {
 	}
 
 	// 수정
-//	@Override
-//	public int modifyVendor(VendorVO vendorVO) {
-//		int result = vendorMapper.updateVendorStatus(vendorVO);
-//		if(result <1) {
-//			return 0;
-//		}
-//		ApprovalVO approval = approvalMapper.selectApprovalById(approvalVO);
-//		if("a2".equals(approval.getApprStatus()) && "AF002".equals(approval.getApprType())) {
-//			vendorMapper.updateVendorStatus(approvalVO)
-//		}
-//		return approvalMapper.updateApprovalDate(approvalVO);
-//	}
-	
 	@Override
 	public int modifyVendor(VendorVO vendorVO) {
-		// TODO Auto-generated method stub
-		return 0;
+		return vendorMapper.updateVendorInfo(vendorVO);
 	}
 
 

@@ -1,5 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.vendor.mapper.VendorMapper">
-
+	<!-- 거래처 전체조회 -->
+	<select id="selectVendorList" resultType="VendorVO">
+		select 
+		   vend_code
+	      ,vend_name
+	      ,vend_detail
+	      ,bizr_num
+	      ,rpstr_name
+	      ,biztp
+	      ,vend_adress
+	      ,vend_phone
+	      ,vend_email
+	      ,cntr_start
+	      ,cntr_end
+	      ,cntr_status
+	      ,cntr_manager
+	      ,condition
+	      ,reg_date
+	      ,cntr_count
+	      ,cntr_file
+		from vendor
+	</select>
+	<!-- 거래처 단건조회 -->
+	<select id="selectVendorById" resultType="VendorVO" parameterType="VendorVO">
+		select 
+		   vend_code
+	      ,vend_name
+	      ,vend_detail
+	      ,bizr_num
+	      ,rpstr_name
+	      ,biztp
+	      ,vend_adress
+	      ,vend_phone
+	      ,vend_email
+	      ,cntr_start
+	      ,cntr_end
+	      ,cntr_status
+	      ,cntr_manager
+	      ,condition
+	      ,reg_date
+	      ,cntr_count
+	      ,cntr_file
+		from vendor
+		where vend_code=#{vendCode}
+	</select>
+	<!-- 거래처 등록 -->
+	<insert id="insertVendorInfo" parameterType="VendorVO">
+		<selectKey keyProperty="vendCode" resultType="String" order="BEFORE">
+			<!-- keyProperty는 결과를 담을 필드/변수를 뜻한다 -->
+			SELECT vend_code_seq.NEXTVAL
+			FROM dual
+		</selectKey>
+			INSERT INTO vendor(
+			   vend_code
+		      ,vend_name
+		      ,vend_detail
+		      ,bizr_num
+		      ,rpstr_name
+		      ,biztp
+		      ,vend_adress
+		      ,vend_phone
+		      ,vend_email
+		      ,cntr_start
+		      ,cntr_end
+		      ,cntr_status
+		      ,cntr_manager
+		      ,condition
+		      ,reg_date
+		      ,cntr_count
+		      ,cntr_file
+				)
+			VALUES (
+			   #{vendCode}
+		      ,#{vendName}
+		      ,#{vendDetail}
+		      ,#{bizrNum}
+		      ,#{rpstrName}
+		      ,#{biztp}
+		      ,#{vendAdress}
+		      ,#{vendPhone}
+		      ,#{vendEmail}
+		      ,#{cntrStart}
+		      ,#{cntrEnd}
+		      ,'a1'
+		      ,#{cntrManager}
+		      ,#{condition}
+		      ,sysdate
+		      ,#{cntrCount}
+		      ,#{cntrFile}
+			)
+	</insert>
+	<!-- 거래처 수정 -->
+	<update id="updateVendorInfo" parameterType="VendorVO">
+		UPDATE vendor
+    	SET
+	        vend_name = #{vendName},
+	        vend_detail = #{vendDetail},
+	        bizr_num = #{bizrNum},
+	        rpstr_name = #{rpstrName},
+	        biztp = #{biztp},
+	        vend_adress = #{vendAdress},
+	        vend_phone = #{vendPhone},
+	        vend_email = #{vendEmail},
+	        cntr_start = #{cntrStart},
+	        cntr_end = #{cntrEnd},
+	        cntr_manager = #{cntrManager},
+	        condition = #{condition},
+	        cntr_count = #{cntr_count},
+	        reg_date = SYSDATE
+	      <if test="cntrFile != null and cntrFile != ''">
+	           ,cntr_file = #{cntrFile}
+	      </if>
+	    WHERE vend_code = #{vendCode}
+	</update>
+	<!-- 거래처 상태수정 -->
+	<update id="updateVendorStatus" parameterType="int">
+		update vendor
+		set	  cntr_status = 'a2'
+		where vend_code = #{vendCode}
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="deleteVendorInfo" parameterType="VendorVO">
+		delete from vendor
+		where vend_code = #{vendCode}
+	</delete>
 </mapper>

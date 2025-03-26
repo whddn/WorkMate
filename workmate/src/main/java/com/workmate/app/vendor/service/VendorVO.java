@@ -21,7 +21,9 @@ public class VendorVO {
 	private String cntrManager;		// 담당자
 	private String condition;		// 특별조건
 	private Date regDate;			// 거래처 등록일
-	private String signImg;			// 서명이미지
+	private Integer cntrCount;		// 거래금액
+	private String cntrFile;		// 첨부파일
+	private String cntrAttachment;   // 서버에 저장된 파일명
 	
 
 }

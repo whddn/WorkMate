@@ -151,6 +151,11 @@
 								<label class="form-label">이용 날짜</label>
 								 <input type="date"	class="form-control" name="reserDate" th:value="${reser.reserDate}">
 							</div>
+							<div class="mb-3" th:if="${reser.reserNo} != null">
+ 								<label class="form-label">예약 시간</label>
+ 								<input class="form-control" th:value="${#temporals.format(reser.reserStartTime, 'HH:mm') + ' ~ ' + #temporals.format(reser.reserEndTime, 'HH:mm')}" readonly>
+
+ 							</div>
 							<div class="mb-3">
 								<label class="form-label">예약 내용</label>
 								<textarea class="form-control" name="content" required rows="3" placeholder="예약 목적을 입력하세요"></textarea>
@@ -166,32 +171,21 @@
 			</div>
 		</div>
 	</form>
+	
 	<!-- ✅ JavaScript -->
 	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
-
+	
 	<!-- ✅ 1. reservedList 넘기기 -->
 	<script th:inline="javascript">
-		let reservedList = /*[[${reservedList}]]*/ [];
-		let reserNo = /*[[${reser.reserNo}]]*/ null;
+		let reservedList = [[${reservedList}]];
+		let reserNo = [[${reser.reserNo}]];
 	</script>
 	
-	<script>
-	  function handleCancel() {
-	    const reserNo = document.querySelector("input[name='reserNo']").value;
-	    if (reserNo) {
-	      // 수정 상태 → 예약 리스트로 이동
-	      window.location.href = '/workmate/reservation/List';
-	    } else {
-	      // 등록 상태 → 예약 메인으로 이동
-	      window.location.href = '/workmate/reservation/main';
-	    }
-	  }
-	</script>
-	
-
 	<!-- ✅ 2. 예약 관련 JS -->
 	<script>
+		
+	
 		function formatDate(dateStr) {
 		  const date = new Date(dateStr);
 		  const yyyy = date.getFullYear();
@@ -227,15 +221,22 @@
 		        slot.classList.remove("disabled", "selected");
 		      });
 		
-		      const myReserNo = document.querySelector("input[name='reserNo']")?.value || null;
-		
+		      // 내 예약번호 선언
+		      const myReserNo = String(reserNo);
+		      
+		      // 내 예약 제외
 		      const reservedTimes = reservedList.filter(res => {
-		        const isSameDate = formatDate(res.reserDate) === selectedDate;
-		        if (!res.reserNo || !myReserNo) {
-		          return isSameDate; // 예약번호 없으면 모두 포함
-		        }
-		        return isSameDate && String(res.reserNo) !== String(myReserNo);
-		      });
+		  const isSameDate = formatDate(res.reserDate) === selectedDate;
+		  if (myReserNo && res.reserNo) {
+		    return isSameDate && String(res.reserNo) !== String(myReserNo);
+		  }
+		  return isSameDate;
+		});
+
+
+
+
+
 		
 		      // 🔧 시간 슬롯 기준으로 비활성화 처리
 		      let disabledSlots = new Set();
@@ -269,14 +270,17 @@
 		      // 🟢 내 예약시간 다시 selected 처리
 		      const myStartTime = document.getElementById("reserStartTime")?.value;
 		      const myEndTime = document.getElementById("reserEndTime")?.value;
-		
-		      if (myStartTime && myEndTime && selectedDate === formatDate(document.querySelector('input[name="reserDate"]').value)) {
+		      const currentDateInput = document.querySelector('input[name="reserDate"]').value;
+		      
+		      if (myStartTime && myEndTime && selectedDate === formatDate(currentDateInput)) {
+
 		        const myStartHour = parseInt(myStartTime.split(":")[0]);
 		        const myEndHour = parseInt(myEndTime.split(":")[0]);
 		
 		        for (let h = myStartHour; h <= myEndHour; h++) {
 		          const slot = document.querySelector(`#time${h}`);
-		          if (slot && !slot.classList.contains("disabled")) {
+		          if (slot) {
+		        	slot.classList.remove("disabled");  	
 		            slot.classList.add("selected");
 		          }
 		        }
@@ -338,9 +342,11 @@
 		  const selectedDate = formatDate(document.querySelector('input[name="reserDate"]').value);
 		  const hasConflict = reservedList.some(res => {
 		    if (formatDate(res.reserDate) !== selectedDate) return false;
+		    if (res.reserNo && String(res.reserNo) === String(reserNo)) return false;
+		    
 		    const start = parseInt(res.reserStartTime.split(":")[0]);
 		    const end = parseInt(res.reserEndTime.split(":")[0]);
-		    return selectedHours.some(h => h >= start && h < end);
+		    return selectedHours.some(h => h >= start && h <= end);
 		  });
 		
 		  if (hasConflict) {
@@ -356,8 +362,19 @@
 		  document.getElementById("reserStartTime").value = `${pad(minHour)}:00`;
 		  document.getElementById("reserEndTime").value = `${pad(maxHour)}:59`;
 		});
+		
+	
+		function handleCancel() {
+			  const reserNo = document.querySelector("input[name='reserNo']").value;
+			  if (reserNo) {
+			    window.location.href = '/workmate/reservation/List';
+			  } else {
+			    window.location.href = '/workmate/reservation/main';
+			  }
+			}
+		
+		
 	</script>
-
 
 
 </body>
