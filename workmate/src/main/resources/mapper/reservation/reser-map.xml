@@ -52,6 +52,7 @@
 	<!-- 시간 중복체크 -->
 	<select id="selectReservedTimes" resultType="ReservationVO">
 	    SELECT	r.reser_date
+	    	   ,r.reser_no
 	     	   ,TO_CHAR(r.reser_start_time, 'HH24:MI') AS reser_start_time
 			   ,TO_CHAR(r.reser_end_time, 'HH24:MI') AS reser_end_time
 			   ,c.image 
@@ -59,7 +60,7 @@
 	    JOIN 
 		    common_item c ON r.common_no = c.common_no
 	    WHERE c.common_no = #{commonNo}
-	    and	r.reser_start_time >= trunc(sysdate)
+	    and	r.reser_date >= trunc(sysdate)
 	    <if test="reserNo != null">
         	AND r.reser_no != #{reserNo}
     	</if>
@@ -95,7 +96,7 @@
 			,#{content}
 			,#{userNo}
 			,#{commonNo}
-			,#{usageStatus}
+			,'a1'
 		)
 	</insert>
 	

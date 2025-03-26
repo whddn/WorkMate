@@ -26,7 +26,7 @@ public class SpringSecurityConfig {
 				-> authrize
 					//.requestMatchers("/", "/workmate").permitAll()	// 전체 접근 허용
 				    .requestMatchers("/header").authenticated()
-					.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
+					//.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
 					//.requestMatchers("/team/**").hasAuthority("T001")  // 중간 권한
 					.requestMatchers("/attendance/attendanceManage").hasRole("T001")  // 중간 권한
 					.requestMatchers("/emp/bfevalu").hasRole("T001")		// 평가 관리 권한 (인사관리팀)
