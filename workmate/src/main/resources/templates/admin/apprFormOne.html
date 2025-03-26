@@ -48,7 +48,8 @@
 	$(document).ready(function() {
 		smartEditor();
 		
-		let apprType = [[${apprType}]];
+		let urlParams = new URLSearchParams(window.location.search);
+		let apprType = urlParams.get('apprType');
 		if(apprType == undefined || apprType == null || apprType == '') {
 			return;
 		}
