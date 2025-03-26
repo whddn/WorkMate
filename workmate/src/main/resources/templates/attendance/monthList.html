@@ -8,42 +8,41 @@
 	<title>근태관리</title>
 	<style>
 	.main-container {
-		display: flex;
-		width: 100%;
-		align-items: stretch;
-	}
+	display: flex;
+	width: 100%;
+	align-items: flex-start; /* 위쪽 정렬 */
+	gap: 20px;
+}
 
-	#card-left {
-		width: 400px;
-		padding: 30px;
-		margin: 30px;
-		flex-shrink: 0;
-		box-sizing: border-box;
-	}
+#card-left {
+	width: 400px;
+	height: 630px;
+	padding: 30px;
+	margin-top: 30px;
+	margin-left: 30px;
+	box-sizing: border-box;
+	
+}
 
-	.right-container {
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
-		padding: 20px;
-		box-sizing: border-box;
-	}
+.right-container {
+	flex-grow: 1;
+	padding: 30px 30px 0 0;
+	box-sizing: border-box;
+}
 
-	#card-center {
-		width: 100%;
-		padding: 20px;
-		margin-bottom: 20px;
-		flex-grow: 1;
-		box-sizing: border-box;
-	}
+#card-center {
+	width: 100%;
+	padding: 20px;
+	margin-bottom: 20px;
+	box-sizing: border-box;
+}
 
-	#card-right {
-		width: calc(100% - 50px); /* 전체 카드 너비: card-left + card-center 가정 */
-		margin: 0 auto 30px auto;
-		padding: 20px;
-		box-sizing: border-box;
-	}
-
+#card-right {
+	width: 100%;
+	margin: 0 auto 30px auto;
+	padding: 30px;
+	box-sizing: border-box;
+}
 	.date-box {
 		font-size: 20px;
 		margin-top: 30px;
@@ -93,6 +92,10 @@
 		display: inline-flex;
 		align-items: center;
 	}
+	#work-type{
+		height: 42px;
+	}
+	
 	</style>
 </head>
 <body>
@@ -116,9 +119,9 @@
 				<div class="dropdown-work" style="display: inline-flex; align-items: center; gap: 10px;">
 					<select id="work-type" class="form-select input-fixed">
 						<option value="">근무타입선택</option>
-						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">연차</option>
-						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">재택</option>
-						<option value="http://localhost:8099/workmate/approval/read?apprNo=YD001">출장</option>
+						<option value="http://localhost:8099/workmate/approval/write?apprType=AF001">연차</option>
+						<option value="http://localhost:8099/workmate/approval/write?apprType=AF005">재택</option>
+						<option value="http://localhost:8099/workmate/approval/write?apprType=AF002">출장</option>
 					</select>
 					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청</button>
 				</div>

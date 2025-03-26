@@ -5,19 +5,20 @@
 	<select id="findReceivedMailsList" parameterType="int"
 		resultType="MailVO">
 		SELECT
-			M.MAIL_ID,
-			M.USER_NO AS SENDER_NO,
-			E_SENDER.USER_NAME
-			AS SENDER_NAME,
-			M.RECIPIENTS,
-			M.SUBJECT,
-			M.CONTENT,
-			M.SENT_AT,
-			M.STATUS,
-			M.FOLDER_ID,
-			(SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID =
-			M.MAIL_ID) AS
-			ATTACHMENT_COUNT
+		M.MAIL_ID,
+		M.USER_NO AS SENDER_NO,
+		E_SENDER.USER_NAME
+		AS SENDER_NAME,
+		M.RECIPIENTS,
+		M.SUBJECT,
+		M.CONTENT,
+		M.SENT_AT,
+		M.STATUS,
+		M.FOLDER_ID,
+		M.IS_READ AS isRead,
+		(SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID =
+		M.MAIL_ID) AS
+		ATTACHMENT_COUNT
 		FROM MAIL M
 			JOIN EMPLOYEE E_SENDER ON
 			M.USER_NO = E_SENDER.USER_NO
@@ -31,11 +32,13 @@
 		SELECT
 		MAIL_ID,
 		USER_NO,
+		CC_LIST,
 		RECIPIENTS,
 		SUBJECT,
 		CONTENT,
 		SENT_AT,
 		STATUS,
+		IS_READ AS isRead,
 		FOLDER_ID
 		FROM MAIL
 		WHERE MAIL_ID = #{mailId}
@@ -49,12 +52,12 @@
 		INSERT INTO MAIL
 		( MAIL_ID, SENDER_EMAIL, MESSAGE_ID,
 		USER_NO, RECIPIENTS, CC_LIST, SUBJECT, CONTENT, SENT_AT, STATUS,
-		FOLDER_ID, ENCRYPTED, MAIL_TYPE, IS_SPAM)
+		FOLDER_ID, ENCRYPTED, MAIL_TYPE, IS_SPAM, RESER_SENDTIME, RESER_STATUS)
 		VALUES
 		(#{mail.mailId},#{mail.senderEmail}, #{mail.messageId},
 		#{mail.userNo}, #{mail.recipients}, #{mail.ccList}, #{mail.subject},
 		#{mail.content}, SYSDATE, #{mail.status}, #{mail.folderId},
-		#{mail.encrypted}, #{mail.mailType}, #{mail.isSpam})
+		#{mail.encrypted}, #{mail.mailType}, #{mail.isSpam},#{mail.reserSendtime}, #{mail.reserStatus})
 	</insert>
 
 	<!-- 보낸 메일 전체 -->
@@ -68,6 +71,8 @@
 		M.CONTENT,
 		M.SENT_AT,
 		M.STATUS,
+		M.RESER_STATUS,       
+   		M.RESER_SENDTIME,
 		M.FOLDER_ID,
 		(SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS
 		ATTACHMENT_COUNT
@@ -83,6 +88,7 @@
 		M.USER_NO AS SENDER_NO,
 		E_SENDER.USER_NAME AS SENDER_NAME,
 		M.RECIPIENTS,
+		M.CC_LIST,
 		M.SUBJECT,
 		M.CONTENT,
 		M.SENT_AT,
@@ -136,6 +142,7 @@
         M.MAIL_ID,
         M.USER_NO,
         M.RECIPIENTS,
+        M.CC_LIST,
         M.SUBJECT,
         M.CONTENT,
         M.SENT_AT,
@@ -159,11 +166,13 @@
         M.MAIL_ID,
         M.USER_NO,
         M.RECIPIENTS,
+        M.CC_LIST,
         M.SUBJECT,
         M.CONTENT,
         M.SENT_AT,
         M.STATUS,
         M.FOLDER_ID,
+        M.IS_READ AS isRead,
         (SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS ATTACHMENT_COUNT
     FROM MAIL M
     WHERE M.USER_NO = #{userNo}
@@ -188,12 +197,16 @@
                 M.MAIL_ID,
                 M.USER_NO,
                 M.RECIPIENTS,
+                M.CC_LIST,
                 M.SUBJECT,
                 M.SENDER_EMAIL,
                 M.CONTENT,
                 M.SENT_AT,
                 M.STATUS,
+                M.RESER_STATUS,       
+   			    M.RESER_SENDTIME,
                 M.FOLDER_ID,
+                M.IS_READ AS isRead,
                 (SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS ATTACHMENT_COUNT
             FROM MAIL M
             WHERE M.USER_NO = #{userNo}
@@ -247,6 +260,32 @@
     FROM EMPLOYEE
     WHERE TEAM_NO = #{teamNo}
     AND STATUS_USER = '재직'
+</select>
+<!-- 예약된 메일 중 발송 시점이 지난 것 조회 -->
+<select id="selectScheduledMails" resultType="MailVO">
+    SELECT *
+    FROM MAIL
+    WHERE RESER_STATUS = '예약됨'
+      AND RESER_SENDTIME &lt;= SYSDATE
+</select>
+
+<!-- 예약 상태 업데이트 -->
+<update id="updateReserStatus">
+    UPDATE MAIL
+    SET RESER_STATUS = #{status}
+    WHERE MAIL_ID = #{mailId}
+</update>
+<!-- 특정 메일(mailId)에 첨부된 파일(Attachment) 목록을 DB에서 조회 -->
+<select id="findAttachmentsByMailId" parameterType="int" resultType="com.workmate.app.mail.service.AttachmentVO">
+    SELECT
+        FILE_ID,
+        MAIL_ID,
+        FILE_NAME,
+        FILE_TYPE,
+        FILE_SIZE,
+        FILE_PATH
+    FROM ATTACHMENT
+    WHERE MAIL_ID = #{mailId}
 </select>
 
 </mapper>

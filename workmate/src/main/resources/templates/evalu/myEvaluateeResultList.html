@@ -128,7 +128,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>내가 피평가자로 속한 평가 리스트</h1>
+        <h1>나의 평가</h1>
 
         <!-- 기간 및 검색창 -->
         <div class="search-bar">
@@ -172,7 +172,7 @@
                 	<th:block th:each="one : ${evlist}" >
                 <tr>
                     <td><input type="checkbox" name="postSelection"></td>
-                    <td><a th:href="@{/emp/evalu/{eva}(eva=${one.evaluFormNo})}">[[ ${one.evaluName} ]]</a></td>
+                    <td><a th:href="@{/emp/myResult/{eva}(eva=${one.evaluFormNo})}">[[ ${one.evaluName} ]]</a></td>
                     <td>[[ ${one.usageStatus} ]]</td>
                     <td th:each="team : ${one.teamList}">[[ ${team.teamName} ]]</td>
                     <td th:text="${#dates.format(one.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(one.evaluEnd, 'yyyy-MM-dd')}"></td>

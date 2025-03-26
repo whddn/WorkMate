@@ -163,19 +163,11 @@ public class EmpController {
 	@GetMapping("emp/bfoneevalu/{evaluFormNo}")
 	public String selectBeforeEvaluResultById(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
 		evaluVO.setEvaluFormNo(evaluFormNo);
-		List<EvaluVO> findOneEvaluResult = empService.findBeforeEvaluById(evaluVO); // 지난 평가 단건 조회
-		List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
-		List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
-		List<EvaluVO> deptList = empService.findBeforeEvaluById(new EvaluVO());
-		model.addAttribute("evaluList", deptList);
-		model.addAttribute("evalu", evalu); // 평가자 정보
-		model.addAttribute("evaluatee", evaluatee); // 피평가자 정보
-		model.addAttribute("one", findOneEvaluResult);
-		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
 		
-		EvaluVO param = new EvaluVO();
-		List<EvaluVO> detailList = empService.getEvaluItemsUniqueByUser(param);
-		 model.addAttribute("evaluDetail", detailList);
+		Map<String, Object> result = empService.findAdminEvaluBeforeById(evaluVO);
+		model.addAttribute("people", result.get("people"));
+		model.addAttribute("items", result.get("items"));
+		model.addAttribute("scores", result.get("scores"));
 		    
 		return "evalu/beforeEvaluOneInList"; // 페이지 이동 방식 @PathVariable : 한 건만 넘길 때 / @requestParam : 여러 건 넘길 때
 	}
@@ -213,7 +205,7 @@ public class EmpController {
 
 		// 2. 상태 조회
 		String status = Optional.ofNullable(empService.findEvaluStatus(formNo)).orElse("진행 중");
-
+		
 		if ("평가 완료".equals(status)) {
 			evaluVO.setEvaluFormNo(formNo);
 			evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
@@ -282,8 +274,10 @@ public class EmpController {
 			evaluVO.setEvaluFormNo(formNo);
 			evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
 
-			List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
-
+			List<EvaluVO> fullList = empService.findMyEvaluById(evaluVO);
+			System.out.println(fullList);
+			System.out.println("✅ 전달된 평가자 userNo: " + evaluVO.getUserNo());
+			System.out.println("✅ 전달된 평가폼 번호: " + evaluVO.getEvaluFormNo());
 			// 1) 사용자 중복 제거
 			Set<Integer> userSet = new HashSet<>();
 			List<EvaluVO> userList = new ArrayList<>();
@@ -302,8 +296,6 @@ public class EmpController {
 					evaluList.add(vo);
 				}
 			}
-			
-
 			model.addAttribute("userList", userList);
 			model.addAttribute("evaluList", evaluList);
 

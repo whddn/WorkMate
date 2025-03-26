@@ -3,6 +3,8 @@ package com.workmate.app.employee.service.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,24 +78,12 @@ public class EmpServiceImpl implements EmpService {
 //		return null;
 //	}
 
-	// 지나간 평가 전체 리스트 조회 (전체 조회)
-	@Override
-	public List<EvaluVO> findBeforeEvaluList(EvaluVO evaluVO) {
-		List<EvaluVO> result = empMapper.selectBeforeEvaluList(evaluVO);
-		Set<Integer> teamSet = new HashSet<>();
-		List<EvaluVO> uniqueTeam = new ArrayList<>();
-		for (EvaluVO vo : result) {
-			if (teamSet.add(vo.getEvaluFormNo())) { // 폼 번호 기준으로 중복 제거
-				uniqueTeam.add(vo);
-			}
-		}
-		return uniqueTeam;
-	}
 
 	// 내가 진행한 평가 단건 조회 
 	@Override
 	public List<EvaluVO> findMyEvaluById(EvaluVO evaluVO) {
 	    List<EvaluVO> rawList = empMapper.selectOneEvaluById(evaluVO);
+	    
 	    Set<String> seen = new HashSet<>();	// set : 중복 제거 
 	    List<EvaluVO> result = new ArrayList<>(); // 새 리스트 생성 
 
@@ -116,49 +106,89 @@ public class EmpServiceImpl implements EmpService {
 	    return result;
 	}
 
-	// 지나간 평가 단건 조회 (관리자 - 단건 조회)
-	@Override
-	public List<EvaluVO> findBeforeEvaluById(EvaluVO evaluVO) {
-	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
-	    Set<String> seen = new HashSet<>();
-	    List<EvaluVO> result = new ArrayList<>();
-
-	    for (EvaluVO vo : rawList) {
-	        String deptName = vo.getDepartmentName();
-	        String teamName = vo.getTeamName();
-	        int userNo = vo.getUserNo();
-
-	        if (deptName == null || teamName == null) continue;
-
-	        String key = deptName.trim().toLowerCase() + "|" +
-	                     teamName.trim().toLowerCase() + "|" +
-	                     userNo;
-
-	        if (seen.add(key)) {
-	            result.add(vo);
-	        }
-	    }
-	    return result;
-	}
-	// 관리자 단건 조회 항목 / 컨텐츠 중복 제거 
-	@Override
-	public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO param) {
-	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(param); // 기존 쿼리 재활용
-	    Set<String> seen = new HashSet<>();
-	    List<EvaluVO> result = new ArrayList<>();
-
-	    for (EvaluVO vo : rawList) {
-	        if (vo.getUserNo() != param.getUserNo()) continue;
-
-	        String key = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
-	        if (seen.add(key)) {
-	            result.add(vo);
-	        }
-	    }
-	    return result;
-	}
-
 	
+	// 지나간 평가 전체 리스트 조회 (관리자 - 평가 - 전체 조회)
+	@Override
+	public List<EvaluVO> findBeforeEvaluList(EvaluVO evaluVO) {
+		List<EvaluVO> result = empMapper.selectBeforeEvaluList(evaluVO);
+		Set<Integer> teamSet = new HashSet<>();
+		List<EvaluVO> uniqueTeam = new ArrayList<>();
+		for (EvaluVO vo : result) {
+			if (teamSet.add(vo.getEvaluFormNo())) { // 폼 번호 기준으로 중복 제거
+				uniqueTeam.add(vo);
+			}
+		}
+		return uniqueTeam;
+	}
+	
+	
+	@Override
+	public Map<String, Object> findAdminEvaluBeforeById(EvaluVO evaluVO) {
+	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
+
+	    // 1. 사람 중복 제거
+	    Map<Integer, EvaluVO> peopleMap = new LinkedHashMap<>();
+
+	    // 2. 항목 중복 제거
+	    Set<String> itemKeySet = new LinkedHashSet<>();
+	    List<EvaluVO> itemList = new ArrayList<>();
+
+	    // 3. 점수 저장
+	    Map<Integer, List<EvaluVO>> scoreMap = new LinkedHashMap<>();
+
+	    for (EvaluVO vo : rawList) {
+	        int userNo = vo.getUserNo();
+	        String itemKey = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
+
+	        // 사람 정보 1번만
+	        peopleMap.putIfAbsent(userNo, vo);
+
+	        // 항목 중복 없이
+	        if (itemKeySet.add(itemKey)) {
+	            EvaluVO item = new EvaluVO();
+	            item.setEvaluCompet(vo.getEvaluCompet());
+	            item.setEvaluContent(vo.getEvaluContent());
+	            item.setOrderNo(vo.getOrderNo());
+	            itemList.add(item);
+	        }
+
+	        // 점수 보존
+	        scoreMap.computeIfAbsent(userNo, k -> new ArrayList<>()).add(vo);
+	    }
+
+	    Map<String, Object> result = new LinkedHashMap<>();
+	    result.put("people", new ArrayList<>(peopleMap.values()));
+	    result.put("items", itemList);
+	    result.put("scores", scoreMap); // Map<Integer, List<EvaluVO>>
+
+	    return result;
+	}
+
+
+
+	// 관리자 단건 조회 항목 / 컨텐츠 중복 제거 
+//	@Override
+//	public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO param) {
+//	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(param); // 기존 쿼리 재활용
+//	    Set<String> seen = new HashSet<>();
+//	    List<EvaluVO> result = new ArrayList<>();
+//
+//	    for (EvaluVO vo : rawList) {
+//	        if (vo.getUserNo() != param.getUserNo()) continue;
+//
+//	        String key = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
+//	        if (seen.add(key)) {
+//	            result.add(vo);
+//	        }
+//	    }
+//	    return result;
+//	}
+	// 관리자 단건 조회
+//	@Override
+//	public List<EvaluVO> findAdminEvaluBeforeById(EvaluVO EvaluVO) {
+//	    return empMapper.selectAdminBeforeEvaluById(EvaluVO);
+//	}
+//	
 	
 	
 	// 평가 등록 페이지
@@ -268,14 +298,21 @@ public class EmpServiceImpl implements EmpService {
 	public int inputEvaluResultScore(List<EvaluVO> evaluList) {
 	    int result = 0;
 	    for (EvaluVO evalu : evaluList) {
+	        // 평가자 그룹 ID 조회 
+	    
+	       
+	        // 피평가자 그룹 ID 조회 
 
+	        // 평가 결과 insert
 	        int inserted = empMapper.insertEvaluScore(evalu);
 	        result += inserted;
-
 	    }
 
 	    return result;
-	}
+	    }
+
+	
+	
 	@Override
 	public String findEvaluStatus(int formNo) {
 	    return empMapper.getEvaluStatus(formNo);
@@ -291,8 +328,22 @@ public class EmpServiceImpl implements EmpService {
 	// 내가 받은 평가 점수 확인 (단건)
 	@Override
 	public List<EvaluVO> findMyEvaluScoreResultById(EvaluVO evaluVO) {
-		return empMapper.selectMyEvaluScoreResultById(evaluVO);
+	    List<EvaluVO> oneList = empMapper.selectMyEvaluScoreResultById(evaluVO);
+
+	    Set<Integer> seenUserNos = new HashSet<>();
+	    
+	    for (EvaluVO vo : oneList) {
+	        int userNo = vo.getUserNo();
+	        
+	        // 이미 출력된 사람일 경우, 사람 관련 정보 비우기
+	        if (!seenUserNos.add(userNo)) {
+	            vo.setUserName(null);
+	        }
+	    }
+
+	    return oneList;
 	}
+	
 
 
 }

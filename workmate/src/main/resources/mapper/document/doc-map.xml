@@ -18,6 +18,23 @@
 		LEFT JOIN team t ON e.team_no = t.team_no
 	</select> 
 	
+	<select id="selectFileById" parameterType="int" resultType="DocVO">
+	    SELECT 
+	        document_no,
+	        file_name,
+	        file_desc,
+	        file_size,
+	        attachment,
+	        extenstion,
+	        file_reg_date,
+	        file_tag,
+	        user_no,
+	        update_user
+	    FROM document
+	    WHERE document_no = #{documentNo}
+	</select>
+	
+	<!-- 자료실 업로드 -->
 	<insert id="insertFile" parameterType="DocVO">
 		INSERT INTO document (
         DOCUMENT_NO
