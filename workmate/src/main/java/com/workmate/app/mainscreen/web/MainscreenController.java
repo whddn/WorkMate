@@ -38,6 +38,7 @@ import lombok.RequiredArgsConstructor;
  * 03-21	이지응	검색 화면 제작
  * 03-22	이지응	캘린더 화면 제작
  * 03-23	이지응	일정 조정 기능 제작
+ * 03-26	이지응	메인화면 초기화면 제작
  * 
  * </pre>
  */
@@ -62,7 +63,7 @@ public class MainscreenController {
 		model.addAttribute("scheduleList", scheduleService.findScheduleList(scheduleVO));
 		
 		List<MailVO> mailList = mailService.findReceivedMailsList(myself.getUserNo());
-		model.addAttribute("mailList", mailList.subList(0, 12));
+		model.addAttribute("mailList", mailList.subList(0, 13));
 		
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setUserNo(myself.getUserNo());

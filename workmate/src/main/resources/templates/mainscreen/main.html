@@ -12,10 +12,10 @@
 </head>
 
 <body>
-    <main class="container-fluid"> 
-        <div class="row">
+        <main class="container-fluid">
+        <div class="row mx-5">
             <div class="col-md-12">
-                <div class="card p-3 mb-4"> 
+                <div class="card p-3">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="row">
@@ -25,7 +25,7 @@
                                 <div class="col"><h1>2025년 3월 13일</h1></div>
                             </div>
                             <div class="row">
-                                <div class="col"><h1 id="current-time">12:50:14</h1></div>
+                                <div class="col"><h1 id="current-time">02:41:56</h1></div>
                             </div>
                         </div>
                         <div class="col-md-4 d-flex flex-column justify-content-center align-items-center">
@@ -33,62 +33,66 @@
                             <button class="btn btn-secondary">퇴근하기</button>
                         </div>
                         <div class="col-md-4 d-flex align-items-center justify-content-center">
-                            <div>근무타입 신청</div>
+                            <div>근무 타입 신청</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card p-3 mb-4">
-                    <h5>오늘의 할 일</h5>
-                    <ul class="list-group">
-                    	<th:block th:each="schedule : ${scheduleList}">
-                    		<li class="list-group-item">
-                    			[[ ${schedule.scheduleContent} ]]
-                    		</li>
-                    	</th:block>
-                    	<li class="list-group-item" th:if="${#lists.size(scheduleList) == 0}">오늘의 일정은 딱히 없습니다</li>
-                    	<li class="list-group-item"><a th:href=@{/calendar}>캘린더로 가기</a></li>
-                    </ul>
-                </div>
-            </div>
-    
-            <div class="col-md-4">
-                <div class="card p-3 mb-4">
-                    <h5>메일 목록</h5>
-                    <ul class="list-group">
-                    	<th:block th:each="mail : ${mailList}">
-                    		<li 
-                    			th:onclick="| location.href = '@{/mail/view(mailId=${mail.mailId})}' |"
-                    			class="list-group-item"
-                    			>
-                    			[[ ${mail.subject} ]]
-                    		</li>
-                    	</th:block>
-                    	<li class="list-group-item" th:if="${#lists.size(mailList) == 0}">받은 메일이 딱히 없습니다</li>
-                    	<li class="list-group-item"><a th:href=@{/mail/departments}>메일함으로 가기</a></li>
-                    </ul>
-                </div>
-            </div>
-    
-            <div class="col-md-4">
-                <div class="card p-3 mb-4">
-                    <h5>결재 목록</h5>
-                    <ul class="list-group">
-                        <th:block th:each="approval : ${approvalList}">
-                            <li 
-                            	th:onclick="| location.href = '@{/approval/read(apprNo=${approval.apprNo})}' |" 
-                            	class="list-group-item"
-                            	>
-                                [[ ${approval.apprTitle} ]]
-                            </li>
-                        </th:block>
-                        <li class="list-group-item" th:if="${#lists.size(approvalList) == 0}">내와 관련된 결재가 없습니다.</li>
-                        <li class="list-group-item"><a th:href=@{/approval/waiting}>전자결재로 가기</a></li>
-                    </ul>
+
+        <div class="row mx-5">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card p-3 h-100">
+                            <h5>오늘의 할 일</h5>
+                            <ul class="list-group">
+                                <th:block th:each="schedule : ${scheduleList}">
+                                    <li class="list-group-item">
+                                        [[ ${schedule.scheduleContent} ]]
+                                    </li>
+                                </th:block>
+                                <li class="list-group-item" th:if="${#lists.size(scheduleList) == 0}">오늘의 일정은 딱히 없습니다</li>
+                                <li class="list-group-item"><a th:href=@{/calendar}>캘린더로 가기</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card p-3 h-100">
+                            <h5>메일 목록</h5>
+                            <ul class="list-group">
+                                <th:block th:each="mail : ${mailList}">
+                                    <li
+                                        th:onclick="| location.href = '@{/mail/view(mailId=${mail.mailId})}' |"
+                                        class="list-group-item"
+                                        >
+                                        [[ ${mail.subject} ]]
+                                    </li>
+                                </th:block>
+                                <li class="list-group-item" th:if="${#lists.size(mailList) == 0}">받은 메일이 딱히 없습니다</li>
+                                <li class="list-group-item"><a th:href=@{/mail/departments}>메일함으로 가기</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card p-3 h-100">
+                            <h5>결재 목록</h5>
+                            <ul class="list-group">
+                                <th:block th:each="approval : ${approvalList}">
+                                    <li
+                                        th:onclick="| location.href = '@{/approval/read(apprNo=${approval.apprNo})}' |"
+                                        class="list-group-item"
+                                        >
+                                        [[ ${approval.apprTitle} ]]
+                                    </li>
+                                </th:block>
+                                <li class="list-group-item" th:if="${#lists.size(approvalList) == 0}">내와 관련된 결재가 없습니다.</li>
+                                <li class="list-group-item"><a th:href=@{/approval/waiting}>전자결재로 가기</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
