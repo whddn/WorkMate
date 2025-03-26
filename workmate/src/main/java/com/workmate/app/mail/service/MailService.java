@@ -18,7 +18,7 @@ public interface MailService {
 	MailVO findMailById(int mailId);
 
 	// 이메일 전송
-	void sendEmail(String senderName, String senderEmail, String toEmail, String subject, String content)
+	void sendEmail(String senderName, String senderEmail, String toEmail,String ccList, String subject, String content)
 			throws MessagingException;
 
 	// 보낸 메일함
@@ -95,4 +95,8 @@ public interface MailService {
     List<String> findEmailsByTeam(String teamNo);
     //특정 팀에 속한 사원들의 정보 전체
     List<EmpVO> findEmployeesByTeam(String teamNo);
+  //예약 메일 등록 기능
+    void scheduleMail(MailVO mail, MultipartFile[] attachments);
+    //받은메일 읽음 기능
+    void markAsRead(int mailId);
 }
