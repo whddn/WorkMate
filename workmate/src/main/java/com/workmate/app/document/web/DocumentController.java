@@ -1,12 +1,19 @@
 package com.workmate.app.document.web;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,8 +23,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.workmate.app.common.FileHandler;
@@ -25,6 +32,7 @@ import com.workmate.app.document.service.DocVO;
 import com.workmate.app.document.service.DocumentService;
 import com.workmate.app.security.service.LoginUserVO;
 
+@RequestMapping("/document")
 @Controller
 public class DocumentController {
 	
@@ -42,13 +50,23 @@ public class DocumentController {
 	private String subDir ="document/";
 	
 	//자료실 전체 조회
-	@GetMapping("document/list")
+	@GetMapping("/list")
 	public String documentList(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
 		
 		String userId = loginUser.getUserVO().getUserId();
 		String teamNo = loginUser.getUserVO().getTeamNo();
 		
 		List<DocVO> list = documentService.findFileList();
+		
+		// 선언 후 초기화
+		List<Map<String, Object>> fileListWithSize = new ArrayList<>();
+		
+		for (DocVO doc : list) {
+			Long fileSize = doc.getFileSize() != null ? doc.getFileSize() : 0L;
+	        doc.setFormattedSize(formatSize(fileSize)); // 포맷된 문자 셋팅
+        }
+
+		
 		model.addAttribute("lists",list);
 		model.addAttribute("userId",userId);
 		model.addAttribute("teamNo",teamNo);
@@ -56,8 +74,22 @@ public class DocumentController {
 		return "document/list";
 	}
 	
+	//자료 단건 조회
+	
+	
+	//파일사이즈
+	private String formatSize(long size) {
+		  if (size >= 1024 * 1024) {
+	            return String.format("%.2f MB", size / (1024.0 * 1024.0));
+	        } else if (size >= 1024) {
+	            return String.format("%.1f KB", size / 1024.0);
+	        } else {
+	            return size + " B";
+	        }
+	}
+	
 	//자료 업로드	
-	@PostMapping("document/upload")
+	@PostMapping("/upload")
 	public  ResponseEntity<String> uploadFileProcess(@RequestParam("uploadFile") MultipartFile file,
                                     DocVO docVO,
                                     Model model) {
@@ -87,15 +119,51 @@ public class DocumentController {
 		
 	}
 	
+	//자료 첨부파일 다운로드
+	@GetMapping("/download/{documentNo}")
+	public ResponseEntity<Resource> downloadDocument(@PathVariable int documentNo) throws IOException{
+		 System.out.println("요청 들어옴: " + documentNo);
+		DocVO doc = documentService.findFileById(documentNo); //파일 단건 조회
+		
+		//저장된 파일 경로			
+		String fullPath = Paths.get(uploadDir, subDir, doc.getAttachment()).toString();
+	    Path path = Paths.get(fullPath);
+	    	
+		if (!Files.exists(path)) {
+	        return ResponseEntity.notFound().build(); // 파일 없으면 404
+	    }
+		
+		Resource resource = new UrlResource(path.toUri());
+		
+		String encodedFileName = URLEncoder.encode(doc.getFileName(), StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+		
+		return ResponseEntity.ok()
+		        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
+		        .body(resource);
+		
+		
+	}
+	
 	//자료 단건 삭제
-	@DeleteMapping("document/delete/{documentNo}")
+	@DeleteMapping("/delete/{documentNo}")
 	public ResponseEntity<String> documentDelete(@PathVariable Integer documentNo, DocVO docVO ) {
 	    try {
 	        if (documentNo == null) {
 	            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
 	        }	        
-	      
-	        //DB 삭제
+	        // 1) 삭제할 파일 정보 단건조회
+	        DocVO doc = documentService.findFileById(documentNo);
+	        if(doc == null) {
+	        	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("파일 정보를 찾을 수 없습니다.");
+	        }
+	        //2) 실제 파일 삭제 시도
+	        String fullPath = Paths.get(uploadDir, subDir, doc.getAttachment()).toString();
+		    Path path = Paths.get(fullPath);
+	        if (Files.exists(path)) {
+	            Files.delete(path);  // 파일 삭제
+	        }
+	        // 3) DB 삭제
 	        documentService.dropFileInfo(documentNo);
 	        
 	        return ResponseEntity.ok("삭제되었습니다.");
@@ -104,4 +172,7 @@ public class DocumentController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
 	    }
 	}
+	
+	//다운로드 이력 전체조회
+	
 }
