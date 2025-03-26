@@ -12,7 +12,6 @@
 </head>
 
 <body>
-	<!-- 이렇게 변경하세요 -->
 	<div th:insert="~{|/forms/approval/${approval.formPath}|}"></div>
 	<div>
 		<table id="AttachTable" class="display">
@@ -126,6 +125,7 @@
 <script th:inline="javascript">
 	let approval = [[ ${approval} ]];
 	let apprLine = [[ ${apprLine} ]];
+	let refLine = [[ ${refLine} ]];
 	
 	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
@@ -175,6 +175,13 @@
 				signRow.find('td').eq(colIndex - 1).empty().append(imgTag);
 			}
 			nameRow.find('td').eq(colIndex - 1).text(element.userName);
+		});
+		
+		// 참조선 데이터 삽입
+		$.each(refLine, function(index, element) {
+			console.log(refLine);
+			let liTag = $(`<li> ${element.departmentName} &gt; ${element.teamName} &gt; ${element.userName} </li>`);
+			$('#refLine').append(liTag);
 		});
 		
 		if(approval.apprStatus != 'a1') {

@@ -34,7 +34,19 @@ public class ApprLineServiceImpl implements ApprLineService {
 	@Override
 	public int inputApprLine(ApprLineVO apprLineVO) {
 		// TODO Auto-generated method stub
-		return 0;
+		return apprLineMapper.insertApprLine(apprLineVO);
+	}
+
+	@Override
+	public int modifyApprLine(ApprLineVO apprLineVO) {
+		// TODO Auto-generated method stub
+		return apprLineMapper.updateApprLine(apprLineVO);
+	}
+
+	@Override
+	public int dropApprLine(ApprLineVO apprLineVO) {
+		// TODO Auto-generated method stub
+		return apprLineMapper.deleteApprLine(apprLineVO);
 	}
 
 }
