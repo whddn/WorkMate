@@ -27,62 +27,19 @@
 						</th:block>
 					</div>
 				</div>
-				<div class="card-body">
-					<!-- Modal -->
-				<div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true" >
-				    <div class="modal-dialog" role="document">
-				        <div class="modal-content">
-				            <div class="modal-header border-0">
-				                <h3 class="modal-title">파일 업로드</h3>
-				                <button type="button" class="close" onclick="closeModal()">
-				                    <span aria-hidden="true">×</span>
-				                </button>
-				            </div>
-				            <div class="modal-body">
-				                <p class="small">파일을 업로드 해주세요.</p>
-				                <form id="uploadForm" method="post" enctype="multipart/form-data"  name="uploadForm" action="/archive/upload">
-				                    <div class="row">
-				                        <div class="col-sm-12">
-				                            <div class="form-group form-group-default">
-				                                <label>파일설명</label>
-				                                <input id="addName" name="fileDesc" type="text" class="form-control" placeholder="파일 설명을 입력하세요">
-				                            </div>
-				                             <div class="form-group form-group-default">
-				                                <label>파일분류</label>
-												<select name="fileTag"class="form-select input-fixed" id="notify_placement_from">
-												    <th:block th:each="tag : ${#sets.toSet(lists.![fileTag])}">
-												        <option th:value="${tag}">[[ ${tag} ]]</option>
-												    </th:block>
-												</select>
-				                            </div>
-				                        </div>
-				                        <input type="file" name="uploadFile" class="form-control-file" id="uploadFile">
-				                    </div>
-				                    <div class="modal-footer border-0">
-				            	<button type="button" id="addRowButton" class="btn btn-primary" >업로드하기</button>
-				                <button type="button" class="btn btn-danger" onclick="closeModal()">취소</button>
-				            		</div>
-				                </form>
-				            </div>				            
-				        </div>
-				    </div>
-				</div>
-
+				<div class="card-body">				
 					<div class="table-responsive">
 							<table id="documentTable" class="table">
 								<thead>
-								    <tr>								    	
+								    <tr>
 								        <th>
 								        	<select id="extFilter" class="form-select">
-								                <option value="">🔍︎ 자료 전체</option>
-								            </select>
-								        </th>
+								                <option value="">자료 전체</option>
+								            </select></th> <!-- 체크박스 필터 X -->
+								        <th>다운로드 날짜</th>
 								        <th>파일명</th>
-								        <th>파일설명</th>
-								        <th>파일크기</th>
-								        <th>확장자</th>
-								        <th>업로드날짜</th>
-								        <th><i class="fas fa-download"></i></th>
+								        <th>다운로드 사원</th>
+								        <th>사원 ID</th>
 								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 								        <th> <i class="fas fa-trash-alt"></i></th>
    										</th:block>
@@ -94,13 +51,8 @@
 										<td>[[ ${item.fileTag} ]]</td>
 										<td>[[ ${item.fileName} ]]</td>
 										<td>[[ ${item.fileDesc} ]]</td>
-										<td>[[ ${item.formattedSize} ]]</td>
 										<td>[[ ${item.extenstion} ]]</td>
-										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>
-										<td><a th:href="@{/document/download/{documentNo}(documentNo=${item.documentNo})}">
-										    <i class="fas fa-download"></i>
-											</a>
-										</td>
+										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>									
 										<th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 										<td>
 										    <i class="fas fa-trash-alt"

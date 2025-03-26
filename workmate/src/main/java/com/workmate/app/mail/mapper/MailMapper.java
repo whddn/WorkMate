@@ -86,4 +86,14 @@ public interface MailMapper {
     List<String> selectEmailsByTeam(String teamNo);
   //특정 팀에 속한 사원들의 정보 전체
     List<EmpVO> selectEmployeesByTeam(String teamNo);
+    //예약된 메일 중 발송 시점이 지난 것 조회
+    List<MailVO> selectScheduledMails();
+    //예약 상태 업데이트
+    void updateReserStatus(int mailId, String status);
+    //특정 메일(mailId)에 첨부된 파일(Attachment) 목록을 DB에서 조회
+    List<AttachmentVO> findAttachmentsByMailId(int mailId);
+    //받은 메일 읽음 기능
+    @Update("UPDATE MAIL SET IS_READ = 'Y' WHERE MAIL_ID = #{mailId}")
+    void updateMailReadStatus(@Param("mailId") int mailId);
+   
 }

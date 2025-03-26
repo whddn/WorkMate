@@ -26,6 +26,13 @@ public class DocumentServiceImpl implements DocumentService {
 		return docMapper.selectFileList();
 	}
 	
+	// 파일 단건 조회
+	@Override
+	public DocVO findFileById(int documentNo) {
+		return docMapper.selectFileById(documentNo);
+	}
+
+	
 	// 파일 업로드
 	@Override
 	public int inputFile(DocVO docVO) {
@@ -44,6 +51,7 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return map;
 	}
+	
 
 
 }
