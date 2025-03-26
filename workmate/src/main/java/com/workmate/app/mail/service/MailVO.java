@@ -26,5 +26,6 @@ public class MailVO {
 	private int folderId; //폴더ID
 	private String senderEmail;  // 외부 보낸 사람 이메일
 	private String messageId; //메세지 중복방지
+	private String isRead; //받은메일 읽음 표시
 	private List<AttachmentVO> attachmentList;
 }

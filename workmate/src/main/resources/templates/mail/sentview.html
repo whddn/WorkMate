@@ -41,6 +41,7 @@
 					</p>
 				</div>
 				<p><strong>수신자:</strong> <span th:text="${mail.recipients}"></span></p>
+				<p><strong>참조자:</strong> <span th:text="${mail.ccList}"></span></p>
 				<p><strong>제목:</strong> <span th:text="${mail.subject}"></span></p>
 				<p><strong>발송 시간:</strong> <span th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></span></p>
 

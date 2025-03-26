@@ -15,7 +15,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -80,6 +82,7 @@ public class MailController {
     @GetMapping("mail/view")
     public String viewMail(@RequestParam("mailId") int mailId, Model model) {
         MailVO mail = mailService.findMailById(mailId);
+        mailService.markAsRead(mailId);
         List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId);
         
         // 🔥 첨부파일 리스트 mail VO에 세팅
@@ -115,7 +118,7 @@ public class MailController {
                 mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments);
             } else {
                 // 첨부파일 없으면 일반 전송만
-                mailService.sendEmail(senderName, senderEmail, recipients, subject, content);
+                mailService.sendEmail(senderName, senderEmail, recipients, ccList, subject, content);
             }
 
             return "redirect:/mail/mailmain";
@@ -448,6 +451,38 @@ public class MailController {
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
             .body(resource);
+    }
+    
+    //예약 메일 등록 기능
+    @PostMapping("/mail/schedule")
+    public String scheduleMail(
+            @AuthenticationPrincipal LoginUserVO loginUser,
+            @RequestParam String recipients,
+            @RequestParam(required = false) String ccList,
+            @RequestParam String subject,
+            @RequestParam String content,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date scheduledTime,
+            @RequestParam(required = false) MultipartFile[] attachments) {
+
+        MailVO mail = new MailVO();
+        mail.setUserNo(loginUser.getUserVO().getUserNo());
+        mail.setRecipients(recipients);
+        mail.setCcList(ccList);
+        mail.setSubject(subject);
+        mail.setContent(content);
+        mail.setSentAt(new Date()); // 등록일시
+        mail.setReserSendtime(scheduledTime); // 예약 발송 시점
+        mail.setReserStatus("예약됨");
+        mail.setStatus("예약대기");
+        mail.setEncrypted("N");
+        mail.setMailType("내부");
+        mail.setIsSpam("N");
+        mail.setFolderId(1002); // 보낸 메일함으로 등록
+
+        
+        mailService.scheduleMail(mail, attachments);
+        return "redirect:/mail/sent";
+        
     }
     
 }

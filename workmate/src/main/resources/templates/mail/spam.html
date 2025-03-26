@@ -30,6 +30,8 @@
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" onclick="moveToFolder(1001)">받은메일함</a></li>
                 <li><a class="dropdown-item" href="#" onclick="moveToFolder(1002)">보낸메일함</a></li>
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1003)">임시보관함</a></li>
+                <li><a class="dropdown-item" href="#" onclick="moveToFolder(1004)">스팸메일함</a></li>
                 <li><a class="dropdown-item" href="#" onclick="moveToFolder(1006)">휴지통</a></li>
                 <li th:each="folder : ${myFolders}">
                     <a class="dropdown-item" href="#"
@@ -146,5 +148,6 @@
         });
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
