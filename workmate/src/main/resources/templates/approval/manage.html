@@ -30,7 +30,7 @@
 						<th><img th:src="${sign.signPath}" th:alt="${sign.signTitle}" width="50" height="50"></th>
 						<th>[[ ${sign.signTitle} ]]</th>
 						<th>[[ ${sign.insertDate} ]]</th>
-						<th><button id="signFileDelete" th:onclick="|killSign(${sign.signNo})|" class="btn btn-primary">삭제</button></th>
+						<th><button th:onclick="|killSign(${sign.signNo})|" class="btn btn-primary">삭제</button></th>
 					</tr>
 				</th:block>
 			</tbody>
@@ -44,10 +44,13 @@
 		<h3>결재선 리스트</h3>
 		<button 
 			id="setApprLine"
+			class="btn btn-primary"
 			data-bs-toggle="modal" 
-			data-bs-target="#addApprLineModal" 
-			data-bs-whatever="@mdo">
-			결재선 지정
+			data-bs-target="#addApprLineModal"
+			data-bs-apprlineNo=""
+			data-bs-insertTitle=""
+			>
+			결재선 추가
 		</button>
 		<table id="ApprLines" class="display">
 			<thead>
@@ -62,12 +65,12 @@
 					<tr 
 						data-bs-toggle="modal" 
 						data-bs-target="#addApprLineModal" 
-						data-bs-whatever="@mdo"
 						th:data-bs-apprlineNo="${apprLine.apprlineNo}"
-						th:data-bs-insertTitle="${apprLine.insertTitle}">
+						th:data-bs-insertTitle="${apprLine.insertTitle}"
+						>
 						<th>[[ ${apprLine.insertTitle} ]]</th>
 						<th>[[ ${apprLine.insertDate} ]]</th>
-						<th><button class="btn btn-primary">삭제</button></th>
+						<th><button th:onclick="|killApprLine(${apprLine.apprlineNo}, event)|" class="btn btn-primary">삭제</button></th>
 					</tr>
 				</th:block>
 			</tbody>
@@ -84,7 +87,8 @@
 				</div>
 				<div class="modal-body">
 					<input type="hidden" id="apprlineNo">
-					<input type="text" id="insertTitle" placeholder="결재선 이름">
+					<label for="insertTitle" class="col-form-label">결재선 이름</label>
+					<input type="text" class="form-control" id="insertTitle">
 					<table class="table mt-3">
 						<tbody>
 							<tr>
@@ -102,7 +106,7 @@
 																<span class="employee" 
 																	th:data-tn="${team.teamName}"
 																	th:data-id="${name.userNo}"
-																	th:onclick="| addElmnt(${name.userNo}) |"
+																	th:onclick="| addApprElmnt(${name.userNo}) |"
 																	>
 																	[[ ${name.userName}]]
 																</span>
@@ -144,31 +148,10 @@
 <script th:inline="javascript">
 	let apprElmntList = [];
 	
-	// 서명 파일을 제거한다.
-	function killSign(signNo) {
-		const path = [[ @{/approval/sign} ]];
-		fetch(`${path}/${signNo}`, {
-			method: 'DELETE'
-		})
-		.then(response => response.json())
-		.then(result => {
-			if(result.success) {
-				alert('서명이 삭제되었습니다.');
-				location.reload(); // 페이지 새로고침
-			}
-			else {
-				alert('삭제에 실패하였습니다.');
-			}
-		})
-		.catch(error => {
-			console.error('Error:', error);
-			alert('서버 요청 중 오류가 발생했습니다.');
-		});
-	}
-
 	$(document).ready(function() {
 		$('#SignsTable').DataTable();
 		$('#ApprLines').DataTable();
+		$('#ApprovalTable').DataTable();
 	});
 	
 	// 서명 파일 추가 버튼을 누를때 행동
@@ -184,37 +167,6 @@
         }
         
         $('#signFileInput').click();
-        
-     	// 결재선 모달이 열릴 때 실행
-        $('#addApprLineModal').on('show.bs.modal', function(event) {
-            let button = $(event.relatedTarget);  // 모달을 열게 한 요소 (tr)
-            let apprlineNo = button.data('bs-apprlineno');  // 결재선 번호
-            let insertTitle = button.data('bs-inserttitle');  // 결재선 이름
-
-            // 모달 내부 요소에 값 설정
-            $('#apprlineNo').val(apprlineNo);
-            $('#insertTitle').val(insertTitle);
-            
-            // 결재선을 이루는 결재자들을 apprElmntList에 저장한다.
-            $.ajax({
-    			url: [[ @{/approval/summonApprElmnts} ]],
-    			type: 'POST',
-    			headers: {
-    				'Content-Type': 'application/json'
-    			},
-    			data: JSON.stringify({
-    				'apprlineNo': apprlineNo
-    			}),
-    			success: function(response) {
-    				if(!Array.isArray(response)) {
-    					return;
-    				}
-    				
-    				apprElmntList = response;
-    				loadApprElmnts();
-    			}
-    		});
-        });
     });
 
 	// 서명 파일을 추가한다.
@@ -241,6 +193,66 @@
                 }
             });
         }
+    });
+	
+	// 서명 파일을 제거한다.
+	function killSign(signNo) {
+		const path = [[ @{/approval/sign} ]];
+		fetch(`${path}/${signNo}`, {
+			method: 'DELETE'
+		})
+		.then(response => response.json())
+		.then(result => {
+			if(result.success) {
+				alert('서명이 삭제되었습니다.');
+				location.reload(); // 페이지 새로고침
+			}
+			else {
+				alert('삭제에 실패하였습니다.');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			alert('서버 요청 중 오류가 발생했습니다.');
+		});
+	}
+	
+	// 결재선 모달이 열릴 때 실행
+    $('#addApprLineModal').on('show.bs.modal', function(event) {
+        let button = $(event.relatedTarget);  // 모달을 열게 한 요소 (tr)
+        let apprlineNo = button.data('bs-apprlineno');  // 결재선 번호
+        let insertTitle = button.data('bs-inserttitle');  // 결재선 이름
+        apprElmntList = [];
+
+        // 모달 내부 요소에 값 설정
+        $('#apprlineNo').val(apprlineNo);
+        $('#insertTitle').val(insertTitle);
+        
+        // apprlineNo가 비었으면 중간에 중단
+        if(apprlineNo == null || apprlineNo == '') {
+        	apprElmntList = [];
+			loadApprElmnts();
+        	return;
+        }
+        
+        // 결재선을 이루는 결재자들을 apprElmntList에 저장한다.
+        $.ajax({
+			url: [[ @{/approval/summonApprElmnts} ]],
+			type: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify({
+				'apprLineNo': apprlineNo
+			}),
+			success: function(response) {
+				if(!Array.isArray(response)) {
+					return;
+				}
+				apprElmntList = response;
+				loadApprElmnts();
+			}
+		});
     });
 	
 	// apprElmntList의 내용을 모달화면에 띄운다
@@ -299,11 +311,11 @@
 	
 	// 결재선 변경을 적용한다.
     $('#saveApprElmnts').on('click', function() {
-    	const apprlineNo = $('apprlineNo').val();
+    	const apprlineNo = $('#apprlineNo').val();
         const insertTitle = $('#insertTitle').val();
-        const components = apprElmntList.join(',');
- 
-        if (apprlineNo == null) {
+        const components = apprElmntList.map(element => element.userNo).join(',');
+        
+        if (apprlineNo == null || apprlineNo == '') {
             $.ajax({
                 url: [[ @{/approval/apprLine} ]], // 결재선 추가 요청을 처리할 서버 URL
                 type: 'POST',
@@ -338,6 +350,26 @@
             });
         }
     });
+	
+	// 결재선 삭제를 적용한다
+	function killApprLine(apprlineNo, event) {
+		event.stopPropagation();  // 이벤트 전파 방지
+	    event.preventDefault();   // 기본 동작 방지 (필요 시)
+		
+		$.ajax({
+			url: [[ @{/approval/apprLine} ]],
+			type: 'DELETE',
+			contentType: 'application/json',
+			data: JSON.stringify({
+				apprlineNo: apprlineNo
+			}),
+			success: function(response) {
+				// 서버 응답 처리 (예: 테이블에 새 결재선 추가)
+                console.log(response);
+                location.reload(); // 페이지 새로고침
+			}
+		});
+	}
 </script>
 
 </html>

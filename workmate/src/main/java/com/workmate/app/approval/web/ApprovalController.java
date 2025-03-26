@@ -322,6 +322,9 @@ public class ApprovalController {
 		model.addAttribute("signs", signService.findSignList(myself));
 		model.addAttribute("apprLines", apprLineService.findApprLineList(myself));
 		
+		// 조직도 정보를 전부 불러온다.
+		model.addAttribute("names", empService.findDeptEmpNameList());
+		
 		return "approval/manage";
 	}
 	
@@ -403,7 +406,7 @@ public class ApprovalController {
 	public ResponseEntity<?> putApprLine(@RequestBody ApprLineVO apprLineVO) {
 		EmpVO myself = whoAmI.whoAmI();
 		apprLineVO.setInserter(myself.getUserNo());
-		int result = apprLineService.inputApprLine(apprLineVO);
+		int result = apprLineService.modifyApprLine(apprLineVO);
 		
 		if(result > 0) {
 			return ResponseEntity.ok("결재선 변경 성공");
@@ -418,7 +421,7 @@ public class ApprovalController {
 	public ResponseEntity<?> deleteApprLine(@RequestBody ApprLineVO apprLineVO) {
 		EmpVO myself = whoAmI.whoAmI();
 		apprLineVO.setInserter(myself.getUserNo());
-		int result = apprLineService.inputApprLine(apprLineVO);
+		int result = apprLineService.dropApprLine(apprLineVO);
 		
 		if(result > 0) {
 			return ResponseEntity.ok("결재선 제거 성공");

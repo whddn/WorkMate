@@ -26,7 +26,7 @@
 		WHERE apprline_no = #{apprlineNo}
 	</select>
 	<insert id="insertApprLine" parameterType="ApprLineVO">
-		<selectKey keyProperty="apprlineNo" resultType="String" order="BEFORE">
+		<selectKey keyProperty="apprlineNo" resultType="Integer" order="BEFORE">
 			SELECT NVL(MAX(apprline_no), 0) + 1
 			FROM appr_line
 		</selectKey>
