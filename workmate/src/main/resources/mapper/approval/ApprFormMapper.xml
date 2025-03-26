@@ -56,10 +56,10 @@
 	</insert>
 	<update id="updateApprForm" parameterType="ApprFormVO">
 		UPDATE appr_form
-		SET(form_name = #{formName}
+		SET form_name = #{formName}
 			, form_path = #{formPath}
 			, contact_no = #{contactNo}
-		)
+		WHERE appr_type = #{apprType}
 	</update>
 	<delete id="deleteApprForm" parameterType="ApprFormVO">
 		DELETE FROM appr_form

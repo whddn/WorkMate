@@ -68,21 +68,22 @@
 </head>
 <body>
 <div class="container">
-    <h2>2025년 2월 입출금 내역서</h2>
+
+    <h2>[[ ${trans[0].reportTitle} ]] </h2>
 
     <h3>기본정보</h3>
     <table>
         <tr>
             <th>기간</th>
-            <td>2025-02-01 ~ 2025-02-28</td>
-            <th>부서</th>
-            <td>디자인팀</td>
+         	<td th:text="${#dates.format(trans[0].transStart, 'yyyy-MM-dd')} + ' ~ ' +  ${#dates.format(trans[0].transEnd, 'yyyy-MM-dd')}"></td>
+            <th>팀명</th>
+            <td>[[ ${trans[0].teamName} ]]</td>
         </tr>
         <tr>
             <th>직급</th>
             <td></td>
-            <th>성명</th>
-            <td></td>
+            <th>작성자</th>
+            <td>[[ ${trans[0].userName} ]]</td>
         </tr>
     </table>
 
@@ -96,62 +97,22 @@
             <th>잔액(원)</th>
             <th>비고</th>
         </tr>
-        <tr>
-            <td>1일(토)</td>
-            <td>고객사 결제</td>
-            <td>500,000원</td>
-            <td></td>
-            <td>673,348원</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>2일(일)</td>
-            <td>사무용품 구매</td>
-            <td></td>
-            <td>120,000원</td>
-            <td>553,348원</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>3일(월)</td>
-            <td></td>
-            <td>300,000원</td>
-            <td></td>
-            <td>853,348원</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>4일(화)</td>
-            <td>납부</td>
-            <td></td>
-            <td>300,000원</td>
-            <td>553,348원</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>27일(목)</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>28일(금)</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        <tr th:each="trans : ${trans}">
+            <td th:text="${#dates.format(trans.transDate, 'yyyy-MM-dd')}"></td>
+            <td th:text="${trans.purposeUse}"></td>
+            <td th:text="${#numbers.formatInteger(trans.deposit, 0, 'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(trans.withdrawal, 0, 'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(trans.balance, 0, 'COMMA')}"></td>
+            <td>비고</td>
         </tr>
     </table>
 
     <h3>월간합계</h3>
     <table>
         <tr>
-            <th>입금액(원)</th>
-            <th>출금액(원)</th>
-            <th>잔액(원)</th>
+            <th>입금액 (원)</th>
+            <th>출금액 (원)</th>
+            <th>잔액 (원)</th>
         </tr>
         <tr>
             <td></td>

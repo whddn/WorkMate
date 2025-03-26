@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.workmate.app.finance.mapper.FinanceMapper;
 import com.workmate.app.finance.service.FinanceService;
-import com.workmate.app.finance.service.FinanceVO;
+import com.workmate.app.finance.service.ReportVO;
 
 @Service
 public class FinanceServiceImpl implements FinanceService {
@@ -20,20 +20,21 @@ public class FinanceServiceImpl implements FinanceService {
 	
 	// 입출금 리포트 조회
 	@Override
-	public List<FinanceVO> findReportList(FinanceVO financeVO) {
-		return financeMapper.selectReportList(financeVO);
+	public List<ReportVO> findReportList(ReportVO reportVO) {
+		return financeMapper.selectReportList(reportVO);
 	}
 	
-	// 입출금 리포트 상세 조회
-	@Override
-	public List<FinanceVO> findReportById(FinanceVO financeVO) {
-		return financeMapper.selectReportById(financeVO);
-	}
 	
 	// 입출금 리포트 등록
 	@Override
-	public String findReportInsertPage(FinanceVO financeVO) {
-		return financeMapper.selectReportInsertPage(financeVO);
+	public String findReportInsertPage(ReportVO reportVO) {
+		return financeMapper.selectReportInsertPage(reportVO);
 	}
 
+	// 입출금 리포트 - 한 보고서에 대한 모든 입출금 리스트
+	@Override
+	public List<ReportVO> findTransList(ReportVO reportVO) {
+		return financeMapper.selectTransList(reportVO);
+	}
+	
 }

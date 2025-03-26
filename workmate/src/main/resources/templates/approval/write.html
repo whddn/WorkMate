@@ -12,7 +12,7 @@
 </head>
 
 <body>
-	<div th:insert="~{|forms/approval/${apprForm.formPath}|}"></div>
+	<div th:insert="~{|/forms/approval/${apprForm.formPath}|}"></div>
 	<table id="AttachTable" class="display">
 		<thead>
 			<tr>
@@ -53,18 +53,34 @@
 						<tbody>
 							<tr>
 								<td>
-									<h5>내 결재선</h5>										
-									<ul class="list-group">
-										<th:block th:each="apprLine : ${apprLineList}">
-											<li class="list-group-item" th:onclick="| summonApprElmnts(${apprLine.apprlineNo}) |">[[ ${apprLine.insertTitle} ]]</li>
-										</th:block>
-									</ul>
+									<h5>조직도</h5>
+									<div class="tree-panel">
+										<ul class="tree">
+											<li th:each="dpt : ${names}">
+												<span class="folder">[[ ${dpt.departmentName} ]]</span>
+												<ul>
+													<li th:each="team : ${dpt.teamList}">
+														<span class="teamN" th:data-tn="${team.teamName}">[[ ${team.teamName} ]]</span>
+														<ul>
+															<li th:each="name : ${team.empList}">
+																<span class="employee" 
+																	th:data-tn="${team.teamName}"
+																	th:data-id="${name.userNo}"
+																	th:onclick="| addElmnt(${name.userNo}) |"
+																	>
+																	[[ ${name.userName}]]
+																</span>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</div>
 								</td>
-								<td>
-									<ul class="list-group">
-										<li class="list-group-item">결재선 추가</li>
-										<li class="list-group-item" id="delApprElmnt">결재선 제거</li>
-									</ul>
+								<td id="apprOrRef" rowspan="2">
+									<input type="radio" class="form-check-input" name="apprOrRef" value="appr">결재선으로
+									<input type="radio" class="form-check-input" name="apprOrRef" value="ref">참조자로
 								</td>
 								<td>
 									<table id="ApprovalTable" class="display">
@@ -83,12 +99,11 @@
 							</tr>
 							<tr>
 								<td>
-									<h5>조직도</h5>
-								</td>
-								<td>
+									<h5>내 결재선</h5>										
 									<ul class="list-group">
-										<li class="list-group-item">참조자 추가</li>
-										<li class="list-group-item">참조자 제거</li>
+										<th:block th:each="apprLine : ${apprLineList}">
+											<li class="list-group-item" th:onclick="| summonApprElmnts(${apprLine.apprlineNo}) |">[[ ${apprLine.insertTitle} ]]</li>
+										</th:block>
 									</ul>
 								</td>
 								<td>
@@ -101,11 +116,6 @@
 											</tr>
 										</thead>
 										<tbody>
-											<tr>
-												<td>고길동</td>
-												<td>사원</td>
-												<td>개발부</td>
-											</tr>
 										</tbody>
 									</table>
 								</td>
@@ -114,7 +124,7 @@
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" id="saveApprElmnts">저장</button>
+					<button type="button" class="btn btn-primary" id="saveApprRefElmnts">저장</button>
 					<button type="button" class="btn btn-secondary" id="closeModalBtn" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
@@ -126,8 +136,9 @@
 	let creator = [[ ${creator} ]];
 	let apprForm = [[ ${apprForm} ]];
 	let apprElmntList = [];
+	let refElmntList = [];
 	const fileInput = $('#fileInput');
-
+	
 	// apprElmntList의 내용을 모달화면에 띄운다
 	function loadApprElmnts() {
 	    let tbodyTag = $('#ApprovalTable > tbody');
@@ -141,7 +152,7 @@
 	    
 	    apprElmntList.forEach(function(element, index) {
 	        let trTag = $(`
-	        	<tr>
+	        	<tr onclick="delApprElmnt()">
 	        		<td>${index + 1}</td>
 	        		<td>${element.userName}</td>
 	        		<td>${element.teamName}</td>
@@ -152,32 +163,116 @@
 	    });
 	}
 	
-	// 결재선을 클릭하면 결재선을 이루는 결재자들을 apprElmntList에 저장한다.
-	function summonApprElmnts(apprLineNo) {
-		fetch([[ @{/approval/summonApprElmnts} ]], {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				'apprLineNo': apprLineNo
-			})
-		})
-		.then(response => response.json())
-		.then(data => {
-			if (!Array.isArray(data)) {
-	            return;
-	        }
-			
-			apprElmntList = data;
-			loadApprElmnts();
+	// refElmntList의 내용을 모달화면에 띄운다
+	function loadRefElmnts() {
+		let = tbodyTag = $('#ReferrersTable > tbody');
+		tbodyTag.empty();
+		
+		if (!Array.isArray(refElmntList) || refElmntList.length === 0) {
+			return;
+		}
+		
+		refElmntList.forEach(function(element) {
+			let trTag = $(`
+				<tr onclick="delRefElmnt()">
+					<td>${element.userName}</td>
+					<td>${element.teamName}</td>
+					<td>${element.departmentName}</td>
+				</tr>
+			`);
+			tbodyTag.append(trTag);
 		});
 	}
 	
 	// 조직도의 사원을 클릭하면 결재자로 apprElmntList에 저장한다
-	function insertApprElmnt(userNo) {
+	function addApprElmnt(userNo) {
+		if(apprElmntList.length >= 3) {
+			return;
+		}
 		
+		let urlBase = [[ @{/emp/organ/} ]];
+		$.ajax({
+			url: urlBase + userNo,
+			type: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			success: function(response) {
+				if(response == null) {
+					return;
+				}
+				
+				apprElmntList.push(response);
+				loadApprElmnts();
+			}
+		});
 	}
+	
+	// 조직도의 사원을 클릭하면 참조자로 refElmntList에 저장한다
+	function addRefElmnt(userNo) {
+		let urlBase = [[ @{/emp/organ/} ]];
+		$.ajax({
+			url: urlBase + userNo,
+			type: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			success: function(response) {
+				if(response == null) {
+					return;
+				}
+				
+				refElmntList.push(response);
+				loadRefElmnts();
+			}
+		});
+	}
+	
+	// apprElmntList에서 하나씩 결재자 정보를 삭제한다
+	function delApprElmnt() {
+		apprElmntList.pop();
+		loadApprElmnts();
+	}
+	
+	// refElmntList에서 하나씩 결재자 정보를 삭제한다
+	function delRefElmnt() {
+		refElmntList.pop();
+		loadRefElmnts();
+	}
+	
+	// 조직도의 사원을 클릭하면 apprElmntList에 저장할지, refElmntList에 저장할지 알아서 해준다
+	function addElmnt(userNo) {
+		const result = $('#apprOrRef > input[type="radio"]:checked').val();
+		if(result == 'appr') {
+			addApprElmnt(userNo);
+		}
+		else if(result == 'ref') {
+			addRefElmnt(userNo);
+		}
+	}
+	
+	// 결재선을 클릭하면 결재선을 이루는 결재자들을 apprElmntList에 저장한다.
+	function summonApprElmnts(apprLineNo) {
+		$.ajax({
+			url: [[ @{/approval/summonApprElmnts} ]],
+			type: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify({
+				'apprLineNo': apprLineNo
+			}),
+			success: function(response) {
+				if(!Array.isArray(response)) {
+					return;
+				}
+				
+				apprElmntList = response;
+				loadApprElmnts();
+			}
+		});
+	}
+	
 	
 	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
@@ -208,17 +303,10 @@
 		$('#userNo').text(creator.userNo);
 		$('#userName').text(creator.userName);
 	});
-	
-	// apprElmntList에서 하나씩 결재자 정보를 삭제한다 
-	$('#delApprElmnt').on('click', function() {
-		apprElmntList.pop();
-		loadApprElmnts();
-	});
 
-	// apprElmntList의 정보를 결재선 양식에 등록한다
-	$('#saveApprElmnts').on('click', function() {
+	// apprElmntList의 정보를 결재선 양식에, refElmntList의 정보를 참조자에 등록한다
+	$('#saveApprRefElmnts').on('click', function() {
 		let table = $('#apprLine');
-		
 		table.find('td').text('');
 		
 		if (!Array.isArray(apprElmntList) || apprElmntList.length === 0) {
@@ -240,9 +328,16 @@
 			nameRow.find('td').eq(colIndex - 1).text(element.userName);
 		});
 		
+		// 참조선 데이터 삽입
+		$.each(refElmntList, function(index, element) {
+			let liTag = $(`<li> ${element.departmentName} &lt; ${element.teamName} &lt; ${element.userName} </li>`);
+			$('#refLine').append(liTag);
+		})
+		
 		$('#closeModalBtn').trigger('click');
 	});
 	
+	// id="fileInput"인 태그의 행동
 	fileInput.on('change', function() {
 		const table = $('#AttachTable').DataTable();
         for(let file of fileInput[0].files) {
@@ -296,11 +391,19 @@
 		    }
 		});
 		
+		// 결재선 추가
 		let approverList = [];
 		apprElmntList.forEach(function(element) {
 			approverList.push(element.userNo);
 		});
-		request['approverList'] = approverList;
+		request['approverList'] = approverList;		
+		
+		// 참조선 추가
+		let referrerList = [];
+		refElmntList.forEach(function(element) {
+			referrerList.push(element.userNo);
+		})
+		request['referrerList'] = referrerList;
 		
 		formData.append('request', JSON.stringify(request));
 		
@@ -331,6 +434,7 @@
 		});
 	});
 	
+	// 결재신청 화면으로 되돌아간다
 	$('#cancelBtn').on('click', function(event) {
 		 location.href = [[ @{/approval/formList} ]]; 
 	})

@@ -59,7 +59,7 @@ public class AdminController {
 	@Value("${file.upload-dir}")
 	private String uploadDir;
 	private final String subDir = "CommonItemImage/";
-	private final String apprFormDir = "forms/approval/";
+	private final String apprFormDir = "src/main/resources/templates/forms/approval/";
 	
 	// 공용품 관리
 	@GetMapping("admin/commonItemList")
@@ -213,10 +213,11 @@ public class AdminController {
 	        apprFormVO.setApprType(apprType);
 	        apprFormVO = apprFormService.findFormById(apprFormVO);
 	        model.addAttribute("apprForm", apprFormVO);
+	        System.out.println(apprFormVO);
 	        
 	        try {
 	        	// HTML 파일 경로 지정
-	        	Path path = Paths.get(uploadDir, apprFormDir, apprFormVO.getFormPath());
+	        	Path path = Paths.get(apprFormDir, apprFormVO.getFormPath() + ".html");
 	        	File file = ResourceUtils.getFile(path.toString());
 	        	
 	        	// 파일 내용을 문자열로 변환
@@ -224,6 +225,7 @@ public class AdminController {
 	        	
 	        	// Thymeleaf 모델에 데이터 추가
 	        	model.addAttribute("editorContent", content);
+	        	System.out.println(content);
 	        }
 	        catch(IOException e) {
 	        	e.printStackTrace();
@@ -237,19 +239,18 @@ public class AdminController {
 	@PostMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> postAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		Path path = Paths.get(uploadDir, apprFormDir);
-		String fileName = fileHandler.htmlStrUpload(
+		Path path = Paths.get(apprFormDir);
+		String pathResult = fileHandler.htmlStrUpload(
 			apprFormVO.getFormPath(), 
 			apprFormVO.getContent(), 
 			path.toString(), 
 			true);
 		
-		if(fileName == null || fileName.equals("")) {
+		if(pathResult == null || pathResult.equals("")) {
 			return ResponseEntity.badRequest().body(false);
 		}
 		
-		apprFormVO.setFormPath(fileName);
-		
+		System.out.println(apprFormVO);
 		int result = apprFormService.inputForm(apprFormVO);
 		return ResponseEntity.ok(result > 0);
 	}
@@ -258,17 +259,18 @@ public class AdminController {
 	@PutMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> putAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		Path path = Paths.get(uploadDir, apprFormDir);
-		String fileName = fileHandler.htmlStrUpload(
+		Path path = Paths.get(apprFormDir);
+		String pathResult = fileHandler.htmlStrUpload(
 			apprFormVO.getFormPath(), 
 			apprFormVO.getContent(), 
 			path.toString(), 
 			true);
 		
-		if(fileName == null || fileName.equals("")) {
+		if(pathResult == null || pathResult.equals("")) {
 			return ResponseEntity.badRequest().body(false);
 		}
 		
+		System.out.println(apprFormVO);
 		int result = apprFormService.modifyForm(apprFormVO);
 		return ResponseEntity.ok(result > 0);
 	}
