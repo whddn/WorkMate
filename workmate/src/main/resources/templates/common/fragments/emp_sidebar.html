@@ -88,7 +88,7 @@
                 </a>
               </li>
               
-                           <li class="nav-item submenu">
+                <li class="nav-item submenu">
                 <a data-bs-toggle="collapse" href="#sidebarLayouts" class="" aria-expanded="true">
                   <i class="fas fa-th-list"></i>
                   <p>평가</p>
@@ -109,7 +109,7 @@
                   </ul>
                 </div>
               </li>      
-              <li class="nav-item">
+              <li class="nav-item" th:if="${teamNo == 'ROLE_T001'}">
                 <a th:href="@{/emp/bfevalu}">
                   <i class="fas fa-pen-square"></i>
                   <p>지난 평가 조회(관리자)</p>
