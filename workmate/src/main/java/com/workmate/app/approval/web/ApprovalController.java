@@ -35,6 +35,8 @@ import com.workmate.app.approval.service.ApprLineService;
 import com.workmate.app.approval.service.ApprLineVO;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.approval.service.ReferenceService;
+import com.workmate.app.approval.service.ReferenceVO;
 import com.workmate.app.approval.service.ReportAttachService;
 import com.workmate.app.approval.service.ReportAttachVO;
 import com.workmate.app.approval.service.SignService;
@@ -54,6 +56,7 @@ import lombok.RequiredArgsConstructor;
  * 수정일자	수정자	수정내용
  * ----------------------
  * 03-12	이지응	전자결재 기능 제작 시작
+ * 03-26	이지응	전자결재 결재자 지정 기능 추가
  * 
  * </pre>
  */
@@ -64,6 +67,7 @@ public class ApprovalController {
 	private final ApprFormService apprFormService;
 	private final ApprLineService apprLineService;
 	private final ApprovalService approvalService;
+	private final ReferenceService referenceService;
 	private final ReportAttachService reportAttachService;
 	private final SignService signService;
 	private final EmpService empService;
@@ -126,6 +130,9 @@ public class ApprovalController {
 		model.addAttribute("creator", empService.findEmpByEmpNo(myself));
 		model.addAttribute("apprLineList", apprLineService.findApprLineList(myself));
 		
+		// 조직도 정보를 전부 불러온다.
+		model.addAttribute("names", empService.findDeptEmpNameList());
+		
 		return "approval/write";
 	}
 	
@@ -172,6 +179,17 @@ public class ApprovalController {
         	apprElmntService.inputApprElmnt(apprElmntVO);
         }
         
+        // 참조자(의 번호)들을 DB에 등록
+        for(Integer empNo : (List<Integer>) approvalVO.getReferrerList()) {
+        	// 참조요소에 참조자 번호, 결재문서 번호를 입력
+        	ReferenceVO referenceVO = new ReferenceVO();
+        	referenceVO.setUserNo(empNo);
+        	referenceVO.setApprNo(approvalVO.getApprNo());
+        	
+        	// 참조요소 등록
+        	referenceService.inputReference(referenceVO);
+        }
+        
         // 파일 업로드 관리
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
@@ -193,22 +211,6 @@ public class ApprovalController {
         return ResponseEntity.ok(response);
 	}
 	
-	// 사용자가 즐겨찾기한 결재선 목록들을 가져온다.
-	@PostMapping("approval/summonApprElmnts")
-	public ResponseEntity<List<EmpVO>> postSummonApprElmnts(@RequestBody Map<String, Object> request) {
-		ApprLineVO apprLineVO = new ApprLineVO();
-		apprLineVO.setApprlineNo(Integer.parseInt(request.get("apprLineNo").toString()));
-		
-        apprLineVO = apprLineService.findApprLineById(apprLineVO);
-        List<EmpVO> list = new ArrayList<>();
-        for(Integer empNo : apprLineVO.getComponentsByList()) {
-        	EmpVO empVO = new EmpVO();
-        	empVO.setUserNo(empNo);
-        	list.add(empService.findEmpByEmpNo(empVO));
-        }
-        return ResponseEntity.ok(list);
-	}
-	
 	// 작성한 결재문서 읽는 페이지를 보여준다.
 	@GetMapping("approval/read")
 	public String getRead(Model model, @RequestParam String apprNo) {
@@ -220,6 +222,7 @@ public class ApprovalController {
 		
 		model.addAttribute("approval", approvalService.findApprovalById(approvalVO));
 		model.addAttribute("apprLine", apprElmntService.findApprElmntList(approvalVO));
+		model.addAttribute("refLine", referenceService.findReferenceList(approvalVO));
 		model.addAttribute("fileList", reportAttachService.findApprovalRAList(approvalVO));
 		model.addAttribute("mySigns", signService.findSignList(myself));
 		
@@ -319,6 +322,9 @@ public class ApprovalController {
 		model.addAttribute("signs", signService.findSignList(myself));
 		model.addAttribute("apprLines", apprLineService.findApprLineList(myself));
 		
+		// 조직도 정보를 전부 불러온다.
+		model.addAttribute("names", empService.findDeptEmpNameList());
+		
 		return "approval/manage";
 	}
 	
@@ -364,12 +370,64 @@ public class ApprovalController {
 		}
 	}
 	
-	/*
+	// 사용자가 즐겨찾기한 결재선의 결재요소들을 가져온다.   나중에 GET으로 바꾸든지 말든지
+	@PostMapping("approval/summonApprElmnts")
+	public ResponseEntity<List<EmpVO>> postSummonApprElmnts(@RequestBody Map<String, Object> request) {
+		ApprLineVO apprLineVO = new ApprLineVO();
+		apprLineVO.setApprlineNo(Integer.parseInt(request.get("apprLineNo").toString()));
+		
+        apprLineVO = apprLineService.findApprLineById(apprLineVO);
+        List<EmpVO> list = new ArrayList<>();
+        for(Integer empNo : apprLineVO.getComponentsByList()) {
+        	EmpVO empVO = new EmpVO();
+        	empVO.setUserNo(empNo);
+        	list.add(empService.findEmpByEmpNo(empVO));
+        }
+        return ResponseEntity.ok(list);
+	}
+	
+	// 결재선을 새로 등록한다.
 	@PostMapping("approval/apprLine")
 	public ResponseEntity<?> postApprLine(@RequestBody ApprLineVO apprLineVO) {
-	    // DB에 결재선 정보 저장 로직 구현
-	    // ...
-	    return ResponseEntity.ok("결재선 추가 성공");
+		EmpVO myself = whoAmI.whoAmI();
+		apprLineVO.setInserter(myself.getUserNo());
+		int result = apprLineService.inputApprLine(apprLineVO);
+		
+		if(result > 0) {
+			return ResponseEntity.ok("결재선 추가 성공");
+		}
+		else {
+			return ResponseEntity.badRequest().body("결재선 추가 실패");
+		}
 	}
-	*/
+	
+	// 결재선을 변경한다.
+	@PutMapping("approval/apprLine")
+	public ResponseEntity<?> putApprLine(@RequestBody ApprLineVO apprLineVO) {
+		EmpVO myself = whoAmI.whoAmI();
+		apprLineVO.setInserter(myself.getUserNo());
+		int result = apprLineService.modifyApprLine(apprLineVO);
+		
+		if(result > 0) {
+			return ResponseEntity.ok("결재선 변경 성공");
+		}
+		else {
+			return ResponseEntity.badRequest().body("결재선 변경 실패");
+		}
+	}
+	
+	// 결재선을 삭제한다.
+	@DeleteMapping("approval/apprLine")
+	public ResponseEntity<?> deleteApprLine(@RequestBody ApprLineVO apprLineVO) {
+		EmpVO myself = whoAmI.whoAmI();
+		apprLineVO.setInserter(myself.getUserNo());
+		int result = apprLineService.dropApprLine(apprLineVO);
+		
+		if(result > 0) {
+			return ResponseEntity.ok("결재선 제거 성공");
+		}
+		else {
+			return ResponseEntity.badRequest().body("결재선 제거 실패");
+		}
+	}
 }

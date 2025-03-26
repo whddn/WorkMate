@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.workmate.app.approval.mapper.ReferenceMapper">
+	<select id="selectReferenceList" parameterType="ApprovalVO" resultType="ReferenceVO">
+		SELECT reference.user_no
+			, user_name
+		    , team_name
+		    , department_name
+		FROM reference
+			JOIN employee
+		    ON reference.user_no=employee.user_no
+		    LEFT JOIN team
+		    ON employee.team_no=team.team_no
+		    LEFT JOIN department
+		    ON team.department_id=department.department_id
+		WHERE appr_no = #{apprNo}
+	</select>
+	<insert id="insertReference" parameterType="ReferenceVO">
+		INSERT INTO reference(user_no, appr_no)
+		VALUES(#{userNo}, #{apprNo})
+	</insert>
+</mapper>

@@ -23,6 +23,36 @@
 		FROM appr_line
 		    JOIN employee
 		    ON appr_line.inserter=employee.user_no
-		WHERE apprline_no=#{apprlineNo}
+		WHERE apprline_no = #{apprlineNo}
 	</select>
+	<insert id="insertApprLine" parameterType="ApprLineVO">
+		<selectKey keyProperty="apprlineNo" resultType="Integer" order="BEFORE">
+			SELECT NVL(MAX(apprline_no), 0) + 1
+			FROM appr_line
+		</selectKey>
+		INSERT INTO appr_line(apprline_no
+			, insert_title
+			, insert_date
+			, inserter
+			, components
+		)
+		VALUES(#{apprlineNo}
+			, #{insertTitle}
+			, SYSDATE
+			, #{inserter}
+			, #{components}
+		)
+	</insert>
+	<update id="updateApprLine" parameterType="ApprLineVO">
+		UPDATE appr_line
+		SET insert_title = #{insertTitle}
+			, components = #{components}
+		WHERE apprline_no = #{apprlineNo}
+			AND inserter = #{inserter}
+	</update>
+	<delete id="deleteApprLine" parameterType="ApprLineVO">
+		DELETE FROM appr_line
+		WHERE apprline_no = #{apprlineNo}
+			AND inserter = #{inserter}
+	</delete>
 </mapper>

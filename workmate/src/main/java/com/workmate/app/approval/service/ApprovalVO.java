@@ -34,5 +34,6 @@ public class ApprovalVO {
 	private String userName;		// 결재자 이름 FK
 	private String departmentName;	// 결재 부서 이름 FK
 	private List<Integer> approverList = new ArrayList<>();	// 결재자 번호 리스트
+	private List<Integer> referrerList = new ArrayList<>();	// 참조자 번호 리스트
 	private String standard;		// select하는 기준
 }

@@ -18,6 +18,8 @@ import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.common.WhoAmI;
 import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.mail.service.MailService;
+import com.workmate.app.mail.service.MailVO;
 import com.workmate.app.mainscreen.service.MenuService;
 import com.workmate.app.mainscreen.service.MenuVO;
 import com.workmate.app.mainscreen.service.ScheduleService;
@@ -36,6 +38,7 @@ import lombok.RequiredArgsConstructor;
  * 03-21	이지응	검색 화면 제작
  * 03-22	이지응	캘린더 화면 제작
  * 03-23	이지응	일정 조정 기능 제작
+ * 03-26	이지응	메인화면 초기화면 제작
  * 
  * </pre>
  */
@@ -44,26 +47,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MainscreenController {
 	private final MenuService menuService;
-	private final ApprovalService approvalService;
 	private final ScheduleService scheduleService;
+	private final MailService mailService;
+	private final ApprovalService approvalService;
 	private final WhoAmI whoAmI;
 	
 	@GetMapping("/")
 	public String base(Model model) {
 		EmpVO myself = whoAmI.whoAmI();
 		
-		ApprovalVO approvalVO = new ApprovalVO();
-		approvalVO.setUserNo(myself.getUserNo());
-		approvalVO.setApprStatus("a1");
-		approvalVO.setStandard("toMe");
-		model.addAttribute("waitingList", approvalService.findApprovalList(approvalVO));
-		
 		ScheduleVO scheduleVO = new ScheduleVO();
 		scheduleVO.setUserNo(myself.getUserNo());
 		scheduleVO.setDeptNo(myself.getDepartmentId());
 		scheduleVO.setUnit("day");
-		
 		model.addAttribute("scheduleList", scheduleService.findScheduleList(scheduleVO));
+		
+		List<MailVO> mailList = mailService.findReceivedMailsList(myself.getUserNo());
+		model.addAttribute("mailList", mailList.subList(0, 13));
+		
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setUserNo(myself.getUserNo());
+		approvalVO.setApprStatus("a1");
+		approvalVO.setStandard("toMe");
+		model.addAttribute("approvalList", approvalService.findApprovalList(approvalVO));
 		
 		return "mainscreen/main";
 	}

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.workmate.app.finance.service.FinanceService;
-import com.workmate.app.finance.service.FinanceVO;
+import com.workmate.app.finance.service.ReportVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,24 +19,32 @@ public class FinanceController {
 	
 	// 입출금 보고서 메인 
 	@GetMapping("finance/report") 
-	public String ReportMainList(FinanceVO financeVO, Model model) {
+	public String ReportMainList(ReportVO reportVO, Model model) {
 		// 2) 서비스 
-		model.addAttribute("report", financeService.findReportList(financeVO)); 
+		model.addAttribute("report", financeService.findReportList(reportVO)); 
 		return "finance/financeMain";
 	}
 	
 	// 입출금 보고서 단건 조회
 	@GetMapping("finance/reportInfo/{reportNo}")
-	public String ReportOneInfo(FinanceVO financeVO, Model model, @PathVariable int reportNo) {
-		financeVO.setReportNo(reportNo); 
-	    List<FinanceVO> oneReport = financeService.findReportById(financeVO); 
-	    model.addAttribute("one", oneReport);
+	public String ReportOneInfo(ReportVO reportVO, Model model, @PathVariable int reportNo) {
+		reportVO.setReportNo(reportNo); 
+		// 입/출금 쿼리문 
+	    List<ReportVO> transList = financeService.findTransList(reportVO); 
+	    model.addAttribute("trans", transList);
+	   
 	    return "finance/reportInfo"; 
 	}
 	
 	// 입출금 보고서 등록 화면 페이지 
 	@GetMapping("finance/reportInsert")
-	public String ReportInsertPage(FinanceVO financeVO) {
+	public String ReportInsertPage(ReportVO reportVO) {
 		return "finance/reportInsert";
+	}
+	
+	// 법인카드 전체 조회 페이지 
+	@GetMapping("finance/corcardList")
+	public String CorcardListPage(ReportVO reportVO) {
+		return "finance/corcard"; 
 	}
 }
