@@ -13,4 +13,13 @@ public interface FinanceMapper {
 	
 	// 입출금 보고서 작성 페이지
 	public String selectReportInsertPage(FinanceVO financeVO);
+	
+	// 법인 카드 전체 조회 (관리자만 가능)
+	public List<FinanceVO> selectCorCardList(FinanceVO financeVO);
+	
+	// 법인 카드 등록 
+	public int insertCorCardInfo(FinanceVO financeVO);
+	
+	// 법인 카드 상세 조회 
+	public List<FinanceVO> selectCorCardById(FinanceVO financeVO);
 }

@@ -33,7 +33,7 @@ public interface EmpService {
 	public List<EvaluVO> findBeforeEvaluList(EvaluVO evaluVO);
 	
 	// 지나간 평가 단건 조회 (관리자) 
-	public List<EvaluVO> findBeforeEvaluById(EvaluVO evaluVO);
+	public Map<String, Object> findAdminEvaluBeforeById(EvaluVO evaluVO);
 	
 	// 평가 결과 - 평가자 정보 조회 
 	//public List<DepartmentVO> findEvaluInfo(EvaluVO evaluVO);
@@ -48,10 +48,10 @@ public interface EmpService {
 	// 나의 평가한 리스트 / 평가할 리스트 조회 (페이지)
 	public List<EvaluVO> findMyEvaluList(EvaluVO evaluVO);
 
-	// 나의 평가 진행 중 조회 (단건 조회) 
+	// 평가 제출 전 : 평가자 기준으로 피평가자 + 항목 조회 (점수 없음)
 	public List<EvaluVO> findMyEvaluById(EvaluVO evaluVO);
 	
-	// 평가 진행 페이지 (단건...?)
+	// 평가 제출 후 : 평가자 기준으로 평가 결과(점수 포함) 조회
 	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO);
 	//public List<EvaluVO> findMyEvaluingById(EvaluVO evaluVO);
 	
@@ -80,5 +80,5 @@ public interface EmpService {
 	public List<EvaluVO> findMyEvaluScoreResultById(EvaluVO evaluVO);
 	
 	// 사원 중복 제거 ?? 
-	public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO evaluVO); 
+	//public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO evaluVO); 
 }

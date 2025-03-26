@@ -39,4 +39,10 @@ public class FinanceController {
 	public String ReportInsertPage(FinanceVO financeVO) {
 		return "finance/reportInsert";
 	}
+	
+	// 법인카드 전체 조회 페이지 
+	@GetMapping("finance/corcardList")
+	public String CorcardListPage(FinanceVO financeVO) {
+		return "finance/corcard"; 
+	}
 }

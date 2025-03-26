@@ -2,6 +2,7 @@ package com.workmate.app.employee.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 
@@ -56,4 +57,8 @@ public class EvaluVO {
 	private String evaluateeGroupId;	// 피평가자 그룹 아이디
 	// 평가 결과 테이블
 	private String evaluResultId; 	//
+	private int evaluateeUserNo;	//피평가자 사번
+   
+	private Double otherAvgScore;	// 다른 사원의 평균 점수 
+	
 }
