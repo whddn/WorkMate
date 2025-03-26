@@ -59,12 +59,12 @@ public interface EmpMapper {
 	
 	// 나의 평가했던 리스트 페이지 전체 조회
 	public List<EvaluVO> selectMyEvaluList(EvaluVO evaluVO);
-	
-	// 내가 등록한 평가 단건 조회
-	public List<EvaluVO> selectMyEvaluingById(EvaluVO evaluVO);
 
-	// 개인 평가 진행 (평가할 페이지)
+	// 개인 평가 진행 (내가 평가자로 등록된 평가 단건 조회) - 평가 진행 전
 	public List<EvaluVO> selectOneEvaluById(EvaluVO evaluVO);
+	
+	// 내가 등록한 평가 단건 조회 - 평가 진행 후 
+	public List<EvaluVO> selectMyEvaluingById(EvaluVO evaluVO);
 	
 	// 평가한 거 등록 진행 (평가 결과에 insert)
 	public int insertEvaluScore(EvaluVO evaluVO);
@@ -81,5 +81,10 @@ public interface EmpMapper {
 	// 내가 받은 평가 단건 (피평가자 : loginUser)
 	public List<EvaluVO> selectMyEvaluScoreResultById(EvaluVO evaluVO);
 	
+	// 평가자 그룹 ID 조회
+	int selectEvaluGroupId(EvaluVO evaluVO);
 
+	// 피평가자 그룹 ID 조회
+	int selectEvaluateeGroupId(EvaluVO evaluVO);
+	
 }

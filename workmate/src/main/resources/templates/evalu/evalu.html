@@ -150,7 +150,7 @@ button:hover {
 						<td th:each="user : ${userList}" class="evaluName">
 						<select th:data-evaluitemno="${evalu.evaluItemNo}"  th:data-form="${evalu.evaluFormNo}" 
 						th:data-userno="${user.userNo}" th:data-orderno="${evalu.orderNo}" th:data-teamno="${evalu.teamNo}" 
-						th:data-gid = "${evalu.evaluateeGroupId}" th:data-en="${evalu.evaluNo}" th:data-gd="${evalu.evaluGroupId}" 
+						th:data-gid = "${user.evaluateeGroupId}" th:data-en="${evalu.evaluNo}" th:data-gd="${user.evaluGroupId}" 
 							name="score" 
 							id="score-select">
 								<option value="">선택</option>
@@ -187,6 +187,8 @@ button:hover {
   	
   	function evaluAjax() {
 	    let scoreList = [];
+	    let hasEmpty = false; 
+	    
 	  	Array.from(document.querySelectorAll('[name="score"]')).forEach(select => {
 	  		let evaluItemNo = parseInt(select.dataset.evaluitemno);
 	  		let userNo = parseInt(select.dataset.userno);
@@ -197,6 +199,10 @@ button:hover {
 	  		let evaluNo = select.dataset.en;
 	  		let formNo = select.dataset.form;
 	  		
+	  	  if (isNaN(score)) {
+	            hasEmpty = true;
+	        }
+	  	  
 	  		scoreList.push({
 	  			evaluNo : evaluNo,
 	  			evaluItemNo : evaluItemNo,
@@ -206,8 +212,13 @@ button:hover {
 	  			evaluateeGroupId : evaluateeGroupId,
 	  			evaluGroupId : evaluGroupId,
 	  			evaluFormNo : formNo
-	  		})	
-  	})
+	  		});	
+  	});
+	    // 점수 빠진 항목이 있으면 AJAX 보내지 않고 alert
+	    if (hasEmpty) {
+	        alert("모든 항목에 점수를 선택해주세요!");
+	        return;
+	    }
 	  		console.log(scoreList);
 	
 let formNo = document.querySelector('[name="score"]').dataset.form;

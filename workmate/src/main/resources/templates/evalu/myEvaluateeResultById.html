@@ -10,14 +10,14 @@
       background-color: #f4f4f4;
     }
 
-    #container {
+    /* #container {
       max-width: 1000px;
       margin: 0 auto;
       background-color: #fff;
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+    }*/
 
     h2, h3 {
       font-weight: 600;
@@ -53,94 +53,183 @@
     canvas {
       margin-top: 30px;
     }
+
+    /* 스타일 추가 */
+    .con {
+	  max-width: 1000px;
+      border: 1px solid #ddd; /* 테두리 추가 */
+      border-radius: 8px; /* 둥근 테두리 */
+      padding: 20px; /* 안쪽 여백 추가 */
+      margin: 0 auto;
+      margin-bottom: 20px; /* 항목 간 간격 추가 */
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .con h3 {
+      margin-bottom: 15px; /* 제목과 내용 간 간격 추가 */
+    }
   </style>
 </head>
 
 <body>
   <div id="container">
-    <h2>내가 받은 평가 결과</h2>
-
+	<div class="con">
+    <h2>[[ ${result[0].evaluName} ]]</h2>
+    </div>
     <!-- 1. 평가 대상자 정보 -->
-    <h3>1. 피평가자 정보</h3>
-    <table>
-      <tr>
-        <th>성명</th>
-        <th>부서</th>
-        <th>팀</th>
-      </tr>
-      <tr th:each="user : ${evaluatee}">
-        <td th:text="${user.userName}">홍길동</td>
-        <td th:text="${user.departmentName}">기획부</td>
-        <td th:text="${user.teamName}">전략팀</td>
-      </tr>
-    </table>
+    <div class="con">
+      <h3>피평가자 정보</h3>
+      <table>
+        <tr>
+          <th>부서</th>
+          <th>팀</th>
+          <th>성명</th>
+        </tr>
+        <tr>
+            <td th:text="${result[0].departmentName}"></td>
+          <td th:text="${result[0].teamName}"></td>
+          <td th:text="${result[0].userName}"></td>
+        </tr>
+      </table>
+    </div>
 
     <!-- 2. 평가 설명 -->
-    <h3>2. 평가 설명</h3>
-    <div class="ver2">
-      <p>- 이 평가는 다면평가로, 동료 및 상사의 피드백을 기반으로 구성됩니다.</p>
-      <p>- 각 항목은 1~5점 기준으로 평균 점수를 산출합니다.</p>
+    <div class="con">
+      <h3>평가 설명</h3>
+      <div class="ver2">
+        <p>- 이 평가는 다면평가로, 동료 및 상사의 피드백을 기반으로 구성됩니다.</p>
+        <p>- 각 항목은 1~5점 기준으로 평균 점수를 산출합니다.</p>
+      </div>
     </div>
 
     <!-- 3. 평가 항목 및 평균 점수 -->
-    <h3>3. 평가 항목 평균 점수</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>평가 분야</th>
-          <th>평가 항목</th>
-          <th>평균 점수</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="one : ${result}">
-          <td th:text="${result.evaluCompet}"></td>
-          <td th:text="${result.evaluContent}"></td>
-          <td th:text="${result.evaluScore}"></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- 4. 평균 점수 그래프 -->
-    <h3>4. 시각화 차트</h3>
-    <canvas id="scoreChart" width="600" height="300"></canvas>
-  </div>
+    <div class="con">
+      <h3>평가 항목 평균 점수</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>평가 분야</th>
+            <th>평가 항목</th>
+            <th>평균 점수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="one : ${result}">
+            <td th:text="${one.evaluCompet}"></td>
+            <td th:text="${one.evaluContent}"></td>
+            <td th:text="${one.avgScore}"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script th:inline="javascript">
-    /*<![CDATA[*/
-    const labels = [[${one.*.evaluContent}]];
-    const scores = [[${one.*.evaluScore}]];
+  <div id="chart-container" class="con">
+    <canvas id="scoreChart" width="500" height="500" style="max-width: 100%; height: auto;"></canvas>
+  </div>
+  </div> <!-- #container -->
 
-    const ctx = document.getElementById('scoreChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: '평균 점수',
-          data: scores,
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
+
+  <script th:inline="javascript">
+  /*<![CDATA[*/
+  // 평가 항목명
+  let labels = [[${result.?[evaluCompet != null].![evaluCompet]}]];
+
+  // 내 평균 점수
+  let myScores = [[${result.?[avgScore != null].![avgScore]}]];
+
+  // 다른 사원들의 평균 점수
+  let otherAvgScores = [[${result.?[otherAvgScore != null].![otherAvgScore]}]];
+
+  console.log('Labels:', labels);
+  console.log('My Scores:', myScores);
+  console.log('Other Avg Scores:', otherAvgScores);
+
+  // 차트 데이터
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: '나의 평균 점수',
+        data: myScores,
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',     // 블루 계열 투명 배경
+        borderColor: 'rgba(59, 130, 246, 1)',           // 선 색상
+        pointBackgroundColor: 'rgba(59, 130, 246, 1)',  // 점 색상
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+        borderWidth: 2
       },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 5,
-            title: {
-              display: true,
-              text: '점수 (1~5)'
+      {
+        label: '전체 평균 점수',
+        data: otherAvgScores,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',    // 초록 계열 투명 배경
+        borderColor: 'rgba(75, 192, 192, 1)',          // 선 색상
+        pointBackgroundColor: 'rgba(75, 192, 192, 1)', // 점 색상
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2
+      }
+    ]
+  };
+
+  // 차트 설정
+  const config = {
+    type: 'radar',
+    data: data,
+    options: {
+      responsive: true,
+      aspectRatio: 3,
+      scales: {
+        r: {
+          angleLines: { color: '#E5E7EB' },
+          grid: { color: '#E5E7EB' },
+          suggestedMin: 0,
+          suggestedMax: 5,
+          ticks: {
+            stepSize: 1,
+            color: '#6B7280',
+            font: { size: 12 }
+          },
+          pointLabels: {
+            color: '#1F2937',
+            font: { size: 14, family: 'Arial' }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            color: '#1F2937',
+            font: { size: 14, family: 'Arial' }
+          }
+        },
+        tooltip: {
+          backgroundColor: '#ffffff',
+          titleColor: '#111827',
+          bodyColor: '#1F2937',
+          borderColor: '#e5e7eb',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.raw + '점';
             }
           }
         }
       }
-    });
-    /*]]>*/
-  </script>
+    }
+  };
+
+  // 차트 그리기
+  new Chart(document.getElementById('scoreChart'), config);
+  /*]]>*/
+</script>
+
+
 </body>
 </html>
