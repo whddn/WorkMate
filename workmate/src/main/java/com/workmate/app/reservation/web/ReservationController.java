@@ -82,7 +82,7 @@ public class ReservationController {
 	// 내 예약 목록 페이지
 	@GetMapping("reservation/List")
 	public String myReserList(Model model) {
-		EmpVO vo =whoAmI.whoAmI();
+		EmpVO vo = whoAmI.whoAmI();
 		
 		List<ReservationVO> list = reservationService.findAllmyReserList(vo.getUserNo());
 		model.addAttribute("reser", list);

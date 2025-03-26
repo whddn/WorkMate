@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/vendor_layout}"
+      layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>거래처 상세 정보</title>
+    <style>
+        .detail-group { margin-bottom: 20px; }
+        .detail-label { font-weight: bold; width: 150px; display: inline-block; }
+        .detail-value { display: inline-block; }
+        .section-title { font-size: 1.2rem; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="mb-4">거래처 상세 정보</h2>
+
+    <div class="detail-group">
+        <span class="detail-label">거래처 이름:</span>
+        <span class="detail-value" th:text="${vendor.vendName}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">설명:</span>
+        <span class="detail-value" th:text="${vendor.vendDetail}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">사업자번호:</span>
+        <span class="detail-value" th:text="${vendor.bizrNum}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">대표자:</span>
+        <span class="detail-value" th:text="${vendor.rpstrName}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">업종:</span>
+        <span class="detail-value" th:text="${vendor.biztp}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">주소:</span>
+        <span class="detail-value" th:text="${vendor.vendAdress}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">연락처:</span>
+        <span class="detail-value" th:text="${vendor.vendPhone}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">이메일:</span>
+        <span class="detail-value" th:text="${vendor.vendEmail}"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">계약 기간:</span>
+        <span class="detail-value" th:text="${#dates.format(vendor.cntrStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(vendor.cntrEnd, 'yyyy-MM-dd')}"></span>
+
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">계약 금액:</span>
+        <span class="detail-value" th:text="${#numbers.formatInteger(vendor.cntr_count, 3, 'COMMA')} + ' 원'"></span>
+    </div>
+    <div class="detail-group">
+        <span class="detail-label">담당자:</span>
+        <span class="detail-value" th:text="${vendor.cntrManager}"></span>
+    </div>
+
+    <div class="section-title">특별 조건</div>
+    <div th:utext="${vendor.condition}" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background: #fdfdfd;"></div>
+
+    <div class="detail-group mt-3">
+        <span class="detail-label">첨부파일:</span>
+        <span class="detail-value">
+            <a th:if="${vendor.cntrAttachment != null}" th:href="@{'/files/' + ${vendor.cntrAttachment}}" target="_blank" th:text="${vendor.cntrFile}"></a>
+            <span th:if="${vendor.cntrAttachment == null}">첨부파일 없음</span>
+        </span>
+    </div>
+
+    <div class="mt-4">
+    	<a th:href="@{'/vendor/edit/' + ${vendor.vendCode}}" class="btn btn-warning">수정</a>
+        <a th:href="@{/vendor/list}" class="btn btn-secondary">목록으로</a>
+    </div>
+</div>
+</body>
+</html>
