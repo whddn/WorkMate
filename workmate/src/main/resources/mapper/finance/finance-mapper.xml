@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.finance.mapper.FinanceMapper">
 	<!-- 보고서 전체 조회 -->
-	<select id="selectReportList" resultType="FinanceVO">
+	<select id="selectReportList" resultType="ReportVO">
 		SELECT 	r.report_no
 		        , r.report_title
 		        , r.report_status
@@ -13,19 +13,35 @@
 		JOIN employee u
 		ON u.user_NO = r.user_no 
 	</select>
-	<!-- 입출금 보고서 단건 조회 -->
-	<select id="selectReportById" resultType="FinanceVO">
-		SELECT 	
-				report_no
-				, report_title
-				, report_status
-				, write_date
-				, deposit
-				, withdrawal
-				, balance
-				, user_Position
-				, user_no
-		FROM report
-		WHERE report_no = #{reportNo}
+	<!-- 입출금 내역 - 입/출금 -->
+	<select id="selectTransList" resultType="ReportVO">
+		SELECT 
+		    r.REPORT_NO
+		    , r.REPORT_TITLE
+		    , r.TRANS_START
+		    , r.TRANS_END
+		    , t.TEAM_NAME
+		    , u.USER_NAME
+		    , u.USER_NO
+		    , th.TRANS_DATE
+		    , th.PURPOSE_USE
+		    , th.TRANS_TYPE
+		    , th.DEPOSIT
+		    , th.WITHDRAWAL
+		    , th.BALANCE
+		FROM REPORT r
+		JOIN TRANS_HISTORY th
+		  ON r.REPORT_NO = th.REPORT_NO
+		JOIN EMPLOYEE u
+		  ON r.USER_NO = u.USER_NO
+		JOIN TEAM t
+		  ON u.TEAM_NO = t.TEAM_NO
+		WHERE r.REPORT_NO = #{reportNo}
+		ORDER BY th.TRANS_DATE ASC,
+		         CASE th.TRANS_TYPE
+		             WHEN '입금' THEN 0
+		             WHEN '출금' THEN 1
+		             ELSE 2
+		         END
 	</select>
 </mapper>
