@@ -55,11 +55,24 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return attendMapper.occAnnualList(workVO);
 	}
 	
+	@Override
+	//연차 단건 조회
+	public WorkVO findAnnualByApprNo(WorkVO workVO) {
+		return attendMapper.selectAnnualByApprNo(workVO);
+	}
+	
 	//연차 사용내역 전체 조회
 	@Override
 	public List<WorkVO> findAllAnnual(WorkVO workVO) {
 		return attendMapper.allAnnualList(workVO);
 	}
+	
+	//연차 목록 업데이트
+	@Override
+	public Integer inputAnnual(WorkVO workVO) {
+		return attendMapper.insertAnl(workVO);
+	}
+	
 	// 전체사원 근태 조회
 	@Override
 	public List<WorkVO> findAllEmpWork(WorkVO workVO) {
@@ -76,6 +89,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public List<WorkVO> getFilterAttend(String stDate, String endDate, String userName, String teamName) {
 		
 		return attendMapper.selectFilterEmpList(stDate,endDate, userName,teamName);
+	}
+	
+	// 지각 사유 업로드
+	@Override
+	public int inputLateReason(WorkVO workVO) {
+		
+		return attendMapper.insertLateReason(workVO);
 	}	
 
 	

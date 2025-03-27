@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.workmate.app.approval.mapper.ApprovalMapper;
-import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.vendor.mapper.VendorMapper;
 import com.workmate.app.vendor.service.VendorService;
 import com.workmate.app.vendor.service.VendorVO;
@@ -49,9 +49,10 @@ public class VendorServiceImpl implements VendorService {
 
 
 	// 삭제
+	@Transactional
 	@Override
-	public int dropVendor(VendorVO vendorVO) {
-		return vendorMapper.deleteVendorInfo(vendorVO);
+	public int dropVendor(String vendCode) {
+		return vendorMapper.deleteVendorInfo(vendCode);
 	}
 
 	

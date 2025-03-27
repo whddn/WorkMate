@@ -7,5 +7,6 @@ import com.workmate.app.approval.service.ReportAttachVO;
 
 public interface ReportAttachMapper {
 	public List<ReportAttachVO> selectApprovalRAList(ApprovalVO approvalVO);
+	public ReportAttachVO selectApprovalRA(Integer repattachNo);
 	public int insertApprovalRA(ReportAttachVO reportAttachVO);
 }

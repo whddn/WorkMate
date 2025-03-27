@@ -1,6 +1,9 @@
 package com.workmate.app.document.service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
@@ -19,12 +22,18 @@ public class DocVO {
 	private String	fileTag; 		//태그
 	private Integer userNo; 		//사원번호
 	private String TeamNo; 			//팀번호
-	private String userId; 			//사원이이디	
+	private String userId; 			//사원이이디
+	private String userName;
 	private Integer updateUser; 	//등록한 사원
 	
 	
 	// 다운로드 이력
 	private Integer downUser; 	 	//다운로드사원
+	private String downloadUserIp; 	 	//다운로드사원
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date downloadDate; 		//다운로드 날짜
+	
 	private int downloadNo;  		//다운로드 번호	
+
 }

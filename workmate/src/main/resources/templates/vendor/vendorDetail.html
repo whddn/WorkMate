@@ -6,78 +6,96 @@
 <head>
     <meta charset="UTF-8">
     <title>거래처 상세 정보</title>
-    <style>
-        .detail-group { margin-bottom: 20px; }
-        .detail-label { font-weight: bold; width: 150px; display: inline-block; }
-        .detail-value { display: inline-block; }
-        .section-title { font-size: 1.2rem; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
 <div class="container mt-4">
     <h2 class="mb-4">거래처 상세 정보</h2>
 
-    <div class="detail-group">
-        <span class="detail-label">거래처 이름:</span>
-        <span class="detail-value" th:text="${vendor.vendName}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">설명:</span>
-        <span class="detail-value" th:text="${vendor.vendDetail}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">사업자번호:</span>
-        <span class="detail-value" th:text="${vendor.bizrNum}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">대표자:</span>
-        <span class="detail-value" th:text="${vendor.rpstrName}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">업종:</span>
-        <span class="detail-value" th:text="${vendor.biztp}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">주소:</span>
-        <span class="detail-value" th:text="${vendor.vendAdress}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">연락처:</span>
-        <span class="detail-value" th:text="${vendor.vendPhone}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">이메일:</span>
-        <span class="detail-value" th:text="${vendor.vendEmail}"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">계약 기간:</span>
-        <span class="detail-value" th:text="${#dates.format(vendor.cntrStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(vendor.cntrEnd, 'yyyy-MM-dd')}"></span>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>거래처 이름</th>
+                        <td th:text="${vendor.vendName}"></td>
+                    </tr>
+                    <tr>
+                        <th>설명</th>
+                        <td th:text="${vendor.vendDetail}"></td>
+                    </tr>
+                    <tr>
+                        <th>사업자번호</th>
+                        <td th:text="${vendor.bizrNum}"></td>
+                    </tr>
+                    <tr>
+                        <th>대표자</th>
+                        <td th:text="${vendor.rpstrName}"></td>
+                    </tr>
+                    <tr>
+                        <th>업종</th>
+                        <td th:text="${vendor.biztp}"></td>
+                    </tr>
+                    <tr>
+                        <th>주소</th>
+                        <td th:text="${vendor.vendAdress}"></td>
+                    </tr>
+                    <tr>
+                        <th>연락처</th>
+                        <td th:text="${vendor.vendPhone}"></td>
+                    </tr>
+                    <tr>
+                        <th>이메일</th>
+                        <td th:text="${vendor.vendEmail}"></td>
+                    </tr>
+                    <tr>
+                        <th>계약 기간</th>
+                        <td th:text="|${#dates.format(vendor.cntrStart, 'yyyy-MM-dd')} ~ ${#dates.format(vendor.cntrEnd, 'yyyy-MM-dd')}|"></td>
+                    </tr>
+                    <tr>
+                        <th>계약 금액</th>
+                       	<td th:if="${vendor.cntrCount != null}" th:text="|${#numbers.formatInteger(vendor.cntrCount, 4, 'COMMA').replaceFirst('^0,', '')} ₩|"></td>
+					    <td th:if="${vendor.cntrCount == null}">-</td>
+                    </tr>
+                    <tr>
+                        <th>담당자</th>
+                        <td th:text="${vendor.cntrManager}"></td>
+                    </tr>
+                    <tr>
+					    <th>첨부파일</th>
+					    <td>
+					      <span th:if="${vendor.cntrFile != null and !vendor.cntrFile.isEmpty()}">
+					        <a th:href="@{'/vendor/files/' + ${vendor.vendCode}}"
+					           th:text="${vendor.cntrFile != null ? vendor.cntrFile : '파일 다운로드'}">
+					           </a>
+					      </span>
+					      <span th:if="${vendor.cntrFile == null or vendor.cntrFile.isEmpty()}">첨부파일 없음</span>
+					    </td>
+					</tr>
 
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">계약 금액:</span>
-        <span class="detail-value" th:text="${#numbers.formatInteger(vendor.cntr_count, 3, 'COMMA')} + ' 원'"></span>
-    </div>
-    <div class="detail-group">
-        <span class="detail-label">담당자:</span>
-        <span class="detail-value" th:text="${vendor.cntrManager}"></span>
-    </div>
+                </tbody>
+            </table>
 
-    <div class="section-title">특별 조건</div>
-    <div th:utext="${vendor.condition}" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background: #fdfdfd;"></div>
+			<div class="mt-5">
+			    <h5 class="section-title">
+			        <i class="bi bi-star-fill text-warning"></i> 특별조건
+			    </h5>
+			    <div class="card" style="background-color: #fcfcfc; border-left: 4px solid #ffc107;">
+			        <div class="card-body" th:text="${vendor.condition}" 
+			             style="white-space: pre-wrap; font-size: 0.95rem;">
+			        </div>
+			    </div>
+			</div>
 
-    <div class="detail-group mt-3">
-        <span class="detail-label">첨부파일:</span>
-        <span class="detail-value">
-            <a th:if="${vendor.cntrAttachment != null}" th:href="@{'/files/' + ${vendor.cntrAttachment}}" target="_blank" th:text="${vendor.cntrFile}"></a>
-            <span th:if="${vendor.cntrAttachment == null}">첨부파일 없음</span>
-        </span>
-    </div>
+            <div class="mt-4 text-end">
+                <a th:href="@{'/vendor/edit/' + ${vendor.vendCode}}" class="btn btn-warning" th:if="${teamNo == 'ROLE_T004'}">수정</a>
+                <a th:href="@{/vendor/list}" class="btn btn-secondary">목록으로</a>
+            </div>
+            
+        </div> <!-- end of cardbody -->
+    </div> <!-- end of card -->
+</div> <!-- container mt-4 -->
 
-    <div class="mt-4">
-    	<a th:href="@{'/vendor/edit/' + ${vendor.vendCode}}" class="btn btn-warning">수정</a>
-        <a th:href="@{/vendor/list}" class="btn btn-secondary">목록으로</a>
-    </div>
-</div>
+
 </body>
 </html>

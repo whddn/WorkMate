@@ -36,4 +36,5 @@ public class ApprovalVO {
 	private List<Integer> approverList = new ArrayList<>();	// 결재자 번호 리스트
 	private List<Integer> referrerList = new ArrayList<>();	// 참조자 번호 리스트
 	private String standard;		// select하는 기준
+	private String apprStatusName;	// 결재상태이름
 }

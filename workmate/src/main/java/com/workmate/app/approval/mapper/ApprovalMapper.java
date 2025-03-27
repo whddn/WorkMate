@@ -6,6 +6,7 @@ import com.workmate.app.approval.service.ApprovalVO;
 
 public interface ApprovalMapper {
 	public List<ApprovalVO> selectApprovalList(ApprovalVO approvalVO);
+	public List<ApprovalVO> selectApprovalListAboutMe(ApprovalVO approvalVO);
 	public ApprovalVO selectApprovalById(ApprovalVO approvalVO);
 	public int insertApproval(ApprovalVO approvalVO);
 	public int updateApprovalStatus(ApprovalVO approvalVO);

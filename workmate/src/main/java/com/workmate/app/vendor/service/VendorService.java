@@ -12,5 +12,5 @@ public interface VendorService {
 	// 수정
 	public int modifyVendor(VendorVO vendorVO);
 	// 삭제
-	public int dropVendor(VendorVO vendorVO);
+	public int dropVendor(String vendCode);
 }

@@ -9,6 +9,7 @@ import com.workmate.app.approval.mapper.ApprovalMapper;
 import com.workmate.app.approval.service.ApprovalService;
 import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.attendance.mapper.AttendMapper;
+import com.workmate.app.attendance.service.WorkVO;
 import com.workmate.app.reservation.mapper.ReservationMapper;
 
 @Service
@@ -29,6 +30,12 @@ public class ApprovalServiceImpl implements ApprovalService {
 		return approvalMapper.selectApprovalList(approvalVO);
 	}
 
+	@Override
+	public List<ApprovalVO> findApprovalListAboutMe(ApprovalVO approvalVO) {
+		// TODO Auto-generated method stub
+		return approvalMapper.selectApprovalListAboutMe(approvalVO);
+	}
+	
 	@Override
 	public ApprovalVO findApprovalById(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
@@ -51,8 +58,13 @@ public class ApprovalServiceImpl implements ApprovalService {
 		}
 		// 최종 결재 완료 후 휴가/연차 인 경우 연차갯수 차감
 		ApprovalVO approval = approvalMapper.selectApprovalById(approvalVO);
-		if ( "a2".equals(approval.getApprStatus())  && "AF001".equals(approval.getApprType()) ) {
-			attendMapper.updateOccList(approvalVO.getUserNo());
+		if ("a2".equals(approval.getApprStatus()) && "AF001".equals(approval.getApprType()) ) {
+			WorkVO workVO = new WorkVO();
+			workVO.setUserNo(approval.getUserNo());
+			workVO.setApprNo(approval.getApprNo());
+			workVO = attendMapper.selectAnnualByApprNo(workVO);
+			
+			attendMapper.updateOccList(workVO);
 		}
 		
 		// 예약 결재 후 / 승인변경

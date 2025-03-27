@@ -21,6 +21,7 @@
 	      ,reg_date
 	      ,cntr_count
 	      ,cntr_file
+	      ,cntr_attachment
 		from vendor
 	</select>
 	<!-- 거래처 단건조회 -->
@@ -43,6 +44,7 @@
 	      ,reg_date
 	      ,cntr_count
 	      ,cntr_file
+	      ,cntr_attachment
 		from vendor
 		where vend_code=#{vendCode}
 	</select>
@@ -71,6 +73,7 @@
 		      ,reg_date
 		      ,cntr_count
 		      ,cntr_file
+		      ,cntr_attachment
 				)
 			VALUES (
 			   #{vendCode}
@@ -90,6 +93,7 @@
 		      ,sysdate
 		      ,#{cntrCount}
 		      ,#{cntrFile}
+		      ,#{cntrAttachment}
 			)
 	</insert>
 	<!-- 거래처 수정 -->
@@ -108,11 +112,12 @@
 	        cntr_end = #{cntrEnd},
 	        cntr_manager = #{cntrManager},
 	        condition = #{condition},
-	        cntr_count = #{cntr_count},
+	        cntr_count = #{cntrCount},
 	        reg_date = SYSDATE
 	      <if test="cntrFile != null and cntrFile != ''">
 	           ,cntr_file = #{cntrFile}
 	      </if>
+	           ,cntr_attachment = #{cntrAttachment}
 	    WHERE vend_code = #{vendCode}
 	</update>
 	<!-- 거래처 상태수정 -->
@@ -123,7 +128,7 @@
 	</update>
 	
 	<!-- 삭제 -->
-	<delete id="deleteVendorInfo" parameterType="VendorVO">
+	<delete id="deleteVendorInfo" parameterType="string">
 		delete from vendor
 		where vend_code = #{vendCode}
 	</delete>

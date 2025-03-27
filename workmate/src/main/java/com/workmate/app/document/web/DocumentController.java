@@ -1,14 +1,19 @@
 package com.workmate.app.document.web;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -31,6 +36,8 @@ import com.workmate.app.common.FileHandler;
 import com.workmate.app.document.service.DocVO;
 import com.workmate.app.document.service.DocumentService;
 import com.workmate.app.security.service.LoginUserVO;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RequestMapping("/document")
 @Controller
@@ -74,8 +81,17 @@ public class DocumentController {
 		return "document/list";
 	}
 	
-	//자료 단건 조회
-	
+	//자료실 이력 전체조회
+	@GetMapping("/downloadHistory")
+	public String downhistoryList(Model model, DocVO docVO) {
+				
+		List<DocVO> list = documentService.findDownhistory(docVO);
+		
+		model.addAttribute("lists", list);
+		
+		return "document/downloadHistory";
+		
+	}
 	
 	//파일사이즈
 	private String formatSize(long size) {
@@ -92,7 +108,12 @@ public class DocumentController {
 	@PostMapping("/upload")
 	public  ResponseEntity<String> uploadFileProcess(@RequestParam("uploadFile") MultipartFile file,
                                     DocVO docVO,
-                                    Model model) {
+                                    Model model,
+                                    @AuthenticationPrincipal LoginUserVO loginUser) {
+		
+		String userId = loginUser.getUserVO().getUserId();
+		String teamNo = loginUser.getUserVO().getTeamNo();
+		
 		try {
 		
 			if(file.isEmpty()) {
@@ -121,18 +142,43 @@ public class DocumentController {
 	
 	//자료 첨부파일 다운로드
 	@GetMapping("/download/{documentNo}")
-	public ResponseEntity<Resource> downloadDocument(@PathVariable int documentNo) throws IOException{
-		 System.out.println("요청 들어옴: " + documentNo);
+	public ResponseEntity<Resource> downloadDocument(@PathVariable int documentNo,
+											@AuthenticationPrincipal LoginUserVO loginUser,
+											HttpServletRequest request) 
+													throws IOException {
+		
+		String userId = loginUser.getUserVO().getUserId();
+		int userNo = loginUser.getUserVO().getUserNo();
+		String teamNo = loginUser.getUserVO().getTeamNo();
+		
+		System.out.println("요청 들어옴: " + documentNo);
+		
 		DocVO doc = documentService.findFileById(documentNo); //파일 단건 조회
 		
 		//저장된 파일 경로			
 		String fullPath = Paths.get(uploadDir, subDir, doc.getAttachment()).toString();
-	    Path path = Paths.get(fullPath);
+	    Path path = Paths.get(fullPath); //파일시스템에서 쓸수있게 변환
 	    	
 		if (!Files.exists(path)) {
 	        return ResponseEntity.notFound().build(); // 파일 없으면 404
 	    }
+		// 다운로드 이력 저장
+		 DocVO log = new DocVO();
+		 log.setDocumentNo(documentNo);
+		 log.setFileName(doc.getFileName());
+
+		 Integer downUserNo = -1;
+		 if (loginUser != null && loginUser.getUserVO() != null && loginUser.getUserVO().getUserNo() != null) {
+		     downUserNo = loginUser.getUserVO().getUserNo();
+		 }
+		 log.setDownUser(downUserNo);
+
+		 log.setDownloadDate(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
+		 log.setDownloadUserIp(request.getRemoteAddr());
 		
+		 documentService.inputDownhistory(log);
+		    
+		// 다운로드
 		Resource resource = new UrlResource(path.toUri());
 		
 		String encodedFileName = URLEncoder.encode(doc.getFileName(), StandardCharsets.UTF_8)

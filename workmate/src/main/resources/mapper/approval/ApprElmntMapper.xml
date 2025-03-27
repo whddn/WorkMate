@@ -15,17 +15,24 @@
 		    , team_name
 		    , department_name
 		    , sign_path
+		    
 		FROM appr_elmnt
 		    JOIN employee
 		    ON appr_elmnt.approver=employee.user_no
+		    
 		    LEFT JOIN team
 		    ON employee.team_no=team.team_no
+		    
 		    LEFT JOIN department
 		    ON appr_elmnt.dept_no=department.department_id
+		    
 		    LEFT JOIN sign
 		    ON appr_elmnt.sign_no=sign.sign_no
+		    
 		WHERE appr_no=#{apprNo}
 	</select>
+	
+	
 	<insert id="insertApprElmnt" parameterType="ApprElmntVO">
 		<selectKey keyProperty="apprelmntNo" resultType="Integer" order="BEFORE">
 			SELECT NVL(MAX(apprelmnt_no), 0) + 1

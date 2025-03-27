@@ -23,13 +23,15 @@ public class WorkVO {
 		private String userName;		//사원번호
 		private String userId;		//사원아이디
 		private String teamName;		//사원아이디
-		
+		private String lateReason;		//지각사유		
 		private double totalWorkTime; // 현재달 총 근무시간 
 		private double remainWorkTime; // 남은 근무시간
 		
 		// annual table 연차내역
 		private String annualNo;	//연차번호
+		@DateTimeFormat(pattern = "yyyy-MM-dd")
 		private Date annualStart;	//연차시작일
+		@DateTimeFormat(pattern = "yyyy-MM-dd")
 		private Date annualEnd;		//연차종료일
 		private int annualCount;	//연차일수
 		private String annualType;	//연차유형
@@ -49,8 +51,7 @@ public class WorkVO {
 		private int allStatusCount;	//근무상태수	
 		private int nstartCount;	//출근미체크수	
 		private int nafterCount;	//퇴근미체크수	
-		private int addWorkCount;	//연장근무총합
-		
+		private int addWorkCount;	//연장근무총합		
 		
 		
 		// 검색날짜

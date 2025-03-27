@@ -8,6 +8,7 @@
 		           after_work,
 		           work_time,
 		           work_status,
+		           work_no,
 		           add_work_time,
 		           (SELECT COUNT(*) 
 		            FROM work 
@@ -30,7 +31,8 @@
 	           after_work,
 	           work_time,
 	           work_status,
-	           add_work_time
+	           add_work_time,
+	           late_reason
 	    FROM work
 	    WHERE user_no = #{userNo}
 	    AND 1 = 1
@@ -92,6 +94,14 @@
 		WHERE work_no = #{workNo}
 	</update>	
 	
+	<!-- 지각 사유 등록 -->
+	<update id="insertLateReason" parameterType="WorkVO">
+		UPDATE WORK
+		SET 
+			late_reason = #{lateReason}
+		WHERE work_no = #{workNo}
+	</update>
+	
 	<!-- 연차 조회 -->
 	<select id="occAnnualList" resultType="WorkVO">
 	    SELECT occ_annual,
@@ -117,11 +127,27 @@
 		ORDER BY annual_no DESC
 	</select>
 	
+	<!-- 연차 사용내역 단건조회 -->
+	<select id="selectAnnualByApprNo" resultType="WorkVO">
+		SELECT annual_start
+		    , annual_end
+		    , annual_count
+		    , annual_type
+		    , appr_date
+		    , appr_content 
+		FROM annual
+		    INNER JOIN approval
+		        ON annual.appr_no = approval.appr_no
+		WHERE annual.appr_no = #{apprNo}
+	</select>
+	
 	<!-- 연차휴가 신청 내역 등록 -->
 	<insert id="insertAnl" parameterType="WorkVO">
-	   
-	    INSERT INTO annual(
-	        ANNUAL_NO
+		<selectKey keyProperty="annualNo" resultType="String" order="BEFORE">
+			SELECT NVL(MAX(TO_NUMBER(annual_no)), 0) + 1
+			FROM annual
+		</selectKey>
+	    INSERT INTO annual(ANNUAL_NO
 	        , ANNUAL_START
 	        , ANNUAL_END
 	        , ANNUAL_COUNT
@@ -130,15 +156,13 @@
 	        , APPR_NO
 	        , OCC_ANNUAL_NO
 	    )
-	    VALUES (
-	        MAX(ANNUAL_NO) + 1
+	    VALUES(#{annualNo}
 	        , #{annualStart}
 	        , #{annualEnd}
-	        , 
-	        CASE 
-            WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5 --오전반차, 오후반차면 0.5
-            ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
-        END,
+	        , CASE 
+            	WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5 --오전반차, 오후반차면 0.5
+            	ELSE TRUNC(#{annualEnd}) - TRUNC(#{annualStart})
+        	END
 	        , #{annualType}
 	        , #{userNo}
 	        , #{apprNo}
@@ -154,12 +178,12 @@
 			  update_annual_count = update_annual_count - 
             CASE 
                 WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
-                ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
+                ELSE #{annualCount}
             END,
         remain_annual_leave = remain_annual_leave + 
             CASE 
                 WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
-                ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
+                ELSE TRUNC(#{annualEnd}) - TRUNC(#{annualStart})
             END
 		WHERE 	user_no = #{userNo}
 		AND user_annual_year = EXTRACT(YEAR FROM SYSDATE)
@@ -216,7 +240,8 @@
 		       w.after_work,             
 		       w.work_time,
 		       w.add_work_time,               
-		       w.work_status              
+		       w.work_status,
+		       w.late_reason           
 		FROM work w
 		JOIN employee e ON w.user_no = e.user_no  
 		JOIN team t ON e.team_no = t.team_no  
