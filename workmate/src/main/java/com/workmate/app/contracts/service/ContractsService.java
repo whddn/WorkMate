@@ -3,7 +3,7 @@ package com.workmate.app.contracts.service;
 import java.util.List;
 import java.util.Map;
 
-import com.workmate.app.approval.service.ApprovalVO;
+import com.workmate.app.approval.service.ApprFormVO;
 
 public interface ContractsService {
 	// 전체조회
@@ -17,6 +17,6 @@ public interface ContractsService {
 	// 삭제
 	public Map<String, Object>dropContracts(String contrNo);
 	
-	// 전자계약 폼 전체조회
-//	public List<ApprovalVO> findContractsList(ApprovalVO approvalVO);
+	//전자계약 폼 전체조회
+	public List<ApprFormVO> findFormList();
 }

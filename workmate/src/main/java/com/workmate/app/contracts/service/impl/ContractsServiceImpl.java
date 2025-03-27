@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.approval.mapper.ApprFormMapper;
+import com.workmate.app.approval.service.ApprFormVO;
 import com.workmate.app.approval.service.ApprovalVO;
 import com.workmate.app.contracts.mapper.ContractsMapper;
 import com.workmate.app.contracts.service.ContractsService;
@@ -15,9 +16,15 @@ import com.workmate.app.contracts.service.ContractsVO;
 @Service
 
 public class ContractsServiceImpl implements ContractsService{
-	@Autowired
+	
 	private ContractsMapper contractsMapper;
 	private ApprFormMapper apprFormMapper;
+	
+	@Autowired
+	ContractsServiceImpl(ApprFormMapper apprFormMapper, ContractsMapper contractsMapper) {
+		this.apprFormMapper = apprFormMapper;
+		this.contractsMapper = contractsMapper;
+	}
 
 	@Override
 	public List<ContractsVO> findContractsList() {
@@ -44,11 +51,13 @@ public class ContractsServiceImpl implements ContractsService{
 		return null;
 	}
 
-	// 전자계약 폼 전체조회
-//	@Override
-//	public List<ApprovalVO> findContractsList() {
-//		return contractsMapper.selectApprFormList();
-//	} 
+	// 폼 전체 조회
+	@Override
+	public List<ApprFormVO> findFormList() {
+		return contractsMapper.selectApprFormList();
+	}
+
+
 //	
 	
 }

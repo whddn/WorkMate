@@ -53,11 +53,11 @@ public class ContractsController {
 	 */
 	
 	// 결재 신청하려 할때 결재 양식 목록 불러옴
-//	@GetMapping("approval/formList")
-//	public String getFormList(Model model) {
-//		model.addAttribute("formList", contractsService.selectApprFormList());
-//		return "contracts/contractsForm";
-//	}
+	@GetMapping("contracts/formList")
+	public String getFormList(Model model) {
+		model.addAttribute("formList", contractsService.findFormList());
+		return "contracts/contractsForm";
+	}
 	
 	// 전자계약 조회
 	@GetMapping("contracts/main")
