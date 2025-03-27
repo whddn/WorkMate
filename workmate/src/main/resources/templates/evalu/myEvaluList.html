@@ -128,7 +128,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>평가</h1>
+        <h1>평가 목록</h1>
 
         <!-- 기간 및 검색창 -->
         <div class="search-bar">
@@ -150,7 +150,7 @@
             </div>
                 <!--직접 입력 버튼을 누르면 시작일과 끝일이 나오게 가렸다가 저쩌고 하게-->
 
-        </div>
+        </div> 
         <!-- 게시글 목록 테이블 -->
         <table class="table-container" id="evaluTable">
             <thead>
@@ -169,7 +169,7 @@
                     <td><input type="checkbox" name="postSelection"></td>
                     <td><a th:href="@{/emp/evalu/{eva}(eva=${one.evaluFormNo})}">[[ ${one.evaluName} ]]</a></td>
                     <td>[[ ${one.usageStatus} ]]</td>
-                    <td th:each="team : ${one.teamList}">[[ ${team.teamName} ]]</td>
+                    <td>[[ ${one.teamName} ]]</td>
                     <td th:text="${#dates.format(one.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(one.evaluEnd, 'yyyy-MM-dd')}"></td>
                     <td>추가 설명</td>
                 </tr>

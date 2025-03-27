@@ -44,4 +44,49 @@
 		             ELSE 2
 		         END
 	</select>
+	<!-- report 테이블 insert -->
+	<insert id="insertReportOne" parameterType="ReportVO">
+	<selectKey keyProperty="reportNo" resultType="Integer" order="BEFORE"> <!-- 직전 등록된 reportNo 받아옴 -->
+        SELECT REPORT_NO_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+		INSERT INTO REPORT
+				( REPORT_NO
+			    , REPORT_TITLE
+			    , WRITE_DATE
+			    , USER_NO
+			    , TEAM_NO
+			    , TRANS_START
+			    , TRANS_END ) 
+			    
+		VALUES ( REPORT_NO_SEQ.NEXTVAL
+		        , #{reportTitle}
+		        , SYSDATE
+		        , #{userNo}
+		        , #{teamNo}
+		        , #{transStart}
+		        , #{transEnd} ) 
+	</insert>
+	
+	<!-- TransHistory 테이블 insert -->
+	<insert id="insertReportTransOne" parameterType="ReportVO">
+		    INSERT INTO TRANS_HISTORY
+		                ( TRANS_ID
+		                , TRANS_TYPE
+		                , TRANS_DATE 
+		                , WITHDRAWAL
+		                , DEPOSIT
+		                , BALANCE
+		                , PURPOSE_USE
+		                , REPORT_NO
+		                ) 
+		    VALUES ( TRANS_ID_SEQ.NEXTVAL
+		            , #{transType}
+		            , #{transDate}
+		            , #{withdrawal}
+		            , #{deposit}
+		            , #{balance}
+		            , #{purposeUse}
+		            , #{reportNo}
+		            ) 
+	</insert>
 </mapper>

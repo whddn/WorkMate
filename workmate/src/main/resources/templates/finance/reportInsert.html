@@ -144,32 +144,26 @@
 <body>
   <div id="container">
   <h3>신규 리포트 작성</h3>
-    <input type="text" placeholder="리포트 제목을 입력하세요" required id="title">
+    <input type="text" placeholder="리포트 제목을 입력하세요" required id="reportTitle">
     <h3>기본 정보</h3>
     <table>
       <tr>
         <th>기간</th>
         <td>
           <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="date" style="width: 130px;" />
+            <input type="date" style="width: 130px;" id="startDate" />
             ~
-            <input type="date" style="width: 130px;" />
+            <input type="date" style="width: 130px;" id="endDate"/>
           </div>
         </td>
-        <th>부서</th>
-        <td>
-          <select>
-            <option>부서선택</option>
-            <option>인사부</option>
-            <option>개발부</option>
-          </select>
-        </td>
+        <th>팀명</th>
+        <td><input type="text" th:data-teamno="${teamNo}" th:value="${teamName}" readonly></td>
       </tr>
       <tr>
-        <th>직급</th>
-        <td><input type="text"></td>
-        <th>성명</th>
-        <td><input type="text"></td>
+        <th>직급</th><!-- 로그인한 유저 -->
+        <td><input type="text" th:value="${position}" readonly></td>
+        <th>성명</th><!-- 로그인한 유저 -->
+        <td><input type="text" th:data-userno="${userNo}" th:value="${userName}" id="userNo" readonly></td>
       </tr>
     </table>
 
@@ -177,6 +171,8 @@
     <div class="btn-group">
       <button class="btn plus" onclick="addRow()">＋ 행 추가</button>
       <button class="btn minus" onclick="removeRow()">－ 행 삭제</button>
+      <input type="file" id="excelFile" />
+	  <button type="button" id="Excelupload">엑셀 업로드</button>
     </div>
 
     <table id="financeTable">
@@ -194,8 +190,8 @@
         <tr>
           <td><input type="text" placeholder="예: 1일(토)"></td>
           <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
+          <td><input type="number" th:data-deposit="입금"></td>
+          <td><input type="number" th:data-drawal="출금"></td>
           <td><input type="number"></td>
           <td><input type="checkbox"></td>
         </tr>
@@ -248,27 +244,29 @@
 
       <div class="button-area">
         <button type="button" class="btn-approve">결재선</button>
-        <button type="submit" class="btn-submit">등록</button>
+        <button type="submit" class="btn-submit" id="insertReport">등록</button>
       </div>
     </div>
   </div>
 
   <script>
+  
+  // 입출금 내역
     function calculateTotals() {
       let totalDeposit = 0;
       let totalWithdraw = 0;
       let totalBalance = 0;
 
       document.querySelectorAll('#financeTable tbody tr').forEach(row => {
-        const depositInput = row.cells[2].querySelector('input');
-        const withdrawInput = row.cells[3].querySelector('input');
-        const balanceInput = row.cells[4].querySelector('input');
+        const depositInput = row.cells[2].querySelector('input'); // 입금 
+        const withdrawInput = row.cells[3].querySelector('input'); // 출금
+        const balanceInput = row.cells[4].querySelector('input'); // 잔액
 
         const deposit = parseFloat(depositInput.value) || 0;
         const withdraw = parseFloat(withdrawInput.value) || 0;
 
         const balance = deposit - withdraw;
-        balanceInput.value = balance; // 자동 계산된 잔액 입력
+        //balanceInput.value = balance; // 자동 계산된 잔액 입력
 
         totalDeposit += deposit;
         totalWithdraw += withdraw;
@@ -287,6 +285,7 @@
       });
     }
 
+    // 행 추가
     function addRow() {
       const tbody = document.querySelector('#financeTable tbody');
       const newRow = tbody.rows[0].cloneNode(true);
@@ -298,6 +297,8 @@
       attachInputListeners();
     }
 
+    
+    // 행 삭제
     function removeRow() {
       const tbody = document.querySelector('#financeTable tbody');
       const rows = Array.from(tbody.rows);
@@ -305,13 +306,13 @@
 
       if (checkedRows.length > 0) {
         if (rows.length - checkedRows.length < 2) {
-          alert("최소 2개의 행은 유지되어야 합니다.");
+          alert("더 이상 삭제할 수 없습니다.");
           return;
         }
         checkedRows.forEach(row => row.remove());
       } else {
         if (rows.length <= 2) {
-          alert("최소 2개의 행은 유지되어야 합니다.");
+          alert("더 이상 삭제할 수 없습니다.");
           return;
         }
         tbody.deleteRow(rows.length - 1);
@@ -325,27 +326,66 @@
     };
     
     
-    // AJAX로 보낼 변수 
+    // Report 등록 AJAX
     
-    let rTitle = document.querySelector('title').value;
-    let rdate = document.querySelector('');
+    // 버튼 클릭시 click 이벤트
+    
+    document.querySelector('#insertReport').addEventListener('click', e => {
+    	insertReportAjax();
+    })
+    
+    let rTitle = document.querySelector('#reportTitle').value; // 리포트 제목
+    let sDate = document.querySelector('#startDate').value; // 기간 시작
+    let eDate = document.querySelector('#endDate').value; // 기간 끝
+    let userNo = document.querySelector('#userNo').dataset.userno;
+    
+    function insertReportAjax(){
+
+   	document.querySelectorAll('#financeTable tbody tr').forEach(e => {
+   		let tDate = e.cells[0].querySelector('input').value;	// 거래 일자 
+   		let purpose = e.cells[1].querySelector('input').value;  // 상세 내역
+   		let deposit = parseInt(e.cells[2].querySelector('input').value) || 0;	// 입금액 
+   		let drawal = parseInt(e.cells[3].querySelector('input').value) || 0;	// 출금액 
+   		let balance = parseInt(e.cells[4].querySelector('input').value) || 0;	// 잔액
+
+   	})
+   	
+    let transList = {
+    	'reportTitle' : rTitle,
+    	'transStart' : sDate,
+    	'transEnd' : eDate,
+    	'userNo' : userNo
+   		};
+   	
     // insertAJAX 
     fetch(`/workmate/finance/reportInsert`, {
-    	method : POST, // 등록
+    	method : 'POST', // 등록
     	headers : {
     		'Content-Type' : 'application/json'
     	},
-    	body : JSON.stringify()
+    	body : JSON.stringify(transList)
     })
-    .then(res => {
-    	
-    })
+    .then(res => res.json())
     .then(result => {
     	if(result != null) {
     		alert('성공적으로 등록되었습니다.');
     	}
     })
     .catch(err => console.log(err));
+    	
+    }
+    
+    
+    
+    // Excel upload AJAX
+    document.querySelector('#Excelupload').addEventListener('click', e => {
+    	excelUpload();
+    })
+    
+    function excelUpload() {
+    	
+    }
+    
   </script>
 
 

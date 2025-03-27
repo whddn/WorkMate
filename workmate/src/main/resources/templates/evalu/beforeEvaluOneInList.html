@@ -13,14 +13,27 @@ body {
 	background-color: #f4f4f4;
 }
 
-#container {
+/* #container {
 	max-width: 900px;
 	margin: 0 auto;
 	background-color: #fff;
 	border-radius: 8px;
 	padding: 20px;
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+} */
+
+    /* 스타일 추가 */
+    .con {
+	  max-width: 1000px;
+      border: 1px solid #ddd; /* 테두리 추가 */
+      border-radius: 8px; /* 둥근 테두리 */
+      padding: 20px; /* 안쪽 여백 추가 */
+      margin: 0 auto;
+      margin-bottom: 20px; /* 항목 간 간격 추가 */
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
 /* 제목 스타일 */
 h2, h3 {
@@ -108,10 +121,12 @@ button:hover {
 
 <body>
 	<div id="container">
-		<h2>지난 평가 결과 조회</h2>
-		<form id="evaluationForm">
+		<div class="con">
+			<h2>지난 평가 결과 조회</h2>
+		</div>
+		<div class="con">
 			<!-- 1. 평가자 정보 -->
-			<b>평가자 정보</b>
+			<b>정보</b>
 			<table>
 				<tr>
 					<th>정보</th>
@@ -119,63 +134,62 @@ button:hover {
 					<th>팀명</th>
 					<th>이름</th>
 				</tr>
-				  <tr>
-					  <td>평가자</td>
-					   <td th:text="${people[0].departmentName}"></td>
-    				   <td th:text="${people[0].teamName}"></td>
-				    
-				    <!-- select 박스는 사람 목록 전체가 동일하게 들어가게 -->
-				     <td colspan="2">
-				      <select id="userSelect">
-				        <option value="">사원 선택</option>
-				        <option th:each="p : ${people}"
-				                th:value="${p.userNo}"
-				                th:text="${p.userName}"
-				                th:data-userno="${p.userNo}">
-				        </option>
-				      </select>
-				    </td>
+				<tr>
+					<td>피평가자</td>
+					<td th:text="${people[0].departmentName}"></td>
+					<td th:text="${people[0].teamName}"></td>
+
+					<!-- select 박스는 사람 목록 전체가 동일하게 들어가게 -->
+					<td colspan="2"><select id="userSelect">
+							<option value="">사원 선택</option>
+							<option th:each="p : ${people}" th:value="${p.userNo}"
+								th:text="${p.userName}" th:data-userno="${p.userNo}"></option>
+					</select></td>
 				</tr>
 			</table>
-
+		</div>
+		<div class="con">
 			<!-- 2. 평가 안내-->
 			<b>평가 설명</b>
 			<div class="ver2">
 				<p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
 				<p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
 			</div>
+		</div>
+		<div class="con">
+		<!-- 3. 평가항목 -->
+		<b>평가항목 및 채점표</b>
+		<table>
+			<tr>
+				<th>평가 분야</th>
+				<th>평가 항목</th>
+				<th th:each="p : ${people}" th:text="${p.userName}"></th>
+			</tr>
 
-			<!-- 3. 평가항목 -->
-			<b>평가항목 및 채점표</b>
-			<table>
-			  <tr>
-			    <th>평가 분야</th>
-			    <th>평가 항목</th>
-			    <th th:each="entry : ${one}" th:text="${entry.key.userName} + ' 점수'"></th>
-			  </tr>
-			
-			  <!-- 항목은 공통 리스트에서 한 번만 출력 -->
-			  <tr th:each="item : ${items}">
-			    <td th:text="${item.evaluCompet}"></td>
-			    <td th:text="${item.evaluContent}"></td>
-			    
-			    <!-- 사람별 점수 반복 -->
-			  </tr>
-			</table>
-			<!-- 4. 추가 의견 -->
-			<h5>추가 의견</h5>
-			<table>
-				<tr>
-					<th>강점</th>
-					<td><input type="text" name=""></td>
-				</tr>
-				<tr>
-					<th>약점</th>
-					<td><input type="text" name=""></td>
-				</tr>
-			</table>
-			<button type="button" th:onclick="|location.href='@{/emp/bfevalu}'|">목록으로</button>
-		</form>
+			<!-- 항목은 공통 리스트에서 한 번만 출력 -->
+			<tr th:each="item : ${items}">
+				<td th:text="${item.evaluCompet}"></td>
+				<td th:text="${item.evaluContent}"></td>
+				<!-- 사람별 점수 반복 -->
+				 <td th:each="p : ${people}" th:text="${p.avgScore}"></td> <!-- 전체 출력 -->
+			</tr>
+		</table>
+		</div>
+		<!-- 4. 추가 의견 -->
+		<div class="con">
+		<h5>추가 의견</h5>
+		<table>
+			<tr>
+				<th>강점</th>
+				<td><input type="text" name=""></td>
+			</tr>
+			<tr>
+				<th>약점</th>
+				<td><input type="text" name=""></td>
+			</tr>
+		</table>
+		</div>
+		<button type="button" th:onclick="|location.href='@{/emp/bfevalu}'|">목록으로</button>
 	</div>
 </body>
 </html>

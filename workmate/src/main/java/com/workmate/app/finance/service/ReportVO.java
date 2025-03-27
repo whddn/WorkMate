@@ -1,6 +1,7 @@
 package com.workmate.app.finance.service;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -24,6 +25,8 @@ public class ReportVO {
 	private String teamName;
 	private String departmentName;
 	private String departmentId;		// 부서번호
+	
+	List<ReportVO> transHistoryList;	// 거래내역 리스트
 	
 	// transHistory
 	private Integer transId;			// 거래번호

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
+ layout:fragment="content">
 
 <head>
   <meta charset="UTF-8" />
@@ -52,7 +52,6 @@
       width: 100%;
       max-width: 500px;
       /* 고정된 최대 너비 */
-      display: none;
       flex-direction: column;
       justify-content: center;
       height: 500px;
@@ -119,27 +118,9 @@
 </head>
 
 <body>
-  <div class="wrapper">
-    <!-- 왼쪽: 조직도 -->
-    <div class="tree-panel">
-      <ul class="tree">
-        <li th:each="dpt : ${names}">
-          <span class="folder">[[ ${dpt.departmentName} ]]</span>
-          <ul>
-            <li th:each="team : ${dpt.teamList}">
-              <span class="teamN" th:data-tn="${team.teamName}">[[ ${team.teamName} ]]</span>
-              <ul>
-                <li th:each="name : ${team.empList}">
-                  <span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}">[[ ${name.userName}
-                    ]]</span>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
 
+
+<div th:fragment="employeeFrag">
     <!-- 오른쪽: 상세 정보 카드 -->
     <div class="card" id="detailsBox">
       <div class="info-list">
@@ -154,7 +135,7 @@
         <div class="info-row">
           <span class="label">팀이름</span>
           <select class="value"  id="info-team">
-          	<option th:value="${team.teamNo}" th:each="team : ${teams}" th:text="${team.teamName}"></option>
+          	<option th:value="${team.teamNo}" th:each="team : ${teams}" th:text="${team.teamName}" th:selected="${team.teamNo} == ${update.teamNo}"></option>
           </select>
         </div>
         <div class="info-row">
@@ -163,7 +144,7 @@
         </div>
         <div class="info-row">
           <span class="label">입사일</span>
-          <input class="value" type="date" id="info-hire" th:value="${update.hireDate}">
+          <input class="value" type="date" id="info-hire" th:value="${#dates.format(update.hireDate, 'yyyy-MM-dd')}">
         </div>
         <div class="info-row">
           <span class="label">휴대폰</span>
@@ -176,59 +157,16 @@
       </div>
       <div class="buttons-container">
         <div class="action-buttons">
+        <br>
           <button id="add-employee" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
-          <button id="evaluate-employee">📝 평가하기</button>
-          <button id="update-employee" th:onclick="|location.href='@{/emp/update}'|"
+          <button id="update-employee"
             th:data-no="${update.userNo}" type="button">저장하기</button>
-          <button id="">📝 조직도로 돌아가기</button>
         </div>
       </div>
-    </div>
+  </div>
 
     <script>
-      let hireD = document.querySelector('#info-hire').value;
-      console.log(hireD);
-
-      let names = document.querySelectorAll('.employee'); // 사원이름 
-      let teamNames = document.querySelectorAll('.teamN'); // 팀이름
-
-      for (let teamclick of teamNames) {
-        teamclick.addEventListener('click', e => {
-          const team = e.target.dataset.tn; // 클릭된 팀의 data-tn 값 가져오기
-          document.querySelectorAll('.employee').forEach(namedisplay => { // 사원 이름 보이게
-            if (namedisplay.dataset.tn === team) {
-              namedisplay.style.display = 'block'; // 클릭된 팀에 속한 사원만 보이게
-            } else {
-              namedisplay.style.display = 'none'; // 클릭된 팀 이외의 사원은 숨기기
-            }
-          });
-        });
-      }
-
-
-   // 화면 부르기 AJAX
-      for (let nameclick of names) {
-        nameclick.addEventListener('click', function (event) {
-          const userNo = event.target.dataset.id;
-          document.getElementById("detailsBox").style.display = 'block'; // 상세 페이지 표시
-
-          fetch(`/workmate/emp/update/${userNo}`)
-            .then(res => res.json())
-            .then(result => {
-              let hireDate = result.hireDate.split('T')[0];
-              document.querySelector('#info-name').value = result.userName;
-              document.querySelector('#info-team option:checked').text = result.teamName;
-              document.querySelector('#info-userNo').value = result.userNo;
-              document.querySelector('#info-id').value = result.userId;
-              document.querySelector('#info-hire').value = hireDate;
-              document.querySelector('#info-phone').value = result.userPhone;
-              document.querySelector('#info-address').value = result.address;
-
-            })
-            .catch(err => console.log(err));
-        });
-      }
-
+  
       // 사원 수정 AJAX
 
       document.querySelector('#update-employee').addEventListener('click', e => {
@@ -252,7 +190,7 @@
         };
         const updateNo = document.querySelector('#info-userNo').value;
         console.log(updateNo);
-        fetch(`/workmate/emp/update/${updateNo}`, {
+        fetch('/workmate/emp/update/'+ updateNo, {
             method: "put",
             headers: {
               'Content-type': "application/json"
@@ -267,10 +205,14 @@
             document.querySelector('#info-phone').value = result.userPhone;
             document.querySelector('#info-address').value = result.address;
             document.querySelector('#info-hire').value = hireDateS;
+            
+            location.href= "/workmate/emp/update"
           })
           .catch(err => console.log(err));
       }
+
     </script>
+</div>
 </body>
 
 </html>

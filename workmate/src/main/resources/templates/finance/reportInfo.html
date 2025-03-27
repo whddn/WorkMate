@@ -7,7 +7,6 @@
 <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
             background-color: #f9f9f9;
         }
         .container {
@@ -71,7 +70,7 @@
 
     <h2>[[ ${trans[0].reportTitle} ]] </h2>
 
-    <h3>기본정보</h3>
+    <h4>기본정보</h4>
     <table>
         <tr>
             <th>기간</th>
@@ -86,8 +85,8 @@
             <td>[[ ${trans[0].userName} ]]</td>
         </tr>
     </table>
-
-    <h3>입출금 내역</h3>
+	<br>
+    <h4>입출금 내역</h4>
     <table>
         <tr>
             <th>일자</th>
@@ -106,8 +105,8 @@
             <td>비고</td>
         </tr>
     </table>
-
-    <h3>월간합계</h3>
+	<br>
+    <h4>월간합계</h4>
     <table>
         <tr>
             <th>입금액 (원)</th>
@@ -120,21 +119,8 @@
             <td></td>
         </tr>
     </table>
-
-    <h3>추가 자료 첨부</h3>
-    <p>사진 / 그래프 등 첨부</p>
-
-    <h3>첨부 파일</h3>
-    <input type="file" id="file1" class="file-upload">
-    <label for="file1" class="file-label">파일 첨부</label>
-
-    <input type="file" id="file2" class="file-upload">
-    <label for="file2" class="file-label">파일 첨부</label>
-
-    <br>
-
     <button>수정</button>
-    <button class="delete-btn">삭제</button>
+    <button type="button" th:onclick="|location.href='@{/finance/report}'|">목록으로</button>
 </div>
 </body>
 </html>

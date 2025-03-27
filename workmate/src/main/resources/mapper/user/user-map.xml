@@ -3,11 +3,13 @@
 <mapper namespace="com.workmate.app.security.mapper.UserMapper">
 	<!-- user-map.xml -->
 	<select id="getUserInfo" resultType="EmpVO">
-		SELECT user_no, user_id,
-		user_pwd, user_mail, user_position, hire_date,
-		user_name, resign_date, status_user, user_birth, address,
-		user_phone, 'ROLE_'||team_no  team_no, user_ip
-		FROM employee
-		WHERE user_id = #{id}
+		SELECT u.user_no, u.user_id,
+		u.user_pwd, u.user_mail, u.user_position, u.hire_date,
+		u.user_name, u.resign_date, u.status_user, u.user_birth, u.address,
+		u.user_phone, 'ROLE_'||u.team_no  team_no, u.user_ip, t.team_name
+		FROM employee u 
+		JOIN TEAM t 
+		ON u.team_no = t.team_no
+		WHERE u.user_id = #{id}
 	</select>
 </mapper>
