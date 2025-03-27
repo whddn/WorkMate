@@ -17,5 +17,11 @@ public interface DocumentService {
 	
 	// 자료 삭제
 	public Map<String, Object> dropFileInfo(int documentNo);
+	
+	// 다운로드시 자료실 이력추가
+	public int inputDownhistory(DocVO docVO);
+	
+	// 자료실 이력 전체 조회
+	public List<DocVO> findDownhistory(DocVO docVO);
 
 }

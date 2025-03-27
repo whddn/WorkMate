@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -127,10 +128,10 @@ public class AttendanceController {
 		int userNo = loginUser.getUserVO().getUserNo();
 		workVO.setUserNo(userNo);		
 		attendService.startWork(workVO);
-		rttr.addFlashAttribute("msg", "출근처리되었습니다.");
+		rttr.addFlashAttribute("msg", "출근등록되었습니다.");
 		return "redirect:/attendance/monthList";		
 	}
-	
+	 
 	//퇴근 등록
 	@GetMapping("/afterWork")
 	public String afterWork(WorkVO workVO,
@@ -139,7 +140,23 @@ public class AttendanceController {
 		int userNo = loginUser.getUserVO().getUserNo();
 		workVO.setUserNo(userNo);
 		int after = attendService.afterWork(workVO);
-		rttr.addFlashAttribute("msg", "퇴근처리되었습니다.");
+		rttr.addFlashAttribute("msg", "퇴근등록되었습니다.");
+		return "redirect:/attendance/monthList";
+	}
+	
+	//지각사유업로드
+	@PostMapping("/lateReason")
+	public String lateReason(WorkVO workVO,
+							@AuthenticationPrincipal LoginUserVO loginUser ,
+							RedirectAttributes rttr) {
+		
+		int userNo = loginUser.getUserVO().getUserNo();
+		workVO.setUserNo(userNo);
+		
+		 // 지각 사유 저장하는 서비스 호출
+	    attendService.inputLateReason(workVO); 
+		
+		rttr.addFlashAttribute("msg", "지각사유가 제출되었습니다.");
 		return "redirect:/attendance/monthList";
 	}
 	

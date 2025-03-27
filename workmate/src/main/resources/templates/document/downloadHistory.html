@@ -10,6 +10,47 @@
 	.card{
 		padding: 100px;
 	}
+	.search-container {
+    display: flex; /* 가로로 배치 */
+    gap: 30px; /* 각 입력 필드 사이 간격 */
+    padding: 15px;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    margin-top: 20px;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    flex-wrap: nowrap; /* 입력 박스가 한 줄로 배치되게 설정 */
+}
+
+form {
+    display: flex; /* 가로로 배치 */
+    justify-content: space-between; /* 항목 간의 간격을 자동으로 배치 */
+    gap: 20px; /* 항목 간의 간격을 설정 */
+}
+
+.search-group {
+    display: flex;
+    flex-direction: column; /* 라벨과 입력 필드를 세로로 배치 */
+    width: 30%; /* 각 입력 필드의 너비를 30%로 설정 (3개 항목을 한 줄에 배치) */
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%; /* 입력 필드가 부모 컨테이너에 꽉 차도록 */
+}
+
+button{
+	margin-top: 20px;
+	height: 40px;
+}
+a {
+	color: #fff;
+}
 </style>
 </head>
 <body>
@@ -18,50 +59,60 @@
 			<div class="card">
 				<div class="card-header">
 					<div class="d-flex align-items-center">
-						<h4 class="card-title">전사 자료실</h4>
-						<th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
-						    <button class="btn btn-primary btn-round ms-auto" onclick="uploadModal()"
-						            data-bs-toggle="modal" data-bs-target="#addRowModal">
-						        <i class="fa fa-plus"></i> FILE UPLOAD
-						    </button>
-						</th:block>
+						<h4 class="card-title">자료 다운로드 이력</h4>						
 					</div>
 				</div>
-				<div class="card-body">				
-					<div class="table-responsive">
+				<div class="card-body">	
+					<div class="search-container">					
+				    <form>
+				
+				        <!-- 기간 -->
+				        <div class="search-group">
+				            <label><b>날짜</b></label>
+				            <input type="date" name="downloadDate" class="search-input" 
+				            		th:value="${#dates.format(docVO.downloadDate, 'yyyy-MM-dd')}"/>
+				        </div>
+				        
+				        <!-- 파일명 -->
+				        <div class="search-group">
+				            <label for="searchFile">파일명</label>
+				            <input type="text" id="searchFile" name="fileName" class="search-input" placeholder="파일명 입력" th:value="${docVO.fileName}">
+				        </div>
+				
+				        <!-- 이름 -->
+				        <div class="search-group">
+				            <label for="searchName">이름</label>
+				            <input type="text" id="searchName" name="userName" class="search-input" placeholder="사원이름 입력" th:value="${docVO.userName}">
+				        </div>
+				
+				        <button id="searchBtn" class="btn btn-primary"><i class="fas fa-search"></i></button>
+				        <button onclick="resetDate()" type="button" id="searchRe" name="searchRe" class="btn btn-black"><i class="fas fa-undo-alt"></i></button>
+				    </form>				   
+				</div>
+							
+					<div class="table-responsive">						
 							<table id="documentTable" class="table">
 								<thead>
 								    <tr>
-								        <th>
-								        	<select id="extFilter" class="form-select">
-								                <option value="">자료 전체</option>
-								            </select></th> <!-- 체크박스 필터 X -->
+								        <th>분류</th>
 								        <th>다운로드 날짜</th>
 								        <th>파일명</th>
-								        <th>다운로드 사원</th>
-								        <th>사원 ID</th>
-								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
-								        <th> <i class="fas fa-trash-alt"></i></th>
-   										</th:block>
+								        <th>다운로드 사원ID</th>
+								        <th>다운로드 사원이름</th>
+								        <th>다운로드 IP</th>
+								        
 								    </tr>
 								</thead>
 								<tbody>
 									<!-- 단건 : 배열 -->
 									<tr th:each="item : ${lists}">
 										<td>[[ ${item.fileTag} ]]</td>
+										<td>[[ ${#dates.format(item.downloadDate, 'yyyy-MM-dd HH:mm')} ]]</td>
 										<td>[[ ${item.fileName} ]]</td>
-										<td>[[ ${item.fileDesc} ]]</td>
-										<td>[[ ${item.extenstion} ]]</td>
-										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>									
-										<th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
-										<td>
-										    <i class="fas fa-trash-alt"
-										       th:if="${item != null and not #strings.isEmpty(item.fileName)}"
-										       th:data-document-no="${item.documentNo}"
-										       onclick="deleteDocument(this)">										       
-										    </i>
-										</td>
-										</th:block>										
+										<td>[[ ${item.userId} ]]</td>
+										<td>[[ ${item.userName} ]]</td>
+										<td>[[ ${item.downloadUserIp} ]]</td>
+																			
 									</tr>
 								</tbody>
 							</table>
@@ -77,74 +128,19 @@
 //	info: false,
 // });
 
-// 파일 등록 모달
-function uploadModal() {
-    var modal = new bootstrap.Modal(document.getElementById('addRowModal'));
-    modal.show();
+
+//검색 조건 초기화
+function resetDate() {
+	
+    $('#searchDate').val('');   // 날짜 input 필드 초기화
+    $('#searchName').val('') ;  // 이름 input 필드 초기화
+    $('#searchFile').val('');  // 팀명 input 필드 초기화
 }
 
-function closeModal() {
-    var modalElement = document.getElementById('addRowModal');
-    var modalInstance = bootstrap.Modal.getInstance(modalElement);
-    
-    if (modalInstance) {
-        modalInstance.hide();
-    }
+ $('#searchRe').on('click', function() {
+     resetDate();
+ });
 
-    // backdrop 강제 제거
-    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-}
-
-// 파일 업로드
-document.getElementById("addRowButton").addEventListener("click", function () {
-    const fileInput = document.getElementById("uploadFile");
-    const file = fileInput.files[0];
-
-    if (!file) {
-        alert("파일을 선택해주세요.");
-        return;
-    }
-
-    const formData = new FormData(document.uploadForm);
-
-    fetch("/workmate/document/upload", {
-        method: "POST",
-        body: formData
-    }) .then(response => response.text() 
-    ) .then(response => {
-            if (response) {
-                alert("업로드 완료");
-            location.reload(); // 페이지 새로고침
-            } 
-        })
-        .catch(error => {
-            console.error("업로드 오류:", error);
-            alert("업로드 실패");
-        });
-});
-
-// 파일 단건 삭제
-function deleteDocument(icon) {
-    const documentNo = icon.getAttribute("data-document-no");
-
-    if (confirm("삭제하시겠습니까?")) {
-        fetch(`/workmate/document/delete/${documentNo}`, {
-            method: "DELETE"
-        })
-        .then(response => {
-            if (response.ok) {
-                alert("삭제 완료");
-                location.reload(); // 페이지 새로고침
-            } else {
-                alert("삭제 실패");
-            }
-        })
-        .catch(error => {
-            console.error("삭제 오류:", error);
-            alert("삭제 중 오류가 발생했습니다.");
-        });
-    }
-}
 $(document).ready(function() {
     var table = $('#documentTable').DataTable({
         "paging": true,

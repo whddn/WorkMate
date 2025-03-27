@@ -23,7 +23,7 @@ public class WorkVO {
 		private String userName;		//사원번호
 		private String userId;		//사원아이디
 		private String teamName;		//사원아이디
-		
+		private String lateReason;		//지각사유		
 		private double totalWorkTime; // 현재달 총 근무시간 
 		private double remainWorkTime; // 남은 근무시간
 		
@@ -49,8 +49,7 @@ public class WorkVO {
 		private int allStatusCount;	//근무상태수	
 		private int nstartCount;	//출근미체크수	
 		private int nafterCount;	//퇴근미체크수	
-		private int addWorkCount;	//연장근무총합
-		
+		private int addWorkCount;	//연장근무총합		
 		
 		
 		// 검색날짜
