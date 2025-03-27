@@ -67,9 +67,7 @@ public class MainscreenController {
 		
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setUserNo(myself.getUserNo());
-		approvalVO.setApprStatus("a1");
-		approvalVO.setStandard("toMe");
-		model.addAttribute("approvalList", approvalService.findApprovalList(approvalVO));
+		model.addAttribute("approvalList", approvalService.findApprovalListAboutMe(approvalVO));
 		
 		return "mainscreen/main";
 	}

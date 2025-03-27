@@ -6,13 +6,14 @@
 	<select id="selectScheduleList" parameterType="ScheduleVO" resultType="ScheduleVO">
 		SELECT schedule_no
 		    , schedule_content
-		    , schedule_type
+		    , schedule.schedule_type
 		    , public_score
 		    , schedule_start_date
 		    , schedule_end_date
 		    , schedule.user_no
 		    , mail_id
 		    , department.department_id
+		    , code_name AS schedule_type_name
 		FROM schedule
 		    JOIN employee
 		    ON schedule.user_no=employee.user_no
@@ -20,12 +21,14 @@
 		    ON employee.team_no=team.team_no
 		    LEFT JOIN department
 		    ON team.department_id=department.department_id
+		    JOIN common_code
+		    ON schedule.schedule_type=common_code.code
 		WHERE (public_score = 'c1' AND schedule.user_no = #{userNo}
 		    OR public_score = 'c2' AND department.department_id = #{deptNo}
 		    OR public_score = 'c3')
-		    <if test="unit != null and unit.equals('day')">
-		    AND (schedule_start_date &gt;= TRUNC(SYSDATE)
-				OR schedule_end_date &lt;= TRUNC(SYSDATE))
+		    <if test='unit == "day"'>
+		    AND (TRUNC(schedule_start_date) &lt;= TRUNC(SYSDATE) 
+		    	AND TRUNC(schedule_end_date) &gt;= TRUNC(SYSDATE))
 		    </if>
 	</select>
 	<!-- 새로운 일정을 추가한다 -->

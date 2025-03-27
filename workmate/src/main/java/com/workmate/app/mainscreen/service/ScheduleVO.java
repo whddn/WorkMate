@@ -21,4 +21,5 @@ public class ScheduleVO {
 	
 	private String deptNo;	// 사원이 속한 부서
 	private String unit;	// 검색 단위
+	private String scheduleTypeName;// 일정 종류 이름
 }
