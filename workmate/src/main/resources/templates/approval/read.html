@@ -91,8 +91,10 @@
 					<form>
 						<div class="mb-3">
 							<label for="apprResult" class="col-form-label">결재처리</label>
-							<input type="radio" name="apprResult" value="a2">승인
-							<input type="radio" name="apprResult" value="a3">반려
+							<div>
+								<input type="radio" name="apprResult" value="a2">승인
+								<input type="radio" name="apprResult" value="a3">반려
+							</div>
 						</div>
 						<div class="mb-3">
 							<label for="signNo" class="col-form-label">결재서명</label>
@@ -226,8 +228,7 @@
 				}
 			},
 			error: function(error) {
-				console.error('Error : ' + error);
-				alert('서버 요청 중 오류가 발생했습니다.');
+				alert('결재에 실패하였습니다.');
 			}
 		});
 		
@@ -255,8 +256,7 @@
 				}
 			},
 			error: function(error) {
-				console.error('Error : ' + error);
-				alert('서버 요청 중 오류가 발생했습니다.');
+				alert('삭제에 실패하였습니다.');
 			}
 		});
 		

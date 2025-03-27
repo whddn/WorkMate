@@ -30,6 +30,12 @@ public class ApprovalServiceImpl implements ApprovalService {
 	}
 
 	@Override
+	public List<ApprovalVO> findApprovalListAboutMe(ApprovalVO approvalVO) {
+		// TODO Auto-generated method stub
+		return approvalMapper.selectApprovalListAboutMe(approvalVO);
+	}
+	
+	@Override
 	public ApprovalVO findApprovalById(ApprovalVO approvalVO) {
 		// TODO Auto-generated method stub
 		return approvalMapper.selectApprovalById(approvalVO);

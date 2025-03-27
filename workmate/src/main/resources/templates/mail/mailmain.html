@@ -21,14 +21,21 @@
 <body>
 	<div class="container mt-4">
 		<h2 class="mb-4">받은 메일함</h2>
-
+	
 		<!-- 🔍 검색창 -->
 		<div class="input-group w-25">
 			<input type="text" id="searchBox" class="form-control"
 				placeholder="검색...">
 			<button class="btn btn-secondary" onclick="searchTable()">검색</button>
 		</div>
-
+	<div class="mb-2" style="margin-bottom: 10px;">
+    <span class="badge bg-primary px-3 py-2 me-2" style="font-size: 0.95rem;">
+        전체 메일: <span th:text="${totalCount}">0</span>건
+    </span>
+    <span class="badge bg-warning text-dark px-3 py-2" style="font-size: 0.95rem;">
+        읽지 않음: <span th:text="${unreadCount}">0</span>건
+    </span>
+</div>
 		<div class="card mt-3">
 			<div class="card-body">
 				<!-- 삭제 + 이동 영역 -->
@@ -88,8 +95,10 @@
 								th:value="${mail.mailId}"></td>
 							<td th:text="${mail.senderEmail}"></td>
 							<td><a th:href="@{/mail/view(mailId=${mail.mailId})}"> <span
-									th:if="${mail.isRead != null and mail.isRead.equals('N')}"><b
-										th:text="${mail.subject}"></b></span> <span
+									th:if="${mail.isRead != null and mail.isRead.equals('N')}">
+										<span style="color: #0d6efd; font-size: 10px;">●</span> <b
+										th:text="${mail.subject}"></b>
+								</span> <span
 									th:unless="${mail.isRead != null and mail.isRead.equals('N')}"
 									th:text="${mail.subject}"></span>
 							</a></td>
@@ -184,7 +193,6 @@
     }
 </script>
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

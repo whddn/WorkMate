@@ -35,6 +35,32 @@
 				AND reference.user_no = #{userNo}
 			</if>
 	</select>
+	<select id="selectApprovalListAboutMe" parameterType="ApprovalVO" resultType="ApprovalVO">
+		SELECT DISTINCT approval.appr_no
+		    , form_name
+		    , appr_title
+		    , user_name
+		    , department_name
+		    , create_date
+		    , code_name AS appr_status_name
+		FROM approval
+		    JOIN appr_form
+		    ON approval.appr_type=appr_form.appr_type
+		    JOIN employee
+		    ON approval.user_no=employee.user_no
+		    LEFT JOIN department
+		    ON approval.dept_no=department.department_id
+			LEFT JOIN appr_elmnt 
+	    	ON approval.appr_no = appr_elmnt.appr_no
+    		LEFT JOIN reference
+    		ON approval.appr_no = reference.appr_no
+    		JOIN common_code
+    		ON approval.appr_status = common_code.code
+		WHERE approval.user_no = #{userNo}
+			OR approver = #{userNo}
+			OR reference.user_no = #{userNo}
+		ORDER BY appr_status_name
+	</select>
 	<select id="selectApprovalById" parameterType="ApprovalVO" resultType="ApprovalVO">
 			SELECT 
 			a.appr_no,
