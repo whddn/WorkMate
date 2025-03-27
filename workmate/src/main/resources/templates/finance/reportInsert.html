@@ -303,7 +303,7 @@
 				if (input.type === 'checkbox') input.checked = false;
 				else input.value = '';
 			});
-			tbody.appendChild(newRow);
+			tbody.appendChild(newRow); 
 			attachInputListeners(); // 새로 추가된 행에도 리스너 붙이기
 			calculateTotals(); // 추가 후 계산 다시 실행
 		}
