@@ -24,11 +24,16 @@ public class ReportAttachServiceImpl implements ReportAttachService {
 		// TODO Auto-generated method stub
 		return reportAttachMapper.selectApprovalRAList(approvalVO);
 	}
+	
+	@Override
+	public ReportAttachVO findApprovalRA(Integer repattachNo) {
+		// TODO Auto-generated method stub
+		return reportAttachMapper.selectApprovalRA(repattachNo);
+	}
 
 	@Override
 	public int insertApprovalRA(ReportAttachVO reportAttachVO) {
 		// TODO Auto-generated method stub
 		return reportAttachMapper.insertApprovalRA(reportAttachVO);
 	}
-
 }

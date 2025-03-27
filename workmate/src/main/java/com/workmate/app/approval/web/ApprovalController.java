@@ -1,6 +1,8 @@
 package com.workmate.app.approval.web;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -41,6 +43,8 @@ import com.workmate.app.approval.service.ReportAttachService;
 import com.workmate.app.approval.service.ReportAttachVO;
 import com.workmate.app.approval.service.SignService;
 import com.workmate.app.approval.service.SignVO;
+import com.workmate.app.attendance.service.AttendanceService;
+import com.workmate.app.attendance.service.WorkVO;
 import com.workmate.app.common.FileHandler;
 import com.workmate.app.common.WhoAmI;
 import com.workmate.app.employee.service.EmpService;
@@ -70,15 +74,18 @@ public class ApprovalController {
 	private final ReferenceService referenceService;
 	private final ReportAttachService reportAttachService;
 	private final SignService signService;
+	private final AttendanceService attendantService;
 	private final EmpService empService;
 	private final ObjectMapper objectMapper;
 	private final FileHandler fileHandler;
 	private final WhoAmI whoAmI;
+	
+	private final String signDir = "sign/";
+	private final String apprAttachDir = "apprAttach/";
+	
 	// ✅ `application.properties`에서 파일 저장 경로 가져오기
 	@Value("${file.upload-dir}")
 	private String uploadDir;
-	private final String signDir = "sign/";
-	private final String apprAttachDir = "apprAttach/";
 	
 	/**
 	 * 결재를 기다리는 문서 리스트를 보여준다(자신과 관련된)
@@ -140,22 +147,21 @@ public class ApprovalController {
 	@PostMapping("approval/write")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> postWrite(
-		@RequestPart("request") String requestString,
-		@RequestPart(value="files", required=false) MultipartFile[] files
-	) throws IOException {
+		@RequestParam("request") String requestString,
+		@RequestPart(value="files", required=false) MultipartFile[] files) throws IOException {
+		System.out.print("requestString은 : ");
+		System.out.println(requestString);
+		
 		// JSON 객체에서 공통되는 키의 값만 해당 VO에 전이
 		ApprovalVO approvalVO = objectMapper.readValue(requestString, ApprovalVO.class);
-		System.out.println(requestString);
-		System.out.println(approvalVO);
 		
 		// 결재문서를 DB에 등록
 		EmpVO myself = whoAmI.whoAmI();
-		
 		approvalVO.setUserNo(myself.getUserNo());
 		approvalVO.setDeptNo(myself.getDepartmentId());
-
-		Map<String, Object> response = new HashMap<>();
         
+		// 자기 기안 올리는 거
+		Map<String, Object> response = new HashMap<>();
         int result = approvalService.inputApproval(approvalVO);
         if(result <= 0) {
         	response.put("success", false);
@@ -198,12 +204,21 @@ public class ApprovalController {
             	fileName = fileHandler.fileUpload(file, filePath.toString(), false);
                 
                 ReportAttachVO reportAttachVO = new ReportAttachVO();
-                reportAttachVO.setFileName(fileName);
-                reportAttachVO.setFilePath(filePath.toString());
+                reportAttachVO.setFileName(file.getOriginalFilename());
+                reportAttachVO.setFilePath(apprAttachDir + fileName);
                 reportAttachVO.setApprNo(approvalVO.getApprNo());
                 
                 reportAttachService.insertApprovalRA(reportAttachVO);
             }
+        }
+        
+        // 결재유형이 휴가이면 연차내역(?)을 삽입한다
+        if(approvalVO.getApprType().equals("AF001")) {
+        	WorkVO workVO = objectMapper.readValue(requestString, WorkVO.class);
+        	workVO.setApprNo(approvalVO.getApprNo());
+        	workVO.setUserNo(myself.getUserNo());
+
+        	attendantService.inputAnnual(workVO);
         }
         
         // 응답을 반송한다
@@ -218,13 +233,23 @@ public class ApprovalController {
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprNo);
 		
+		approvalVO = approvalService.findApprovalById(approvalVO);
 		System.out.println(apprNo);
 		
-		model.addAttribute("approval", approvalService.findApprovalById(approvalVO));
+		model.addAttribute("approval", approvalVO);
 		model.addAttribute("apprLine", apprElmntService.findApprElmntList(approvalVO));
 		model.addAttribute("refLine", referenceService.findReferenceList(approvalVO));
 		model.addAttribute("fileList", reportAttachService.findApprovalRAList(approvalVO));
 		model.addAttribute("mySigns", signService.findSignList(myself));
+		
+		if(approvalVO.getApprType().equals("AF001")) {
+			WorkVO workVO = new WorkVO();
+        	workVO.setApprNo(approvalVO.getApprNo());
+
+        	workVO = attendantService.findAnnualByApprNo(workVO);
+        	System.out.println(workVO);
+        	model.addAttribute("annual", workVO);
+		}
 		
 		System.out.println(approvalService.findApprovalById(approvalVO));
 		
@@ -285,17 +310,19 @@ public class ApprovalController {
 	// 파일을 다운로드한다.
 	@GetMapping("approval/download")
     public ResponseEntity<FileSystemResource> getDownload(
-    	@RequestParam("filePath") String filePath, 
-    	@RequestParam("fileName") String fileName
-    ) throws IOException {
-		FileSystemResource resource = fileHandler.fileDownload(fileName, filePath);
+    	@RequestParam("fileNo") Integer fileNo) throws IOException {
+		//
+		ReportAttachVO reportAttachVO = reportAttachService.findApprovalRA(fileNo);
+		
+		FileSystemResource resource = fileHandler.fileDownload(reportAttachVO.getFilePath(), uploadDir + apprAttachDir);
 		
 		if(!resource.exists()) {
 			return ResponseEntity.notFound().build();
 		}
 		
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+		String encodedFileName = URLEncoder.encode(reportAttachVO.getFileName(), StandardCharsets.UTF_8);
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + encodedFileName);
 		
 		return ResponseEntity.ok()
 				.headers(headers)

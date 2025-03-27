@@ -83,9 +83,9 @@
 			</td>
 			<td style="background: rgb(255, 255, 255); padding: 5px; border: 1px solid black; height: 25px; text-align: left; color: rgb(0, 0, 0); font-size: 14px; font-weight: normal; vertical-align: middle;">
 				<span style="font-family: malgun gothic, dotum, arial, tahoma; font-size: 11pt; line-height: normal; margin-top: 0px; margin-bottom: 0px;">
-					<input class="input-in-form" type="radio" name="annualType" value="full">연차</option>
-					<input class="input-in-form" type="radio" name="annualType" value="morning">오전반차</option>
-					<input class="input-in-form" type="radio" name="annualType" value="afternoon">오후반차</option>
+					<input class="input-in-form" type="radio" name="annualType" value="연차">연차
+					<input class="input-in-form" type="radio" name="annualType" value="오전반차">오전반차
+					<input class="input-in-form" type="radio" name="annualType" value="오후반차">오후반차
 				</span> 
 			</td>
 		</tr>
@@ -102,7 +102,7 @@
 				연차&nbsp;일수
 			</td>
 			<td style="padding: 3px; border: 1px solid black; width: 700px; height: 22px; text-align: left; color: rgb(0, 0, 0); font-size: 12px;  vertical-align: middle; background: rgb(255, 255, 255);">
-				<span id="restPointArea" style="font-family: malgun gothic, dotum, arial, tahoma; font-size: 9pt; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span><span id="applyPointArea" style="font-family: malgun gothic, dotum, arial, tahoma; font-size: 9pt; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span> 
+				<span id="restPointArea" style="font-family: malgun gothic, dotum, arial, tahoma; font-size: 9pt; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span> <input name="annualCount" readonly> <span id="applyPointArea" style="font-family: malgun gothic, dotum, arial, tahoma; font-size: 9pt; line-height: normal; margin-top: 0px; margin-bottom: 0px;"></span> 
 			</td>
 		</tr>
 			<td style="background: rgb(221, 221, 221); padding: 5px; border: 1px solid black; height: 25px; text-align: center; color: rgb(0, 0, 0); font-size: 14px; font-weight: bold; vertical-align: middle;">
@@ -137,5 +137,51 @@
 		</tr>
 	</tbody>
 </table>
+
+<script>
+	let startInput = document.querySelector('input[name="annualStart"]');
+	let endInput = document.querySelector('input[name="annualEnd"]');
+	let annualCountInput = document.querySelector('input[name="annualCount"]');
+	
+	let startDate = null;
+	let endDate = null;
+	
+	function getAnnualCount() {
+	    if (!startDate || !endDate) {
+	        return;
+	    }
+	
+	    if (document.querySelector('input[name="annualType"]:checked').value === '연차') {
+	        let start = new Date(startDate);
+	        let end = new Date(endDate);
+	
+	        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+	            return;
+	        }
+	
+	        let diffTime = end - start;
+	        let annualCount = diffTime / (1000 * 60 * 60 * 24) + 1;
+	        
+	        annualCountInput.value = annualCount;
+	    } else {
+	        endInput.value = startInput.value;
+	        annualCountInput.value = 0.5;
+	    }
+	}
+	
+	startInput.addEventListener('change', function(event) {
+	    startDate = event.target.value;
+	    getAnnualCount();
+	});
+	
+	endInput.addEventListener('change', function(event) {
+	    endDate = event.target.value;
+	    getAnnualCount();
+	});
+	
+	document.querySelectorAll('input[name="annualType"]').forEach(element => element.addEventListener('click', function(event) {
+	    getAnnualCount();
+	}));
+</script>
 
 </div>
