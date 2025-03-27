@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.common.WhoAmI;
 import com.workmate.app.contracts.service.ContractsService;
 import com.workmate.app.contracts.service.ContractsVO;
@@ -28,23 +29,38 @@ import lombok.RequiredArgsConstructor;
  * 수정일자	수정자	수정내용
  * -------------------------
  * 03-20	이종우	계약페이지 생성
- * 
+ * 03-27	이종우	계약폼 불러오기
  * 
  * 
  * </pre>
  */
 
 @Controller
-@RequestMapping("/contracts")
 @RequiredArgsConstructor
 public class ContractsController {
 
 	private final ContractsService contractsService;
+	private final ApprFormService apprFormService; 
 	private final EmpService empService;
 	private final WhoAmI whoAmI;
 
+	/**
+	 * 전자계약 폼 불러옴
+	 * @param model
+	 * @param approvalVO, contractsVO
+	 * @param standard
+	 * @return 전자계약 페이지
+	 */
+	
+	// 결재 신청하려 할때 결재 양식 목록 불러옴
+//	@GetMapping("approval/formList")
+//	public String getFormList(Model model) {
+//		model.addAttribute("formList", contractsService.selectApprFormList());
+//		return "contracts/contractsForm";
+//	}
+	
 	// 전자계약 조회
-	@GetMapping("/main")
+	@GetMapping("contracts/main")
 	public String contractsList(Model model) {
 		List<ContractsVO> list = contractsService.findContractsList();
 		model.addAttribute("contr", list);
@@ -54,15 +70,15 @@ public class ContractsController {
 	// 전자계약 상세 조회
 
 	// 전자계약 템플릿
-	@GetMapping("/template")
+	@GetMapping("contracts/form")
 	public String contractsTemplate(Model model) {
 		List<ContractsVO> list = contractsService.findContractsList();
 		model.addAttribute("contr", list);
-		return "contracts/contractsTemplate";
+		return "contracts/contractsForm";
 	}
 	
 	// 전자계약 템플릿 양식 불러오기
-	 @GetMapping("/forms/{type}")
+	 @GetMapping("contracts/forms/{type}")
 	    public String loadContractForm(@PathVariable String type) {
 	        switch (type) {
 	            case "standard":

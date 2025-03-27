@@ -6,12 +6,8 @@
           <!-- Logo Header -->
           <div class="logo-header" data-background-color="dark">
             <a href="index.html" class="logo">
-              <img
-                src="assets/img/kaiadmin/logo_light.svg"
-                alt="navbar brand"
-                class="navbar-brand"
-                height="20"
-              />
+              <!-- 로고이미지 자리 -->
+              
             </a>
             <div class="nav-toggle">
               <button class="btn btn-toggle toggle-sidebar">
@@ -83,22 +79,16 @@
               </li>
               <li class="nav-item">
                 <a th:href="@{/vendor/list}">
-                  <i class="fas fa-clipboard-list"></i>
-                  <p>거래처 조회</p>
+                  <i class="far fa-handshake"></i>
+                  <p>거래처 관리</p>
                 </a>
               </li>
-               <li class="nav-item">
+               <li class="nav-item" th:if="${teamNo == 'ROLE_T004'}">
                 <a th:href="@{/vendor/insert}">
                   <i class="fas fa-pen-square"></i>
                   <p>거래처 등록</p>
                 </a>
               </li>  
-              <li class="nav-item"  th:if="${teamNo == 'ROLE_T001'}">
-                <a th:href="@{/}">
-                  <i class="far fa-handshake"></i>
-                  <p>거래처 관리</p>
-                </a>
-              </li>
             </ul>
           </div>
         </div>
