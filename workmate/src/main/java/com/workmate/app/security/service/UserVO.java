@@ -20,4 +20,5 @@ public class UserVO {
 	private String userPhone; //번호
 	private String teamNo; //팀번호
 	private String userIp; //아이피
+	private String teamName; // 팀이름
 }

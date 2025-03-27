@@ -72,11 +72,6 @@ public class EmpServiceImpl implements EmpService {
 	public List<EvaluVO> findOneEvaluPage(EvaluVO evaluVO) {
 		return empMapper.selectEvaluList(evaluVO);
 	}
-	// 단순 평가 리스트 조회 (페이지 불러냄)
-//	@Override
-//	public EvaluVO findEvaluList(EvaluVO evaluVO) {
-//		return null;
-//	}
 
 
 	// 내가 진행한 평가 단건 조회 
@@ -121,7 +116,7 @@ public class EmpServiceImpl implements EmpService {
 		return uniqueTeam;
 	}
 	
-	
+	// 관리자 단건 조회
 	@Override
 	public Map<String, Object> findAdminEvaluBeforeById(EvaluVO evaluVO) {
 	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
@@ -135,7 +130,7 @@ public class EmpServiceImpl implements EmpService {
 
 	    // 3. 점수 저장
 	    Map<Integer, List<EvaluVO>> scoreMap = new LinkedHashMap<>();
-
+	    Map<String, Double> avgScoreMap = new LinkedHashMap<>();
 	    for (EvaluVO vo : rawList) {
 	        int userNo = vo.getUserNo();
 	        String itemKey = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
@@ -149,7 +144,10 @@ public class EmpServiceImpl implements EmpService {
 	            item.setEvaluCompet(vo.getEvaluCompet());
 	            item.setEvaluContent(vo.getEvaluContent());
 	            item.setOrderNo(vo.getOrderNo());
+	            item.setAvgScore(vo.getAvgScore());
 	            itemList.add(item);
+	            
+	            avgScoreMap.put(itemKey, vo.getAvgScore());
 	        }
 
 	        // 점수 보존
@@ -160,37 +158,11 @@ public class EmpServiceImpl implements EmpService {
 	    result.put("people", new ArrayList<>(peopleMap.values()));
 	    result.put("items", itemList);
 	    result.put("scores", scoreMap); // Map<Integer, List<EvaluVO>>
-
+	    result.put("avgScores", avgScoreMap); // 필요시
 	    return result;
 	}
 
 
-
-	// 관리자 단건 조회 항목 / 컨텐츠 중복 제거 
-//	@Override
-//	public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO param) {
-//	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(param); // 기존 쿼리 재활용
-//	    Set<String> seen = new HashSet<>();
-//	    List<EvaluVO> result = new ArrayList<>();
-//
-//	    for (EvaluVO vo : rawList) {
-//	        if (vo.getUserNo() != param.getUserNo()) continue;
-//
-//	        String key = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
-//	        if (seen.add(key)) {
-//	            result.add(vo);
-//	        }
-//	    }
-//	    return result;
-//	}
-	// 관리자 단건 조회
-//	@Override
-//	public List<EvaluVO> findAdminEvaluBeforeById(EvaluVO EvaluVO) {
-//	    return empMapper.selectAdminBeforeEvaluById(EvaluVO);
-//	}
-//	
-	
-	
 	// 평가 등록 페이지
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {

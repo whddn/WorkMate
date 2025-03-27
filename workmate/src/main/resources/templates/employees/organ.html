@@ -7,119 +7,127 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>조직도</title>
   <style>
-    body,
-    html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #f4f6f8;
-      font-family: 'Segoe UI', sans-serif;
-    }
+body, html {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background: #f4f6f8;
+	font-family: 'Segoe UI', sans-serif;
+}
 
-    /* 화면 전체 레이아웃 */
-    .wrapper {
+.container {
+	max-width: 1000px;
+	margin: 0 auto;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+    display: flex;
+}
+/* 화면 전체 레이아웃 */
+/*  .wrapper {
       display: flex;
       justify-content: center;
-      /* 중앙 정렬 */
       align-items: center;
-      /* 수직 중앙 정렬 */
       height: 100vh;
-      /* 화면 전체 높이 */
       padding: 20px;
-    }
+    } 
+    
+ */
+/* 조직도 패널 */
+.tree-panel {
+	background: #fff;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+	min-width: 250px;
+	width: 300px;
+	margin-right: 20px;
+	/* 오른쪽에 약간의 간격 추가 */
+	max-height: 500px;
+	overflow-y: auto;
+	/* 내용이 넘칠 경우 스크롤 추가 */
+}
 
-    /* 조직도 패널 */
-    .tree-panel {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      min-width: 250px;
-      width: 300px;
-      margin-right: 20px;
-      /* 오른쪽에 약간의 간격 추가 */
-      max-height: 500px;
-      overflow-y: auto;
-      /* 내용이 넘칠 경우 스크롤 추가 */
-    }
+/* 상세 정보 카드 */
+.card {
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+	padding: 20px;
+	width: 100%;
+	max-width: 500px;
+	/* 고정된 최대 너비 */
+	flex-direction: column;
+	justify-content: center;
+	height: 500px;
+	overflow: hidden;
+}
 
-    /* 상세 정보 카드 */
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-      padding: 20px;
-      width: 100%;
-      max-width: 500px;
-      /* 고정된 최대 너비 */
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      height: 500px;
-      overflow: hidden;
-    }
+/* 내부 정보 리스트 */
+.info-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
 
+/* 각 줄 */
+.info-row {
+	display: flex;
+	align-items: center;
+}
 
-    /* 내부 정보 리스트 */
-    .info-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+.employee {
+	display: none;
+}
 
-    /* 각 줄 */
-    .info-row {
-      display: flex;
-      align-items: center;
-    }
+/* 라벨 */
+.label {
+	width: 100px;
+	font-weight: bold;
+	color: #333;
+	background: #e7edf7;
+	padding: 8px 12px;
+	border-radius: 6px;
+	text-align: left;
+}
 
-    .employee {
-      display: none;
-    }
+/* 값 */
+.value {
+	flex: 1;
+	background: #f2f4f8;
+	padding: 8px 12px;
+	border-radius: 6px;
+	color: #222;
+	margin-left: 10px;
+}
 
-    /* 라벨 */
-    .label {
-      width: 100px;
-      font-weight: bold;
-      color: #333;
-      background: #e7edf7;
-      padding: 8px 12px;
-      border-radius: 6px;
-      text-align: left;
-    }
+h1 {
+	text-align: center;
+	/* 중앙 정렬 */
+	margin-bottom: 20px;
+	/* 제목 아래 간격 */
+}
 
-    /* 값 */
-    .value {
-      flex: 1;
-      background: #f2f4f8;
-      padding: 8px 12px;
-      border-radius: 6px;
-      color: #222;
-      margin-left: 10px;
-    }
+.tree li {
+	list-style: none;
+	margin: 8px 0;
+	font-weight: 500;
+	color: #333;
+}
 
-    h1 {
-      text-align: center;
-      /* 중앙 정렬 */
-      margin-bottom: 20px;
-      /* 제목 아래 간격 */
-    }
-
-    .tree li {
-      list-style: none;
-      margin: 8px 0;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .tree ul {
-      padding-left: 20px;
-    }
-  </style>
+.tree ul {
+	padding-left: 20px;
+}
+</style>
 </head>
 
 <body>
-  <div class="wrapper">
+  <div class="container">
     <!-- 왼쪽: 조직도 -->
     <div class="tree-panel">
       <ul class="tree">
@@ -139,6 +147,8 @@
         </li>
       </ul>
     </div>
+	<div id="replace"  th:fragment="employeeFrag">
+	
 
     <!-- 오른쪽: 상세 정보 카드 -->
     <div class="card" id="detailsBox">
@@ -176,15 +186,16 @@
           <span class="value" id="info-address"></span>
         </div>
       </div>
-      <div class="buttons-container">
+      <br>
+      <div class="buttons-container"> <!--  th:if="${teamNo == 'ROLE_T001'}" -->
         <div class="action-buttons">
           <button id="add-employee" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
-          <button id="evaluate-employee">📝 평가하기</button>
-          <button id="evaluate-employee-update" th:onclick="|location.href='@{/emp/update}'|"
+          <button id="evaluate-employee-update" 
             th:data-no="${oneinfo.userNo}">수정하기</button>
         </div>
       </div>
     </div>
+</div>
 
     <script>
       let hireD = document.querySelector('#info-hire').value;
@@ -197,12 +208,12 @@
         teamclick.addEventListener('click', e => {
           const team = e.target.dataset.tn; // 클릭된 팀의 data-tn 값 가져오기
           document.querySelectorAll('.employee').forEach(namedisplay => { // 사원 이름 보이게
-            if (namedisplay.dataset.tn === team) {
-              namedisplay.style.display = 'block'; // 클릭된 팀에 속한 사원만 보이게
-            } else {
-              namedisplay.style.display = 'none'; // 클릭된 팀 이외의 사원은 숨기기
-            }
-          });
+              if (namedisplay.dataset.tn === team) {
+                namedisplay.style.display = 'block'; // 클릭된 팀에 속한 사원만 보이게
+              } else {
+                namedisplay.style.display = 'none'; // 클릭된 팀 이외의 사원은 숨기기
+              }
+            });
         });
       }
 
@@ -229,7 +240,24 @@
             .catch(err => console.log(err));
         });
       }
+      
+      document.querySelector('#evaluate-employee-update').addEventListener('click', e => {
+    	  let userNo = document.querySelector('#info-userNo').innerHTML;
+    	  
+    	  $('#replace').load(`/workmate/emp/update?userNo=${userNo}`)
+    	 /* fetch(`/workmate/emp/update?userNo=${userNo}`, {
+    		  headers : {
+    			  'Content-Type' : 'text/html; charset=utf-8'
+    		  }
+    	  })
+    	  .then(res => res.text())
+    	  .then(result => {
+    		 document.querySelector('#replace').innerHTML = result;
+    	  })
+    	  .catch(err => console.log(err)); */
+      })
     </script>
+</div>
 </body>
 
 </html>

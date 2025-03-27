@@ -28,6 +28,7 @@ public class SpringSecurityConfig {
 				    .requestMatchers("/header").authenticated()
 					//.requestMatchers("/user/**").permitAll() // 모든사용자 접근 허용
 					//.requestMatchers("/team/**").hasAuthority("T001")  // 중간 권한
+
 				    // 중간 권한
 					.requestMatchers("/attendance/attendanceManage").hasRole("T001")
 					.requestMatchers("/vendor/insert").hasRole("T004")

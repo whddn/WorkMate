@@ -6,21 +6,28 @@ import com.workmate.app.finance.service.ReportVO;
 
 public interface FinanceMapper {
 	// 보고서 전체 조회
-	public List<ReportVO> selectReportList(ReportVO financeVO);
+	public List<ReportVO> selectReportList(ReportVO reportVO);
 	
 	// 입출금 거래 내역 보고서 하나에 대한 전체 입/출금 리스트 조회
-	public List<ReportVO> selectTransList(ReportVO financeVO);
-	
+	public List<ReportVO> selectTransList(ReportVO reportVO);
 	
 	// 입출금 보고서 작성 페이지
-	public String selectReportInsertPage(ReportVO financeVO);
+	public String selectReportInsertPage(ReportVO reportVO);
+	
+	// 입출금 보고서 insert 기능
+	public int insertReportOne(ReportVO reportVO);
+	
+	// 입출금 보고서의 거래 내역 insert 기능
+	public int insertReportTransOne(ReportVO reportVO);
 	
 	// 법인 카드 전체 조회 (관리자만 가능)
-	public List<ReportVO> selectCorCardList(ReportVO financeVO);
+	public List<ReportVO> selectCorCardList(ReportVO reportVO);
 	
 	// 법인 카드 등록 
-	public int insertCorCardInfo(ReportVO financeVO);
+	public int insertCorCardInfo(ReportVO reportVO);
 	
 	// 법인 카드 상세 조회 
-	public List<ReportVO> selectCorCardById(ReportVO financeVO);
+	public List<ReportVO> selectCorCardById(ReportVO reportVO);
+	
+
 }

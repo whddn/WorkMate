@@ -201,33 +201,40 @@
 	</select>
 	<!-- 평가 결과 단순 조회 (관리자, formNo 기반) -->
 		<select id="selectAdminBeforeEvaluById" resultType="EvaluVO">
-			SELECT    
-			    	  f.EVALU_FORM_NO
-					, f.EVALU_NAME              
-			        , f.EVALU_START               
-			        , u.USER_NO
-			        , u.USER_NAME          
-			        , i.EVALU_COMPET       
-			        , i.EVALU_CONTENT
-			        , fm.ORDER_NO
-                    , d.department_name
-                    , t.team_name
-                    , fm.evalu_no
-			FROM EVALU_FORM f              
-			JOIN EVALUATEE_GROUP g
-			ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
-			JOIN EMPLOYEE u
-			ON g.USER_NO = u.USER_NO        
-			JOIN EVALU_FORMAT fm
-			ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO  
-			JOIN EVALU_ITEM i
-			ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
-            JOIN TEAM t
-            ON t.TEAM_NO = u.TEAM_NO
-            JOIN DEPARTMENT d
-            ON t.department_id = d.department_id
-			WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-			ORDER BY fm.ORDER_NO
+					SELECT    
+			      f.EVALU_FORM_NO,
+			      f.EVALU_NAME,              
+			      f.EVALU_START,               
+			      u.USER_NO,
+			      u.USER_NAME,          
+			      i.EVALU_COMPET,       
+			      i.EVALU_CONTENT,
+			      fm.ORDER_NO,
+			      d.DEPARTMENT_NAME,
+			      t.TEAM_NAME,
+			      fm.EVALU_NO,
+			      r.EVALU_SCORE,  
+				      (
+				        SELECT AVG(r2.EVALU_SCORE)
+				        FROM EVALU_RESULT r2
+				        JOIN EVALU_FORMAT fm2 ON r2.EVALU_NO = fm2.EVALU_NO
+				        WHERE fm2.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+				          AND r2.EVALU_FORM_NO = f.EVALU_FORM_NO
+				      ) AS avgScore
+				FROM EVALU_FORM f              
+				JOIN EVALUATEE_GROUP g ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
+				JOIN EMPLOYEE u ON g.USER_NO = u.USER_NO        
+				JOIN EVALU_FORMAT fm ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO  
+				JOIN EVALU_ITEM i ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
+				JOIN TEAM t ON t.TEAM_NO = u.TEAM_NO
+				JOIN DEPARTMENT d ON t.DEPARTMENT_ID = d.DEPARTMENT_ID
+				JOIN EVALU_RESULT r ON r.EVALU_NO = fm.EVALU_NO
+				                    AND r.EVALU_FORM_NO = f.EVALU_FORM_NO
+                                    AND r.EVALUATEE_GROUP_ID = g.EVALUATEE_GROUP_ID
+				
+				WHERE f.EVALU_FORM_NO = #{evaluFormNo}
+				ORDER BY u.USER_NO
+			
 	</select>
 	
 	
@@ -267,7 +274,7 @@
 
 		<!-- 내가 평가한 평가 리스트 (전체 조회) -->
 	<select id="selectMyEvaluList" resultMap="formEmpMyList">
- 			SELECT f.EVALU_NAME
+ 			SELECT DISTINCT f.EVALU_NAME
 		 					, f.EVALU_FORM_NO
 					        , f.EVALU_START
 					        , f.EVALU_END
@@ -288,15 +295,13 @@
 	</select>
 	
 		<resultMap id="formEmpMyList" type="EvaluVO">
-		<id property="evaluFormNo" column="evalu_form_no" />
-		  <result property="usageStatus" column="usage_status" />
-			<result property="evaluName" column="evalu_name" />
-				<result property="evaluStart" column="evalu_start" />
-				<result property="evaluEnd" column="evalu_end" />
-				<collection property="teamList" ofType="teamVO">
-					<result property="teamName" column="team_name" />
-				</collection>
-	</resultMap>
+			  <id property="evaluFormNo" column="evalu_form_no" />
+			  <result property="usageStatus" column="usage_status" />
+			  <result property="evaluName" column="evalu_name" />
+			  <result property="evaluStart" column="evalu_start" />
+			  <result property="evaluEnd" column="evalu_end" />
+              <result property="teamName" column="team_name" />
+		</resultMap>
 	<!-- 평가 폼 등록 시 필요한 항목과 내용 선택하기 위한 조회 쿼리문 -->
 	<select id="selectContentList" resultType="EvaluVO">
 			SELECT EVALU_ITEM_NO

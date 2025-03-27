@@ -43,6 +43,7 @@ public class EvaluVO {
 	private Date evaluEnd;			// 평가 종료 날짜
 	List<EmpVO> empOne;
 	List<TeamVO> teamList;
+	
 	private Integer userNo;				// 유저 번호 
 //	private int userNo;	
 	private String userName;		// 유저 이름
