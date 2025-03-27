@@ -91,53 +91,59 @@ public class MailServiceImpl implements MailService {
         String[] recipientList = recipients.split(",");
         String[] ccListArray = ccList != null && !ccList.isBlank() ? ccList.split(",") : new String[0];
 
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        String fromEmail = "the7100000@gmail.com";
+        InternetAddress fromAddress = new InternetAddress(fromEmail);
+        try {
+			fromAddress.setPersonal(senderName, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        helper.setFrom(fromAddress);
+        helper.setTo(recipientList); // ✅ 여러명 한 번에 전송
+        if (ccListArray.length > 0) {
+            helper.setCc(ccListArray);
+        }
+
+        boolean isInternal = true;
+        for (String r : recipientList) {
+            if (mailMapper.findUserByEmail(r.trim()) == null) {
+                isInternal = false;
+                break;
+            }
+        }
+
+        String finalSubject = (isInternal ? "[내부] " : "[외부] ") + subject;
+        helper.setSubject(finalSubject);
+        helper.setText(content, true);
+        helper.setReplyTo(senderEmail);
+
+        // ✉️ SMTP 전송
+        mailSender.send(message);
+
+        // ✅ 보낸사람 저장
+        MailVO mail = new MailVO();
+        mail.setUserNo(getUserNoByEmail(senderEmail));
+        mail.setRecipients(recipients);
+        mail.setCcList(ccList);
+        mail.setSubject(finalSubject);
+        mail.setContent(content);
+        mail.setSentAt(new Date());
+        mail.setStatus("발송됨");
+        mail.setEncrypted("N");
+        mail.setMailType(isInternal ? "내부" : "외부");
+        mail.setIsSpam("N");
+        mail.setFolderId(1002);
+        mail.setSenderEmail(senderEmail);
+        mailMapper.insertMail(mail);
+
+        // ✅ 수신자 각각 저장
         for (String recipient : recipientList) {
             recipient = recipient.trim();
-            if (recipient.isBlank()) continue;
-
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            String fromEmail = "the7100000@gmail.com";
-            InternetAddress fromAddress = new InternetAddress(fromEmail);
-            try {
-				fromAddress.setPersonal(senderName, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-            helper.setFrom(fromAddress);
-            helper.setTo(recipient);
-            if (ccListArray.length > 0) {
-                helper.setCc(ccListArray);
-            }
-
-            boolean isInternal = mailMapper.findUserByEmail(recipient) != null;
-            String finalSubject = (isInternal ? "[내부] " : "[외부] ") + subject;
-            helper.setSubject(finalSubject);
-            helper.setText(content, true);
-            helper.setReplyTo(senderEmail);
-
-            mailSender.send(message);
-
-            // 발신자 저장
-            MailVO mail = new MailVO();
-            mail.setUserNo(getUserNoByEmail(senderEmail));
-            mail.setRecipients(recipient);
-            mail.setCcList(ccList);
-            mail.setSubject(finalSubject);
-            mail.setContent(content);
-            mail.setSentAt(new Date());
-            mail.setStatus("발송됨");
-            mail.setEncrypted("N");
-            mail.setMailType(isInternal ? "내부" : "외부");
-            mail.setIsSpam("N");
-            mail.setFolderId(1002);
-            mail.setSenderEmail(senderEmail);
-            mailMapper.insertMail(mail);
-
-            // 수신자 저장
             Integer recipientNo = getUserNoByEmail(recipient);
             if (recipientNo != null) {
                 MailVO receiverMail = new MailVO();
@@ -153,10 +159,13 @@ public class MailServiceImpl implements MailService {
                 receiverMail.setIsSpam("N");
                 receiverMail.setFolderId(1001);
                 receiverMail.setSenderEmail(senderEmail);
+                receiverMail.setMessageId(mail.getMessageId());
+
                 mailMapper.insertMail(receiverMail);
             }
         }
     }
+
 
 
 
@@ -481,7 +490,7 @@ public class MailServiceImpl implements MailService {
 	    String[] recipientList = recipients.split(",");
 	    String fromEmail = "the7100000@gmail.com";
 
-	    // ✅ 첨부파일 먼저 저장
+	    // ✅ 첨부파일 저장
 	    List<AttachmentVO> savedAttachments = new ArrayList<>();
 	    if (attachments != null && attachments.length > 0) {
 	        for (MultipartFile file : attachments) {
@@ -506,7 +515,7 @@ public class MailServiceImpl implements MailService {
 	        }
 	    }
 
-	    // ✅ 메일 전송은 한 번만
+	    // ✅ 메일 실제 전송 (1번만)
 	    MimeMessage message = mailSender.createMimeMessage();
 	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -535,7 +544,7 @@ public class MailServiceImpl implements MailService {
 	    helper.setText(content, true);
 	    helper.setReplyTo(senderEmail);
 
-	    // 첨부파일 추가
+	    // 📎 첨부파일 추가
 	    for (AttachmentVO att : savedAttachments) {
 	        File fileToAttach = new File(att.getFilePath());
 	        if (fileToAttach.exists()) {
@@ -543,7 +552,6 @@ public class MailServiceImpl implements MailService {
 	        }
 	    }
 
-	    // ✉️ 실제 전송
 	    mailSender.send(message);
 
 	    // ✅ 보낸 메일 저장 (보낸사람 1건)
@@ -559,12 +567,13 @@ public class MailServiceImpl implements MailService {
 	    mail.setEncrypted("N");
 	    mail.setMailType(isInternal ? "내부" : "외부");
 	    mail.setIsSpam("N");
-	    mail.setFolderId(1002);
+	    mail.setFolderId(1002); // 보낸메일함
 	    mail.setSenderEmail(senderEmail);
 	    mail.setMessageId(((MimeMessage) message).getMessageID());
 
 	    mailMapper.insertMail(mail);
 
+	    // 보낸 메일 첨부파일 저장
 	    for (AttachmentVO att : savedAttachments) {
 	        AttachmentVO copy = new AttachmentVO();
 	        copy.setMailId(mail.getMailId());
@@ -575,7 +584,7 @@ public class MailServiceImpl implements MailService {
 	        attachmentMapper.insertAttachment(copy);
 	    }
 
-	    // ✅ 받는사람 각각 수신 메일 저장 (메일은 위에서 한 번만 전송됨)
+	    // ✅ 수신자별 메일 + 첨부파일 저장
 	    for (String recipient : recipientList) {
 	        recipient = recipient.trim();
 	        Integer recipientNo = getUserNoByEmail(recipient);
@@ -591,14 +600,25 @@ public class MailServiceImpl implements MailService {
 	            receiverMail.setEncrypted("N");
 	            receiverMail.setMailType(isInternal ? "내부" : "외부");
 	            receiverMail.setIsSpam("N");
-	            receiverMail.setFolderId(1001);
+	            receiverMail.setFolderId(1001); // 받은메일함
 	            receiverMail.setSenderEmail(senderEmail);
 	            receiverMail.setMessageId(mail.getMessageId());
 
 	            mailMapper.insertMail(receiverMail);
+
+	            for (AttachmentVO att : savedAttachments) {
+	                AttachmentVO copy = new AttachmentVO();
+	                copy.setMailId(receiverMail.getMailId());
+	                copy.setFileName(att.getFileName());
+	                copy.setFileType(att.getFileType());
+	                copy.setFileSize(att.getFileSize());
+	                copy.setFilePath(att.getFilePath());
+	                attachmentMapper.insertAttachment(copy);
+	            }
 	        }
 	    }
 	}
+
 
 
 
@@ -727,5 +747,8 @@ public class MailServiceImpl implements MailService {
 	public void markAsRead(int mailId) {
 	    mailMapper.updateMailReadStatus(mailId);
 	}
-	
+	@Override
+    public int countUnreadMails(int userNo) {
+        return mailMapper.countUnreadMails(userNo);
+    }
 }

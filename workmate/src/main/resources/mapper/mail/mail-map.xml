@@ -39,7 +39,8 @@
 		SENT_AT,
 		STATUS,
 		IS_READ AS isRead,
-		FOLDER_ID
+		FOLDER_ID,
+		ENCRYPTED
 		FROM MAIL
 		WHERE MAIL_ID = #{mailId}
 	</select>
@@ -287,5 +288,6 @@
     FROM ATTACHMENT
     WHERE MAIL_ID = #{mailId}
 </select>
+
 
 </mapper>

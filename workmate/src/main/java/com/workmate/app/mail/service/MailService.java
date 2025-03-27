@@ -99,4 +99,6 @@ public interface MailService {
     void scheduleMail(MailVO mail, MultipartFile[] attachments);
     //받은메일 읽음 기능
     void markAsRead(int mailId);
+    
+    int countUnreadMails(int userNo);
 }
