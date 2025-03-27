@@ -31,14 +31,15 @@
     background: url("https://cdn-icons-png.flaticon.com/512/622/622669.png") no-repeat 10px center;
     background-size: 20px 20px;
   }
-    .btn { padding: 6px 12px; }
+.btn { padding: 6px 12px; };
+    
   </style>
 </head>
 <body>
 <div class="container mt-4">
   <h2>거래처 목록</h2>
 
-  <div class="mb-3">
+  <div class="mb-3" th:if="${teamNo == 'ROLE_T004'}">
     <a th:href="@{/vendor/insert}" class="btn btn-success">신규 등록</a>
   </div>
 
@@ -49,7 +50,7 @@
 	      <th>사업자번호</th>
 	      <th>대표자</th>
 	      <th>담당자</th>
-	      <th>계약기간</th>
+	      <th>업종</th>
 	      <th>등록일</th>
 	      <th>비고</th>
 	    </tr>
@@ -62,8 +63,9 @@
 	      <td th:text="${vendor.bizrNum}"></td>
 	      <td th:text="${vendor.rpstrName}"></td>
 	      <td th:text="${vendor.cntrManager}"></td>
-	      <td th:text="${vendor.cntrStart} + ' ~ ' + ${vendor.cntrEnd}"></td>
+	      <td th:text="${vendor.biztp}"></td>
 	      <td th:text="${vendor.regDate}"></td>
+	      <td></td>
 	    </tr>
 	  </tbody>
 	</table>
@@ -75,13 +77,16 @@
 <script>
   $(document).ready(function() {
     $('#vendorTable').DataTable({
+    	"pageLength": 5,
+    	
       "language": {
         "search": "검색:",
-        "lengthMenu": "페이지당 _MENU_ 개씩 보기",
+        "lengthMenu": " ",
         "info": "현재 _START_ - _END_ / _TOTAL_건",
         "infoEmpty": "",
         "zeroRecords": "일치하는 데이터가 없습니다.",
         "infoFiltered": "(전체 _MAX_ 개 중 검색결과)",
+        
         "paginate": {
           "next": "다음",
           "previous": "이전"

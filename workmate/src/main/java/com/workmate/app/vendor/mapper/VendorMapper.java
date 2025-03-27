@@ -18,5 +18,5 @@ public interface VendorMapper {
 	// 수정
 	public int updateVendorInfo(VendorVO vendorVO);
 	// 삭제
-	public int deleteVendorInfo(VendorVO vendorVO);
+	public int deleteVendorInfo(String vendCode);
 }

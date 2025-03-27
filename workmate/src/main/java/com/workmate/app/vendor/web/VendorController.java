@@ -1,7 +1,11 @@
 package com.workmate.app.vendor.web;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,8 +36,9 @@ import lombok.RequiredArgsConstructor;
  * 수정일자	수정자	수정내용
  * ----------------------
  * 03-26	이종우	거래처 페이지 생성
+ * 03-27	이종우	거래처 상세, 등록, 수정 구현
  * 
- *        </pre>
+ * </pre>
  */
 
 @Controller
@@ -69,6 +74,30 @@ public class VendorController {
 
 	    return "vendor/vendorDetail"; // 상세 페이지 이름
 	}
+	
+	// 파일 다운로드
+	@GetMapping("/files/{vendCode}")
+	public ResponseEntity<FileSystemResource> downloadFile(@PathVariable String vendCode) {
+	    try {
+	    	
+	    	VendorVO vo = new VendorVO();
+		    vo.setVendCode(vendCode);
+	    	VendorVO vendor = vendorService.findVendorById(vo);
+	    	
+	        String fullPath = uploadDir + subDir; // 예: C:/uploads/vendor/
+	        FileSystemResource resource = fileHandler.fileDownload(vendor.getCntrAttachment() , fullPath);
+
+	        String encodedFileName = URLEncoder.encode(vendor.getCntrFile() , StandardCharsets.UTF_8);
+	        		
+	        return ResponseEntity.ok()
+	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+	                .body(resource);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
 
 	
 
@@ -91,6 +120,7 @@ public class VendorController {
 	            String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toUpperCase();
 
 	            vendorVO.setCntrFile(fileName); // 원본 파일 이름
+	            vendorVO.setCntrAttachment(saveFileName);
 	        }
 
 	        vendorService.inputVendor(vendorVO);
@@ -107,14 +137,14 @@ public class VendorController {
 
 
 	// 거래처 수정 - 페이지
-	@GetMapping("/vendor/edit/{vendCode}")
+	@GetMapping("/edit/{vendCode}")
 	public String vendorEditForm(VendorVO vendorVO, Model model) {
 		VendorVO vendor = vendorService.findVendorById(vendorVO); 
 	    model.addAttribute("vendor", vendor);
 	    return "vendor/vendorEdit";
 	}
 	// 거래처 수정 - 처리
-	@PostMapping("/vendor/update")
+	@PostMapping("/update")
 	public String updateVendor(
 	        VendorVO vendorVO,
 	        @RequestParam(value = "uploadFile", required = false) MultipartFile file
@@ -128,7 +158,7 @@ public class VendorController {
 
 	            // 파일 관련 정보 설정
 	            vendorVO.setCntrFile(fileName);
-	            // 필요 시: vendorVO.setSaveFileName(saveFileName);
+	            vendorVO.setCntrAttachment(saveFileName);
 	        }
 
 	        vendorService.modifyVendor(vendorVO);
@@ -141,26 +171,6 @@ public class VendorController {
 	}
 	
 
-	// 삭제 - 처리
-	@DeleteMapping("/vendor/delete/{vendCode}")
-	public String deleteVendor(@PathVariable String vendCode) {
-	    try {
-	        VendorVO vendorVO = new VendorVO();
-	        vendorVO.setVendCode(vendCode);
-
-	        vendorService.dropVendor(vendorVO);
-
-	        return "redirect:/vendor/list";
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return "redirect:/vendor/detail/" + vendCode + "?error=true";
-	    }
-	}
-
-
-
-	
-	
 	
 	
 }
