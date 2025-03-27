@@ -1,392 +1,404 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{common/layouts/finance_layout}" layout:fragment="content">
+	layout:decorate="~{common/layouts/finance_layout}" layout:fragment="content">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>리포트 작성</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f9f9f9;
+	<meta charset="UTF-8" />
+	<title>리포트 작성</title>
+	<style>
+		body {
+			font-family: 'Arial', sans-serif;
+			background-color: #f9f9f9;
 
-    }
+		}
 
-    #container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 40px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+		#container {
+			max-width: 1000px;
+			margin: 0 auto;
+			background-color: #fff;
+			border-radius: 10px;
+			padding: 40px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
 
-    input[type="date"] {
-      width: 130px;
-      /* ✅ 너비 줄이기 */
-      padding: 6px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
+		input[type="date"] {
+			width: 130px;
+			/* ✅ 너비 줄이기 */
+			padding: 6px;
+			font-size: 14px;
+			box-sizing: border-box;
+		}
 
-    h2,
-    h3 {
-      color: #333;
-      margin-top: 30px;
-      margin-bottom: 10px;
-    }
+		h2,
+		h3 {
+			color: #333;
+			margin-top: 30px;
+			margin-bottom: 10px;
+		}
 
-    input[type="text"],
-    input[type="number"],
-    input[type="date"],
-    select {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
+		input[type="text"],
+		input[type="number"],
+		input[type="date"],
+		select {
+			width: 100%;
+			padding: 8px;
+			box-sizing: border-box;
+			font-size: 14px;
+		}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 10px;
+		}
 
-    th,
-    td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 14px;
-    }
+		th,
+		td {
+			border: 1px solid #ccc;
+			padding: 10px;
+			text-align: center;
+			vertical-align: middle;
+			font-size: 14px;
+		}
 
-    th {
-      background-color: #f2f2f2;
-      font-weight: bold;
-    }
+		th {
+			background-color: #f2f2f2;
+			font-weight: bold;
+		}
 
-    .btn-group {
-      margin: 15px 0;
-      text-align: right;
-    }
+		.btn-group {
+			margin: 15px 0;
+			text-align: right;
+		}
 
-    .btn {
-      padding: 8px 16px;
-      margin-left: 5px;
-      border: none;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-    }
+		.btn {
+			padding: 8px 16px;
+			margin-left: 5px;
+			border: none;
+			border-radius: 4px;
+			font-size: 14px;
+			cursor: pointer;
+		}
 
-    .plus {
-      background-color: #28a745;
-      color: white;
-    }
+		.plus {
+			background-color: #28a745;
+			color: white;
+		}
 
-    .minus {
-      background-color: #dc3545;
-      color: white;
-    }
+		.minus {
+			background-color: #dc3545;
+			color: white;
+		}
 
-    .report-section {
-      margin-top: 40px;
-    }
+		.report-section {
+			margin-top: 40px;
+		}
 
-    .attachment-area textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      resize: vertical;
-      font-size: 14px;
-    }
+		.attachment-area textarea {
+			width: 100%;
+			padding: 12px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			resize: vertical;
+			font-size: 14px;
+		}
 
-    .file-upload>div {
-      display: flex;
-      align-items: center;
-      margin-top: 10px;
-    }
+		.file-upload>div {
+			display: flex;
+			align-items: center;
+			margin-top: 10px;
+		}
 
-    .file-upload input[type="file"] {
-      flex: 1;
-      margin-right: 10px;
-    }
+		.file-upload input[type="file"] {
+			flex: 1;
+			margin-right: 10px;
+		}
 
-    .button-area {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 30px;
-    }
+		.button-area {
+			display: flex;
+			justify-content: flex-end;
+			gap: 10px;
+			margin-top: 30px;
+		}
 
-    .btn-approve {
-      background-color: #17a2b8;
-      color: #fff;
-    }
+		.btn-approve {
+			background-color: #17a2b8;
+			color: #fff;
+		}
 
-    .btn-submit {
-      background-color: #007bff;
-      color: #fff;
-    }
+		.btn-submit {
+			background-color: #007bff;
+			color: #fff;
+		}
 
-    .btn-approve:hover {
-      background-color: #138496;
-    }
+		.btn-approve:hover {
+			background-color: #138496;
+		}
 
-    .btn-submit:hover {
-      background-color: #0056b3;
-    }
-  </style>
+		.btn-submit:hover {
+			background-color: #0056b3;
+		}
+	</style>
 </head>
 
 <body>
-  <div id="container">
-  <h3>신규 리포트 작성</h3>
-    <input type="text" placeholder="리포트 제목을 입력하세요" required id="reportTitle">
-    <h3>기본 정보</h3>
-    <table>
-      <tr>
-        <th>기간</th>
-        <td>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="date" style="width: 130px;" id="startDate" />
-            ~
-            <input type="date" style="width: 130px;" id="endDate"/>
-          </div>
-        </td>
-        <th>팀명</th>
-        <td><input type="text" th:data-teamno="${teamNo}" th:value="${teamName}" readonly></td>
-      </tr>
-      <tr>
-        <th>직급</th><!-- 로그인한 유저 -->
-        <td><input type="text" th:value="${position}" readonly></td>
-        <th>성명</th><!-- 로그인한 유저 -->
-        <td><input type="text" th:data-userno="${userNo}" th:value="${userName}" id="userNo" readonly></td>
-      </tr>
-    </table>
+	<div id="container">
+		<h3>신규 리포트 작성</h3>
+		<input type="text" placeholder="리포트 제목을 입력하세요" required id="reportTitle">
+		<h3>기본 정보</h3>
+		<table>
+			<tr>
+				<th>기간</th>
+				<td>
+					<div style="display: flex; gap: 10px; align-items: center;">
+						<input type="date" style="width: 130px;" id="startDate" />
+						~
+						<input type="date" style="width: 130px;" id="endDate" />
+					</div>
+				</td>
+				<th>팀명</th>
+				<td><input type="text" th:data-teamno="${teamNo}" th:value="${teamName}" readonly></td>
+			</tr>
+			<tr>
+				<th>직급</th><!-- 로그인한 유저 -->
+				<td><input type="text" th:value="${position}" readonly></td>
+				<th>성명</th><!-- 로그인한 유저 -->
+				<td><input type="text" th:data-userno="${userNo}" th:value="${userName}" id="userNo" readonly></td>
+			</tr>
+		</table>
 
-    <h3>입출금 내역</h3>
-    <div class="btn-group">
-      <button class="btn plus" onclick="addRow()">＋ 행 추가</button>
-      <button class="btn minus" onclick="removeRow()">－ 행 삭제</button>
-      <input type="file" id="excelFile" />
-	  <button type="button" id="Excelupload">엑셀 업로드</button>
-    </div>
+		<h3>입출금 내역</h3>
+		<div class="btn-group">
+			<button class="btn plus" onclick="addRow()">＋ 행 추가</button>
+			<button class="btn minus" onclick="removeRow()">－ 행 삭제</button>
+			<input type="file" id="excelFile" />
+			<button type="button" id="Excelupload">엑셀 업로드</button>
+		</div>
 
-    <table id="financeTable">
-      <thead>
-        <tr>
-          <th>일자</th>
-          <th>상세내역</th>
-          <th>입금액(원)</th>
-          <th>출금액(원)</th>
-          <th>잔액(원)</th>
-          <th>선택</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><input type="text" placeholder="예: 1일(토)"></td>
-          <td><input type="text"></td>
-          <td><input type="number" th:data-deposit="입금"></td>
-          <td><input type="number" th:data-drawal="출금"></td>
-          <td><input type="number"></td>
-          <td><input type="checkbox"></td>
-        </tr>
-        <tr>
-          <td><input type="text" placeholder="예: 2일(일)"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="checkbox"></td>
-        </tr>
-      </tbody>
-    </table>
+		<table id="financeTable">
+			<thead>
+				<tr>
+					<th>일자</th>
+					<th>상세내역</th>
+					<th>입금액(원)</th>
+					<th>출금액(원)</th>
+					<th>잔액(원)</th>
+					<th>선택</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><input type="text" placeholder="예: 1일(토)"></td>
+					<td><input type="text"></td>
+					<td><input type="number" th:data-deposit="입금"></td>
+					<td><input type="number" th:data-drawal="출금"></td>
+					<td><input type="number"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<td><input type="text" placeholder="예: 2일(일)"></td>
+					<td><input type="text"></td>
+					<td><input type="number"></td>
+					<td><input type="number"></td>
+					<td><input type="number"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+			</tbody>
+		</table>
 
-    <div class="report-section">
-      <h3>월간합계</h3>
-      <table class="sum-table">
-        <thead>
-          <tr>
-            <th>입금액(원)</th>
-            <th>출금액(원)</th>
-            <th>잔액(원)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><input type="number" readonly id="totalDeposit"></td>
-            <td><input type="number" readonly id="totalWithdraw"></td>
-            <td><input type="number" readonly id="totalBalance"></td>
-          </tr>
-        </tbody>
-      </table>
+		<div class="report-section">
+			<h3>월간합계</h3>
+			<table class="sum-table">
+				<thead>
+					<tr>
+						<th>입금액(원)</th>
+						<th>출금액(원)</th>
+						<th>잔액(원)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="number" readonly id="totalDeposit"></td>
+						<td><input type="number" readonly id="totalWithdraw"></td>
+						<td><input type="number" readonly id="totalBalance"></td>
+					</tr>
+				</tbody>
+			</table>
 
-      <h3>추가 자료 첨부</h3>
-      <div class="attachment-area">
-        <textarea placeholder="사진 / 그래프 등 첨부" rows="5"></textarea>
-      </div>
+			<h3>추가 자료 첨부</h3>
+			<div class="attachment-area">
+				<textarea placeholder="사진 / 그래프 등 첨부" rows="5"></textarea>
+			</div>
 
-      <h3>첨부 파일</h3>
-      <div class="file-upload">
-        <div>
-          <input type="file">
-          <button type="button">첨부</button>
-        </div>
-        <div>
-          <input type="file">
-          <button type="button">첨부</button>
-        </div>
-      </div>
+			<h3>첨부 파일</h3>
+			<div class="file-upload">
+				<div>
+					<input type="file">
+					<button type="button">첨부</button>
+				</div>
+				<div>
+					<input type="file">
+					<button type="button">첨부</button>
+				</div>
+			</div>
 
-      <div class="button-area">
-        <button type="button" class="btn-approve">결재선</button>
-        <button type="submit" class="btn-submit" id="insertReport">등록</button>
-      </div>
-    </div>
-  </div>
+			<div class="button-area">
+				<button type="button" class="btn-approve">결재선</button>
+				<button type="submit" class="btn-submit" id="insertReport">등록</button>
+			</div>
+		</div>
+	</div>
 
-  <script>
-  
-  // 입출금 내역
-    function calculateTotals() {
-      let totalDeposit = 0;
-      let totalWithdraw = 0;
-      let totalBalance = 0;
+	<script>
 
-      document.querySelectorAll('#financeTable tbody tr').forEach(row => {
-        const depositInput = row.cells[2].querySelector('input'); // 입금 
-        const withdrawInput = row.cells[3].querySelector('input'); // 출금
-        const balanceInput = row.cells[4].querySelector('input'); // 잔액
+		function calculateTotals() {
+			let totalDeposit = 0;
+			let totalWithdraw = 0;
+			let totalBalance = 0;
+			let prevBalance = 0;
 
-        const deposit = parseFloat(depositInput.value) || 0;
-        const withdraw = parseFloat(withdrawInput.value) || 0;
+			const rows = document.querySelectorAll('#financeTable tbody tr');
 
-        const balance = deposit - withdraw;
-        //balanceInput.value = balance; // 자동 계산된 잔액 입력
+			rows.forEach((row, index) => {
+				const depositInput = row.cells[2].querySelector('input');
+				const withdrawInput = row.cells[3].querySelector('input');
+				const balanceInput = row.cells[4].querySelector('input');
 
-        totalDeposit += deposit;
-        totalWithdraw += withdraw;
-        totalBalance += balance;
-      });
+				const deposit = parseInt(depositInput.value) || 0;
+				const withdraw = parseInt(withdrawInput.value) || 0;
 
-      document.getElementById('totalDeposit').value = totalDeposit;
-      document.getElementById('totalWithdraw').value = totalWithdraw;
-      document.getElementById('totalBalance').value = totalBalance;
-    }
+				let balance = 0;
 
-    function attachInputListeners() {
-      const tbody = document.querySelector('#financeTable tbody');
-      tbody.querySelectorAll('input[type="number"]').forEach(input => {
-        input.addEventListener('input', calculateTotals);
-      });
-    }
+				if (index === 0) {
+					balance = deposit - withdraw;
+				} else {
+					balance = prevBalance + deposit - withdraw;
+				}
 
-    // 행 추가
-    function addRow() {
-      const tbody = document.querySelector('#financeTable tbody');
-      const newRow = tbody.rows[0].cloneNode(true);
-      newRow.querySelectorAll('input').forEach(input => {
-        if (input.type === 'checkbox') input.checked = false;
-        else input.value = '';
-      });
-      tbody.appendChild(newRow);
-      attachInputListeners();
-    }
+				balanceInput.value = balance;
 
-    
-    // 행 삭제
-    function removeRow() {
-      const tbody = document.querySelector('#financeTable tbody');
-      const rows = Array.from(tbody.rows);
-      const checkedRows = rows.filter(row => row.querySelector('input[type="checkbox"]').checked);
+				prevBalance = balance;
+				totalDeposit += deposit;
+				totalWithdraw += withdraw;
+				totalBalance = balance;
+			});
 
-      if (checkedRows.length > 0) {
-        if (rows.length - checkedRows.length < 2) {
-          alert("더 이상 삭제할 수 없습니다.");
-          return;
-        }
-        checkedRows.forEach(row => row.remove());
-      } else {
-        if (rows.length <= 2) {
-          alert("더 이상 삭제할 수 없습니다.");
-          return;
-        }
-        tbody.deleteRow(rows.length - 1);
-      }
-      calculateTotals();
-    }
+			document.getElementById('totalDeposit').value = totalDeposit;
+			document.getElementById('totalWithdraw').value = totalWithdraw;
+			document.getElementById('totalBalance').value = totalBalance;
+		}
 
-    window.onload = () => {
-      attachInputListeners();
-      calculateTotals();
-    };
-    
-    
-    // Report 등록 AJAX
-    
-    // 버튼 클릭시 click 이벤트
-    
-    document.querySelector('#insertReport').addEventListener('click', e => {
-    	insertReportAjax();
-    })
-    
-    let rTitle = document.querySelector('#reportTitle').value; // 리포트 제목
-    let sDate = document.querySelector('#startDate').value; // 기간 시작
-    let eDate = document.querySelector('#endDate').value; // 기간 끝
-    let userNo = document.querySelector('#userNo').dataset.userno;
-    
-    function insertReportAjax(){
+		function attachInputListeners() {
+			const tbody = document.querySelector('#financeTable tbody');
+			tbody.querySelectorAll('input[type="number"]').forEach(input => {
+				input.addEventListener('input', calculateTotals);
+			});
+		}
 
-   	document.querySelectorAll('#financeTable tbody tr').forEach(e => {
-   		let tDate = e.cells[0].querySelector('input').value;	// 거래 일자 
-   		let purpose = e.cells[1].querySelector('input').value;  // 상세 내역
-   		let deposit = parseInt(e.cells[2].querySelector('input').value) || 0;	// 입금액 
-   		let drawal = parseInt(e.cells[3].querySelector('input').value) || 0;	// 출금액 
-   		let balance = parseInt(e.cells[4].querySelector('input').value) || 0;	// 잔액
+		// 행 추가
+		function addRow() {
+			const tbody = document.querySelector('#financeTable tbody');
+			const newRow = tbody.rows[0].cloneNode(true);
+			newRow.querySelectorAll('input').forEach(input => {
+				if (input.type === 'checkbox') input.checked = false;
+				else input.value = '';
+			});
+			tbody.appendChild(newRow); 
+			attachInputListeners(); // 새로 추가된 행에도 리스너 붙이기
+			calculateTotals(); // 추가 후 계산 다시 실행
+		}
 
-   	})
-   	
-    let transList = {
-    	'reportTitle' : rTitle,
-    	'transStart' : sDate,
-    	'transEnd' : eDate,
-    	'userNo' : userNo
-   		};
-   	
-    // insertAJAX 
-    fetch(`/workmate/finance/reportInsert`, {
-    	method : 'POST', // 등록
-    	headers : {
-    		'Content-Type' : 'application/json'
-    	},
-    	body : JSON.stringify(transList)
-    })
-    .then(res => res.json())
-    .then(result => {
-    	if(result != null) {
-    		alert('성공적으로 등록되었습니다.');
-    	}
-    })
-    .catch(err => console.log(err));
-    	
-    }
-    
-    
-    
-    // Excel upload AJAX
-    document.querySelector('#Excelupload').addEventListener('click', e => {
-    	excelUpload();
-    })
-    
-    function excelUpload() {
-    	
-    }
-    
-  </script>
+		// 행 삭제
+		function removeRow() {
+			const tbody = document.querySelector('#financeTable tbody');
+			const rows = Array.from(tbody.rows);
+			const checkedRows = rows.filter(row => row.querySelector('input[type="checkbox"]').checked);
+
+			if (checkedRows.length > 0) {
+				if (rows.length - checkedRows.length < 2) {
+					alert("더 이상 삭제할 수 없습니다.");
+					return;
+				}
+				checkedRows.forEach(row => row.remove());
+			} else {
+				if (rows.length <= 2) {
+					alert("더 이상 삭제할 수 없습니다.");
+					return;
+				}
+				tbody.deleteRow(rows.length - 1);
+			}
+			calculateTotals();
+		}
+
+		// 페이지 로드 시 초기 실행
+		window.onload = () => {
+			attachInputListeners();
+			calculateTotals();
+		};
+
+
+		// Report 등록 AJAX
+
+		// 버튼 클릭시 click 이벤트
+
+		document.querySelector('#insertReport').addEventListener('click', e => {
+			insertReportAjax();
+		})
+
+		function insertReportAjax() {
+
+
+			let rTitle = document.querySelector('#reportTitle').value; // 리포트 제목
+			let sDate = document.querySelector('#startDate').value; // 기간 시작
+			let eDate = document.querySelector('#endDate').value; // 기간 끝
+			let userNo = document.querySelector('#userNo').dataset.userno;
+
+			document.querySelectorAll('#financeTable tbody tr').forEach(e => {
+				let tDate = e.cells[0].querySelector('input').value;	// 거래 일자 
+				let purpose = e.cells[1].querySelector('input').value;  // 상세 내역
+				let deposit = parseInt(e.cells[2].querySelector('input').value) || 0;	// 입금액 
+				let drawal = parseInt(e.cells[3].querySelector('input').value) || 0;	// 출금액 
+				let balance = parseInt(e.cells[4].querySelector('input').value) || 0;	// 잔액
+
+			})
+
+			let transList = {
+				'reportTitle': rTitle,
+				'transStart': sDate,
+				'transEnd': eDate,
+				'userNo': userNo
+			};
+
+			// insertAJAX 
+			fetch(`/workmate/finance/reportInsert`, {
+				method: 'POST', // 등록
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(transList)
+			})
+				.then(res => res.json())
+				.then(result => {
+					if (result != null) {
+						alert('성공적으로 등록되었습니다.');
+					}
+				})
+				.catch(err => console.log(err));
+
+		}
+
+
+
+		// Excel upload AJAX
+		document.querySelector('#Excelupload').addEventListener('click', e => {
+			excelUpload();
+		})
+
+		function excelUpload() {
+
+		}
+
+	</script>
 
 
 </body>

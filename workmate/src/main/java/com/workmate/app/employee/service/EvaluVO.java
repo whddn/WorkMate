@@ -28,7 +28,7 @@ public class EvaluVO {
 	// 평가 양식 (평가 양식 개별...?)
 	private Integer evaluNo;		// 평가 번호
 	private String orderNo;			// 평가 번호 나열 순서
-	private int evaluFormNo;		// 평가 폼 번호 
+	private Integer evaluFormNo;		// 평가 폼 번호 
 	private Double avgScore;		// 평가 평균 점수
 	
 	//List<DepartmentVO> dptList;

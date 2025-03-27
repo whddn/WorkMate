@@ -177,6 +177,7 @@ button:hover {
 			</table>
 			<button type="button" id="selectAjax">제출</button>
 		</form>
+		<button type="button" th:onclick="|location.href='@{/emp/myEvalu}'|">목록으로</button>
 	</div>
 	<script>
   	// 평가 채점한 거 제출 AJAX 
@@ -233,7 +234,8 @@ let formNo = document.querySelector('[name="score"]').dataset.form;
   .then(res => res.json())
   .then(result => {
 	  if (result != null) {
-		    alert('평가가 성공적으로 제출되었습니다!');		  
+		    alert('평가가 성공적으로 제출되었습니다!');		 
+		    location.href = `/workmate/emp/update?formNo=${formNo}` 
 	  } 
 
   })
