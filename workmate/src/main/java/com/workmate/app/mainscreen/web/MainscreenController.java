@@ -63,7 +63,10 @@ public class MainscreenController {
 		model.addAttribute("scheduleList", scheduleService.findScheduleList(scheduleVO));
 		
 		List<MailVO> mailList = mailService.findReceivedMailsList(myself.getUserNo());
-		model.addAttribute("mailList", mailList.subList(0, 13));
+		if(mailList.size() > 13) {
+			mailList = mailList.subList(0, 13);
+		}
+		model.addAttribute("mailList", mailList);
 		
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setUserNo(myself.getUserNo());

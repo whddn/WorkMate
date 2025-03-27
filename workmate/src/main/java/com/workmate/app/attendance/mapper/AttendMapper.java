@@ -20,6 +20,9 @@ public interface AttendMapper {
 	// 퇴근 등록 = 수정
 	public int insertAfterInfo(WorkVO workVO);
 	
+	// 지각 사유 = 수정
+	public int insertLateReason(WorkVO workVO);
+	
 	// 출퇴근 여부
 	public WorkVO attendanceStatus(int userNo);
 	

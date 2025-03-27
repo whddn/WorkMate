@@ -18,6 +18,33 @@
 		LEFT JOIN team t ON e.team_no = t.team_no
 	</select> 
 	
+	<!-- 자료실 다운로드 이력 전체조회 -->
+	<select id="selectDownhistory" resultType="DocVO">
+	  SELECT 
+	      h.file_name,
+	      h.down_user,
+	      e.user_name,        
+	      e.user_id,          
+	      h.download_date,
+	      h.document_no,
+	      h.download_user_ip,
+	      d.file_tag
+	  FROM download_history h
+	  JOIN document d ON h.document_no = d.document_no
+	  JOIN employee e ON h.down_user = e.user_no 
+	  WHERE 1 = 1 
+	  <if test="downloadDate != null">
+	  	AND h.download_date = #{downloadDate}
+	  </if>
+	  <if test="fileName != null and fileName != ''">
+        	AND h.file_name LIKE '%' || #{fileName} || '%'
+	   </if>
+	  <if test="userName != null and userName != ''">
+        	AND e.user_name LIKE '%' || #{userName} || '%'
+	   </if>
+	</select>
+	
+	<!-- 자료실 단건조회, 파일삭제 및 업로드에 사용 -->
 	<select id="selectFileById" parameterType="int" resultType="DocVO">
 	    SELECT 
 	        document_no,
@@ -59,7 +86,26 @@
         #{userNo}
     )	
 	</insert>
+	
+	<!-- 다운로드 이력 저장 -->
+	<insert id="insertDownhistory" parameterType="DocVO">
+		INSERT INTO download_history (
+			 download_no
+			, file_name
+			, down_user
+			, download_date
+			, document_no
+			, download_user_ip		
 		
+		) VALUES (
+			 (SELECT NVL(MAX(download_no), 0) + 1 FROM download_history),
+			#{fileName},
+			#{downUser},
+			SYSDATE,
+			#{documentNo},
+			#{downloadUserIp}
+		)	
+	</insert>
 		
 	<!-- 파일 삭제 -->
 	<delete id="deleteFileInfo" parameterType="int">

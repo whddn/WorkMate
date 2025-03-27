@@ -52,6 +52,18 @@ public class DocumentServiceImpl implements DocumentService {
 		return map;
 	}
 	
+	// 자료실 다운로드 이력 전체 조회
+	@Override
+	public List<DocVO> findDownhistory(DocVO docVO) {
+		return docMapper.selectDownhistory(docVO);
+	}
+	
+	// 자료실 이력 저장
+	@Override
+	public int inputDownhistory(DocVO docVO) {
+		return docMapper.insertDownhistory(docVO);
+	}
+	
 
 
 }

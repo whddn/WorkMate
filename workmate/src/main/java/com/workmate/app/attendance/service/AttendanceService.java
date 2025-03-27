@@ -16,6 +16,9 @@ public interface AttendanceService {
 	//퇴근등록
 	public int afterWork(WorkVO workVO);
 	
+	//지각사유
+	public int inputLateReason(WorkVO workVO);
+	
 	//출근여부
 	public WorkVO attendanceStatus(int userNo);
 	
