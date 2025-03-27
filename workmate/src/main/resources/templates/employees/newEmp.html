@@ -201,6 +201,7 @@ function homeAddCode() {
 	    })
 	    .then(res => res.json())
 	    .then(result => {
+	      alert('새로운 평가가 등록되었습니다.');
 	      location.href = "/workmate/emp/organ"
 	    })
 	    .catch(err => console.log(err));
