@@ -46,51 +46,88 @@
                     <div class="col-md-4 mb-4">
                         <div class="card p-3 h-100">
                             <h5>오늘의 할 일</h5>
-                            <ul class="list-group">
-                                <th:block th:each="schedule : ${scheduleList}">
-                                    <li class="list-group-item">
-                                        [[ ${schedule.scheduleContent} ]]
-                                    </li>
-                                </th:block>
-                                <li class="list-group-item" th:if="${#lists.size(scheduleList) == 0}">오늘의 일정은 딱히 없습니다</li>
-                                <li class="list-group-item"><a th:href=@{/calendar}>캘린더로 가기</a></li>
-                            </ul>
+                            <table id="scheduleTable" class="stripe">
+                            	<thead>
+                            		<tr>
+                            			<th>유형</th>
+                            			<th>제목</th>
+                            			<th>종료일</th>
+                            		</tr>
+                            	</thead>
+                            	<tbody>
+                            		<th:block th:each="schedule : ${scheduleList}">
+                            			<tr>
+                            				<th>[ [[ ${schedule.scheduleTypeName} ]] ]</th>
+                            				<th>[[ ${schedule.scheduleContent} ]]</th>
+                            				<th th:text="${#dates.format(schedule.scheduleEndDate, 'yyyy.MM.dd')}"></th>
+                            			</tr>
+                            		</th:block>
+                            	</tbody>
+                            	<tr th:if="${#lists.isEmpty(scheduleList)}">
+                            		<td colspan="3">오늘의 일정은 딱히 없습니다</td>
+                            	</tr>
+                            	<tr>
+                            		<td colspan="3"><a th:href=@{/calendar}>캘린더로 가기</a></td>
+                            	</tr>
+                            </table>
                         </div>
                     </div>
 
                     <div class="col-md-4 mb-4">
                         <div class="card p-3 h-100">
                             <h5>메일 목록</h5>
-                            <ul class="list-group">
-                                <th:block th:each="mail : ${mailList}">
-                                    <li
-                                        th:onclick="| location.href = '@{/mail/view(mailId=${mail.mailId})}' |"
-                                        class="list-group-item"
-                                        >
-                                        [[ ${mail.subject} ]]
-                                    </li>
-                                </th:block>
-                                <li class="list-group-item" th:if="${#lists.size(mailList) == 0}">받은 메일이 딱히 없습니다</li>
-                                <li class="list-group-item"><a th:href=@{/mail/departments}>메일함으로 가기</a></li>
-                            </ul>
+                            <table id="mailTable" class="stripe">
+                            	<thead>
+                            		<tr>
+                            			<th>제목</th>
+                            			<th>발송일시</th>
+                            		</tr>
+                            	</thead>
+                            	<tbody>
+                            		<th:block th:each="mail : ${mailList}">
+                            			<tr th:onclick="| location.href = '@{/mail/view(mailId=${mail.mailId})}' |">
+                            				<th>[[ ${mail.subject} ]]</th>
+                            				<th th:text="${#dates.format(mail.sentAt, 'yyyy.MM.dd')}"></th>
+                            			</tr>
+                            		</th:block>
+                            	</tbody>
+								<tr th:if="${#lists.isEmpty(mailList)}">
+	                           		<td colspan="3">받은 메일이 딱히 없습니다</td>
+	                           	</tr>
+	                           	<tr>
+	                           		<td colspan="3"><a th:href=@{/mail/mailmain}>메일함으로 가기</a></td>
+	                           	</tr>
+                            </table>
                         </div>
                     </div>
 
                     <div class="col-md-4 mb-4">
                         <div class="card p-3 h-100">
                             <h5>결재 목록</h5>
-                            <ul class="list-group">
-                                <th:block th:each="approval : ${approvalList}">
-                                    <li
-                                        th:onclick="| location.href = '@{/approval/read(apprNo=${approval.apprNo})}' |"
-                                        class="list-group-item"
-                                        >
-                                        [[ ${approval.apprTitle} ]]
-                                    </li>
-                                </th:block>
-                                <li class="list-group-item" th:if="${#lists.size(approvalList) == 0}">내와 관련된 결재가 없습니다.</li>
-                                <li class="list-group-item"><a th:href=@{/approval/waiting}>전자결재로 가기</a></li>
-                            </ul>
+                            <table id="approvalTable" class="stripe">
+                            	<thead>
+                            		<tr>
+                            			<th>제목</th>
+                            			<th>상신일</th>
+                            			<th>결재 상태</th>
+                            		</tr>
+                            	</thead>
+                            	<tbody>
+                            		<th:block th:each="approval : ${approvalList}">
+                            			<tr th:onclick="| location.href = '@{/approval/read(apprNo=${approval.apprNo})}' |">
+                            				<th>[[ ${approval.apprTitle} ]]</th>
+                            				<th th:text="${#dates.format(approval.createDate, 'yyyy.MM.dd')}"></th>
+                            				<th>[[ ${approval.apprStatusName} ]]</th>
+                            			</tr>
+                            		</th:block>
+                            	</tbody>
+								<tr th:if="${#lists.isEmpty(approvalList)}">
+	                           		<td colspan="3">님과 관련된 결재가 없습니다</td>
+	                           	</tr>
+	                           	<tr>
+	                           		<td colspan="3"><a th:href=@{/approval/waiting}>전자결재로 가기</a></td>
+	                           	</tr>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -99,11 +136,24 @@
     </main>
     
     <script>
-        function updateTime() {
-            let now = new Date();
-            document.getElementById("current-time").innerText = now.toLocaleTimeString();
-        }
-        setInterval(updateTime, 1000);
+        setInterval(function() {
+        	let now = new Date();
+        	$('#current-time').text(now.toLocaleTimeString());
+        }, 1000);
+    	
+    	$(document).ready(function() {
+    		const dataTableSettings = {
+				"lengthChange": false,
+				"searching": false,
+				"paging": false,
+				"info": false
+   			}
+    		
+    		$('#scheduleTable').DataTable(dataTableSettings);
+    		$('#mailTable').DataTable(dataTableSettings);
+    		$('#approvalTable').DataTable(dataTableSettings);
+    	})
+    	
     </script>
     
 </body>

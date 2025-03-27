@@ -76,6 +76,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public List<WorkVO> getFilterAttend(String stDate, String endDate, String userName, String teamName) {
 		
 		return attendMapper.selectFilterEmpList(stDate,endDate, userName,teamName);
+	}
+	
+	// 지각 사유 업로드
+	@Override
+	public int inputLateReason(WorkVO workVO) {
+		
+		return attendMapper.insertLateReason(workVO);
 	}	
 
 	

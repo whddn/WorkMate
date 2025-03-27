@@ -8,6 +8,7 @@
 		           after_work,
 		           work_time,
 		           work_status,
+		           work_no,
 		           add_work_time,
 		           (SELECT COUNT(*) 
 		            FROM work 
@@ -30,7 +31,8 @@
 	           after_work,
 	           work_time,
 	           work_status,
-	           add_work_time
+	           add_work_time,
+	           late_reason
 	    FROM work
 	    WHERE user_no = #{userNo}
 	    AND 1 = 1
@@ -91,6 +93,14 @@
 		   		END
 		WHERE work_no = #{workNo}
 	</update>	
+	
+	<!-- 지각 사유 등록 -->
+	<update id="insertLateReason" parameterType="WorkVO">
+		UPDATE WORK
+		SET 
+			late_reason = #{lateReason}
+		WHERE work_no = #{workNo}
+	</update>
 	
 	<!-- 연차 조회 -->
 	<select id="occAnnualList" resultType="WorkVO">
@@ -216,7 +226,8 @@
 		       w.after_work,             
 		       w.work_time,
 		       w.add_work_time,               
-		       w.work_status              
+		       w.work_status,
+		       w.late_reason           
 		FROM work w
 		JOIN employee e ON w.user_no = e.user_no  
 		JOIN team t ON e.team_no = t.team_no  
