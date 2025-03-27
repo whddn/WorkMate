@@ -11,6 +11,15 @@
 		FROM report_attach
 		WHERE appr_no = #{apprNo}
 	</select>
+	<select id="selectApprovalRA" parameterType="int" resultType="ReportAttachVO">
+		SELECT repattach_no
+			, file_name
+			, file_path
+			, upload_date
+			, report_no
+		FROM report_attach
+		WHERE repattach_no = #{repattachNo}
+	</select>
 	<insert id="insertApprovalRA" parameterType="ReportAttachVO">
 		<selectKey keyProperty="repattachNo" resultType="int" order="BEFORE">
 			SELECT NVL(MAX(repattach_no), 0) + 1

@@ -42,20 +42,23 @@
 		    , user_name
 		    , department_name
 		    , create_date
-		    , code_name AS appr_status_name
+		    , FIND_CODE(appr_status)  AS appr_status_name
 		FROM approval
 		    JOIN appr_form
-		    ON approval.appr_type=appr_form.appr_type
+		      ON approval.appr_type=appr_form.appr_type
+		      
 		    JOIN employee
-		    ON approval.user_no=employee.user_no
+		      ON approval.user_no=employee.user_no
+		      
 		    LEFT JOIN department
-		    ON approval.dept_no=department.department_id
+		      ON approval.dept_no=department.department_id
+		      
 			LEFT JOIN appr_elmnt 
-	    	ON approval.appr_no = appr_elmnt.appr_no
+	    	  ON approval.appr_no = appr_elmnt.appr_no
+	    	  
     		LEFT JOIN reference
-    		ON approval.appr_no = reference.appr_no
-    		JOIN common_code
-    		ON approval.appr_status = common_code.code
+    		  ON approval.appr_no = reference.appr_no
+    		  
 		WHERE approval.user_no = #{userNo}
 			OR approver = #{userNo}
 			OR reference.user_no = #{userNo}
@@ -125,7 +128,7 @@
 		UPDATE approval
 		SET appr_date = SYSDATE
 		WHERE appr_no = #{apprNo} 
-    		AND appr_status IN ('a2', 'a3', 'a4')
+    		AND appr_status IN ('a2', 'a3')
 	</update>
 	<delete id="deleteApproval" parameterType="ApprovalVO">
 		DELETE FROM approval

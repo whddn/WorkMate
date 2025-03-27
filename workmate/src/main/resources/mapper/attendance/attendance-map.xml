@@ -117,11 +117,27 @@
 		ORDER BY annual_no DESC
 	</select>
 	
+	<!-- 연차 사용내역 단건조회 -->
+	<select id="selectAnnualByApprNo" resultType="WorkVO">
+		SELECT annual_start
+		    , annual_end
+		    , annual_count
+		    , annual_type
+		    , appr_date
+		    , appr_content 
+		FROM annual
+		    INNER JOIN approval
+		        ON annual.appr_no = approval.appr_no
+		WHERE annual.appr_no = #{apprNo}
+	</select>
+	
 	<!-- 연차휴가 신청 내역 등록 -->
 	<insert id="insertAnl" parameterType="WorkVO">
-	   
-	    INSERT INTO annual(
-	        ANNUAL_NO
+		<selectKey keyProperty="annualNo" resultType="String" order="BEFORE">
+			SELECT NVL(MAX(TO_NUMBER(annual_no)), 0) + 1
+			FROM annual
+		</selectKey>
+	    INSERT INTO annual(ANNUAL_NO
 	        , ANNUAL_START
 	        , ANNUAL_END
 	        , ANNUAL_COUNT
@@ -130,15 +146,13 @@
 	        , APPR_NO
 	        , OCC_ANNUAL_NO
 	    )
-	    VALUES (
-	        MAX(ANNUAL_NO) + 1
+	    VALUES(#{annualNo}
 	        , #{annualStart}
 	        , #{annualEnd}
-	        , 
-	        CASE 
-            WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5 --오전반차, 오후반차면 0.5
-            ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
-        END,
+	        , CASE 
+            	WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5 --오전반차, 오후반차면 0.5
+            	ELSE TRUNC(#{annualEnd}) - TRUNC(#{annualStart})
+        	END
 	        , #{annualType}
 	        , #{userNo}
 	        , #{apprNo}
@@ -154,12 +168,12 @@
 			  update_annual_count = update_annual_count - 
             CASE 
                 WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
-                ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
+                ELSE #{annualCount}
             END,
         remain_annual_leave = remain_annual_leave + 
             CASE 
                 WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
-                ELSE TO_DATE(#{annualEnd}, 'YYYY-MM-DD') - TO_DATE(#{annualStart}, 'YYYY-MM-DD')
+                ELSE TRUNC(#{annualEnd}) - TRUNC(#{annualStart})
             END
 		WHERE 	user_no = #{userNo}
 		AND user_annual_year = EXTRACT(YEAR FROM SYSDATE)

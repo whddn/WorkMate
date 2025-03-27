@@ -25,6 +25,12 @@ public interface AttendanceService {
 	//연차 사용 내역 전체조회
 	public List<WorkVO> findAllAnnual(WorkVO workVO);
 	
+	//연차 단건 조회
+	public WorkVO findAnnualByApprNo(WorkVO workVO);
+	
+	//연차 목록 업데이트
+	public Integer inputAnnual(WorkVO workVO);
+	
 	// 전체사원 이번달 근태 수	
 	public List<WorkVO> findMothEmpWork(WorkVO workVO);
 	
@@ -33,5 +39,7 @@ public interface AttendanceService {
 	
 	//필터링된 전체사원 엑셀
 	public List<WorkVO> getFilterAttend(String stDate, String endDate, String userName, String teamName);
+
+	
 
 }

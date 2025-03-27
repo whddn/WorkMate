@@ -391,6 +391,10 @@
 		    }
 		});
 		
+		// annualType Count 도저히 안되서 우겨넣은 코드
+		request['annualType'] = $('input[name="annualType"]:checked').val();
+		request['annualCount'] = $('input[name="annualCount"]').val();
+		
 		// 결재선 추가
 		let approverList = [];
 		apprElmntList.forEach(function(element) {
@@ -405,6 +409,7 @@
 		})
 		request['referrerList'] = referrerList;
 		
+		console.log(request);
 		formData.append('request', JSON.stringify(request));
 		
 		// 파일 데이터 추가
@@ -421,6 +426,7 @@
 			data: formData,
 			success: function(response) {
 				if(response.success) {
+					alert('결재등록에 성공하였습니다!');
 					location.href = [[ @{/approval/waiting} ]];
 				}
 				else {
