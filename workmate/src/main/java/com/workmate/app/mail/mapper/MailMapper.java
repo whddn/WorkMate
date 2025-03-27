@@ -95,5 +95,11 @@ public interface MailMapper {
     //받은 메일 읽음 기능
     @Update("UPDATE MAIL SET IS_READ = 'Y' WHERE MAIL_ID = #{mailId}")
     void updateMailReadStatus(@Param("mailId") int mailId);
-   
+    
+    @Select("SELECT COUNT(*) FROM MAIL WHERE USER_NO = #{userNo} AND FOLDER_ID = 1001 AND IS_READ = 'N'")
+    int countUnreadMails(@Param("userNo") int userNo);
+    
+    @Select("SELECT USER_PHONE FROM EMPLOYEE WHERE USER_NO = #{userNo}")
+    String findPhoneByUserNo(int userNo);
+    
 }

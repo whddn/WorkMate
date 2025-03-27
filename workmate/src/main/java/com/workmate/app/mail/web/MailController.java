@@ -105,7 +105,9 @@ public class MailController {
             @RequestParam(required = false) String ccList,
             @RequestParam String subject,
             @RequestParam String content,
-            @RequestParam(required = false) MultipartFile[] attachments
+            @RequestParam(required = false) MultipartFile[] attachments,
+            @RequestParam(required = false, defaultValue = "false") boolean encrypt
+            
     ) {
         try {
             String senderName = loginUser.getUserVO().getUserName();
@@ -192,10 +194,12 @@ public class MailController {
         int endPage = Math.min(startPage + blockSize - 1, totalPage);
 
         int offset = (page - 1) * pageSize;
-
+        int unreadCount = mailService.countUnreadMails(userNo);
+        
         List<MailVO> receivedMails = mailService.findMailListPaging(userNo, folderId, offset, pageSize);
         List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
-
+model.addAttribute("unreadCount", unreadCount);
+        model.addAttribute("totalCount", totalCount);
         model.addAttribute("receivedMails", receivedMails);
         model.addAttribute("myFolders", myFolders);
         model.addAttribute("currentPage", page);
@@ -205,6 +209,8 @@ public class MailController {
 
         return "mail/mailmain";
     }
+    
+    
  
     //삭제 기능
     @PostMapping("/mail/deleteSelected")

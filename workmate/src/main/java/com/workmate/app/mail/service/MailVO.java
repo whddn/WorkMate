@@ -28,4 +28,5 @@ public class MailVO {
 	private String messageId; //메세지 중복방지
 	private String isRead; //받은메일 읽음 표시
 	private List<AttachmentVO> attachmentList;
+	
 }

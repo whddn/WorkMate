@@ -10,4 +10,5 @@ public class AttachmentVO {
     private String fileType;   // 파일 MIME 타입
     private Long fileSize;     // 파일 크기 (바이트)
     private String filePath;   // 서버 내 저장 경로
+    
 }
