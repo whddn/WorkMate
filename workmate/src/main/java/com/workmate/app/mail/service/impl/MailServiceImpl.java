@@ -720,7 +720,7 @@ public class MailServiceImpl implements MailService {
 	    return mailMapper.selectEmployeesByTeam(teamNo);
 	}
 	// 1분마다 예약된 메일 중 발송 시간이 지난 메일들을 전송 시도
-	@Scheduled(fixedDelay = 60000)
+	//@Scheduled(fixedDelay = 60000)
 	public void sendScheduledMails() {
 	    List<MailVO> scheduledMails = mailMapper.selectScheduledMails();
 
