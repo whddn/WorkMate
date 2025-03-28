@@ -93,7 +93,11 @@
 						<tr th:each="mail : ${receivedMails}" class="mail-row">
 							<td><input type="checkbox" class="mail-checkbox"
 								th:value="${mail.mailId}"></td>
-							<td th:text="${mail.senderEmail}"></td>
+							<td>
+  <span class="badge bg-secondary me-1"
+        th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
+  <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}"></a>
+</td>
 							<td><a th:href="@{/mail/view(mailId=${mail.mailId})}"> <span
 									th:if="${mail.isRead != null and mail.isRead.equals('N')}">
 										<span style="color: #0d6efd; font-size: 10px;">●</span> <b

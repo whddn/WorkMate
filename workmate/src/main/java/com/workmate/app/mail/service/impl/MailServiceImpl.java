@@ -137,6 +137,7 @@ public class MailServiceImpl implements MailService {
         mail.setSentAt(new Date());
         mail.setStatus("발송됨");
         mail.setEncrypted("N");
+        mail.setMailRole("SENDER");
         mail.setMailType(isInternal ? "내부" : "외부");
         mail.setIsSpam("N");
         mail.setFolderId(1002);
@@ -157,6 +158,7 @@ public class MailServiceImpl implements MailService {
                 receiverMail.setSentAt(new Date());
                 receiverMail.setStatus("수신됨");
                 receiverMail.setEncrypted("N");
+                receiverMail.setMailRole("RECEIVER");
                 receiverMail.setMailType(isInternal ? "내부" : "외부");
                 receiverMail.setIsSpam("N");
                 receiverMail.setFolderId(1001);
@@ -574,6 +576,7 @@ public class MailServiceImpl implements MailService {
 	    senderMail.setStatus("발송됨");
 	    senderMail.setEncrypted(encrypt ? "Y" : "N");
 	    senderMail.setMailType(isInternal ? "내부" : "외부");
+	    senderMail.setMailRole("SENDER");
 	    senderMail.setIsSpam("N");
 	    senderMail.setFolderId(1002);
 	    senderMail.setSenderEmail(senderEmail);
@@ -602,6 +605,7 @@ public class MailServiceImpl implements MailService {
 	        receiverMail.setStatus("수신됨");
 	        receiverMail.setEncrypted(encrypt ? "Y" : "N");
 	        receiverMail.setMailType(isInternal ? "내부" : "외부");
+	        receiverMail.setMailRole("RECEIVER");
 	        receiverMail.setIsSpam("N");
 	        receiverMail.setFolderId(1001);
 	        receiverMail.setSenderEmail(senderEmail);
