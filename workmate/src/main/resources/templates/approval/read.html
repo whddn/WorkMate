@@ -204,7 +204,7 @@
 			let annual = [[ ${annual} ]];
 			console.log(annual);
 			
-			$(`input[name="annualType"]`).attr('checked', true);
+			$(`input[name="annualType"][value="${annual.annualType}"]`).attr('checked', true);
 			$('input[name="annualStart"]').val(annual.annualStart.substr(0, 10));
 			$('input[name="annualEnd"]').val(annual.annualEnd.substr(0, 10));
 			$('input[name="annualCount"]').val(annual.annualCount);
