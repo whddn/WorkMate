@@ -18,6 +18,7 @@
 		    ON employee.team_no=team.team_no
 		    LEFT JOIN department
 		    ON team.department_id=department.department_id
+		WHERE form_name like '%계약%'
 	</select>
 	<!-- 전체조회 -->
 	<select id="selectContractsList" resultType="ContractsVO">

@@ -1,14 +1,12 @@
 package com.workmate.app.contracts.web;
 
 import java.util.List;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.common.WhoAmI;
 import com.workmate.app.contracts.service.ContractsService;
@@ -16,7 +14,6 @@ import com.workmate.app.contracts.service.ContractsVO;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.security.service.LoginUserVO;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -30,7 +27,7 @@ import lombok.RequiredArgsConstructor;
  * -------------------------
  * 03-20	이종우	계약페이지 생성
  * 03-27	이종우	계약폼 불러오기
- * 
+ * 03-28  이종우 전자계약 목록
  * 
  * </pre>
  */
@@ -69,16 +66,6 @@ public class ContractsController {
 		return "contracts/contractsList";
 	}
 
-	// 전자계약 상세 조회
-
-	// 전자계약 템플릿
-//	@GetMapping("contracts/form")
-//	public String contractsTemplate(Model model) {
-//		List<ContractsVO> list = contractsService.findContractsList();
-//		model.addAttribute("contr", list);
-//		return "contracts/contractsForm";
-//	}
-//	
 	// 전자계약 템플릿 양식 불러오기
 	 @GetMapping("contracts/forms/{type}")
 	    public String loadContractForm(@PathVariable String type) {
@@ -95,10 +82,5 @@ public class ContractsController {
 	    }
 	
 	 
-	 // 테스트 
-	 @GetMapping("/test-view")
-	 public String testView() {
-	     return "forms/contracts/Trade_Contract_Form"; // 바로 뷰 리턴
-	 }
 	
 }
