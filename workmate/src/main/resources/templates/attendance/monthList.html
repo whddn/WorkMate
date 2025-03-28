@@ -208,8 +208,9 @@
 							<td>[[ ${work.addWorkTime} ]] h</td>
 							<td>[[ ${work.workStatus} ]]</td>
 							<td>
+							[[ ${work.lateReason} ]]
 								<button class="btn btn-info" 
-									th:if="${work.workStatus == '지각'}" 
+									th:if="${work.workStatus == '지각'} and (${work.lateReason} == null or ${work.lateReason} == '')" 
 									th:onclick="'showLateReasonModal(' + ${work.workNo} + ')'">
 									<b>지각사유 제출 ＞</b>
 								</button>
@@ -225,7 +226,7 @@
 				    <div class="modal-dialog" role="work">
 				        <div class="modal-content">
 				            <div class="modal-header border-0">
-				                <h3 class="modal-title">지각 사유</h3>
+				                <h5 class="modal-title"><b>지각 사유</b></h5>
 				                <button type="button" class="close" onclick="closeModal()">
 				                    <span aria-hidden="true">×</span>
 				                </button>
@@ -243,7 +244,7 @@
 				                  		</div>				                        
 				                    </div>
 				                    <div class="modal-footer border-0">
-				            		<button type="submit" id="addRowButton" class="btn btn-primary" >업로드하기</button>
+				            		<button type="submit" id="addRowButton" class="btn btn-primary" >제출</button>
 				                	<button type="button" class="btn btn-danger" onclick="closeModal()">취소</button>
 				            		</div>
 				                </form>
