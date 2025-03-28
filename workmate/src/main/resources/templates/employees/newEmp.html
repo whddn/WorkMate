@@ -95,6 +95,10 @@ body {
                 <input type="text" maxlength="13" name="userPhone"> 
             </div>
             <div class="form-group contact">
+                <label>비밀번호</label>
+                <input type="password" maxlength="13" name="userPwd"> 
+            </div>
+            <div class="form-group contact">
                 <label>집주소</label>
                 <input type="text" maxlength="50" class="addresshome" name="address">
                 <span id="search_icon">
@@ -183,13 +187,15 @@ function homeAddCode() {
 	let userPosition = document.querySelector('[name=userPosition]').value;
 	let userPhone =  document.getElementsByName('userPhone')[0].value;
 	let userAddress =  document.getElementsByName('address')[0].value;
+	let userPwd = document.getElementsByName('userPwd')[0].value;
 	
 	let newEmpData = {
 		'userName' : userName,
 		'teamNo' : userTeam,
 		'userPosition' : userPosition,
 		'userPhone' : userPhone,
-		'address' : userAddress
+		'address' : userAddress,
+		'userPwd' : userPwd
 		};
 	
 		fetch('/workmate/emp/newemp', {
@@ -201,7 +207,7 @@ function homeAddCode() {
 	    })
 	    .then(res => res.json())
 	    .then(result => {
-	      alert('새로운 평가가 등록되었습니다.');
+	      alert('새로운 사원이 등록되었습니다.');
 	      location.href = "/workmate/emp/organ"
 	    })
 	    .catch(err => console.log(err));

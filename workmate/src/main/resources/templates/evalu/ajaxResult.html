@@ -1,0 +1,35 @@
+<div th:fragment="resultFragment">
+    <div class="con">
+        <b>평가항목 및 채점표</b>
+        <table>
+            <thead>
+                <tr>
+                    <th>평가 분야</th>
+                    <th>평가 항목</th>
+                    <th>[[${user.userName}]]</th>
+                </tr>
+            </thead>
+				<tbody>
+				    <tr th:each="score : ${scores}">
+				        <td>[[${score.evaluCompet}]]</td>
+				        <td>[[${score.evaluContent}]]</td>
+				        <td>[[${score.evaluScore}]]</td>
+				    </tr>
+				</tbody>
+        </table>
+    </div>
+
+    <div class="con">
+        <h5>추가 의견</h5>
+        <table>
+            <tr>
+                <th>강점</th>
+                <td></td>
+            </tr>
+            <tr>
+                <th>약점</th>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -32,8 +32,11 @@ public interface EmpService {
 	// 지나간 평가 리스트 조회 (전체조회)
 	public List<EvaluVO> findBeforeEvaluList(EvaluVO evaluVO);
 	
-	// 지나간 평가 단건 조회 (관리자) 
+	// 지나간 평가 단건 조회 -> 사원 목록 다 나옴 (관리자) 
 	public Map<String, Object> findAdminEvaluBeforeById(EvaluVO evaluVO);
+	
+	// 지나간 평가 단건 조회 (사원 기준)
+	public List<EvaluVO> findAdminEvaluEmpOneById(EvaluVO evaluVO);
 	
 	// 평가 결과 - 평가자 정보 조회 
 	//public List<DepartmentVO> findEvaluInfo(EvaluVO evaluVO);
