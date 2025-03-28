@@ -136,6 +136,7 @@
 		    , annual_type
 		    , appr_date
 		    , appr_content 
+		    , approval.user_no
 		FROM annual
 		    INNER JOIN approval
 		        ON annual.appr_no = approval.appr_no
@@ -173,7 +174,7 @@
 	
 	
 	<!-- 연차 업데이트 전자결재 -->
-	<update id="updateOccList" parameterType="int">
+	<update id="updateOccList" parameterType="WorkVO">
 		UPDATE occ_annual
 		SET used_annual_count = used_annual_count + 
 		    CASE 
