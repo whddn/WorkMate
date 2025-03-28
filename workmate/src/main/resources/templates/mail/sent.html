@@ -86,7 +86,12 @@
 
                 <tr th:each="mail : ${sentMails}" class="mail-row">
                     <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
-                    <td th:text="${mail.recipients}"></td>
+                    <td>
+  <span class="badge bg-secondary me-1"
+        th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
+  <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}"></a>
+</td>
+                    
                     <td>
                         <span th:if="${mail.reserStatus == '예약됨'}" class="badge bg-warning text-dark me-1">예약됨</span>
                         <a th:href="@{/mail/sentview(mailId=${mail.mailId})}" th:text="${mail.subject}"></a>

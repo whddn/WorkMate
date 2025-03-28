@@ -17,6 +17,7 @@
 		    ON employee.team_no=team.team_no
 		    LEFT JOIN department
 		    ON team.department_id=department.department_id
+		where form_name NOT LIKE '%계약%'
 	</select>
 	<select id="selectApprFormById" parameterType="ApprFormVO" resultType="ApprFormVO">
 		SELECT appr_type
@@ -35,6 +36,7 @@
 			LEFT JOIN department
 			ON team.department_id=department.department_id
 		WHERE appr_type=#{apprType}
+		AND form_name NOT LIKE '%계약%'
 	</select>
 	<insert id="insertApprForm" parameterType="ApprFormVO">
 		<selectKey keyProperty="apprType" resultType="String" order="BEFORE">

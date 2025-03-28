@@ -70,7 +70,11 @@
                 </tr>
                 <tr th:each="mail : ${trashMails}" class="trash-mail-row">
                     <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
-                    <td th:text="${mail.recipients}">보낸사람</td>
+                     <td><span class="badge bg-secondary ms-2"
+              th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
+        <span th:text="${mail.recipients}">보낸사람</span>
+        
+    </td>
                     <td>
                         <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}">제목</a>
                     </td>

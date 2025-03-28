@@ -67,7 +67,7 @@ public class ReservationImpl implements ReservationService {
 //	    approval.setCreateDate();
 //	    approval.setExpireDate();
 	    approval.setApprStatus("a1");
-	    approval.setDeptNo("D004");  // 예시: 부서번호 (실제 값에 맞게 설정)
+	    approval.setDeptNo("D001");  // 예시: 부서번호 (실제 값에 맞게 설정)
 	    approval.setUserNo(reservationVO.getUserNo());  // 사원번호 전달받았을 경우
 	    approval.setReserNo(reservationVO.getReserNo()); // 예약번호 연결
 	    approval.setApprType("AF004");
