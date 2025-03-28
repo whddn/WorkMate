@@ -6,7 +6,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>지난 평가 조회 (관리자)</title>
+<title>지난 평가 조회</title>
 <style>
 body {
 	font-family: 'Arial', sans-serif;
@@ -143,7 +143,7 @@ button:hover {
 					<td colspan="2"><select id="userSelect">
 							<option value="">사원 선택</option>
 							<option th:each="p : ${people}" th:value="${p.userNo}"
-								th:text="${p.userName}" th:data-userno="${p.userNo}"></option>
+								th:text="${p.userName}" th:data-userno="${p.userNo}" id="userNo" th:data-formno="${p.evaluFormNo}"></option>
 					</select></td>
 				</tr>
 			</table>
@@ -156,40 +156,34 @@ button:hover {
 				<p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
 			</div>
 		</div>
-		<div class="con">
+		<div class="con" id="resultArea" style="display:none">
 		<!-- 3. 평가항목 -->
-		<b>평가항목 및 채점표</b>
-		<table>
-			<tr>
-				<th>평가 분야</th>
-				<th>평가 항목</th>
-				<th th:each="p : ${people}" th:text="${p.userName}"></th>
-			</tr>
-
-			<!-- 항목은 공통 리스트에서 한 번만 출력 -->
-			<tr th:each="item : ${items}">
-				<td th:text="${item.evaluCompet}"></td>
-				<td th:text="${item.evaluContent}"></td>
-				<!-- 사람별 점수 반복 -->
-				 <td th:each="p : ${people}" th:text="${p.avgScore}"></td> <!-- 전체 출력 -->
-			</tr>
-		</table>
+		
 		</div>
-		<!-- 4. 추가 의견 -->
-		<div class="con">
-		<h5>추가 의견</h5>
-		<table>
-			<tr>
-				<th>강점</th>
-				<td><input type="text" name=""></td>
-			</tr>
-			<tr>
-				<th>약점</th>
-				<td><input type="text" name=""></td>
-			</tr>
-		</table>
-		<button type="button" th:onclick="|location.href='@{/emp/bfevalu}'|">목록으로</button>
-		</div>
-	</div>
+	
+	<script>
+	// 사원 전환하면 내용 바뀌게 
+		document.querySelector('#userSelect').addEventListener('change', e => {
+	    const selectedOption = e.target.selectedOptions[0];
+	    const userNo = selectedOption.dataset.userno;
+	    const formNo = selectedOption.dataset.formno;
+	
+	    if (!userNo) return;
+	
+	    fetch(`/workmate/emp/bfoneevalu/${formNo}/${userNo}`, {
+	        method: 'post',
+	        headers: {
+	            'Content-Type': 'application/json'
+	        }
+	    })
+	    .then(res => res.text())
+	    .then(html => {
+	        const resultArea = document.querySelector('#resultArea');
+	        console.log("📦 AJAX 응답:", html);  // 👉 실제 응답 확인
+	        resultArea.style.display = 'block'; // 처음에 숨긴 부분을 보여줌
+	        resultArea.innerHTML = html;        // 결과 덮어쓰기
+	    });
+	});
+	</script>
 </body>
 </html>

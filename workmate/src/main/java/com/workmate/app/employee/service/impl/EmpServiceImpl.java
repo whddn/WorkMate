@@ -116,53 +116,71 @@ public class EmpServiceImpl implements EmpService {
 		return uniqueTeam;
 	}
 	
-	// 관리자 단건 조회
-	@Override
-	public Map<String, Object> findAdminEvaluBeforeById(EvaluVO evaluVO) {
-	    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
+	
+		// 관리자 : 완료된 평가 조회 - 피평가자 목록 부르기
+		@Override
+		public Map<String, Object> findAdminEvaluBeforeById(EvaluVO evaluVO) {
+		    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
 
-	    // 1. 사람 중복 제거
-	    Map<Integer, EvaluVO> peopleMap = new LinkedHashMap<>();
+		    // 1. 사람 중복 제거
+		    Map<Integer, EvaluVO> peopleMap = new LinkedHashMap<>();
 
-	    // 2. 항목 중복 제거
-	    Set<String> itemKeySet = new LinkedHashSet<>();
-	    List<EvaluVO> itemList = new ArrayList<>();
+		    // 2. 항목 중복 제거
+		    Set<String> itemKeySet = new LinkedHashSet<>();
+		    List<EvaluVO> itemList = new ArrayList<>();
 
-	    // 3. 점수 저장
-	    Map<Integer, List<EvaluVO>> scoreMap = new LinkedHashMap<>();
-	    Map<String, Double> avgScoreMap = new LinkedHashMap<>();
-	    for (EvaluVO vo : rawList) {
-	        int userNo = vo.getUserNo();
-	        String itemKey = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
+		    // 3. 점수 저장
+		    Map<Integer, List<EvaluVO>> scoreMap = new LinkedHashMap<>();
+		    Map<String, Double> avgScoreMap = new LinkedHashMap<>();
+		    for (EvaluVO vo : rawList) {
+		        int userNo = vo.getUserNo();
+		        String itemKey = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
 
-	        // 사람 정보 1번만
-	        peopleMap.putIfAbsent(userNo, vo);
+		        // 사람 정보 1번만
+		        peopleMap.putIfAbsent(userNo, vo);
 
-	        // 항목 중복 없이
-	        if (itemKeySet.add(itemKey)) {
-	            EvaluVO item = new EvaluVO();
-	            item.setEvaluCompet(vo.getEvaluCompet());
-	            item.setEvaluContent(vo.getEvaluContent());
-	            item.setOrderNo(vo.getOrderNo());
-	            item.setAvgScore(vo.getAvgScore());
-	            itemList.add(item);
-	            
-	            avgScoreMap.put(itemKey, vo.getAvgScore());
-	        }
+		        // 항목 중복 없이
+		        if (itemKeySet.add(itemKey)) {
+		            EvaluVO item = new EvaluVO();
+		            item.setEvaluCompet(vo.getEvaluCompet());
+		            item.setEvaluContent(vo.getEvaluContent());
+		            item.setOrderNo(vo.getOrderNo());
+		            item.setAvgScore(vo.getAvgScore());
+		            itemList.add(item);
+		            
+		            avgScoreMap.put(itemKey, vo.getAvgScore());
+		        }
 
-	        // 점수 보존
-	        scoreMap.computeIfAbsent(userNo, k -> new ArrayList<>()).add(vo);
-	    }
+		        // 점수 보존
+		        scoreMap.computeIfAbsent(userNo, k -> new ArrayList<>()).add(vo);
+		    }
 
-	    Map<String, Object> result = new LinkedHashMap<>();
-	    result.put("people", new ArrayList<>(peopleMap.values()));
-	    result.put("items", itemList);
-	    result.put("scores", scoreMap); // Map<Integer, List<EvaluVO>>
-	    result.put("avgScores", avgScoreMap); // 필요시
-	    return result;
-	}
+		    Map<String, Object> result = new LinkedHashMap<>();
+		    result.put("people", new ArrayList<>(peopleMap.values()));
+		    result.put("items", itemList);
 
+		    return result;
+		}
+	
+		// 관리자 결과 단건 조회 - 사원 1명에 대한 평가 항목별 점수
+		@Override
+		public List<EvaluVO> findAdminEvaluEmpOneById(EvaluVO evaluVO) {
+		    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
 
+		    // 항목 중복 제거용 Set
+		    Set<String> itemKeySet = new LinkedHashSet<>();
+		    List<EvaluVO> itemList = new ArrayList<>();
+
+		    for (EvaluVO vo : rawList) {
+		        String itemKey = vo.getEvaluCompet() + "|" + vo.getEvaluContent();
+		        if (itemKeySet.add(itemKey)) {
+		            itemList.add(vo);
+		        }
+		    }
+
+		    return itemList;
+		}
+	
 	// 평가 등록 페이지
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {
@@ -315,6 +333,8 @@ public class EmpServiceImpl implements EmpService {
 
 	    return oneList;
 	}
+
+
 	
 
 

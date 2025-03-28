@@ -34,6 +34,9 @@ public interface EmpMapper {
 	// 지난 평가 단건 조회 (관리자)
 	public List<EvaluVO> selectAdminBeforeEvaluById(EvaluVO evaluVO);
 	
+	// 지난 평가 단건 조회 (관리자 + userNo 기반)
+	public List<EvaluVO> selectAdminBeforeUserEvaluById(EvaluVO evaluVO);
+	
 	// 평가자 / 피평가자 정보 조회
 	public List<EvaluVO> selectEvaluInfoById(EvaluVO evaluVO);
 	public List<EvaluVO> selectEvaluateeInfoById(EvaluVO evaluVO);
