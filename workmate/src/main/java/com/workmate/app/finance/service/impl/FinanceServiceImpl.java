@@ -41,20 +41,65 @@ public class FinanceServiceImpl implements FinanceService {
 	    int reportInsert = financeMapper.insertReportOne(reportVO);
 
 	    if (reportInsert > 0) {
-	    	Integer reportNo = reportVO.getReportNo();
-	        // 2. 거래 내역 리스트 insert
-	    	List<ReportVO> transList = reportVO.getTransHistoryList();
-	    	 if (transList != null && !transList.isEmpty()) {
-	             for (ReportVO trans : transList) {
-	                 // 각각의 거래내역에 reportNo 세팅
-	                 trans.setReportNo(reportNo);
-	                 // 거래내역 insert (trans_history 테이블)
-	                 result += financeMapper.insertReportTransOne(trans);
-	             }
-	         }    
+	        Integer reportNo = reportVO.getReportNo();
+	        List<ReportVO> transList = reportVO.getTransHistoryList();
+
+	        if (transList != null && !transList.isEmpty()) {
+	            for (ReportVO trans : transList) {
+	                ReportVO transInsertVO = new ReportVO(); // 새 객체 생성
+
+	                // 거래 관련 값만 복사
+	                transInsertVO.setReportNo(reportNo);
+	                transInsertVO.setTransDate(trans.getTransDate());
+	                transInsertVO.setTransType(trans.getTransType());
+	                transInsertVO.setWithdrawal(trans.getWithdrawal());
+	                transInsertVO.setDeposit(trans.getDeposit());
+	                transInsertVO.setBalance(trans.getBalance());
+	                transInsertVO.setPurposeUse(trans.getPurposeUse());
+
+	                result += financeMapper.insertReportTransOne(transInsertVO);
+	            }
+	        }
 	    }
 
 	    return result;
+	}
+
+	// 입출금 리포트 수정 기능
+	@Override
+	public int modifyReportPage(ReportVO reportVO) {
+		  int result = 0;
+
+		    // 1. 리포트 수정
+		    int reportUpdate = financeMapper.updateReportOne(reportVO);
+
+		    if (reportUpdate > 0) {
+		        Integer reportNo = reportVO.getReportNo();
+
+		        // 2. 기존 거래 내역 삭제
+		       // financeMapper.deleteTransHistoryByReportNo(reportNo);
+
+		        // 3. 새로운 거래 내역 insert
+		        List<ReportVO> transList = reportVO.getTransHistoryList();
+
+		        if (transList != null && !transList.isEmpty()) {
+		            for (ReportVO trans : transList) {
+		                ReportVO transInsertVO = new ReportVO();
+
+		                transInsertVO.setReportNo(reportNo);
+		                transInsertVO.setTransDate(trans.getTransDate());
+		                transInsertVO.setTransType(trans.getTransType());
+		                transInsertVO.setWithdrawal(trans.getWithdrawal());
+		                transInsertVO.setDeposit(trans.getDeposit());
+		                transInsertVO.setBalance(trans.getBalance());
+		                transInsertVO.setPurposeUse(trans.getPurposeUse());
+
+		                result += financeMapper.insertReportTransOne(transInsertVO);
+		            }
+		        }
+		    }
+
+		    return result;
 	}
 	
 }

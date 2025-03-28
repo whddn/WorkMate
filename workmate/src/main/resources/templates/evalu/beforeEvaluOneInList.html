@@ -162,12 +162,17 @@ button:hover {
 		</div>
 	
 	<script>
-	// 사원 전환하면 내용 바뀌게 
+
+	
+		// 사원 전환하면 내용 바뀌게 
 		document.querySelector('#userSelect').addEventListener('change', e => {
 	    const selectedOption = e.target.selectedOptions[0];
 	    const userNo = selectedOption.dataset.userno;
 	    const formNo = selectedOption.dataset.formno;
 	
+	
+	    console.log("📡 선택된 userNo:", userNo);
+	    console.log("📡 선택된 formNo:", formNo);
 	    if (!userNo) return;
 	
 	    fetch(`/workmate/emp/bfoneevalu/${formNo}/${userNo}`, {
@@ -179,11 +184,22 @@ button:hover {
 	    .then(res => res.text())
 	    .then(html => {
 	        const resultArea = document.querySelector('#resultArea');
-	        console.log("📦 AJAX 응답:", html);  // 👉 실제 응답 확인
+	       // console.log("📦 AJAX 응답:", html);  // 👉 실제 응답 확인
 	        resultArea.style.display = 'block'; // 처음에 숨긴 부분을 보여줌
 	        resultArea.innerHTML = html;        // 결과 덮어쓰기
+
+
+			  
+		  
+			     
+	      
+
+	        
+
 	    });
-	});
+	  });
+
 	</script>
+	
 </body>
 </html>

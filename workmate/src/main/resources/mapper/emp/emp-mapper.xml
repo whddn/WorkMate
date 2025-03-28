@@ -199,7 +199,7 @@
 		WHERE r.EVALU_FORM_NO = #{evaluFormNo}           
 		ORDER BY u.USER_NO, fm.ORDER_NO
 	</select>
-	<!-- 평가 결과 단순 조회 (관리자, formNo, userNo 기반) -->
+	<!-- 평가 결과 단순 조회 - 목록 불러옴 (관리자, formNo 기반) -->
 		<select id="selectAdminBeforeEvaluById" resultType="EvaluVO">
 					SELECT    
 			      f.EVALU_FORM_NO,
@@ -238,8 +238,8 @@
 	</select>
 	
 	<!-- 관리자 단건 조회 - 개인에 대한 결과 쿼리문 -->
-	<select id="selectAdminBeforeUserEvaluById" resultType="EvaluVO">
-					SELECT    
+	<select id="selectAdminBeforeUserEvaluById"  parameterType="EvaluVO" resultType="EvaluVO">
+			 SELECT    
 			      f.EVALU_FORM_NO,
 			      f.EVALU_NAME,              
 			      f.EVALU_START,               

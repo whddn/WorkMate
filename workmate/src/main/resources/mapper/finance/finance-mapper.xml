@@ -56,15 +56,17 @@
 			    , USER_NO
 			    , TEAM_NO
 			    , TRANS_START
-			    , TRANS_END ) 
+			    , TRANS_END
+			    , REPORT_STATUS ) 
 			    
-		VALUES ( REPORT_NO_SEQ.NEXTVAL
+		VALUES ( #{reportNo}
 		        , #{reportTitle}
 		        , SYSDATE
 		        , #{userNo}
 		        , #{teamNo}
 		        , #{transStart}
-		        , #{transEnd} ) 
+		        , #{transEnd} 
+		        , '결재 중') 
 	</insert>
 	
 	<!-- TransHistory 테이블 insert -->
@@ -89,4 +91,31 @@
 		            , #{reportNo}
 		            ) 
 	</insert>
+	
+	<!-- Report 수정 -->
+	<update id="updateReportOne" parameterType="ReportVO">
+		UPDATE REPORT
+  		   SET REPORT_TITLE   = #{reportTitle},
+       WRITE_DATE     = SYSDATE,
+       USER_NO        = #{userNo},
+       TEAM_NO        = #{teamNo},
+       TRANS_START    = #{transStart},
+       TRANS_END      = #{transEnd},
+       REPORT_STATUS  = '결재 중'
+	   WHERE REPORT_NO      = #{reportNo}
+	</update>
+	<!-- TransHistory 수정 -->
+	<update id="updateReportOne" parameterType="ReportVO">
+	UPDATE TRANS_HISTORY
+   SET TRANS_TYPE   = #{transType},
+       TRANS_DATE   = #{transDate},
+       WITHDRAWAL   = #{withdrawal},
+       DEPOSIT      = #{deposit},
+       BALANCE      = #{balance},
+       PURPOSE_USE  = #{purposeUse},
+       REPORT_NO    = #{reportNo}
+ WHERE TRANS_ID     = #{transId}
+	
+	</update>
+	
 </mapper>
