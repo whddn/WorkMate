@@ -51,11 +51,11 @@
 			FROM dual
 		</selectKey>
 		INSERT INTO MAIL
-		( MAIL_ID, SENDER_EMAIL, MESSAGE_ID,
+		( MAIL_ID, SENDER_EMAIL, MESSAGE_ID,ENCRYPTED_PWD,
 		USER_NO, RECIPIENTS, CC_LIST, SUBJECT, CONTENT, SENT_AT, STATUS,
 		FOLDER_ID, ENCRYPTED, MAIL_TYPE, IS_SPAM, RESER_SENDTIME, RESER_STATUS)
 		VALUES
-		(#{mail.mailId},#{mail.senderEmail}, #{mail.messageId},
+		(#{mail.mailId},#{mail.senderEmail}, #{mail.messageId},#{mail.encryptedPwd},
 		#{mail.userNo}, #{mail.recipients}, #{mail.ccList}, #{mail.subject},
 		#{mail.content}, SYSDATE, #{mail.status}, #{mail.folderId},
 		#{mail.encrypted}, #{mail.mailType}, #{mail.isSpam},#{mail.reserSendtime}, #{mail.reserStatus})
