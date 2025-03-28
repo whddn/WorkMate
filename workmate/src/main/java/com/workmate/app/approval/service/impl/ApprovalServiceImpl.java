@@ -60,7 +60,6 @@ public class ApprovalServiceImpl implements ApprovalService {
 		ApprovalVO approval = approvalMapper.selectApprovalById(approvalVO);
 		if ("a2".equals(approval.getApprStatus()) && "AF001".equals(approval.getApprType()) ) {
 			WorkVO workVO = new WorkVO();
-			workVO.setUserNo(approval.getUserNo());
 			workVO.setApprNo(approval.getApprNo());
 			workVO = attendMapper.selectAnnualByApprNo(workVO);
 			

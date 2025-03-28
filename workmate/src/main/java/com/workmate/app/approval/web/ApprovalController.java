@@ -260,7 +260,7 @@ public class ApprovalController {
 	@PutMapping("approval/read")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> putRead(@RequestBody ApprElmntVO apprElmntVO) 
-	throws IOException {
+	{
 		// 결재결과를 수정
 		EmpVO myself = whoAmI.whoAmI();
 		apprElmntVO.setApprover(myself.getUserNo());
@@ -272,13 +272,11 @@ public class ApprovalController {
         	response.put("success", false);
         	return ResponseEntity.badRequest().body(response);
         }
-		
-        System.out.println("응애");
         
         // 결재문서의 결재결과를 결정
 		ApprovalVO approvalVO = new ApprovalVO();
 		approvalVO.setApprNo(apprElmntVO.getApprNo());
-		approvalService.modifyApproval(approvalVO);
+		approvalService.modifyApproval(approvalVO);		
 		
 		response.put("success", true);
         return ResponseEntity.ok(response);
