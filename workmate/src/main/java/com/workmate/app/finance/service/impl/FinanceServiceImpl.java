@@ -63,6 +63,7 @@ public class FinanceServiceImpl implements FinanceService {
 	    }
 
 	    return result;
+	    
 	}
 
 	// 입출금 리포트 수정 기능
