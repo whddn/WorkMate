@@ -27,7 +27,12 @@
 			<tbody>
 				<th:block th:each="sign, sts : ${signs}">
 					<tr>
-						<th><img th:src="${sign.signPath}" th:alt="${sign.signTitle}" width="50" height="50"></th>
+						<th>
+							<img th:src="@{/{path}(path=${sign.signPath})}" 
+							th:alt="${sign.signTitle}" 
+							width="50" 
+							height="50">
+						</th>
 						<th>[[ ${sign.signTitle} ]]</th>
 						<th>[[ ${sign.insertDate} ]]</th>
 						<th><button th:onclick="|killSign(${sign.signNo})|" class="btn btn-primary">삭제</button></th>
