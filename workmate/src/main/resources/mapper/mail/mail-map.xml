@@ -51,11 +51,11 @@
 			FROM dual
 		</selectKey>
 		INSERT INTO MAIL
-		( MAIL_ID, SENDER_EMAIL, MESSAGE_ID,ENCRYPTED_PWD,
+		( MAIL_ID, SENDER_EMAIL, MESSAGE_ID,ENCRYPTED_PWD,MAIL_ROLE,
 		USER_NO, RECIPIENTS, CC_LIST, SUBJECT, CONTENT, SENT_AT, STATUS,
 		FOLDER_ID, ENCRYPTED, MAIL_TYPE, IS_SPAM, RESER_SENDTIME, RESER_STATUS)
 		VALUES
-		(#{mail.mailId},#{mail.senderEmail}, #{mail.messageId},#{mail.encryptedPwd},
+		(#{mail.mailId},#{mail.senderEmail}, #{mail.messageId},#{mail.encryptedPwd},#{mail.mailRole},
 		#{mail.userNo}, #{mail.recipients}, #{mail.ccList}, #{mail.subject},
 		#{mail.content}, SYSDATE, #{mail.status}, #{mail.folderId},
 		#{mail.encrypted}, #{mail.mailType}, #{mail.isSpam},#{mail.reserSendtime}, #{mail.reserStatus})
@@ -173,6 +173,7 @@
         M.SENT_AT,
         M.STATUS,
         M.FOLDER_ID,
+        M.MAIL_ROLE,
         M.IS_READ AS isRead,
         (SELECT COUNT(*) FROM ATTACHMENT A WHERE A.MAIL_ID = M.MAIL_ID) AS ATTACHMENT_COUNT
     FROM MAIL M
