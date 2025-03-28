@@ -53,7 +53,7 @@ public class ContractsController {
 	 */
 	
 	// 결재 신청하려 할때 결재 양식 목록 불러옴
-	@GetMapping("contracts/formList")
+	@GetMapping("contracts/form")
 	public String getFormList(Model model) {
 		model.addAttribute("formList", contractsService.findFormList());
 		return "contracts/contractsForm";
@@ -67,15 +67,6 @@ public class ContractsController {
 		return "contracts/contractsList";
 	}
 
-	// 전자계약 상세 조회
-
-	// 전자계약 템플릿
-	@GetMapping("contracts/form")
-	public String contractsTemplate(Model model) {
-		List<ContractsVO> list = contractsService.findContractsList();
-		model.addAttribute("contr", list);
-		return "contracts/contractsForm";
-	}
 	
 	// 전자계약 템플릿 양식 불러오기
 	 @GetMapping("contracts/forms/{type}")
@@ -93,10 +84,5 @@ public class ContractsController {
 	    }
 	
 	 
-	 // 테스트 
-	 @GetMapping("/test-view")
-	 public String testView() {
-	     return "forms/contracts/Trade_Contract_Form"; // 바로 뷰 리턴
-	 }
 	
 }
