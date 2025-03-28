@@ -367,7 +367,7 @@ public class ApprovalController {
             EmpVO myself = whoAmI.whoAmI();
             SignVO signVO = new SignVO();
             signVO.setSignTitle(file.getOriginalFilename());
-            signVO.setSignPath(filePath.toString());
+            signVO.setSignPath("upload/" + signDir + fileName);
             signVO.setUserNo(myself.getUserNo());
             
             signService.inputSign(signVO);

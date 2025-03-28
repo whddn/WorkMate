@@ -101,9 +101,11 @@
 							<div class="image-container">
 								<th:block th:each="mySign : ${mySigns}">
 							        <div class="image-item">
-							            <img th:src="${mySign.signPath}" th:alt="${mySign.signTitle}">
-							            <br>
 							            <input type="radio" name="signNo" class="radio-btn" th:value="${mySign.signNo}">
+							            <img th:src="@{/{path}(path=${mySign.signPath})}" 
+							            	th:alt="${mySign.signTitle}" 
+							            	width="50" 
+							            	height="50">
 							        </div>
 						        </th:block>
 						    </div>
@@ -167,8 +169,9 @@
 			
 			departmentRow.find('td').eq(colIndex - 1).text(element.departmentName);
 			if(element.apprResult != 'a1') {
+				let contextPath = [[ @{/} ]];
 				let imgTag = $('<img>', {
-			        src: element.signPath,  // 이미지 경로
+			        src: contextPath + element.signPath,	// 이미지 경로
 			        alt: '결재 사인',
 			        width: 50,  // 이미지 크기 (원하는 크기로 조절)
 			        height: 50
@@ -204,7 +207,7 @@
 			let annual = [[ ${annual} ]];
 			console.log(annual);
 			
-			$(`input[name="annualType"]`).attr('checked', true);
+			$(`input[name="annualType"][value="${annual.annualType}"]`).attr('checked', true);
 			$('input[name="annualStart"]').val(annual.annualStart.substr(0, 10));
 			$('input[name="annualEnd"]').val(annual.annualEnd.substr(0, 10));
 			$('input[name="annualCount"]').val(annual.annualCount);

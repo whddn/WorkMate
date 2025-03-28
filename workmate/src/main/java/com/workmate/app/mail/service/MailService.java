@@ -83,7 +83,7 @@ public interface MailService {
 	//첨부파일 리스트 DB 저장
 	void inputAttachmentList(List<AttachmentVO> attachList);
 	// 첨부파일 포함 이메일 전송
-	void sendMailWithAttachment(String senderName, String senderEmail, String recipients, String ccList, String subject, String content, MultipartFile[] attachments) throws MessagingException;
+	void sendMailWithAttachment(String senderName, String senderEmail, String recipients, String ccList, String subject, String content, MultipartFile[] attachments, boolean encrypt) throws MessagingException;
 	//임시저장 첨부파일
 	void saveDraftMail(MailVO mail, MultipartFile[] attachments);
 	

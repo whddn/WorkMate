@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class EmpController {
 	private final EmpService empService;
 
+	private final PasswordEncoder passwordEncoder;
 	/**
 	 * 사원 관리 및 평가
 	 * 
@@ -84,6 +86,16 @@ public class EmpController {
 	@PostMapping("emp/newemp")
 	@ResponseBody // AJAX (or ResponseEntity) 
 	public boolean empNew(@RequestBody EmpVO empVO) {
+		// 사용자가 입력한 비밀번호
+		String rawPassword = empVO.getUserPwd();
+		
+		// 비밀번호 암호화
+		String endocodedPassword = passwordEncoder.encode(rawPassword);
+		
+		// 암호화된 비밀번호로 덮어쓰기 
+		empVO.setUserPwd(endocodedPassword);
+		
+		// 서비스로 전달해 DB 저장
 		empService.inputNewEmp(empVO);
 		return true; // 등록 후 조직도로 반환 (fetch의 location.href), 페이지 이동
 	}
@@ -99,22 +111,9 @@ public class EmpController {
 		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
 		model.addAttribute("rank", empService.findPositionList()); // 직급명
 		return "employees/empUpdate::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
-		// return "redirect:/workmate/emp/update/" + empVO.getUserNo();
+		// employeeFrag : fragment 교체(html의)
 	}
 
-//	// 조직도 수정 페이지 - 수정된 사원 정보 조회
-//	@PostMapping("emp/update/{userNo}") // 조직도 수정 페이지
-//	public String empUpdatePage(EmpVO empVO, Model model, @PathVariable int userNo) {
-//		// 2) 서비스
-//		empVO.setUserNo(userNo);
-//		EmpVO findVO = new EmpVO();
-//		model.addAttribute("update", findVO);
-//		model.addAttribute("teams", empService.findTeamList()); // 팀명
-//		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
-//		model.addAttribute("rank", empService.findPositionList()); // 직급명
-//		return "employees/update"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
-//		// return "redirect:/workmate/emp/update/" + empVO.getUserNo();
-//	}
 
 	// 조직도 수정 AJAX 단건 조회
 	@GetMapping("emp/update/{userNo}")
@@ -161,17 +160,71 @@ public class EmpController {
 	}
 
 	// 지난 평가 리스트 중 단건 조회 (관리자)
-	@GetMapping("emp/bfoneevalu/{evaluFormNo}")
-	public String selectBeforeEvaluResultById(@PathVariable int evaluFormNo, EvaluVO evaluVO, Model model) {
-		evaluVO.setEvaluFormNo(evaluFormNo);
+	@GetMapping("emp/bfoneevalu/{formNo}")
+	public String selectBeforeEvaluResultById(@PathVariable int formNo, EvaluVO evaluVO, Model model,
+			@AuthenticationPrincipal LoginUserVO loginUser) {
+		evaluVO.setEvaluFormNo(formNo);
 		
+		String status = Optional.ofNullable(empService.findEvaluStatus(formNo)).orElse("진행 중");
+		  if ("평가 완료".equals(status)) {
 		Map<String, Object> result = empService.findAdminEvaluBeforeById(evaluVO);
 		model.addAttribute("people", result.get("people"));
 		model.addAttribute("items", result.get("items"));
 		model.addAttribute("scores", result.get("scores"));
 		    
-		return "evalu/beforeEvaluOneInList"; // 페이지 이동 방식 @PathVariable : 한 건만 넘길 때 / @requestParam : 여러 건 넘길 때
+		return "evalu/beforeEvaluOneInList";
+		} else {
+			// 평가 진행 페이지 (제출 전)
+			evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
+
+			List<EvaluVO> fullList = empService.findMyEvaluById(evaluVO);
+			System.out.println(fullList);
+			System.out.println("✅ 전달된 평가자 userNo: " + evaluVO.getUserNo());
+			System.out.println("✅ 전달된 평가폼 번호: " + evaluVO.getEvaluFormNo());
+			// 1) 사용자 중복 제거
+			Set<Integer> userSet = new HashSet<>();
+			List<EvaluVO> userList = new ArrayList<>();
+			for (EvaluVO vo : fullList) {
+				if (userSet.add(vo.getUserNo())) {
+					userList.add(vo);
+				}
+			}
+
+			// 2) 평가 항목 중복 제거 (compet + content 기준)
+			Set<String> keySet = new HashSet<>();
+			List<EvaluVO> evaluList = new ArrayList<>();
+			for (EvaluVO vo : fullList) {
+				String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
+				if (keySet.add(key)) {
+					evaluList.add(vo);
+				}
+			}
+			model.addAttribute("userList", userList);
+			model.addAttribute("evaluList", evaluList);
+
+			return "evalu/evalu"; // 평가 작성 페이지
+		}
 	}
+	
+	// 사원 선택시 해당 사원 결과만 나옴
+	@PostMapping("/emp/bfoneevalu/{formNo}/{userNo}")
+	public String getEvaluResultByUser(@PathVariable int formNo,
+									   @PathVariable int userNo, 
+	                                   Model model) {
+		EvaluVO evaluVO = new EvaluVO();
+	    evaluVO.setEvaluFormNo(formNo);
+	    evaluVO.setUserNo(userNo);
+	    List<EvaluVO> resultList = empService.findAdminEvaluEmpOneById(evaluVO);
+
+	    if (!resultList.isEmpty()) {
+	        model.addAttribute("user", resultList.get(0)); // 유저 정보용
+	    }
+	    model.addAttribute("scores", resultList); // 항목별 점수 리스트
+
+	    return "evalu/ajaxResult :: resultFragment";
+	}
+
+	
 
 	// 평가 등록 페이지 (관리자)
 	@GetMapping("emp/neweva")

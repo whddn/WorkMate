@@ -164,6 +164,9 @@
         form.append("subject", $('#subject').val());
         form.append("content", html);
         form.append("scheduledTime", $('#scheduledTime').val());
+        
+        const isEncrypt = $('#encrypt').is(':checked') ? 'on' : '';  
+        form.append("encrypt", isEncrypt); 
 
         const files = $('#attachments')[0].files;
         for (let i = 0; i < files.length; i++) {

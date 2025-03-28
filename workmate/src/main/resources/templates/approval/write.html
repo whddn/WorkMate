@@ -380,6 +380,9 @@
 		});
 		
 		$('input[type="radio"]:checked, input[type="checkbox"]:checked').each(function() {
+			name = $(this).attr('name');
+		    value = $(this).val();
+		    
 		    // 체크박스는 같은 name을 가진 값들이 여러 개 선택될 수 있으므로 배열로 저장
 		    if ($(this).is(':checkbox')) {
 		        if (!request[name]) {
@@ -390,10 +393,6 @@
 		        request[name] = value;
 		    }
 		});
-		
-		// annualType Count 도저히 안되서 우겨넣은 코드
-		request['annualType'] = $('input[name="annualType"]:checked').val();
-		request['annualCount'] = $('input[name="annualCount"]').val();
 		
 		// 결재선 추가
 		let approverList = [];

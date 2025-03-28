@@ -9,6 +9,7 @@
 		           work_time,
 		           work_status,
 		           work_no,
+		           late_reason,
 		           add_work_time,
 		           (SELECT COUNT(*) 
 		            FROM work 
@@ -161,7 +162,7 @@
 	        , #{annualEnd}
 	        , CASE 
             	WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5 --오전반차, 오후반차면 0.5
-            	ELSE TRUNC(#{annualEnd}) - TRUNC(#{annualStart})
+            	ELSE TRUNC(#{annualEnd}) - TRUNC(#{annualStart}) + 1
         	END
 	        , #{annualType}
 	        , #{userNo}
@@ -172,21 +173,20 @@
 	
 	
 	<!-- 연차 업데이트 전자결재 -->
-	<update id="updateOccList" parameterType="WorkVO">
+	<update id="updateOccList" parameterType="int">
 		UPDATE occ_annual
-		SET	
-			  update_annual_count = update_annual_count - 
-            CASE 
-                WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
-                ELSE #{annualCount}
-            END,
-        remain_annual_leave = remain_annual_leave + 
-            CASE 
-                WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
-                ELSE TRUNC(#{annualEnd}) - TRUNC(#{annualStart})
-            END
-		WHERE 	user_no = #{userNo}
-		AND user_annual_year = EXTRACT(YEAR FROM SYSDATE)
+		SET used_annual_count = used_annual_count + 
+		    CASE 
+		        WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
+		        ELSE #{annualCount}
+		    END,
+		    remain_anl_leave = remain_anl_leave - 
+		    CASE 
+		        WHEN INSTR(#{annualType}, '반차') > 0 THEN 0.5
+		        ELSE #{annualCount}
+		    END
+		WHERE user_no = #{userNo}
+		AND use_annual_year = EXTRACT(YEAR FROM SYSDATE)
 	</update>
 	
 	<!-- 전체사원 이번달 근태 -->
