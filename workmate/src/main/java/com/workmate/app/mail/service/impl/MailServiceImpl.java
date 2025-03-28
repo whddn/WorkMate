@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -32,6 +33,7 @@ import com.workmate.app.mail.service.AttachmentVO;
 import com.workmate.app.mail.service.MailFolderVO;
 import com.workmate.app.mail.service.MailService;
 import com.workmate.app.mail.service.MailVO;
+import com.workmate.app.mail.util.AttachmentEncryptor;
 
 import jakarta.mail.Address;
 import jakarta.mail.BodyPart;
@@ -486,21 +488,27 @@ public class MailServiceImpl implements MailService {
 	
 	
 	@Override
-	public void sendMailWithAttachment(String senderName, String senderEmail, String recipients, String ccList, String subject, String content, MultipartFile[] attachments) throws MessagingException {
+	public void sendMailWithAttachment(String senderName, String senderEmail, String recipients, String ccList,
+	                                   String subject, String content, MultipartFile[] attachments, boolean encrypt)
+	        throws MessagingException {
 	    String[] recipientList = recipients.split(",");
 	    String fromEmail = "the7100000@gmail.com";
 
-	    // ✅ 첨부파일 저장
 	    List<AttachmentVO> savedAttachments = new ArrayList<>();
+	    List<File> originalFiles = new ArrayList<>();
+
+	    // ✅ 1. 첨부파일 로컬 저장
 	    if (attachments != null && attachments.length > 0) {
 	        for (MultipartFile file : attachments) {
 	            if (file.isEmpty()) continue;
 
 	            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 	            String fullPath = uploadDir + File.separator + fileName;
+
 	            File localFile = new File(fullPath);
 	            try {
 	                file.transferTo(localFile);
+	                originalFiles.add(localFile); // zip 압축용
 	            } catch (IOException e) {
 	                e.printStackTrace();
 	            }
@@ -510,12 +518,11 @@ public class MailServiceImpl implements MailService {
 	            att.setFileType(file.getContentType());
 	            att.setFileSize(file.getSize());
 	            att.setFilePath(fullPath);
-
 	            savedAttachments.add(att);
 	        }
 	    }
 
-	    // ✅ 메일 실제 전송 (1번만)
+	    // ✅ 2. SMTP 메일 전송 (첨부파일 원본만 첨부)
 	    MimeMessage message = mailSender.createMimeMessage();
 	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -544,68 +551,89 @@ public class MailServiceImpl implements MailService {
 	    helper.setText(content, true);
 	    helper.setReplyTo(senderEmail);
 
-	    // 📎 첨부파일 추가
-	    for (AttachmentVO att : savedAttachments) {
-	        File fileToAttach = new File(att.getFilePath());
-	        if (fileToAttach.exists()) {
-	            helper.addAttachment(att.getFileName(), fileToAttach);
+	    if (!encrypt) {
+	        for (AttachmentVO att : savedAttachments) {
+	            File fileToAttach = new File(att.getFilePath());
+	            if (fileToAttach.exists()) {
+	                helper.addAttachment(att.getFileName(), fileToAttach);
+	            }
 	        }
 	    }
 
 	    mailSender.send(message);
 
-	    // ✅ 보낸 메일 저장 (보낸사람 1건)
-	    MailVO mail = new MailVO();
+	    // ✅ 3. 보낸 사람 메일 DB 저장
 	    Integer senderNo = getUserNoByEmail(senderEmail);
-	    mail.setUserNo(senderNo);
-	    mail.setRecipients(recipients);
-	    mail.setCcList(ccList);
-	    mail.setSubject(finalSubject);
-	    mail.setContent(content);
-	    mail.setSentAt(new Date());
-	    mail.setStatus("발송됨");
-	    mail.setEncrypted("N");
-	    mail.setMailType(isInternal ? "내부" : "외부");
-	    mail.setIsSpam("N");
-	    mail.setFolderId(1002); // 보낸메일함
-	    mail.setSenderEmail(senderEmail);
-	    mail.setMessageId(((MimeMessage) message).getMessageID());
+	    MailVO senderMail = new MailVO();
+	    senderMail.setUserNo(senderNo);
+	    senderMail.setRecipients(recipients);
+	    senderMail.setCcList(ccList);
+	    senderMail.setSubject(finalSubject);
+	    senderMail.setContent(content);
+	    senderMail.setSentAt(new Date());
+	    senderMail.setStatus("발송됨");
+	    senderMail.setEncrypted(encrypt ? "Y" : "N");
+	    senderMail.setMailType(isInternal ? "내부" : "외부");
+	    senderMail.setIsSpam("N");
+	    senderMail.setFolderId(1002);
+	    senderMail.setSenderEmail(senderEmail);
+	    senderMail.setMessageId(message.getMessageID());
 
-	    mailMapper.insertMail(mail);
+	    mailMapper.insertMail(senderMail);
 
-	    // 보낸 메일 첨부파일 저장
 	    for (AttachmentVO att : savedAttachments) {
-	        AttachmentVO copy = new AttachmentVO();
-	        copy.setMailId(mail.getMailId());
-	        copy.setFileName(att.getFileName());
-	        copy.setFileType(att.getFileType());
-	        copy.setFileSize(att.getFileSize());
-	        copy.setFilePath(att.getFilePath());
-	        attachmentMapper.insertAttachment(copy);
+	        att.setMailId(senderMail.getMailId());
+	        attachmentMapper.insertAttachment(att);
 	    }
 
-	    // ✅ 수신자별 메일 + 첨부파일 저장
+	    // ✅ 4. 수신자 메일 저장 (암호화 여부에 따라 다르게 첨부)
 	    for (String recipient : recipientList) {
 	        recipient = recipient.trim();
 	        Integer recipientNo = getUserNoByEmail(recipient);
-	        if (recipientNo != null) {
-	            MailVO receiverMail = new MailVO();
-	            receiverMail.setUserNo(recipientNo);
-	            receiverMail.setRecipients(senderEmail);
-	            receiverMail.setCcList(ccList);
-	            receiverMail.setSubject(finalSubject);
-	            receiverMail.setContent(content);
-	            receiverMail.setSentAt(new Date());
-	            receiverMail.setStatus("수신됨");
-	            receiverMail.setEncrypted("N");
-	            receiverMail.setMailType(isInternal ? "내부" : "외부");
-	            receiverMail.setIsSpam("N");
-	            receiverMail.setFolderId(1001); // 받은메일함
-	            receiverMail.setSenderEmail(senderEmail);
-	            receiverMail.setMessageId(mail.getMessageId());
+	        if (recipientNo == null) continue;
 
+	        MailVO receiverMail = new MailVO();
+	        receiverMail.setUserNo(recipientNo);
+	        receiverMail.setRecipients(senderEmail);
+	        receiverMail.setCcList(ccList);
+	        receiverMail.setSubject(finalSubject);
+	        receiverMail.setContent(content);
+	        receiverMail.setSentAt(new Date());
+	        receiverMail.setStatus("수신됨");
+	        receiverMail.setEncrypted(encrypt ? "Y" : "N");
+	        receiverMail.setMailType(isInternal ? "내부" : "외부");
+	        receiverMail.setIsSpam("N");
+	        receiverMail.setFolderId(1001);
+	        receiverMail.setSenderEmail(senderEmail);
+	        receiverMail.setMessageId(message.getMessageID());
+
+	        // 🧩 암호화된 경우: 전화번호 기반 암호 사용
+	        if (encrypt) {
+	            String phone = mailMapper.findPhoneByUserNo(recipientNo);
+	            String password = (phone != null && phone.length() >= 13) ? phone.substring(4, 8) : "0000";
+	            receiverMail.setEncryptedPwd(password);
+
+	            mailMapper.insertMail(receiverMail); // 먼저 mailId 생성
+
+	            // 암호화된 zip 생성
+	            String zipName = UUID.randomUUID() + "_encrypted.zip";
+	            String zipPath = uploadDir + File.separator + zipName;
+	            try {
+	                File encryptedZip = AttachmentEncryptor.encryptMultipleFiles(originalFiles, password, zipPath);
+
+	                AttachmentVO encAtt = new AttachmentVO();
+	                encAtt.setMailId(receiverMail.getMailId());
+	                encAtt.setFileName(zipName);
+	                encAtt.setFileType("application/zip");
+	                encAtt.setFileSize(encryptedZip.length());
+	                encAtt.setFilePath(encryptedZip.getAbsolutePath());
+
+	                attachmentMapper.insertAttachment(encAtt);
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        } else {
 	            mailMapper.insertMail(receiverMail);
-
 	            for (AttachmentVO att : savedAttachments) {
 	                AttachmentVO copy = new AttachmentVO();
 	                copy.setMailId(receiverMail.getMailId());
@@ -618,6 +646,34 @@ public class MailServiceImpl implements MailService {
 	        }
 	    }
 	}
+
+
+	private void sendEncryptedMailToRecipient(String senderName, String senderEmail, String recipient, String ccList, String subject, String content, File encryptedZip) throws MessagingException {
+	    MimeMessage message = mailSender.createMimeMessage();
+	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+	    try {
+	        helper.setFrom(new InternetAddress("the7100000@gmail.com", senderName, "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+	        e.printStackTrace();
+	    }
+
+	    helper.setTo(recipient);
+	    if (ccList != null && !ccList.isBlank()) {
+	        helper.setCc(ccList.split(","));
+	    }
+	    helper.setSubject(subject);
+	    helper.setText(content, true);
+	    helper.setReplyTo(senderEmail);
+
+	    if (encryptedZip.exists()) {
+	        helper.addAttachment("첨부파일.zip", encryptedZip);
+	    }
+
+	    mailSender.send(message);
+	}
+
+
 
 
 
@@ -660,7 +716,7 @@ public class MailServiceImpl implements MailService {
 	    return mailMapper.selectEmployeesByTeam(teamNo);
 	}
 	// 1분마다 예약된 메일 중 발송 시간이 지난 메일들을 전송 시도
-	//@Scheduled(fixedDelay = 60000)
+	@Scheduled(fixedDelay = 60000)
 	public void sendScheduledMails() {
 	    List<MailVO> scheduledMails = mailMapper.selectScheduledMails();
 
@@ -671,13 +727,13 @@ public class MailServiceImpl implements MailService {
 	            }
 
 	            MultipartFile[] attachments = reloadAttachments(mail.getMailId());
-
+	            boolean encrypt = "Y".equals(mail.getEncrypted());
 	            // ✅ 메일 전송은 수신자/참조자 포함하여 한 번만 실행
 	            if (attachments.length > 0) {
 	                sendMailWithAttachment(
 	                    "예약메일", mail.getSenderEmail(),
 	                    mail.getRecipients(), mail.getCcList(),
-	                    mail.getSubject(), mail.getContent(), attachments);
+	                    mail.getSubject(), mail.getContent(), attachments, encrypt);
 	            } else {
 	                sendEmail(
 	                    "예약메일", mail.getSenderEmail(),
@@ -715,33 +771,52 @@ public class MailServiceImpl implements MailService {
 
 
 	//예약 메일 등록 기능
-	@Override
-	public void scheduleMail(MailVO mail, MultipartFile[] attachments) {
-	    mailMapper.insertMail(mail);
+    @Override
+    public void scheduleMail(MailVO mail, MultipartFile[] attachments) {
+        // 🔐 암호화 체크된 경우, 대표 수신자 기준으로 비밀번호 세팅
+        if ("Y".equals(mail.getEncrypted())) {
+            String[] recipientList = mail.getRecipients().split(",");
+            if (recipientList.length > 0) {
+                Integer recipientNo = mailMapper.findUserNoByEmail(recipientList[0].trim());
+                if (recipientNo != null) {
+                    String phone = mailMapper.findPhoneByUserNo(recipientNo);
+                    if (phone != null && phone.length() >= 13) {
+                        String password = phone.substring(4, 8); // 전화번호 중간 4자리
+                        mail.setEncryptedPwd(password);
+                    } else {
+                        mail.setEncryptedPwd("0000"); // 기본값
+                    }
+                }
+            }
+        }
 
-	    if (attachments != null) {
-	        for (MultipartFile file : attachments) {
-	            if (file.isEmpty()) continue;
+        // 📩 예약 메일 DB 저장
+        mailMapper.insertMail(mail);
 
-	            try {
-	                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-	                String fullPath = uploadDir + File.separator + fileName;
-	                file.transferTo(new File(fullPath));
+        // 📎 첨부파일 저장
+        if (attachments != null) {
+            for (MultipartFile file : attachments) {
+                if (file.isEmpty()) continue;
 
-	                AttachmentVO att = new AttachmentVO();
-	                att.setMailId(mail.getMailId());
-	                att.setFileName(file.getOriginalFilename());
-	                att.setFileType(file.getContentType());
-	                att.setFileSize(file.getSize());
-	                att.setFilePath(fullPath);
+                try {
+                    String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                    String fullPath = uploadDir + File.separator + fileName;
+                    file.transferTo(new File(fullPath));
 
-	                attachmentMapper.insertAttachment(att);
-	            } catch (IOException e) {
-	                e.printStackTrace();
-	            }
-	        }
-	    }
-	}
+                    AttachmentVO att = new AttachmentVO();
+                    att.setMailId(mail.getMailId());
+                    att.setFileName(file.getOriginalFilename());
+                    att.setFileType(file.getContentType());
+                    att.setFileSize(file.getSize());
+                    att.setFilePath(fullPath);
+
+                    attachmentMapper.insertAttachment(att);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 	//받은메일 읽음 기능
 	@Override
 	public void markAsRead(int mailId) {

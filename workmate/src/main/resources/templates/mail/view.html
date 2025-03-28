@@ -53,12 +53,14 @@
         <li th:each="file : ${mail.attachmentList}">
             <a th:href="@{/mail/download/{fileId}(fileId=${file.fileId})}" th:text="${file.fileName}"></a>
             (<span th:text="${#numbers.formatInteger(file.fileSize / 1024, 0)}"></span> KB)
+            <span th:if="${mail.encrypted == 'Y'}" class="text-danger"> - (암호화됨)</span>
         </li>
     </ul>
 
     <!-- 🔒 암호화 안내문 -->
     <div th:if="${mail.encrypted == 'Y'}" class="alert alert-warning mt-3">
-        이 메일의 첨부파일은 암호화되어 있습니다.
+        이 메일의 첨부파일은 암호화되어 있습니다.<br>
+        압축 파일을 열 때 비밀번호를 입력해주세요.
     </div>
 </div>
         </div>

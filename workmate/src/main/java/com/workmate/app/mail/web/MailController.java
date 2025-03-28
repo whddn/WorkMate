@@ -117,7 +117,7 @@ public class MailController {
 
             if (hasAttachment) {
                 // 첨부파일이 있을 경우 저장 + 첨부파일 처리 + 전송
-                mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments);
+                mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt);
             } else {
                 // 첨부파일 없으면 일반 전송만
                 mailService.sendEmail(senderName, senderEmail, recipients, ccList, subject, content);
@@ -468,7 +468,9 @@ model.addAttribute("unreadCount", unreadCount);
             @RequestParam String subject,
             @RequestParam String content,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date scheduledTime,
-            @RequestParam(required = false) MultipartFile[] attachments) {
+            @RequestParam(required = false) MultipartFile[] attachments,
+            @RequestParam(value = "encrypt", required = false) String encryptCheckbox  // ✅ 추가
+    ) {
 
         MailVO mail = new MailVO();
         mail.setUserNo(loginUser.getUserVO().getUserNo());
@@ -477,18 +479,22 @@ model.addAttribute("unreadCount", unreadCount);
         mail.setSubject(subject);
         mail.setContent(content);
         mail.setSentAt(new Date()); // 등록일시
-        mail.setReserSendtime(scheduledTime); // 예약 발송 시점
+        mail.setReserSendtime(scheduledTime);
         mail.setReserStatus("예약됨");
         mail.setStatus("예약대기");
-        mail.setEncrypted("N");
         mail.setMailType("내부");
         mail.setIsSpam("N");
-        mail.setFolderId(1002); // 보낸 메일함으로 등록
+        mail.setFolderId(1002);
 
-        
+        // ✅ 암호화 체크박스 처리
+        if ("on".equals(encryptCheckbox)) {
+            mail.setEncrypted("Y");
+        } else {
+            mail.setEncrypted("N");
+        }
+
         mailService.scheduleMail(mail, attachments);
         return "redirect:/mail/sent";
-        
     }
     
 }
