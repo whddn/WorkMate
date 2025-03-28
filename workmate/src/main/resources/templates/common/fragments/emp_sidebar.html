@@ -109,7 +109,7 @@
                   </ul>
                 </div>
               </li>      
-              <li class="nav-item" th:if="${teamNo == 'ROLE_T001'}"><!--   이거 추가하면 인사관리팀으로 접속했을 때만 확인 가능 -->
+              <li class="nav-item" ><!--   th:if="${teamNo == 'ROLE_T001'}" 이거 추가하면 인사관리팀으로 접속했을 때만 확인 가능 -->
                 <a th:href="@{/emp/bfevalu}">
                   <i class="fas fa-pen-square"></i>
                   <p>지난 평가 관리</p>

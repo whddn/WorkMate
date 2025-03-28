@@ -165,8 +165,8 @@ public class EmpServiceImpl implements EmpService {
 		// 관리자 결과 단건 조회 - 사원 1명에 대한 평가 항목별 점수
 		@Override
 		public List<EvaluVO> findAdminEvaluEmpOneById(EvaluVO evaluVO) {
-		    List<EvaluVO> rawList = empMapper.selectAdminBeforeEvaluById(evaluVO);
-
+		    List<EvaluVO> rawList = empMapper.selectAdminBeforeUserEvaluById(evaluVO);
+		    
 		    // 항목 중복 제거용 Set
 		    Set<String> itemKeySet = new LinkedHashSet<>();
 		    List<EvaluVO> itemList = new ArrayList<>();

@@ -4,7 +4,7 @@
 
 <head>
 	<meta charset="UTF-8" />
-	<title>리포트 작성</title>
+	<title>리포트 수정</title>
 	<style>
 		body {
 			font-family: 'Arial', sans-serif;
@@ -143,27 +143,27 @@
 
 <body>
 	<div id="container">
-		<h3>신규 리포트 작성</h3>
-		<input type="text" placeholder="리포트 제목을 입력하세요" required id="reportTitle">
+		
+		<input type="text" th:value="${report[0].reportTitle}" id="reportTitle">
 		<h3>기본 정보</h3>
 		<table>
 			<tr>
 				<th>기간</th>
 				<td>
 					<div style="display: flex; gap: 10px; align-items: center;">
-						<input type="date" style="width: 130px;" id="startDate" />
+						<input type="date" style="width: 130px;" id="startDate" th:value="${report[0].transStart}"/>
 						~
-						<input type="date" style="width: 130px;" id="endDate" />
+						<input type="date" style="width: 130px;" id="endDate" th:value="${report[0].transEnd}" />
 					</div>
 				</td>
 				<th>팀명</th>
-				<td><input type="text" th:data-teamno="${teamNo}" th:value="${teamName}" id="teamNo" readonly></td>
+				<td><input type="text" th:data-teamno="${teamNo}" th:value="${teamName}" id="teamNo" th:data-re="${report[0].reportNo}"></td>
 			</tr>
 			<tr>
 				<th>직급</th><!-- 로그인한 유저 -->
-				<td><input type="text" th:value="${position}" readonly></td>
+				<td><input type="text" th:value="${position}"></td>
 				<th>성명</th><!-- 로그인한 유저 -->
-				<td><input type="text" th:data-userno="${userNo}" th:value="${userName}" id="userNo" readonly></td>
+				<td><input type="text" th:data-userno="${userNo}" th:value="${userName}" id="userNo"></td>
 			</tr>
 		</table>
 
@@ -187,20 +187,12 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td><input type="text" placeholder="예: 1일(토)"></td>
-					<td><input type="text"></td>
-					<td><input type="number" th:data-deposit="입금"></td>
-					<td><input type="number" th:data-drawal="출금"></td>
-					<td><input type="number"></td>
-					<td><input type="checkbox"></td>
-				</tr>
-				<tr>
-					<td><input type="text" placeholder="예: 2일(일)"></td>
-					<td><input type="text"></td>
-					<td><input type="number"></td>
-					<td><input type="number"></td>
-					<td><input type="number"></td>
+				<tr th:each="r : ${report}">
+					<td><input type="text" th:value="${r.transDate}"></td>
+					<td><input type="text" th:value="${r.purposeUse}"></td>
+					<td><input type="number" th:data-deposit="입금" th:value="${r.deposit}"></td>
+					<td><input type="number" th:data-drawal="출금" th:value="${r.withdrawal}"></td>
+					<td><input type="number" th:value="${r.balance}"></td>
 					<td><input type="checkbox"></td>
 				</tr>
 			</tbody>
@@ -384,9 +376,12 @@
         transHistoryList: transList
     };
 
-    // 3. fetch AJAX 요청
-    fetch('/workmate/finance/reportInsert', {
-        method: 'POST',
+
+	const reportNo = document.querySelector('#teamNo').dataset.re;
+
+    // 3. fetch 수정 AJAX 요청
+    fetch(`/workmate/finance/reportUpdate/${reportNo}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -395,12 +390,12 @@
         .then(res => res.json())
         .then(result => {
             if (result.success) {
-                alert('성공적으로 등록되었습니다.');
+                alert('성공적으로 수정되었습니다.');
 		        setTimeout(() => {
 		    location.href = '/workmate/finance/reportList';
 		}, 600); // 리포트 목록으로 이동
             } else {
-                alert('등록에 실패했습니다.');
+                alert('수정에 실패했습니다.');
             }
         })
         .catch(err => {
