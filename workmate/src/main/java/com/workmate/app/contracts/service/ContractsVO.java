@@ -19,4 +19,8 @@ public class ContractsVO {
 	private Date contrStart;
 	private Date contrEnd;
 	private String vendCode;
+	
+	private byte[] signImage; // 서명 이미지 (BLOB)
+	private String signImageBase64; // 프론트에서 넘어온 base64 문자열
+
 }

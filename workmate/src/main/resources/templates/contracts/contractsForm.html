@@ -1,82 +1,131 @@
 <!DOCTYPE html>
 <html 
-	xmlns:th="https://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/contracts_layout}"
-	layout:fragment="content">
+  xmlns:th="https://www.thymeleaf.org/"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layouts/contracts_layout}"
+  layout:fragment="content">
 
 <head>
-	<meta charset="UTF-8">
-	<title>전자 계약 양식</title>
-	<style>
-	  /* 가운데 정렬 */
-  .dataTables_wrapper .dataTables_paginate {
-    text-align: center !important;
-    float: none !important;
-    margin-top: 20px;
-  }
+  <meta charset="UTF-8">
+  <title>전자 계약 양식</title>
+  <style>
+    /* 테이블 가운데 정렬 */
+    #FormsTable {
+      margin: 0 auto;
+      text-align: center;
+      width: 80%;
+    }
 
-  /* 검색창 꾸미기 */
-  .dataTables_wrapper .dataTables_filter {
-    float: right;
-    margin-bottom: 15px;
-  }
-  .dataTables_wrapper .dataTables_filter input {
-    padding-left: 2.5rem;
-    height: 40px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background: url("https://cdn-icons-png.flaticon.com/512/622/622669.png") no-repeat 10px center;
-    background-size: 20px 20px;
-  }
-  .btn { padding: 6px 12px; };
-	</style>
+    #FormsTable th,
+    #FormsTable td {
+      text-align: center;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+      text-align: center !important;
+      float: none !important;
+      margin-top: 20px;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+      float: right;
+      margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+      padding-left: 2.5rem;
+      height: 40px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: url("https://cdn-icons-png.flaticon.com/512/622/622669.png") no-repeat 10px center;
+      background-size: 20px 20px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+    }
+
+    tr.clickable-row {
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
-	<h3>결재 양식</h3>
-	<span>
-		<select>
-			<option value="formName" selected>양식명</option>
-			<option value="dept">담당부서</option>
-			<option value="manager">담당자</option>
-		</select>
-	</span>
-	<h3>[[ ${formList} ]]</h3>
-	<table id="FormsTable" class="display">
-		<thead>
-			<tr>
-				<th>NO</th>
-				<th>양식명</th>
-				<th>담당부서</th>
-				<th>담당자</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="form, sts : ${formList}">
-				<tr th:onclick="| location.href = '@{/contracts/write(apprType=${form.apprType})}' |">
-					<td>[[ ${sts.count} ]]</td>
-					<td>[[ ${form.formName} ]]</td>
-					<td>[[ ${form.departmentName} ]]</td>
-					<td>[[ ${form.userName} ]]</td>
-				</tr>
-			</th:block>
-		</tbody>
-	</table>
+  <h3 style="text-align: center;">결재 양식</h3>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <select>
+      <option value="formName" selected>양식명</option>
+      <option value="dept">담당부서</option>
+      <option value="manager">담당자</option>
+    </select>
+  </div>
+
+  <table id="FormsTable" class="display">
+    <thead>
+      <tr>
+        <th>NO</th>
+        <th>양식명</th>
+        <th>계약유형</th>
+        <th>등록일</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="clickable-row">
+        <td>1</td>
+        <td>고용계약서</td>
+        <td>고용계약</td>
+        <td>2025-03-28</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>용역계약서</td>
+        <td>용역계약</td>
+        <td>2025-03-27</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div id="modalContainer"></div>
+  
 </body>
 
 <script>
-	$(document).ready(function() {
-		$('#FormsTable').DataTable({
-			"language": {
-				"search": "검색:",
-				"lengthMenu":"",
-				"infoEmpty":"",
-				"infoFiltered": "(전체 _MAX_ 개 중 검색결과)",
-			}
-		});
+  $(document).ready(function () {
+    $('#FormsTable').DataTable({
+      "language": {
+        "search": "검색:",
+        "lengthMenu": "페이지당 _MENU_ 개씩 보기",
+        "zeroRecords": "검색 결과가 없습니다.",
+        "info": "총 _TOTAL_건 중 _START_ ~ _END_",
+        "infoEmpty": "데이터가 없습니다.",
+        "infoFiltered": "(전체 _MAX_ 개 중 검색결과)",
+        "paginate": {
+          "first": "처음",
+          "last": "마지막",
+          "next": "다음",
+          "previous": "이전"
+        }
+      }
+    });
+
+    // 첫 번째 tr 클릭 시 이동
+    // tr 클릭 시 Ajax로 모달 불러와서 띄우기
+	$('#FormsTable tbody').on('click', 'tr.clickable-row', function () {
+	  $.ajax({
+	    url: '/contracts/modal/standard', // 모달 반환하는 Controller URL
+	    success: function (data) {
+	      $('#modalContainer').html(data); // 모달 삽입
+	      const modal = new bootstrap.Modal(document.getElementById('standardContractModal'));
+	      modal.show();
+	    },
+	    error: function () {
+	      alert("모달을 불러오는 데 실패했습니다.");
+	    }
+	  });
 	});
+
 </script>
 
 </html>
