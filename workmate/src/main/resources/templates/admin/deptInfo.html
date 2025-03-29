@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/admin_layout}"
+      layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>부서 조회</title>
+    <style>
+
+
+    .center-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .dept-box {
+      width: 700px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #dbeeff;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    td {
+      text-align: left;
+    }
+
+    .btn-area {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .btn-edit {
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #298dff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-edit:hover {
+      background-color: #176fce;
+    }
+  </style>
+<body>
+ <div class="center-wrapper">
+    <div class="dept-box">
+      <h2>📌 부서 정보</h2>
+
+      <table>
+        <tr>
+          <th>부서번호</th>
+          <td>[[ ${dept.departmentId} ]]</td>
+          <th>부서명</th>
+          <td>[[ ${dept.departmentName} ]]</td>
+        </tr>
+        <tr>
+          <th>부서장</th>
+          <td>[[ ${dept.userName} ]]</td>
+          <th>부서 이메일</th>
+          <td>[[ ${dept.userMail} ]]</td>
+        </tr>
+        <tr>
+          <th>연락처</th>
+          <td>[[ ${dept.userPhone} ]]</td>
+          <th>주요 업무</th>
+          <td>[[ ${dept.deptWork} ]]</td>
+        </tr>
+        <tr>
+          <th>위치</th>
+          <td>[[ ${dept.deptLocation} ]]</td>
+          <th>예산 제한</th>
+          <td>1분기 ▼&nbsp;&nbsp;&nbsp;&nbsp;3,750만원 (연간 부서 전체 예산 10억 당)</td>
+        </tr>
+        <tr>
+          <th>전체 예산</th>
+          <td colspan="3" th:text="${#numbers.formatInteger(dept.budget, 3, 'COMMA')} + '원'"></td>
+        </tr>
+      </table>
+
+      <div class="btn-area">
+        <button class="btn-edit" onclick="event.stopPropagation();">수정</button>
+        <!--<button class="btn-edit" onclick="event.stopPropagation(); 수정함수();">수정</button>-->
+        <button class="btn-edit" th:onclick="|location.href='@{/admin/deptList}'|">목록으로</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -151,9 +151,9 @@
 				<th>기간</th>
 				<td>
 					<div style="display: flex; gap: 10px; align-items: center;">
-						<input type="date" style="width: 130px;" id="startDate" th:value="${report[0].transStart}"/>
+						<input type="date" style="width: 130px;" id="startDate" th:value="${#dates.format(report[0].transStart, 'yyyy-MM-dd')}"/>
 						~
-						<input type="date" style="width: 130px;" id="endDate" th:value="${report[0].transEnd}" />
+						<input type="date" style="width: 130px;" id="endDate" th:value="${#dates.format(report[0].transEnd, 'yyyy-MM-dd')}" />
 					</div>
 				</td>
 				<th>팀명</th>
@@ -188,7 +188,7 @@
 			</thead>
 			<tbody>
 				<tr th:each="r : ${report}">
-					<td><input type="text" th:value="${r.transDate}"></td>
+					<td><input type="date" th:value="${#dates.format(r.transDate, 'yyyy-MM-dd')}" th:data-trans="${r.transId}" id="transId"></td>
 					<td><input type="text" th:value="${r.purposeUse}"></td>
 					<td><input type="number" th:data-deposit="입금" th:value="${r.deposit}"></td>
 					<td><input type="number" th:data-drawal="출금" th:value="${r.withdrawal}"></td>
@@ -236,7 +236,7 @@
 
 			<div class="button-area">
 				<button type="button" class="btn-approve">결재선</button>
-				<button type="submit" class="btn-submit" id="insertReport">등록</button>
+				<button type="button" class="btn-submit" id="updateReport">저장</button>
 			</div>
 		</div>
 	</div>
@@ -333,12 +333,13 @@
 
 		// 버튼 클릭시 click 이벤트
 
-		document.querySelector('#insertReport').addEventListener('click', e => {
-			insertReportAjax();
+		document.querySelector('#updateReport').addEventListener('click', e => {
+			updateReportAjax();
 		})
 
-		function insertReportAjax() {
+		function updateReportAjax() {
     let rTitle = document.querySelector('#reportTitle').value;
+    console.log("📌 reportTitle 입력값:", rTitle);
     let sDate = document.querySelector('#startDate').value;
     let eDate = document.querySelector('#endDate').value;
     let userNo = document.querySelector('#userNo').dataset.userno;
@@ -353,15 +354,18 @@
         let deposit = parseInt(row.cells[2].querySelector('input').value) || 0;
         let withdrawal = parseInt(row.cells[3].querySelector('input').value) || 0;
         let balance = parseInt(row.cells[4].querySelector('input').value) || 0;
+        let transId = row.cells[0].querySelector('input').dataset.trans; 
 
         // 거래 일자가 비어있으면 skip
         if (transDate.trim() !== '') {
             transList.push({
+            	transId: transId ? parseInt(transId) : null, // null 허용
                 transDate,
                 purposeUse,
                 deposit,
                 withdrawal,
                 balance
+                
             });
         }
     });
@@ -390,9 +394,10 @@
         .then(res => res.json())
         .then(result => {
             if (result.success) {
+            console.log("🔍 최종 전송 데이터:", JSON.stringify(data, null, 2));
                 alert('성공적으로 수정되었습니다.');
 		        setTimeout(() => {
-		    location.href = '/workmate/finance/reportList';
+		  //  location.href = '/workmate/finance/reportList';
 		}, 600); // 리포트 목록으로 이동
             } else {
                 alert('수정에 실패했습니다.');

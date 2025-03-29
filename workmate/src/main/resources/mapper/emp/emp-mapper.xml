@@ -2,16 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.employee.mapper.EmpMapper">
 	<!-- 사원 전체 조회 (조직도/사원이름/부서명) -->
-	<!-- <select id="selectAllName" resultType="EmpVO">
- 		SELECT u.user_name
- 				, u.user_no
-		        , d.department_name
-		FROM employee u 
-		JOIN  team t 
-		ON u.team_no = t.team_no
-		JOIN department d 
-		ON d.department_id = t.department_id 
-	</select> -->
+	<select id="selectAllEmpList" resultType="EmpVO">
+	  SELECT 
+	      USER_NO
+	      , USER_NAME
+	      , USER_MAIL
+	      , USER_PHONE
+	  FROM EMPLOYEE
+	  ORDER BY USER_NO
+	</select>
+	<!-- 이미 부서장으로 등록된 사원 조회 쿼리 -->
+	<select id="selectDepartmentHeadList" resultType="Integer">
+	    SELECT d.DEPARTMENT_HEAD
+	    FROM DEPARTMENT d
+	    WHERE d.DEPARTMENT_HEAD IS NOT NULL
+	</select>
+	
 	<!--/* 조직도의 사원 상세 조회 */-->
 	<select id="selectEmpById" resultType="EmpVO">
 		SELECT u.user_name
@@ -144,7 +150,7 @@
 		   ON i.EVALU_ITEM_NO = ef.EVALU_ITEM_NO
 		 JOIN EVALU_FORM f 
 		   ON f.EVALU_FORM_NO = ef.EVALU_FORM_NO
-		WHERE f.EVALU_FORM_NO = 1
+		WHERE f.EVALU_FORM_NO = #{evaluFormNo}
 	</select>
 	<!-- 진행할 평가 단건 (왜 있는 건지 모르겠음) -->
 	<!-- <select id="selectOneEvaluById" resultType="EvaluVO">
@@ -399,8 +405,7 @@
 		<selectKey keyProperty="evaluFormNo"
 			   resultType="Integer"
 			   order="BEFORE">
-		 	SELECT MAX(EVALU_FORM_NO) + 1
-       		FROM EVALU_FORM
+		 	SELECT EVALU_FORM_NO_SEQ.NEXTVAL FROM DUAL
 		</selectKey>
 		INSERT INTO EVALU_FORM
 					(EVALU_FORM_NO
@@ -409,7 +414,7 @@
 		            , EVALU_START
 		            , EVALU_END
 		            , USAGE_STATUS)
-		VALUES 	(EVALU_FORM_NO_SEQ.NEXTVAL
+		VALUES 	(#{evaluFormNo}
 		            , #{evaluName}
 		            , SYSDATE
 		            , #{evaluStart}
@@ -586,7 +591,61 @@
 
 	</select>
 	
-
+	<!-- 부서 전체 -->
+	<select id="selectDepartmentList" resultType="DepartmentVO">
+		SELECT d.DEPARTMENT_ID 
+	        , u.USER_NAME
+	        , d.DEPARTMENT_NAME
+	        , t.TEAM_NAME
+		FROM DEPARTMENT d 
+		JOIN TEAM t
+		ON d.DEPARTMENT_ID = t.department_id
+		JOIN EMPLOYEE u
+		ON u.USER_NO = d.department_head
+		ORDER BY DEPARTMENT_ID 
+	</select>
+	<!-- 부서 단건 조회 -->
+	<select id="selectDepartmentById" resultType="DepartmentVO">
+		SELECT 
+	        d.DEPARTMENT_ID
+	        , d.DEPARTMENT_NAME
+	        , u.USER_NAME
+	        , u.USER_MAIL
+	        , u.USER_PHONE
+	        , d.DEPT_WORK
+	        , d.DEPT_LOCATION
+	        , d.BUDGET
+	        , t.TEAM_NAME
+        FROM DEPARTMENT d 
+		JOIN TEAM t
+		ON d.DEPARTMENT_ID = t.department_id
+		JOIN EMPLOYEE u
+		ON u.USER_NO = d.department_head
+		WHERE d.DEPARTMENT_ID = #{departmentId}
+		ORDER BY d.DEPARTMENT_ID
+	</select>
+	<!-- 부서 등록 -->
+	<insert id="insertNewDepartment" parameterType="DepartmentVO">
+	  <selectKey keyProperty="departmentId" resultType="String" order="BEFORE">
+	    SELECT 'D' || LPAD(DEPT_SEQ.NEXTVAL, 3, '0') FROM DUAL
+	  </selectKey>
 	
-
+	  INSERT INTO DEPARTMENT (
+	    DEPARTMENT_ID,
+	    DEPARTMENT_NAME,
+	    DEPARTMENT_HEAD,
+	    DEPT_WORK,
+	    DEPT_LOCATION,
+	    BUDGET
+	  )
+	  VALUES (
+	    #{departmentId},
+	    #{departmentName},
+	    #{departmentHead},
+	    #{deptWork},
+	    #{deptLocation},
+	    #{budget}
+	  )
+	</insert>
+	<!-- 부서 수정 -->
 </mapper>

@@ -32,7 +32,7 @@ public class SpringSecurityConfig {
 				    // 중간 권한
 					.requestMatchers("/attendance/attendanceManage").hasRole("T001")
 					.requestMatchers("/vendor/insert").hasRole("T004")
-					//.requestMatchers("/emp/bfevalu").hasRole("T001")	// 평가 관리 권한 (인사관리팀)
+					.requestMatchers("/emp/bfevalu").hasRole("T001")	// 평가 관리 권한 (인사관리팀)
 					// 관리자 권한
 					.requestMatchers("/admin/**").hasAuthority("관리자") // 관리자만 접근 허용 ROLE_ADMIN
 					.anyRequest().authenticated() // permitAll 넣을시 모든 페이지 로그인 없이 접근 가능

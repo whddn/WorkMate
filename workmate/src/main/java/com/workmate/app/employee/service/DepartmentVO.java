@@ -13,4 +13,11 @@ public class DepartmentVO {
 	private String budgetStatus;		// 예산 상태
 	private int userNo;					// 사원번호 
 	List<TeamVO> teamList;
+	private String userName;			// 부서장 이름
+	private String teamName;			// 팀이름
+	private String userMail;
+	private String deptWork;
+	private String userPhone;
+	private String deptLocation;
+	
 }
