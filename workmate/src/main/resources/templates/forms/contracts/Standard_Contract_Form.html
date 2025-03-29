@@ -1,106 +1,116 @@
-<!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org/"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/layouts/contracts_layout}"
-      layout:fragment="content">
-<head>
-    <meta charset="UTF-8">
-    <title>표준근로계약서</title>
-</head>
-<body>
 
-<!-- ✅ 표준근로계약서 모달 (KaiAdmin 스타일 적용) -->
+<!-- 페이지 로드시 모달 자동 띄우기 -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('standardContractModal'));
+    modal.show();
+  });
+</script>
+
+<!-- 이건 전체 페이지가 아니라 모달 조각으로 사용됨 -->
 <div class="modal fade" id="standardContractModal" tabindex="-1" aria-labelledby="standardContractLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-scrollable">
     <div class="modal-content shadow border-0">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title fw-bold" id="standardContractLabel">📄 표준근로계약서 작성</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
-      <div class="modal-body p-4">
-        <form id="standardContractForm" enctype="multipart/form-data">
-          <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-              <tr class="table-light"><th colspan="4">👥 근로계약 당사자</th></tr>
-              <tr>
-                <th style="width: 20%;">사업주</th>
-                <td colspan="3"><input type="text" name="employerName" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>주소</th>
-                <td colspan="3"><input type="text" name="employerAddress" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>근로자</th>
-                <td colspan="3"><input type="text" name="employeeName" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>주소</th>
-                <td colspan="3"><input type="text" name="employeeAddress" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>주민등록번호</th>
-                <td colspan="3"><input type="text" name="employeeId" class="form-control"></td>
-              </tr>
 
-              <tr class="table-light"><th colspan="4">📝 계약 내용</th></tr>
-              <tr>
-                <th>계약기간</th>
-                <td colspan="3">
-                  <div class="d-flex gap-2">
-                    <input type="date" name="startDate" class="form-control"> ~
-                    <input type="date" name="endDate" class="form-control">
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th>근무장소</th>
-                <td colspan="3"><input type="text" name="workPlace" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>업무의 내용</th>
-                <td colspan="3"><input type="text" name="jobContent" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>소정근로시간</th>
-                <td colspan="3"><input type="text" name="workHours" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>휴게시간</th>
-                <td colspan="3"><input type="text" name="breakTime" class="form-control"></td>
-              </tr>
-              <tr>
-                <th>임금</th>
-                <td colspan="3">
-                  <div class="row g-2">
-                    <div class="col-md-3 d-flex align-items-center gap-1">
-                      <label class="mb-0">월급:</label>
-                      <input type="text" name="monthlySalary" class="form-control form-control-sm">
-                      <span>원</span>
-                    </div>
-                    <div class="col-md-3 d-flex align-items-center gap-1">
-                      <label class="mb-0">지급일:</label>
-                      매월 <input type="number" name="payDay" class="form-control form-control-sm" style="width: 80px;"> 일
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th>서명</th>
-                <td colspan="2"><input type="file" name="signFile" class="form-control"></td>
-                <td><button type="button" class="btn btn-outline-secondary w-100">작성</button></td>
-              </tr>
-            </table>
-          </div>
-
-          <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">📌 등록</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+			<!-- ✅ 표준근로계약서 모달 -->
+			<div class="modal fade" id="standardContractModal" tabindex="-1" aria-labelledby="standardContractLabel" aria-hidden="true">
+			  <div class="modal-dialog modal-xl modal-dialog-centered modal-scrollable">
+			    <div class="modal-content shadow border-0">
+			      <div class="modal-header bg-primary text-white">
+			        <h5 class="modal-title fw-bold" id="standardContractLabel">📄 표준근로계약서 작성</h5>
+			        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
+			      </div>
+			      <div class="modal-body p-4">
+			        <form id="standardContractForm" method="post" action="/contracts/submit" enctype="multipart/form-data">
+			          <div class="contract-text" style="line-height: 2; font-size: 16px;">
+			            <p>주식회사 <input type="text" name="employerName" style="width: 150px;"> (이하 “사업주”)와</p>
+			            <p>성명 <input type="text" name="employeeName" style="width: 150px;"> (이하 “근로자”)는 다음과 같이 근로계약을 체결한다.</p>
+			
+			            <ol>
+			              <li>계약기간: <input type="date" name="startDate"> ~ <input type="date" name="endDate"></li>
+			              <li>근무장소: <input type="text" name="workPlace" style="width: 300px;"></li>
+			              <li>업무의 내용: <input type="text" name="jobContent" style="width: 300px;"></li>
+			              <li>소정근로시간: <input type="text" name="workHours" style="width: 100px;"> / 일</li>
+			              <li>휴게시간: <input type="text" name="breakTime" style="width: 100px;"> / 일</li>
+			              <li>임금: 월급 <input type="text" name="monthlySalary" style="width: 100px;"> 원, 매월 <input type="number" name="payDay" style="width: 60px;"> 일 지급</li>
+			              <li>4대보험 가입 여부:
+			                <span class="ms-2">국민연금 <input type="checkbox" name="pensionYn"></span>
+			                <span class="ms-2">건강보험 <input type="checkbox" name="healthYn"></span>
+			                <span class="ms-2">고용보험 <input type="checkbox" name="employYn"></span>
+			                <span class="ms-2">산재보험 <input type="checkbox" name="industryYn"></span>
+			              </li>
+			            </ol>
+			
+			            <p>위 계약 내용을 확인하고 양 당사자가 서명함.</p>
+			          </div>
+			
+			          <div class="mt-4">
+			            <table class="table table-bordered">
+			              <tr>
+			                <th style="width: 20%;">근로자 성명</th>
+			                <td><input type="text" name="employeeNameConfirm" class="form-control"></td>
+			                <th style="width: 20%;">날짜</th>
+			                <td><input type="date" name="signDate" class="form-control"></td>
+			              </tr>
+			              <tr>
+			                <th>서명</th>
+			                <td colspan="3">
+			                  <canvas id="signatureCanvas" width="400" height="150"></canvas><br>
+			                  <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="clearSignature()">서명 지우기</button>
+			                  <input type="hidden" name="signImageBase64" id="signImageInput">
+			                </td>
+			              </tr>
+			            </table>
+			          </div>
+			
+			          <div class="d-flex justify-content-end mt-3">
+			            <button type="submit" class="btn btn-primary">📌 제출</button>
+			          </div>
+			        </form>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+		</div>
+	</div>
 </div>
 
+<!-- ✍️ Canvas 서명 스크립트 -->
+<script>
+  const canvas = document.getElementById('signatureCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  canvas.addEventListener('mousedown', () => drawing = true);
+  canvas.addEventListener('mouseup', () => {
+    drawing = false;
+    ctx.beginPath();
+  });
+  canvas.addEventListener('mousemove', draw);
+
+  function draw(e) {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  }
+
+  function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  document.getElementById('standardContractForm').addEventListener('submit', function () {
+    const signImageInput = document.getElementById('signImageInput');
+    signImageInput.value = canvas.toDataURL('image/png');
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
