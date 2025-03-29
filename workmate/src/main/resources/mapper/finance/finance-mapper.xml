@@ -29,6 +29,7 @@
 		    , th.DEPOSIT
 		    , th.WITHDRAWAL
 		    , th.BALANCE
+		    , th.TRANS_ID
 		FROM REPORT r
 		JOIN TRANS_HISTORY th
 		  ON r.REPORT_NO = th.REPORT_NO
@@ -113,7 +114,8 @@
        DEPOSIT      = #{deposit},
        BALANCE      = #{balance},
        PURPOSE_USE  = #{purposeUse},
-       REPORT_NO    = #{reportNo}
+       REPORT_NO    = #{reportNo},
+       REPORT_TITLE = #{reportTitle},
  WHERE TRANS_ID     = #{transId}
 	
 	</update>

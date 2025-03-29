@@ -83,7 +83,7 @@ public class FinanceController {
 		
 		List<ReportVO> reportList = financeService.findTransList(reportVO); // 리포트 조회 쿼리문
 		
-		
+	    System.out.println("📌 수정된 리포트 제목: " + reportVO.getReportTitle());
 		int userNo = loginUser.getUserVO().getUserNo();
 		String userName = loginUser.getUserVO().getUserName();
 		String teamName = loginUser.getUserVO().getTeamName();
@@ -104,7 +104,7 @@ public class FinanceController {
 	// 리포트 수정 AJAX
 	@PutMapping("finance/reportUpdate/{reportNo}")
 	@ResponseBody
-	public ResponseEntity <Map<String, Object>> ReportUpdateAjax(ReportVO reportVO) {
+	public ResponseEntity <Map<String, Object>> ReportUpdateAjax(@RequestBody  ReportVO reportVO) {
 		financeService.modifyReportPage(reportVO); 	// 수정 쿼리문
 		 Map<String, Object> result = new HashMap<>();
 		    result.put("success", true);

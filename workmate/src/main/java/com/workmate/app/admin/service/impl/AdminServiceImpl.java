@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.admin.service.AdminService;
+import com.workmate.app.employee.mapper.EmpMapper;
+import com.workmate.app.employee.service.DepartmentVO;
+import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.reservation.mapper.CommonItemMapper;
 import com.workmate.app.reservation.service.CommonItemVO;
 
@@ -17,6 +20,8 @@ public class AdminServiceImpl implements AdminService {
 	@Autowired
 	//필드주입 방법
 	private CommonItemMapper commonitemMapper;
+	@Autowired
+	private EmpMapper empMapper;
 	
 	/*
 	 * 생성자 방식 public AdminServiceImpl(CommonItemMapper commonitemMapper) {
@@ -67,5 +72,42 @@ public class AdminServiceImpl implements AdminService {
 		}
 		return map;
 	}
+
+	// 부서 조회
+	@Override
+	public List<DepartmentVO> findDeptList(DepartmentVO deptVO) {
+		return empMapper.selectDepartmentList(deptVO);
+	}
+	
+	// 부서 단건 조회
+	@Override
+	public DepartmentVO findDeptById(DepartmentVO deptVO) {
+		return empMapper.selectDepartmentById(deptVO);
+	}
+
+
+	// 신규 부서 등록
+	@Override
+	public int inputNewDept(DepartmentVO deptVO) {
+		return empMapper.insertNewDepartment(deptVO);
+	}
+	
+	// 부서 수정
+	@Override
+	public int modifyDept(DepartmentVO deptVO) {
+		return 0;
+	}
+
+	// 전체 조회 
+	@Override
+	public List<EmpVO> findAllEmployees(EmpVO empVO) {
+		return empMapper.selectAllEmpList(empVO);
+	}
+
+	@Override
+	public List<Integer> findCurrentHeads() {
+		return null;
+	}
+
 
 }

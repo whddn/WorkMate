@@ -188,7 +188,7 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td><input type="text" placeholder="예: 1일(토)"></td>
+					<td><input type="date"></td>
 					<td><input type="text"></td>
 					<td><input type="number" th:data-deposit="입금"></td>
 					<td><input type="number" th:data-drawal="출금"></td>
@@ -196,7 +196,7 @@
 					<td><input type="checkbox"></td>
 				</tr>
 				<tr>
-					<td><input type="text" placeholder="예: 2일(일)"></td>
+					<td><input type="date"></td>
 					<td><input type="text"></td>
 					<td><input type="number"></td>
 					<td><input type="number"></td>
@@ -397,7 +397,7 @@
             if (result.success) {
                 alert('성공적으로 등록되었습니다.');
 		        setTimeout(() => {
-		    location.href = '/workmate/finance/reportList';
+		    //location.href = '/workmate/finance/reportList';
 		}, 600); // 리포트 목록으로 이동
             } else {
                 alert('등록에 실패했습니다.');

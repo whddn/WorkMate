@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/admin_layout}"
+      layout:fragment="content">
+
+<head>
+  <meta charset="UTF-8">
+  <title>부서 등록</title>
+
+  <!-- ✅ select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <style>
+    .center-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .dept-box {
+      width: 700px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #dbeeff;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    td {
+      text-align: left;
+    }
+
+    .btn-area {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .btn-edit {
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #298dff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-edit:hover {
+      background-color: #176fce;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="center-wrapper">
+    <div class="dept-box">
+      <h2>📌 부서 등록</h2>
+
+      <form th:action="@{/admin/deptInsert}" method="post">
+        <table>
+          <tr>
+            <th>부서명</th>
+            <td><input type="text" name="departmentName" placeholder="예: 인사부" /></td>
+            <th>부서장</th>
+            <td>
+              <select id="departmentHead" name="departmentHead" style="width: 100%">
+                <option value="">부서장을 선택하세요</option>
+                  <option th:each="emp : ${empList}"
+			 		  th:value="${emp.userNo}"
+			          th:data-mail="${emp.userMail}"
+			          th:data-phone="${emp.userPhone}"
+			          th:text="${emp.userName}">
+                </option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <th>부서 이메일</th>
+            <td><input type="text" id="userMail" name="userMail" placeholder="email@example.com" /></td>
+            <th>연락처</th>
+            <td><input type="text" id="userPhone" name="userPhone" placeholder="010-0000-0000" /></td>
+          </tr>
+          <tr>
+            <th>주요 업무</th>
+            <td><input type="text" name="deptWork" placeholder="예: 인사관리, 채용관리 등" /></td>
+            <th>위치</th>
+            <td><input type="text" name="deptLocation" placeholder="예: 4층 A구역" /></td>
+          </tr>
+          <tr>
+            <th>전체 예산</th>
+            <td colspan="3"><input type="number" name="budget" placeholder="예: 100000000" /></td>
+          </tr>
+        </table>
+
+        <div class="btn-area">
+          <button type="button" class="btn-edit" id="insertDept">등록</button>
+          <button type="button" class="btn-edit" th:onclick="|location.href='@{/admin/deptList}'|">목록으로</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ✅ 필수 스크립트들 (순서 중요!) -->
+  <script src="/assets/js/core/jquery-3.7.1.min.js"></script>
+  <script src="/assets/js/plugins/jquery.scrollbar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="/assets/js/kaiadmin.min.js"></script>
+
+  <!-- ✅ select2 초기화 -->
+  <script>
+  $(document).ready(function () {
+    $('#departmentHead').on('change', function () {
+      let selectedOption = $(this).find('option:selected');
+
+      let email = selectedOption.data('mail');
+      let phone = selectedOption.data('phone');
+
+      $('#userMail').val(email || '');
+      $('#userPhone').val(phone || '');
+    });
+
+    // 선택 초기화 시 초기화되도록
+    $('#departmentHead').select2({
+      placeholder: '부서장을 검색하세요',
+      allowClear: true
+    });
+  });
+  
+  /* ✅ JS 예시 (select2 + 등록 버튼 클릭 시) */
+
+$(document).ready(function () {
+  $('#departmentHead').on('change', function () {
+    const selectedUserNo = $(this).val();
+    const selected = $(this).find('option:selected');
+    const email = selected.data('mail');
+    const phone = selected.data('phone');
+
+    if (selectedUserNo) {
+      $.ajax({
+        url: `/workmate/admin/checkHead/${selectedUserNo}`,
+        type: 'GET',
+        success: function (isAlreadyHead) {
+          if (isAlreadyHead) {
+            alert('⚠ 이미 부서장으로 등록된 사원입니다.');
+            $('#departmentHead').val('').trigger('change');
+            $('#emailInput').val('');
+            $('#phoneInput').val('');
+          } else {
+            $('#emailInput').val(email);
+            $('#phoneInput').val(phone);
+          }
+        }
+      });
+    }
+  });
+
+  // ✅ 등록 버튼 클릭 시
+  $('#insertDept').on('click', function () {
+    const data = {
+      departmentName: $('input[name=departmentName]').val(),
+      departmentHead: $('#departmentHead').val(),
+      userMail: $('#emailInput').val(),
+      userPhone: $('#phoneInput').val(),
+      deptWork: $('input[name=deptWork]').val(),
+      deptLocation: $('input[name=deptLocation]').val(),
+      budget: $('input[name=budget]').val()
+    };
+
+    fetch('/workmate/admin/deptInsert', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+      if (result.success) {
+        alert('부서 등록이 완료되었습니다.');
+        location.href = '/workmate/admin/deptList';
+      } else {
+        alert('이미 부서장으로 등록되어 있는 사원입니다.');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('에러 발생');
+    });
+  });
+});
+</script>
+</body>
+</html>

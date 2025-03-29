@@ -9,6 +9,7 @@ import com.workmate.app.finance.mapper.FinanceMapper;
 import com.workmate.app.finance.service.FinanceService;
 import com.workmate.app.finance.service.ReportVO;
 
+
 @Service
 public class FinanceServiceImpl implements FinanceService {
 	private FinanceMapper financeMapper;
@@ -47,7 +48,7 @@ public class FinanceServiceImpl implements FinanceService {
 	        if (transList != null && !transList.isEmpty()) {
 	            for (ReportVO trans : transList) {
 	                ReportVO transInsertVO = new ReportVO(); // 새 객체 생성
-
+	                
 	                // 거래 관련 값만 복사
 	                transInsertVO.setReportNo(reportNo);
 	                transInsertVO.setTransDate(trans.getTransDate());
@@ -76,28 +77,29 @@ public class FinanceServiceImpl implements FinanceService {
 
 		    if (reportUpdate > 0) {
 		        Integer reportNo = reportVO.getReportNo();
-
-		        // 2. 기존 거래 내역 삭제
-		       // financeMapper.deleteTransHistoryByReportNo(reportNo);
-
-		        // 3. 새로운 거래 내역 insert
 		        List<ReportVO> transList = reportVO.getTransHistoryList();
-
+		        
+		        System.out.println("🧪 전체 거래 내역 수: " + (transList == null ? "null" : transList.size()));
 		        if (transList != null && !transList.isEmpty()) {
-		            for (ReportVO trans : transList) {
-		                ReportVO transInsertVO = new ReportVO();
+		        	
+		        	for (ReportVO trans : transList) {
+		        	    trans.setReportNo(reportNo);
+		        	    trans.setReportTitle(reportVO.getReportTitle());
 
-		                transInsertVO.setReportNo(reportNo);
-		                transInsertVO.setTransDate(trans.getTransDate());
-		                transInsertVO.setTransType(trans.getTransType());
-		                transInsertVO.setWithdrawal(trans.getWithdrawal());
-		                transInsertVO.setDeposit(trans.getDeposit());
-		                transInsertVO.setBalance(trans.getBalance());
-		                transInsertVO.setPurposeUse(trans.getPurposeUse());
+		        	    System.out.println("📦 거래내역 처리 중 → transId: " + trans.getTransId());
 
-		                result += financeMapper.insertReportTransOne(transInsertVO);
-		            }
+		        	    if (trans.getTransId() != null) {
+		        	        int updateResult = financeMapper.updateTransHistory(trans);
+		        	        System.out.println("🟡 UPDATE 결과: " + updateResult + "건 | transId: " + trans.getTransId());
+		        	        result += updateResult;
+		        	    } else {
+		        	        int insertResult = financeMapper.insertReportTransOne(trans);
+		        	        System.out.println("🟢 INSERT 결과: " + insertResult + "건 | 신규 거래내역 추가됨");
+		        	        result += insertResult;
+		        	    }
+		        	}
 		        }
+
 		    }
 
 		    return result;

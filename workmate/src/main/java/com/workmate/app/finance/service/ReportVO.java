@@ -27,6 +27,7 @@ public class ReportVO {
 	private String departmentId;		// 부서번호
 	
 	List<ReportVO> transHistoryList;	// 거래내역 리스트
+
 	
 	// transHistory
 	private Integer transId;			// 거래번호
