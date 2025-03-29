@@ -105,7 +105,7 @@
 	   WHERE REPORT_NO      = #{reportNo}
 	</update>
 	<!-- TransHistory 수정 -->
-	<update id="updateReportOne" parameterType="ReportVO">
+	<update id="updateTransHistory" parameterType="ReportVO">
 	UPDATE TRANS_HISTORY
    SET TRANS_TYPE   = #{transType},
        TRANS_DATE   = #{transDate},
