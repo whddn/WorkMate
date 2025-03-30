@@ -1,89 +1,142 @@
-<div xmlns:th="https://www.thymeleaf.org" th:fragment="FormFrag">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/contracts_layout}"
+      layout:fragment="content">
+<head>
+  <meta charset="UTF-8">
+  <title>거래처 계약서 작성</title>
+  <style>
+    .contract-table th {
+      background-color: #f0f0f0;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .contract-table input,
+    .contract-table textarea {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #aaa;
+      outline: none;
+    }
+    #signatureCanvas {
+      border: 1px solid #ccc;
+      width: 100%;
+      height: 200px;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">📝 거래처 계약서 작성</h2>
+  <form id="tradeContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
+    <table class="table table-bordered contract-table">
+      <tr><th colspan="4">기본 정보</th></tr>
+      <tr>
+        <th style="width: 20%">계약명</th>
+        <td colspan="3"><input type="text" name="contrTitle"></td>
+      </tr>
+      <tr>
+        <th>계약일자</th>
+        <td colspan="3"><input type="date" name="createDate"></td>
+      </tr>
+      <tr>
+        <th>계약 기간</th>
+        <td colspan="3">
+          <input type="date" name="contrStart" style="width: 45%; display: inline-block"> ~
+          <input type="date" name="contrEnd" style="width: 45%; display: inline-block">
+        </td>
+      </tr>
 
-<div class="container mt-4">
-    <h4>거래처 계약서</h4>
-    <form id="tradeContractForm" enctype="multipart/form-data">
-        <table class="table table-bordered">
-            <tr><th colspan="4">기본 정보</th></tr>
-            <tr>
-                <th>계약명</th>
-                <td colspan="3"><input type="text" name="contractName" class="form-control"></td>
-            </tr>
-            <tr>
-                <th>계약일자</th>
-                <td colspan="3"><input type="date" name="contractDate" class="form-control"></td>
-            </tr>
-            <tr>
-                <th>계약 기간</th>
-                <td colspan="3">
-                    <input type="date" name="startDate" class="form-control d-inline-block" style="width: 45%;">
-                    ~
-                    <input type="date" name="endDate" class="form-control d-inline-block" style="width: 45%;">
-                </td>
-            </tr>
+      <tr><th colspan="4">거래처 정보</th></tr>
+      <tr>
+        <th>거래처명</th>
+        <td colspan="3"><input type="text" name="contrB"></td>
+      </tr>
+      <tr>
+        <th>연락처</th>
+        <td><input type="text" name="contrMoney"></td>
+      </tr>
+      <tr>
+        <th>주소</th>
+        <td colspan="3"><input type="text" name="cntrLocation"></td>
+      </tr>
 
-            <tr><th colspan="4">거래처 정보</th></tr>
-            <tr>
-                <th>거래처명</th>
-                <td colspan="3"><input type="text" name="clientName" class="form-control"></td>
-            </tr>
-            <tr>
-                <th>대표자</th>
-                <td><input type="text" name="ceo" class="form-control"></td>
-                <th>연락처</th>
-                <td><input type="text" name="phone" class="form-control"></td>
-            </tr>
-            <tr>
-                <th>주소</th>
-                <td colspan="3"><input type="text" name="address" class="form-control"></td>
-            </tr>
+      <tr><th colspan="4">계약 내용</th></tr>
+      <tr>
+        <td colspan="4">
+          <textarea name="contrContent" rows="6" placeholder="계약 상세 내용을 입력하세요."></textarea>
+        </td>
+      </tr>
+      <tr>
+        <th>첨부파일</th>
+        <td colspan="3"><input type="file" name="attachment"></td>
+      </tr>
 
-            <tr><th colspan="4">계약 내용</th></tr>
-            <tr>
-                <td colspan="4">
-                    <textarea name="contractDetails" rows="6" class="form-control" placeholder="계약 상세 내용을 입력하세요."></textarea>
-                </td>
-            </tr>
-            <tr>
-                <th>첨부파일</th>
-                <td colspan="3"><input type="file" name="attachment" class="form-control"></td>
-            </tr>
-        </table>
-        <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-success">등록</button>
-        </div>
-    </form>
+	      <tr><th colspan="4">대표자 및 서명</th></tr>
+	<tr>
+	  <!-- 대표자 입력 (왼쪽 50%) -->
+	  <td style="width: 50%; vertical-align: top;">
+	    <label><strong>대표자</strong></label>
+	    <input type="text" name="contrA">
+	  </td>
+	  
+	  <!-- 서명 캔버스 (오른쪽 50%) -->
+	  <td colspan="3" style="width: 50%; vertical-align: top;">
+	    <label><strong>서명</strong></label>
+	    <canvas id="signatureCanvas"></canvas>
+	    <input type="hidden" name="signatureImage" id="signatureImage">
+	    <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="clearSignature()">서명 초기화</button>
+	  </td>
+	</tr>
+
+    </table>
+
+    <div class="d-flex justify-content-end mt-3">
+      <button type="submit" class="btn btn-success">등록</button>
+    </div>
+  </form>
 </div>
 
-<<<<<<< HEAD
-=======
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
->>>>>>> refs/heads/main
 <script>
-$(document).ready(function() {
-    $('#tradeContractForm').submit(function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        $.ajax({
-            url: '/Contracts/insertTrade',
-            type: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(res) {
-                if (res.success) {
-                    alert('거래처 계약서가 등록되었습니다.');
-                    location.reload();
-                } else {
-                    alert('등록 실패');
-                }
-            },
-            error: function() {
-                alert('오류 발생');
-            }
-        });
-    });
-});
+  const canvas = document.getElementById("signatureCanvas");
+  const ctx = canvas.getContext("2d");
+  let drawing = false;
+
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  canvas.addEventListener("mousedown", startDraw);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", endDraw);
+  canvas.addEventListener("mouseleave", endDraw);
+
+  function startDraw(e) {
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+  }
+
+  function endDraw() {
+    drawing = false;
+  }
+
+  function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById("signatureImage").value = "";
+  }
+
+  function saveSignature() {
+    const dataURL = canvas.toDataURL("image/png");
+    document.getElementById("signatureImage").value = dataURL;
+  }
 </script>
 </body>
 </html>

@@ -38,17 +38,17 @@ public class ContractsServiceImpl implements ContractsService{
 
 	@Override
 	public int inputContracts(ContractsVO contractsVO) {
-		return 0;
+		return contractsMapper.insertContracts(contractsVO);
 	}
 
 	@Override
 	public int modifyContracts(ContractsVO contractsVO) {
-		return 0;
+		return contractsMapper.updateContracts(contractsVO);
 	}
 
 	@Override
-	public Map<String, Object> dropContracts(String contrNo) {
-		return null;
+	public int dropContracts(String contrNo) {
+		return contractsMapper.deleteContracts(contrNo);
 	}
 
 

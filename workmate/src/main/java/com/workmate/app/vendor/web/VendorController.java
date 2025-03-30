@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
  * @author 이종우
  * @since 2025-03-26
  * 
- *        <pre>
  * <pre>
  * 수정일자	수정자	수정내용
  * ----------------------
