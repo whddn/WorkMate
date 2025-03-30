@@ -5,6 +5,7 @@ import java.util.List;
 import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
+import com.workmate.app.employee.service.TeamVO;
 
 public interface EmpMapper {
 	// 사원 전헤
@@ -97,6 +98,10 @@ public interface EmpMapper {
 	
 	// 부서 단건 조회
 	public DepartmentVO selectDepartmentById(DepartmentVO deptVO);
+	
+	// 팀 등록
+	public int insertNewTeam(TeamVO teamVO);
+	
 	// 부서 등록 
 	public int insertNewDepartment(DepartmentVO deptVO);
 	

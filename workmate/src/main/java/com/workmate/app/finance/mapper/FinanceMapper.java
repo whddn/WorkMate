@@ -2,6 +2,7 @@ package com.workmate.app.finance.mapper;
 
 import java.util.List;
 
+import com.workmate.app.finance.service.CorcardVO;
 import com.workmate.app.finance.service.ReportVO;
 
 public interface FinanceMapper {
@@ -30,7 +31,7 @@ public interface FinanceMapper {
 	public List<ReportVO> selectCorCardList(ReportVO reportVO);
 	
 	// 법인 카드 등록 
-	public int insertCorCardInfo(ReportVO reportVO);
+	public void insertCorCard(CorcardVO card);
 	
 	// 법인 카드 상세 조회 
 	public List<ReportVO> selectCorCardById(ReportVO reportVO);

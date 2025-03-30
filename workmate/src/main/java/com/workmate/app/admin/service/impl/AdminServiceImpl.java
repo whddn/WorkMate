@@ -6,11 +6,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.workmate.app.admin.service.AdminService;
 import com.workmate.app.employee.mapper.EmpMapper;
 import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
 import com.workmate.app.reservation.mapper.CommonItemMapper;
 import com.workmate.app.reservation.service.CommonItemVO;
 
@@ -86,11 +88,11 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 
-	// 신규 부서 등록
-	@Override
-	public int inputNewDept(DepartmentVO deptVO) {
-		return empMapper.insertNewDepartment(deptVO);
-	}
+//	// 신규 부서 등록
+//	@Override
+//	public int inputNewDept(DepartmentVO deptVO) {
+//		return empMapper.insertNewDepartment(deptVO);
+//	}
 	
 	// 부서 수정
 	@Override
@@ -103,11 +105,29 @@ public class AdminServiceImpl implements AdminService {
 	public List<EmpVO> findAllEmployees(EmpVO empVO) {
 		return empMapper.selectAllEmpList(empVO);
 	}
-
+	// 부서장
 	@Override
 	public List<Integer> findCurrentHeads() {
 		return null;
 	}
+	
+	// 부서와 팀 등록
+	@Transactional // 하나라도 insert 실패시 ROLLBACK
+	@Override
+	public int inputNewDeptAndTeam(DepartmentVO deptVO, TeamVO teamVO) {
+	    // 1. 부서 등록 (deptVO에 departmentId가 selectKey로 세팅됨)
+	    int deptResult = empMapper.insertNewDepartment(deptVO);
+	    
+	    // 2. 부서 ID를 팀 VO에 세팅해서 FK로 연결
+	    teamVO.setDepartmentId(deptVO.getDepartmentId());
+	    teamVO.setTeamName(deptVO.getTeamName());
+	    // 3. 팀 등록
+	    int teamResult = empMapper.insertNewTeam(teamVO);
+	    System.out.println("budget = " + deptVO.getBudget()); 
+	    System.out.println("팀 이름 = " + deptVO.getTeamName()); 
+	    return deptResult + teamResult;
+	}
+
 
 
 }

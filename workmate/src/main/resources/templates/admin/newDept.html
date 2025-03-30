@@ -114,7 +114,9 @@
           </tr>
           <tr>
             <th>전체 예산</th>
-            <td colspan="3"><input type="number" name="budget" placeholder="예: 100000000" /></td>
+            <td><input type="number" name="budget" placeholder="예: 100000000" max="9999999999"/></td>
+            <th>팀명</th>
+            <td><input type="text" name="teamName" placeholder="예: 설계팀" /></td>
           </tr>
         </table>
 
@@ -182,15 +184,16 @@ $(document).ready(function () {
 
   // ✅ 등록 버튼 클릭 시
   $('#insertDept').on('click', function () {
-    const data = {
-      departmentName: $('input[name=departmentName]').val(),
-      departmentHead: $('#departmentHead').val(),
-      userMail: $('#emailInput').val(),
-      userPhone: $('#phoneInput').val(),
-      deptWork: $('input[name=deptWork]').val(),
-      deptLocation: $('input[name=deptLocation]').val(),
-      budget: $('input[name=budget]').val()
-    };
+			const data = {
+		  departmentName: $('input[name=departmentName]').val(),
+		  departmentHead: $('#departmentHead').val(),
+		  userMail: $('#userMail').val(),
+		  userPhone: $('#userPhone').val(),
+		  deptWork: $('input[name=deptWork]').val(),
+		  deptLocation: $('input[name=deptLocation]').val(),
+		  budget: $('input[name=budget]').val(),
+		  teamName: $('input[name=teamName]').val() // ✅ 여기에 추가
+		};
 
     fetch('/workmate/admin/deptInsert', {
       method: 'POST',

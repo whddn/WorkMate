@@ -144,7 +144,7 @@
 <body>
 	<div id="container">
 		
-		<input type="text" th:value="${report[0].reportTitle}" id="reportTitle">
+		<input type="text" name="reportTitle" th:value="${report[0].reportTitle}" id="reportTitle">
 		<h3>기본 정보</h3>
 		<table>
 			<tr>
@@ -157,8 +157,9 @@
 					</div>
 				</td>
 				<th>팀명</th>
-				<td><input type="text" th:data-teamno="${teamNo}" th:value="${teamName}" id="teamNo" th:data-re="${report[0].reportNo}"></td>
+				<td><input type="text" th:data-teamno="${teamNo}" th:value="${teamName}" id="teamNo"></td>
 			</tr>
+			<input type="hidden" id="reportNo" th:value="${report[0].reportNo}">
 			<tr>
 				<th>직급</th><!-- 로그인한 유저 -->
 				<td><input type="text" th:value="${position}"></td>
@@ -370,8 +371,11 @@
         }
     });
 
+
     // 2. 최종 JSON 데이터 구성
+    const reportNo = document.querySelector('#reportNo').value;
     const data = {
+        reportNo: parseInt(reportNo), 
         reportTitle: rTitle,
         transStart: sDate,
         transEnd: eDate,
@@ -381,8 +385,8 @@
     };
 
 
-	const reportNo = document.querySelector('#teamNo').dataset.re;
 
+	console.log("📦 reportNo (전송 전):", reportNo);
     // 3. fetch 수정 AJAX 요청
     fetch(`/workmate/finance/reportUpdate/${reportNo}`, {
         method: 'PUT',

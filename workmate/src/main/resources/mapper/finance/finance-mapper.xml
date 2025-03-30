@@ -114,10 +114,37 @@
        DEPOSIT      = #{deposit},
        BALANCE      = #{balance},
        PURPOSE_USE  = #{purposeUse},
-       REPORT_NO    = #{reportNo},
-       REPORT_TITLE = #{reportTitle},
+       REPORT_NO    = #{reportNo}
  WHERE TRANS_ID     = #{transId}
 	
 	</update>
-	
+	<!-- 법인카드 등록  -->
+	<insert id="insertCorCard" parameterType="CorcardVO">
+    INSERT INTO CORCARD (
+        					CORCARD_NO
+        					, CORCARD_NUM
+        					, OWNER_NO
+        					, CORCARD_START
+        					, CORCARD_END
+        					, CORCARD_COMP
+        					, CORCARD_STATUS
+        					, BANK_NAME
+        					, M_LIMIT
+        					, D_LIMIT
+        					, USER_NO
+    					 ) 
+    					VALUES (
+       						  CORCARD_NO_SEQ.NEXTVAL
+       						  , #{corcardNum}
+       						  , #{ownerNo}
+       						  , #{corcardStart}
+       						  , #{corcardEnd}
+       						  , #{corcardComp}
+       						  , #{corcardStatus}
+       						  , #{bankName}
+       						  , #{mLimit}
+       						  , #{dLimit}
+       						  , #{userNo}
+    					)
+	</insert>
 </mapper>
