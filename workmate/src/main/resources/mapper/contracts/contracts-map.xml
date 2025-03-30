@@ -16,6 +16,10 @@
 	      ,sign_date_B
 	      ,contr_start
 	      ,contr_end
+	      ,sign_image
+	      ,sign_image_base64
+	      ,cntr_location
+	      ,cntr_money
 		from contracts
 		order by vend_code
 	</select>
@@ -35,6 +39,10 @@
 	      ,sign_date_B
 	      ,contr_start
 	      ,contr_end
+	      ,sign_image
+	      ,sign_image_base64
+	      ,cntr_location
+	      ,cntr_money
 		from contracts
 		order by vend_code=#{vendCode}
 	</select>
@@ -47,7 +55,7 @@
 			FROM dual
 		</selectKey>
 			INSERT INTO contracts(
-		      ,contr_no
+		      contr_no
 		      ,vend_code
 		      ,contr_title
 		      ,contr_content
@@ -61,22 +69,26 @@
 		      ,contr_start
 		      ,contr_end
 		      ,SIGN_IMAGE
+		      ,cntr_location
+		      ,cntr_money
 				)
 			VALUES (
-			  ,#{contr_no}
-		      ,#{vend_code}
-		      ,#{contr_title}
-		      ,#{contr_content}
-		      ,#{contr_type}
-		      ,#{create_date}
-		      ,#{contr_status}
-		      ,#{contr_A}
-		      ,#{contr_B}
-		      ,#{sign_date_A}
-		      ,#{sign_date_B}
-		      ,#{contr_start}
-		      ,#{contr_end}
+			  #{contrNo}
+		      ,#{vendCode}
+		      ,#{contrTitle}
+		      ,#{contrContent}
+		      ,#{contrType}
+		      ,#{createDate}
+		      ,#{contrStatus}
+		      ,#{contrA}
+		      ,#{contrB}
+		      ,#{signDateA}
+		      ,#{signDateB}
+		      ,#{contrStart}
+		      ,#{contrEnd}
 		      ,#{signImage, jdbcType=BLOB}
+		      ,#{cntrLocation}
+		      ,#{cntrMoney}
 			)
 	</insert>
 	<!-- 수정 -->

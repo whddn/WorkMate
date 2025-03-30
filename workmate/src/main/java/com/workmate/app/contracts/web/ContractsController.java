@@ -1,17 +1,38 @@
 package com.workmate.app.contracts.web;
 
+import java.util.Base64;
 import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.common.WhoAmI;
 import com.workmate.app.contracts.service.ContractsService;
 import com.workmate.app.contracts.service.ContractsVO;
 import com.workmate.app.employee.service.EmpService;
+
 import lombok.RequiredArgsConstructor;
+
+/**
+ * 전자계약 페이지
+ * 
+ * @author 이종우
+ * @since 2025-03-28
+ * 
+ * <pre>
+ * 수정일자	수정자	수정내용
+ * ----------------------
+ * 03-28	이종우	전자계약 목록
+ * 03-30	이종우	전자계약 등록, 조회
+ * 
+ * </pre>
+ */
 
 @Controller
 @RequiredArgsConstructor
@@ -32,18 +53,50 @@ public class ContractsController {
 		return "contracts/contractsForm"; // 리스트 페이지
 	}
 
-	/**
-	 * ✅ Ajax로 불러올 모달 HTML 조각 반환
-	 */
-	@GetMapping("/modal/{contrNo}")
-	public String loadModal(@PathVariable String contrNo) {
+	@GetMapping("/view/{contrNo}")
+	public String viewContractPage(@PathVariable String contrNo) {
 	    switch (contrNo) {
-	        case "standard": return "forms/contracts/Standard_Contract_Form";
-	        case "trade": return "forms/contracts/Trade_Contract_Form";
-	        default: return "error/404";
+	        case "standard":
+	            return "forms/contracts/Standard_Contract_Form"; // 전체 페이지
+	        case "trade":
+	            return "forms/contracts/Trade_Contract_Form";    // 전체 페이지
+	        default:
+	            return "error/404";
 	    }
 	}
+
 	
+	@GetMapping("/test")
+	public String testView() {
+	    return "forms/contracts/Standard_Contract_Form";
+	}
+
+	
+	@PostMapping("/submit")
+	public String submitContract(@ModelAttribute ContractsVO contract, Model model) {
+
+	    // Base64 서명 이미지 디코딩 처리
+	    if (contract.getSignImageBase64() != null && contract.getSignImageBase64().startsWith("data:image")) {
+	        try {
+	            String base64 = contract.getSignImageBase64().split(",")[1];
+	            byte[] decodedImage = Base64.getDecoder().decode(base64);
+	            contract.setSignImage(decodedImage);
+	        } catch (IllegalArgumentException e) {
+	            model.addAttribute("error", "서명 이미지 처리 중 오류가 발생했습니다.");
+	            return "error/500";
+	        }
+	    }
+
+	    // 계약 등록 처리
+	    int result = contractsService.inputContracts(contract);
+
+	    if (result > 0) {
+	        return "redirect:/contracts/main"; // 등록 후 목록으로 이동
+	    } else {
+	        model.addAttribute("error", "계약서 등록에 실패했습니다.");
+	        return "error/500";
+	    }
+	}
 
 	/**
 	 * 전자계약 메인 리스트

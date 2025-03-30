@@ -1,131 +1,123 @@
 <!DOCTYPE html>
-<html 
-  xmlns:th="https://www.thymeleaf.org/"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{common/layouts/contracts_layout}"
-  layout:fragment="content">
-
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/contracts_layout}"
+      layout:fragment="content">
 <head>
   <meta charset="UTF-8">
-  <title>전자 계약 양식</title>
+  <title>전자 계약</title>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
   <style>
-    /* 테이블 가운데 정렬 */
-    #FormsTable {
-      margin: 0 auto;
-      text-align: center;
-      width: 80%;
-    }
+    /* 가운데 정렬 */
+  .dataTables_wrapper .dataTables_paginate {
+    text-align: center !important;
+    float: none !important;
+    margin-top: 20px;
+  }
 
-    #FormsTable th,
-    #FormsTable td {
-      text-align: center;
-    }
+  /* 검색창 꾸미기 */
+  .dataTables_wrapper .dataTables_filter {
+    float: right;
+    margin-bottom: 15px;
+  }
 
-    .dataTables_wrapper .dataTables_paginate {
-      text-align: center !important;
-      float: none !important;
-      margin-top: 20px;
-    }
-
-    .dataTables_wrapper .dataTables_filter {
-      float: right;
-      margin-bottom: 15px;
-    }
-
-    .dataTables_wrapper .dataTables_filter input {
-      padding-left: 2.5rem;
-      height: 40px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: url("https://cdn-icons-png.flaticon.com/512/622/622669.png") no-repeat 10px center;
-      background-size: 20px 20px;
-    }
-
-    .btn {
-      padding: 6px 12px;
-    }
-
-    tr.clickable-row {
-      cursor: pointer;
-    }
+  .dataTables_wrapper .dataTables_filter input {
+    padding-left: 2.5rem;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: url("https://cdn-icons-png.flaticon.com/512/622/622669.png") no-repeat 10px center;
+    background-size: 20px 20px;
+  }
+.btn { padding: 6px 12px; };
+    
   </style>
 </head>
-
 <body>
-  <h3 style="text-align: center;">결재 양식</h3>
-  <div style="text-align: center; margin-bottom: 20px;">
-    <select>
-      <option value="formName" selected>양식명</option>
-      <option value="dept">담당부서</option>
-      <option value="manager">담당자</option>
-    </select>
-  </div>
-
-  <table id="FormsTable" class="display">
-    <thead>
-      <tr>
-        <th>NO</th>
-        <th>양식명</th>
-        <th>계약유형</th>
-        <th>등록일</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="clickable-row">
-        <td>1</td>
-        <td>고용계약서</td>
-        <td>고용계약</td>
-        <td>2025-03-28</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>용역계약서</td>
-        <td>용역계약</td>
-        <td>2025-03-27</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="container mt-4">
+  <h2>전자계약 등록</h2>
   
-  <div id="modalContainer"></div>
-  
-</body>
+	  <table id="Table" class="display">
+	  <br>
+	  <thead>
+	    <tr>
+	      <th>계약번호</th>
+	      <th>계약명</th>
+	      <th>등록일</th>
+	      <th>비고</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <tr>
+	      <td>WM-250330-001</td>
+	      <td><a th:href="@{'/contracts/view/standard'}">표준근로계약서</a></td>
+	      <td>2025-01-01</td>
+	      <td>전자서명으로 계약가능</td>
+	    </tr>
+	    <tr>
+	      <td>WM-250401-002</td>
+	      <td><a th:href="@{'/contracts/view/trade'}">거래처 계약서</td>
+	      <td>2025-02-25</td>
+	      <td>최근 거래처 불러오기</td>
+	    </tr>
+	  </tbody>
+	</table>
+</div>
 
 <script>
-  $(document).ready(function () {
-    $('#FormsTable').DataTable({
+  $(document).ready(function() {
+    $('#Table').DataTable({
+    	"pageLength": 5,
+    	
       "language": {
         "search": "검색:",
-        "lengthMenu": "페이지당 _MENU_ 개씩 보기",
-        "zeroRecords": "검색 결과가 없습니다.",
-        "info": "총 _TOTAL_건 중 _START_ ~ _END_",
-        "infoEmpty": "데이터가 없습니다.",
+        "lengthMenu": " ",
+        "info": " ",
+        "infoEmpty": "",
+        "zeroRecords": "일치하는 데이터가 없습니다.",
         "infoFiltered": "(전체 _MAX_ 개 중 검색결과)",
         "paginate": {
-          "first": "처음",
-          "last": "마지막",
           "next": "다음",
           "previous": "이전"
         }
       }
     });
+  });
+  
+  function openModal(contrNo) {
+	  fetch('/contracts/modal/' + contrNo)
+	    .then(res => res.text())
+	    .then(html => {
+	      const container = document.getElementById('contractModalContainer');
+	      container.innerHTML = html;
 
-    // 첫 번째 tr 클릭 시 이동
-    // tr 클릭 시 Ajax로 모달 불러와서 띄우기
-	$('#FormsTable tbody').on('click', 'tr.clickable-row', function () {
-	  $.ajax({
-	    url: '/contracts/modal/standard', // 모달 반환하는 Controller URL
-	    success: function (data) {
-	      $('#modalContainer').html(data); // 모달 삽입
-	      const modal = new bootstrap.Modal(document.getElementById('standardContractModal'));
-	      modal.show();
-	    },
-	    error: function () {
-	      alert("모달을 불러오는 데 실패했습니다.");
-	    }
-	  });
-	});
+	      // ✨ DOM 반영 후 모달 요소 탐색 & 실행
+	      setTimeout(() => {
+	        const modalEl = document.querySelector('.modal'); // 혹은 #standardContractModal
+	        if (!modalEl) {
+	          alert("모달 요소를 찾을 수 없습니다.");
+	          return;
+	        }
 
+	        const modal = new bootstrap.Modal(modalEl);
+	        modal.show();
+	      }, 10);
+	    })
+	    .catch(error => {
+	      console.error('오류 발생:', error);
+	      alert('계약서 로딩에 실패했습니다.');
+	    });
+	}
+
+
+
+
+	function closeModal() {
+	  document.getElementById('contractModal').style.display = 'none';
+	}
+  
 </script>
-
+</body>
 </html>
