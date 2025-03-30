@@ -35,6 +35,7 @@ import com.workmate.app.approval.service.ApprFormVO;
 import com.workmate.app.common.FileHandler;
 import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
 import com.workmate.app.reservation.service.CommonItemVO;
 
 import lombok.RequiredArgsConstructor;
@@ -241,11 +242,11 @@ public class AdminController {
 	// ✅ [2] 부서 등록 Controller (AJAX)
 	@PostMapping("/admin/deptInsert")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> insertNewDept(@RequestBody DepartmentVO deptVO) {
+	public ResponseEntity<Map<String, Object>> insertNewDept(@RequestBody DepartmentVO deptVO, TeamVO teamVO) {
 	    Map<String, Object> result = new HashMap<>();
 
 	    try {
-	        int insertResult = adminService.inputNewDept(deptVO);
+	        int insertResult = adminService.inputNewDeptAndTeam(deptVO, teamVO);
 	        result.put("success", insertResult > 0);
 	    } catch (Exception e) {
 	        result.put("success", false);

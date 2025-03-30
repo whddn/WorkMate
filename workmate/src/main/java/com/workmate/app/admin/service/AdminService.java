@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
 import com.workmate.app.reservation.service.CommonItemVO;
 
 public interface AdminService {
@@ -24,11 +25,13 @@ public interface AdminService {
 	// 부서 단건 조회
 	public DepartmentVO findDeptById(DepartmentVO deptVO);
 	// 부서 등록
-	public int inputNewDept(DepartmentVO deptVO);
+//	public int inputNewDept(DepartmentVO deptVO);
 	// 부서 수정
 	public int modifyDept(DepartmentVO deptVO);
 	// 사원 전체 조회 (select2)
 	public List<EmpVO> findAllEmployees(EmpVO empVO);
 	// 부서장 확인용
 	public List<Integer> findCurrentHeads();
+	// 부서 & 팀 등록
+	public int inputNewDeptAndTeam(DepartmentVO deptVO, TeamVO teamVO);
 }

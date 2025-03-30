@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.workmate.app.finance.service.CorcardVO;
 import com.workmate.app.finance.service.FinanceService;
 import com.workmate.app.finance.service.ReportVO;
 import com.workmate.app.security.service.LoginUserVO;
@@ -117,4 +119,29 @@ public class FinanceController {
 	public String CorcardListPage(ReportVO reportVO) {
 		return "finance/corcard"; 
 	}
+	
+	
+	// 법인카드 등록
+	@GetMapping("finance/newCard")
+	public String CorcardInsertPage() {
+		return "finance/newCard"; 
+	}
+	
+		 
+	 // 법인카드 등록
+	@PostMapping("/finance/newCard")
+	public ResponseEntity<?> register(@RequestBody CorcardVO card) {
+	    System.out.println("월한도: " + card.getMLimit());  // mLimit 값 출력
+	    System.out.println("일한도: " + card.getDLimit());  // dLimit 값 출력
+	    
+	    try {
+	        financeService.inputCorCard(card);
+	        return ResponseEntity.ok("법인카드 등록 완료");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("등록 실패: " + e.getMessage());
+	    }
+	}
+
+	
 }

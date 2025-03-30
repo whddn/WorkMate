@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.workmate.app.employee.mapper.EmpMapper;
 import com.workmate.app.employee.service.EmpService;
@@ -224,6 +225,7 @@ public class EmpServiceImpl implements EmpService {
 
 	// 다면 평가 폼 등록
 	@Override
+	@Transactional  // 하나라도 실패시 롤백
 	public int inputNewEvaluForm(EvaluVO evaluVO) {
 
 		int formInsert = empMapper.insertEvaluForm(evaluVO); // 폼 등록 쿼리문
@@ -285,6 +287,7 @@ public class EmpServiceImpl implements EmpService {
 
 	// 다면평가 진행(저장)
 	@Override
+	@Transactional
 	public int inputEvaluResultScore(List<EvaluVO> evaluList) {
 	    int result = 0;
 	    for (EvaluVO evalu : evaluList) {

@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.finance.mapper.FinanceMapper;
+import com.workmate.app.finance.security.AES256Util;
+import com.workmate.app.finance.service.CorcardVO;
 import com.workmate.app.finance.service.FinanceService;
 import com.workmate.app.finance.service.ReportVO;
 
@@ -74,7 +76,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 		    // 1. 리포트 수정
 		    int reportUpdate = financeMapper.updateReportOne(reportVO);
-
+		    System.out.println("📝 리포트 수정 결과: " + reportUpdate);
 		    if (reportUpdate > 0) {
 		        Integer reportNo = reportVO.getReportNo();
 		        List<ReportVO> transList = reportVO.getTransHistoryList();
@@ -91,6 +93,11 @@ public class FinanceServiceImpl implements FinanceService {
 		        	    if (trans.getTransId() != null) {
 		        	        int updateResult = financeMapper.updateTransHistory(trans);
 		        	        System.out.println("🟡 UPDATE 결과: " + updateResult + "건 | transId: " + trans.getTransId());
+
+		        	        if (updateResult == 0) {
+		        	            System.out.println("⚠️ UPDATE 실패 or 변경된 데이터 없음 → transId: " + trans.getTransId());
+		        	        }
+
 		        	        result += updateResult;
 		        	    } else {
 		        	        int insertResult = financeMapper.insertReportTransOne(trans);
@@ -103,6 +110,16 @@ public class FinanceServiceImpl implements FinanceService {
 		    }
 
 		    return result;
+	}
+	
+	@Autowired
+	private AES256Util aes256;
+	
+	// 법인카드
+	public void inputCorCard(CorcardVO card) throws Exception {
+		String encryptedCardNum = aes256.encrypt(card.getCorcardNum());
+		card.setCorcardNum(encryptedCardNum);
+		financeMapper.insertCorCard(card);
 	}
 	
 }
