@@ -1,5 +1,6 @@
 package com.workmate.app.employee.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.workmate.app.employee.service.DepartmentVO;
@@ -119,4 +120,7 @@ public interface EmpMapper {
 	
 	// 평가 종료일이 지나면 평가 완료로 
 	public int updateStatusByEvaluEndDate();
+	
+	// 평가 시작일이 되면 진행 중으로
+	public int updateStatusToInProgress(LocalDate today);
 }

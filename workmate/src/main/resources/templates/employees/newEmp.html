@@ -6,104 +6,160 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
     <title>신규 사원 등록</title>
-    <style>
-body {
-    font-family: Arial, sans-serif;
-}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f7f9fc;
+        margin: 0;
+        padding: 0;
+    }
 
-.container {
-    width: 400px;
-    margin: 20px auto;
-    text-align: left;
-}
+    .container {
+    	margin-top: 200px;
+        max-width: 700px;
+        margin: 40px auto;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
 
-.form-group {
-    margin: 10px 0;
-}
+    h3 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 24px;
+        color: #2c3e50;
+    }
 
-.form-group label {
-    display: inline-block;
-    width: 80px;
-}
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
-.form-group input, 
-.form-group select {
-    width: 200px;
-    padding: 5px;
-    border: 1px solid #ccc;
-}
+    .info-row {
+        display: flex;
+        align-items: center;
+    }
 
-.form-group .gender {
+    .label {
+        width: 100px;
+        font-weight: 600;
+        color: #34495e;
+        background-color: #ecf0f1;
+        padding: 10px;
+        border-radius: 6px;
+        margin-right: 12px;
+        text-align: center;
+    }
+
+    .value,
+    .addresshome,
+    select {
+        flex: 1;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: #fdfdfd;
+        font-size: 14px;
+        color: #2d3436;
+    }
+
+    select {
+        width: 100%;
+    }
+
+    .btn-submit {
+        margin-top: 30px;
+        padding: 12px 20px;
+        background-color: #3498db;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: #2980b9;
+    }
+
+    #search_icon {
+        margin-left: 8px;
+        color: #2980b9;
+        transition: color 0.2s ease;
+    }
+
+    #search_icon:hover {
+        color: #1c5980;
+    }
+    .input-icon-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
 }
 
-.form-group .gender input {
-    margin: 0;
+.input-icon-wrapper input {
+    width: 530px;
+    padding: 10px 40px 10px 10px; /* 오른쪽에 여유 공간 추가 */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2d3436;
 }
 
-.form-group .gender label {
-    margin-left: 2px;
-    margin-right: 10px; /* 남과 여 사이 간격 조정 */
-}
-
-.form-group .contact input {
-    width: 60px;
-}
-
-.btn-submit {
-    display: block;
-    width: 100%;
-    background-color: #337ab7;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    border: none;
+.input-icon-wrapper #search_icon {
+    position: absolute;
+    right: 10px;
     cursor: pointer;
-    margin-top: 10px;
+    color: #2980b9;
+    font-size: 16px;
 }
 
-.btn-submit:hover {
-    background-color: #286090;
+.input-icon-wrapper #search_icon:hover {
+    color: #1c5980;
 }
-
-    </style>
+    
+</style>
 </head>
 <body>
     <div class="container">
         <h3>신규 사원 등록</h3>
         <!--/* 신규 사원 등록을 하면 아이디와 비밀번호 자동 발급 */-->
         <form>
-            <div class="form-group">
-                <label>사원명</label>
-                <input type="text" name="userName">
+            <div class="info-row">
+                <span class="label">사원명</span>
+                <input type="text" name="userName" class="value">
             </div>
-            <div class="form-group">
-                <label>팀</label>
-                <select name="teamName">
+            <div class="info-row">
+                <span class="label">팀</span>
+                <select name="teamName"  class="value">
                     <option th:value="${team.teamNo}" th:each="team : ${teams}">[[ ${team.teamName} ]]</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>직급</label>
+            <div class="info-row">
+                <span class="label">직급</span>
                 <select name="userPosition">
-                    <option th:value="${post.code}" th:each="post : ${rank}">[[ ${post.codeName} ]]</option>
+                    <option th:value="${post.code}" th:each="post : ${rank}" class="value">[[ ${post.codeName} ]]</option>
                 </select>
             </div>
-            <div class="form-group contact">
-                <label>연락처</label>
-                <input type="text" maxlength="13" name="userPhone"> 
+            <div class="info-row">
+                <span class="label">연락처</span>
+                <input type="text" maxlength="13" name="userPhone" class="value"> 
             </div>
-            <div class="form-group contact">
-                <label>비밀번호</label>
-                <input type="password" maxlength="13" name="userPwd"> 
+            <div class="info-row">
+                <span class="label">비밀번호</span>
+                <input type="password" maxlength="13" name="userPwd" class="value"> 
             </div>
-            <div class="form-group contact">
-                <label>집주소</label>
-                <input type="text" maxlength="50" class="addresshome" name="address">
-                <span id="search_icon">
-                    <i class="fa fa-search"></i>
-                </span>
+            <div class="info-row">
+                <span class="label">집주소</span>
+                <div class="input-icon-wrapper">
+   				 <input type="text" maxlength="50" class="addresshome" name="address" placeholder="주소 검색">
+    			 <span id="search_icon"><i class="fa fa-search"></i></span>
+				</div>
+                
+
             </div>
             <button type="button" class="btn-submit">등록</button>
         </form>
@@ -111,15 +167,6 @@ body {
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
 
-    // 주소 API 
-	//     function addressAPI() {
-	//     new daum.Postcode({
-	//         oncomplete: function(data) {
-	//             // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
-	//             // 예제를 참고하여 다양한 활용법을 확인해 보세요.
-	//         }
-	//     }).open();
-	// }
     function addCheck(){
         document.querySelector('#search_icon').addEventListener('click', e => {
             homeAddCode();

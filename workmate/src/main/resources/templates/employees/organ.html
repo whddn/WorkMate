@@ -7,13 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>조직도</title>
   <style>
-body, html {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-	background: #f4f6f8;
-	font-family: 'Segoe UI', sans-serif;
-}
 
 .container {
 	max-width: 1000px;
@@ -28,9 +21,22 @@ body, html {
 	gap: 20px;
 	min-height: 600px;
 }
+#container {
+	max-width: 1000px;
+	margin: 0 auto;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	display: flex;
+	align-items: center; /* 세로 가운데 정렬 */
+	justify-content: center;
+	gap: 20px;
+	min-height: 600px;
+	margin-top : 50px;
+}
 .wrapper {
   width: 100%;
-
   flex-direction: column; /* 세로 정렬 */
   align-items: center;
 }
@@ -123,6 +129,8 @@ h1 {
   margin-bottom: 30px;
   color: #333;
   display: block;
+  margin: 50px;
+  margin-left: 0px;
 }
 </style>
 </head>
@@ -130,7 +138,7 @@ h1 {
 <body>
 <div class="wrapper">
  <div class="section-title">조직도</div>
-  <div class="container">
+  <div id="container">
     <div class="tree-panel">
       <ul class="tree">
         <li th:each="dpt : ${names}">
@@ -188,11 +196,11 @@ h1 {
       <br>
       <div class="buttons-container">
       </div>
-        <div class="action-buttons">
-          <button id="add-employee" class="btn btn-primary" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
-          <button id="evaluate-employee-update" class="btn btn-warning" th:data-no="${oneinfo.userNo}">수정하기</button>
-        </div>
     </div>
+        <div class="action-buttons" style="display:none">
+          <button id="add-employee" class="btn btn-primary" th:onclick="|location.href='@{/emp/newemp}'|"  th:if="${teamNo == 'ROLE_T001'}">+ 새로운 사원 추가</button>
+          <button id="evaluate-employee-update" class="btn btn-warning" th:data-no="${oneinfo.userNo}"  th:if="${teamNo == 'ROLE_T001'}">수정하기</button>
+        </div>
   </div>
 </div>
   <script>
@@ -212,7 +220,7 @@ h1 {
       nameclick.addEventListener('click', function (event) {
         const userNo = event.target.dataset.id;
         document.getElementById("detailsBox").classList.remove('hidden');
-
+		document.querySelector('.action-buttons').style.display = 'block';
         fetch(`/workmate/emp/organ/${userNo}`)
           .then(res => res.json())
           .then(result => {
