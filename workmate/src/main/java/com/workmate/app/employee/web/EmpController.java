@@ -166,7 +166,7 @@ public class EmpController {
 		evaluVO.setEvaluFormNo(formNo);
 		
 		String status = Optional.ofNullable(empService.findEvaluStatus(formNo)).orElse("진행 중");
-		  if ("평가 완료".equals(status)) {
+		  if ("제출 완료".equals(status)) {
 		Map<String, Object> result = empService.findAdminEvaluBeforeById(evaluVO);
 		model.addAttribute("people", result.get("people"));
 		model.addAttribute("items", result.get("items"));
@@ -205,6 +205,8 @@ public class EmpController {
 			return "evalu/evalu"; // 평가 작성 페이지
 		}
 	}
+	
+	
 	
 	// 사원 선택시 해당 사원 결과만 나옴
 	@PostMapping("/emp/bfoneevalu/{formNo}/{userNo}")
@@ -260,7 +262,7 @@ public class EmpController {
 		// 2. 상태 조회
 		String status = Optional.ofNullable(empService.findEvaluStatus(formNo)).orElse("진행 중");
 		
-		if ("평가 완료".equals(status)) {
+		if ("제출 완료".equals(status)) {
 			evaluVO.setEvaluFormNo(formNo);
 			evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
 

@@ -76,6 +76,7 @@ public class AttendanceController {
 		double addWorkTime = list.stream().mapToDouble(WorkVO::getAddWorkTime).sum();
 		double totalWorkTime = list.stream().mapToDouble(WorkVO::getWorkTime).sum();
 		double remainWorkTime = monthTotal - totalWorkTime;
+		remainWorkTime = Math.round(remainWorkTime * 100.0) / 100.0;
 		
 		//2-1)Service > View 전달
 		model.addAttribute("works", list);

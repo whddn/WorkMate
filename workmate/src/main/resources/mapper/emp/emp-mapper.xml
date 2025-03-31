@@ -152,19 +152,6 @@
 		   ON f.EVALU_FORM_NO = ef.EVALU_FORM_NO
 		WHERE f.EVALU_FORM_NO = #{evaluFormNo}
 	</select>
-	<!-- 진행할 평가 단건 (왜 있는 건지 모르겠음) -->
-	<!-- <select id="selectOneEvaluById" resultType="EvaluVO">
-				SELECT g.EVALU_GROUP_ID
-			        , ga.EVALUATEE_GROUP_ID
-			        , f.EVALU_FORM_NO
-				FROM EVALU_GROUP g
-				JOIN EVALU_FORM f
-				ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
-				JOIN EVALUATEE_GROUP ga
-				ON f.EVALU_FORM_NO = ga.EVALU_FORM_NO
-				WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-	</select> -->
-
 
 	<!-- 지난 평가 리스트 조회 (전체 출력 / 관리자) -->
 	<select id="selectBeforeEvaluList" resultType="EvaluVO">
@@ -202,8 +189,10 @@
 		    ON r.EVALU_NO = fm.EVALU_NO
 		JOIN EVALU_ITEM i 
 		    ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
-		WHERE r.EVALU_FORM_NO = #{evaluFormNo}           
+		WHERE r.EVALU_FORM_NO = #{evaluFormNo}     
+			  AND r.USER_NO = #{userNo}       
 		ORDER BY u.USER_NO, fm.ORDER_NO
+		
 	</select>
 	<!-- 평가 결과 단순 조회 - 목록 불러옴 (관리자, formNo 기반) -->
 		<select id="selectAdminBeforeEvaluById" resultType="EvaluVO">
@@ -264,7 +253,15 @@
 				        JOIN EVALU_FORMAT fm2 ON r2.EVALU_NO = fm2.EVALU_NO
 				        WHERE fm2.EVALU_ITEM_NO = i.EVALU_ITEM_NO
 				          AND r2.EVALU_FORM_NO = f.EVALU_FORM_NO
-				      ) AS avgScore
+				      ) AS avgScore,
+				          -- 전체 평균 점수 (다른 사람 포함)
+				    (
+				        SELECT AVG(r3.EVALU_SCORE)
+				        FROM EVALU_RESULT r3
+				        JOIN EVALU_FORMAT fm3 ON r3.EVALU_NO = fm3.EVALU_NO
+				        WHERE fm3.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+				          AND r3.EVALU_FORM_NO = f.EVALU_FORM_NO
+				    ) AS otherAvgScore
 				FROM EVALU_FORM f              
 				JOIN EVALUATEE_GROUP g ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
 				JOIN EMPLOYEE u ON g.USER_NO = u.USER_NO        
@@ -315,6 +312,7 @@
 		ORDER BY u.USER_NO, fm.ORDER_NO
 	</select>
 
+	
 		<!-- 내가 평가한 평가 리스트 (전체 조회) -->
 	<select id="selectMyEvaluList" resultMap="formEmpMyList">
  			SELECT DISTINCT f.EVALU_NAME
@@ -491,10 +489,11 @@
 		       , #{userNo} )
 	</insert>
 	
-	<!-- 평가 제출 후 평가 상태 '평가 완료' 로 수정하는 쿼리문 -->
+	<!-- 평가 제출 후 평가 상태 '제출 완료' 로 수정하는 쿼리문 -->
 	<update id="updateEvaluStatus" parameterType="EvaluVO">
 		UPDATE EVALU_FORM 
-		SET USAGE_STATUS = '평가 완료'
+		SET USAGE_STATUS = '제출 완료'
+		WHERE EVALU_FORM_NO = #{evaluFormNo}
 	</update>
 	<!-- 평가 상태 조회 쿼리 -->
 	<select id="getEvaluStatus" resultType="String" parameterType="int">

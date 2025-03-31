@@ -110,4 +110,7 @@ public interface EmpMapper {
 	
 	// 부서장 
 	public List<Integer> selectDepartmentHeadList();
+	
+	// 제출한 평가 (나 : 평가자) 수정
+	public int updateSubmitEvalu(EvaluVO evaluVO);
 }

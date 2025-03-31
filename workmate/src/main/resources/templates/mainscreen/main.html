@@ -9,6 +9,9 @@
 <head>
     <meta charset="UTF-8">
     <title>WorkMate</title>
+    <style> 	
+    
+    </style>
 </head>
 
 <body>
@@ -17,24 +20,20 @@
             <div class="col-md-12">
                 <div class="card p-3">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-4">                            
                             <div class="row">
-                                <div class="col"><h4>현재 시간</h4></div>
-                            </div>
-                            <div class="row">
-                                <div class="col"><h1>2025년 3월 13일</h1></div>
+                                <div class="col"><h5 class="date-box" id="current-date"></h5></div>
                             </div>
                             <div class="row">
                                 <div class="col"><h1 id="current-time">02:41:56</h1></div>
                             </div>
                         </div>
                         <div class="col-md-4 d-flex flex-column justify-content-center align-items-center">
-                            <button class="btn btn-primary mb-2">출근하기</button>
-                            <button class="btn btn-secondary">퇴근하기</button>
-                        </div>
-                        <div class="col-md-4 d-flex align-items-center justify-content-center">
-                            <div>근무 타입 신청</div>
-                        </div>
+                            
+                             <button class="btn btn-primary">
+						        <a href="/workmate/attendance/monthList" style="color: white; text-decoration: none;">출/퇴근 하러가기 ></a>
+						    </button>
+                        </div>                       
                     </div>
                 </div>
             </div>
@@ -45,7 +44,7 @@
                 <div class="row">
                     <div class="col-md-4 mb-4">
                         <div class="card p-3 h-100">
-                            <h5>오늘의 할 일</h5>
+                            <h5><i class="fas fa-calendar-alt"></i><b> 오늘의 일정</b></h5>
                             <table id="scheduleTable" class="stripe">
                             	<thead>
                             		<tr>
@@ -64,10 +63,10 @@
                             		</th:block>
                             	</tbody>
                             	<tr th:if="${#lists.isEmpty(scheduleList)}">
-                            		<td colspan="3">오늘의 일정은 딱히 없습니다</td>
+                            		<td colspan="3">오늘의 일정이 없습니다</td>
                             	</tr>
                             	<tr>
-                            		<td colspan="3"><a th:href=@{/calendar}>캘린더로 가기</a></td>
+                            		<td colspan="3"><a th:href=@{/calendar}>캘린더로 가기 +</a></td>
                             	</tr>
                             </table>
                         </div>
@@ -75,7 +74,7 @@
 
                     <div class="col-md-4 mb-4">
                         <div class="card p-3 h-100">
-                            <h5>메일 목록</h5>
+                            <h5><i class="fas fas fa-envelope"></i><b> 메일 목록</b></h5>
                             <table id="mailTable" class="stripe">
                             	<thead>
                             		<tr>
@@ -92,10 +91,10 @@
                             		</th:block>
                             	</tbody>
 								<tr th:if="${#lists.isEmpty(mailList)}">
-	                           		<td colspan="3">받은 메일이 딱히 없습니다</td>
+	                           		<td colspan="3">받은 메일이 없습니다</td>
 	                           	</tr>
 	                           	<tr>
-	                           		<td colspan="3"><a th:href=@{/mail/mailmain}>메일함으로 가기</a></td>
+	                           		<td colspan="3"><a th:href=@{/mail/mailmain}>메일함으로 가기 +</a></td>
 	                           	</tr>
                             </table>
                         </div>
@@ -103,7 +102,7 @@
 
                     <div class="col-md-4 mb-4">
                         <div class="card p-3 h-100">
-                            <h5>결재 목록</h5>
+                            <h5><i class="fas fas fa-file-alt"></i><b> 결재 목록</b></h5>
                             <table id="approvalTable" class="stripe">
                             	<thead>
                             		<tr>
@@ -122,10 +121,10 @@
                             		</th:block>
                             	</tbody>
 								<tr th:if="${#lists.isEmpty(approvalList)}">
-	                           		<td colspan="3">님과 관련된 결재가 없습니다</td>
+	                           		<td colspan="3">결재가 없습니다</td>
 	                           	</tr>
 	                           	<tr>
-	                           		<td colspan="3"><a th:href=@{/approval/waiting}>전자결재로 가기</a></td>
+	                           		<td colspan="3"><a th:href=@{/approval/waiting}>전자결재로 가기 +</a></td>
 	                           	</tr>
                             </table>
                         </div>
@@ -153,6 +152,16 @@
     		$('#mailTable').DataTable(dataTableSettings);
     		$('#approvalTable').DataTable(dataTableSettings);
     	})
+    	
+    	// 현재시간가져오기
+		function currentDate() {
+			const now = new Date();
+			document.getElementById("current-date").innerText = now.toISOString().split('T')[0];
+			document.getElementById("current-month").innerText = now.toISOString().split('-')[1] + "월";
+			document.getElementById("current-time").innerText = now.toLocaleTimeString();
+		}
+		setInterval(currentDate, 1000);
+		currentDate();
     	
     </script>
     

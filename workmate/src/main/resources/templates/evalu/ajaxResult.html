@@ -1,4 +1,4 @@
-<div th:fragment="resultFragment" th:inline="text">
+<div th:fragment="resultFragment">
     <div class="con">
         <b>평가항목 및 채점표</b>
         <table>
@@ -32,8 +32,10 @@
             </tr>
         </table>
     </div>
-    	<div class="con">
+    	<div class="con" id="chartArea">
 			<h5>평가 차트</h5>
 			<canvas id="evaluationChart" width="400" height="400"></canvas> <!-- 차트가 그려질 공간 -->
 		</div>
 </div>
+
+

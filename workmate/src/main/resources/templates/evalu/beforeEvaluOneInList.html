@@ -173,8 +173,8 @@ button:hover {
 	    const formNo = selectedOption.dataset.formno;
 	
 	
-	    console.log("📡 선택된 userNo:", userNo);
-	    console.log("📡 선택된 formNo:", formNo);
+	    console.log("userNo: ", userNo);
+	    console.log("formNo: ", formNo);
 	    if (!userNo) return;
 	
 	    fetch(`/workmate/emp/bfoneevalu/${formNo}/${userNo}`, {
@@ -230,9 +230,6 @@ function drawEvaluationGraph(data) {
         }
     });
 }
-
-
-
 
 	</script>
 	<script th:inline="javascript">
