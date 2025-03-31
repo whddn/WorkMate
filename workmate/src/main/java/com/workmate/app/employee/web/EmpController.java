@@ -166,7 +166,7 @@ public class EmpController {
 		evaluVO.setEvaluFormNo(formNo);
 		
 		String status = Optional.ofNullable(empService.findEvaluStatus(formNo)).orElse("진행 중");
-		  if ("제출 완료".equals(status)) {
+		if ("평가 완료".equals(status)) {
 		Map<String, Object> result = empService.findAdminEvaluBeforeById(evaluVO);
 		model.addAttribute("people", result.get("people"));
 		model.addAttribute("items", result.get("items"));
@@ -260,12 +260,11 @@ public class EmpController {
 		}
 
 		// 2. 상태 조회
-		String status = Optional.ofNullable(empService.findEvaluStatus(formNo)).orElse("진행 중");
-		
+		evaluVO.setEvaluFormNo(formNo);
+		evaluVO.setUserNo(loginUser.getUserVO().getUserNo()); 
+		String status = Optional.ofNullable(empService.findEvaluStatusById(evaluVO)).orElse("진행 중");
 		if ("제출 완료".equals(status)) {
-			evaluVO.setEvaluFormNo(formNo);
-			evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
-
+	
 			List<EvaluVO> findResult = empService.findMyEvaluById(evaluVO);
 			List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
 			List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
@@ -361,30 +360,42 @@ public class EmpController {
 
 	// AJAX 결과
 	@PostMapping("emp/evalu/{formNo}")
-	public ResponseEntity<Map<String, String>> evaluResultInsert(@RequestBody List<EvaluVO> evaList,
-			@PathVariable int formNo, @AuthenticationPrincipal LoginUserVO loginUser) {
-		Map<String, String> response = new HashMap<>();
-		response.put("result", "success");
-		int evaluatorUserNo = loginUser.getUserVO().getUserNo();
-		for (EvaluVO vo : evaList) {
-			vo.setEvaluFormNo(formNo);
-			vo.setOrderNo(vo.getOrderNo());
-			vo.setUserNo(evaluatorUserNo);
-			String teamNo = vo.getTeamNo();
-			if (teamNo != null) {
-				String numeric = teamNo.replaceAll("[^0-9]", ""); // "001"
-				if (!numeric.isEmpty()) {
-					vo.setEvaluGroupId(numeric); // VO 타입이 String이면 그대로 set
-					vo.setEvaluateeGroupId(numeric);
-				}
+	public ResponseEntity<Map<String, String>> evaluResultInsert(
+	        @RequestBody List<EvaluVO> evaList,
+	        @PathVariable int formNo,
+	        @AuthenticationPrincipal LoginUserVO loginUser) {
 
-			}
-		}
-		empService.inputEvaluResultScore(evaList); // 횟수만큼 insert문 실행
-		empService.modifyEvaluStatus(formNo); // 모두 추가한 후 평가 상태를 평가 완료로 변경
+	    Map<String, String> response = new HashMap<>();
+	    response.put("result", "success");
 
-		return ResponseEntity.ok(response);
+	    int evaluatorUserNo = loginUser.getUserVO().getUserNo();  // ✔️ 평가자 본인 번호
+
+	    for (EvaluVO vo : evaList) {
+	        vo.setEvaluFormNo(formNo);
+	        vo.setOrderNo(vo.getOrderNo());
+	        vo.setUserNo(evaluatorUserNo);
+
+	        String teamNo = vo.getTeamNo();
+	        if (teamNo != null) {
+	            String numeric = teamNo.replaceAll("[^0-9]", "");
+	            if (!numeric.isEmpty()) {
+	                vo.setEvaluGroupId(numeric);
+	                vo.setEvaluateeGroupId(numeric);
+	            }
+	        }
+	    }
+
+	    empService.inputEvaluResultScore(evaList); // ✔️ 평가 점수 저장
+
+	    // ✔️ 상태 변경 (평가자 단위로)
+	    EvaluVO statusVO = new EvaluVO();
+	    statusVO.setEvaluFormNo(formNo);
+	    statusVO.setUserNo(evaluatorUserNo);
+	    empService.modifyEvaluStatus(statusVO); // ✅ 변경된 메서드로 호출
+
+	    return ResponseEntity.ok(response);
 	}
+
 
 	// 내가 평가받은 평가 리스트 (일반 사용자)
 	@GetMapping("emp/myResult")

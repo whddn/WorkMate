@@ -71,7 +71,7 @@ public interface EmpService {
 	public int inputEvaluResultScore(List<EvaluVO> evaluList);
 	
 	// 평가 보내고 나면 상태를 평가 완료로 바꿈 
-	public int modifyEvaluStatus(int formNo);
+	public int modifyEvaluStatus(EvaluVO vo);
 	
 	// 평가 상태 조회 쿼리
 	public String findEvaluStatus(int formNo);
@@ -84,4 +84,8 @@ public interface EmpService {
 	
 	// 사원 중복 제거 ?? 
 	//public List<EvaluVO> getEvaluItemsUniqueByUser(EvaluVO evaluVO); 
+	public String findEvaluStatusById(EvaluVO vo);
+	
+	// 자동 평가 종료로 
+	public int autoUpdateStatusByDate();
 }

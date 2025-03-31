@@ -281,8 +281,8 @@ public class EmpServiceImpl implements EmpService {
 	
 	// 평가 상태 변경 
 	@Override
-	public int modifyEvaluStatus(int formNo) {
-		return empMapper.updateEvaluStatus(formNo);
+	public int modifyEvaluStatus(EvaluVO vo) {
+		return empMapper.updateEvaluStatus(vo);
 	}
 
 	// 다면평가 진행(저장)
@@ -337,8 +337,17 @@ public class EmpServiceImpl implements EmpService {
 	    return oneList;
 	}
 
+	// 내가 제출한 평가 상태
+	@Override
+	public String findEvaluStatusById(EvaluVO vo) {
+		return empMapper.selectMyEvaluStatus(vo);
+	}
 
-	
+	// 자동 평가 완료로
+	@Override
+	public int autoUpdateStatusByDate() {
+	    return empMapper.updateStatusByEvaluEndDate();
+	}
 
 
 }

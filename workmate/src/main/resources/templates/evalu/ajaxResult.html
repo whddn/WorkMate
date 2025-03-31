@@ -13,12 +13,11 @@
 				    <tr th:each="score : ${scores}">
 				        <td>[[${score.evaluCompet}]]</td>
 				        <td>[[${score.evaluContent}]]</td>
-				        <td>[[${score.evaluScore}]]</td>
+				        <td>[[${score.avgScore}]]</td>
 				    </tr>
 				</tbody>
         </table>
     </div>
-
     <div class="con">
         <h5>추가 의견</h5>
         <table>
@@ -32,10 +31,12 @@
             </tr>
         </table>
     </div>
-    	<div class="con" id="chartArea">
-			<h5>평가 차트</h5>
-			<canvas id="evaluationChart" width="400" height="400"></canvas> <!-- 차트가 그려질 공간 -->
+		 <div class="con" id="chartArea" style="width: 960px; height: 400px; margin: 0 auto;">
+		  <h5>평가 차트</h5>
+		  <canvas id="evaluationChart" style="width: 960px; height: 400px; text-align: center;"></canvas>
 		</div>
+<script id="scoreData" type="application/json" th:inline="javascript">
+  [[${scores}]]
+</script>
 </div>
-
 
