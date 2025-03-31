@@ -45,7 +45,7 @@
                 </li>
             </ul>
         </div>
-
+		<h6 class="hi-user" style="margin-right: 20px;"><i class="fas fa-user"></i> <span th:text="${userName}"></span> 님, 안녕하세요 </h6>
         <!-- ✅ 로그아웃 버튼 -->
         <form th:action="@{/logout}" method="post" class="ms-auto">
             <button type="submit" class="btn btn-danger"><i class="fas fa-power-off"></i> Logout</button>
@@ -76,6 +76,11 @@
         padding: 10px 20px; /* 드롭다운 항목 간격 */
         line-height: 1.8; /* 행 간격 추가 */
     }
+    
+    .hi-user {
+    	color: #fff;
+    }
+   
 </style>
 
 

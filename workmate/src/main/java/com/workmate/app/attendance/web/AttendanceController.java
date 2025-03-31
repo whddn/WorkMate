@@ -46,11 +46,6 @@ public class AttendanceController {
 		
 	private final AttendanceService attendService; 
 	
-//	@Autowired
-//	public AttendanceController(AttendanceService attendService) {
-//		this.attendService = attendService;
-//	}
-	
 	/**
 	 * 이번달 근태 조회 페이지 이동
 	 * @param WorkVO
@@ -60,11 +55,7 @@ public class AttendanceController {
 	//월별 근태 전체조회 : GET	
 	@GetMapping("/monthList")
 	public String monthAttendanceList(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {		
-	    
-//		if (loginUser == null || loginUser.getUserVO() == null) {
-//	        return "redirect:/login";  // 로그인 페이지로 리다이렉트
-//	    }
-	    
+
 		//로그인 여부 확인
 		int userNo = loginUser.getUserVO().getUserNo(); 		
 		String userName = loginUser.getUserVO().getUserName();
@@ -91,6 +82,7 @@ public class AttendanceController {
 		
 		return "attendance/monthList";
 	}
+	
 	/**
 	 * 내 전체 근태 조회 페이지로 이동
 	 * @param model
@@ -104,11 +96,7 @@ public class AttendanceController {
 			                        WorkVO workVO, 
 			                        @AuthenticationPrincipal LoginUserVO loginUser) {
 		
-		//로그인 여부
-//		if (loginUser == null || loginUser.getUserVO() == null) {
-//		 return "redirect:/login";
-//		}
-		
+
 		int userNo = loginUser.getUserVO().getUserNo();
 		workVO.setUserNo(userNo);
 		
@@ -118,8 +106,14 @@ public class AttendanceController {
 		return "attendance/allList";
 	}
 	
-
-	//출근 등록
+	/**
+	 * 
+	 * 출근 등록
+	 * @param workVO
+	 * @param loginUser
+	 * @param rttr
+	 * @return 출근시간전송
+	 */	
 	@GetMapping("/startWork")
 	public String startWork(WorkVO workVO , 
 					        @AuthenticationPrincipal LoginUserVO loginUser ,
@@ -132,8 +126,14 @@ public class AttendanceController {
 		rttr.addFlashAttribute("msg", "출근등록되었습니다.");
 		return "redirect:/attendance/monthList";		
 	}
-	 
-	//퇴근 등록
+	
+	/**
+	 * 퇴근시간 등록
+	 * @param workVO
+	 * @param loginUser
+	 * @param rttr
+	 * @return 퇴근시간 전송, 총근무시간,연장근무시간 등록
+	 */
 	@GetMapping("/afterWork")
 	public String afterWork(WorkVO workVO,
 							@AuthenticationPrincipal LoginUserVO loginUser ,
@@ -145,7 +145,13 @@ public class AttendanceController {
 		return "redirect:/attendance/monthList";
 	}
 	
-	//지각사유업로드
+	/**
+	 * 지각사유업로드
+	 * @param workVO
+	 * @param loginUser
+	 * @param rttr
+	 * @return 지각사유폼 전송
+	 */
 	@PostMapping("/lateReason")
 	public String lateReason(WorkVO workVO,
 							@AuthenticationPrincipal LoginUserVO loginUser ,
@@ -161,7 +167,13 @@ public class AttendanceController {
 		return "redirect:/attendance/monthList";
 	}
 	
-	//내 발생 연차, 연차사용내역전체조회
+	/**
+	 * 내 발생 연차, 연차사용내역전체조회
+	 * @param model
+	 * @param workVO
+	 * @param loginUser
+	 * @return 내 연차목록 조회
+	 */
 	@GetMapping("/annual")
 	public String annualList(Model model, WorkVO workVO, @AuthenticationPrincipal LoginUserVO loginUser) {
 		
@@ -179,8 +191,12 @@ public class AttendanceController {
 	}
 	
 	
-	
-	//전체사원 근태조회()
+	/**
+	 * 전체사원 근태조회()
+	 * @param model
+	 * @param workVO
+	 * @return 전체 사원 근태관리
+	 */
 	@GetMapping("/attendanceManage")
 	public String attendEmpList(Model model, WorkVO workVO) {
 		
@@ -193,7 +209,12 @@ public class AttendanceController {
 		return "attendance/attendanceManage";
 	}
 	
-	//엑셀 다운로드
+	/**
+	 * 엑셀 다운로드
+	 * @param response
+	 * @param workVO
+	 * @throws IOException
+	 */
 	@GetMapping("/export/excel")
 	public void exportToExcel(HttpServletResponse response, WorkVO workVO)throws IOException {
 		// 파일명
@@ -246,7 +267,15 @@ public class AttendanceController {
 	    workbook.close();
 	}
 	
-	//필터링 된 엑셀다운
+	/**
+	 * 필터링 된 엑셀다운
+	 * @param stDate
+	 * @param endDate
+	 * @param userName
+	 * @param teamName
+	 * @param response
+	 * @throws IOException
+	 */
 	@GetMapping("/export/excel/filter")
 	public void downExel(@RequestParam(required = false) String stDate,
 						@RequestParam(required = false) String endDate,
@@ -268,7 +297,7 @@ public class AttendanceController {
 	    CreationHelper createHelper = workbook.getCreationHelper();
 	    dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd hh:mm:ss"));
 
-	    // 헤더 작성
+	    // 엑셀 헤더(속성) 작성
 	    Row header = sheet.createRow(0);
 	    header.createCell(0).setCellValue("팀명");
 	    header.createCell(1).setCellValue("이름");
@@ -278,7 +307,7 @@ public class AttendanceController {
 	    header.createCell(5).setCellValue("연장근무");
 	    header.createCell(6).setCellValue("근태상태");
 
-	    // 데이터 작성
+	    // 엑셀 데이터 작성
 	    int rowNum = 1;
 	    for (WorkVO vo : list) {
 	        Row row = sheet.createRow(rowNum++);
