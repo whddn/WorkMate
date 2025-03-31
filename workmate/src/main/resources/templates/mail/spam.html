@@ -65,15 +65,18 @@
             <td colspan="5" class="text-center">스팸 메일이 없습니다.</td>
         </tr>
         <tr th:each="mail : ${spamMails}" class="mail-row">
-            <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"> <td>
-        <span class="badge bg-secondary me-1"
-              th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
-        <span th:text="${mail.subject}">제목</span>
-    </td></td>
-            <td th:text="${mail.recipients}"></td>
-            <td><a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}"></a></td>
-            <td th:text="${mail.recipients}"></td>
-            <td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
+             <td>
+  <span class="badge bg-secondary me-1"
+        th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
+  <span th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.recipients}"></span>
+</td>
+            <td>
+                <a th:href="@{/mail/view(mailId=${mail.mailId})}"
+                   th:text="${mail.subject}">제목</a>
+            </td>
+            <td th:text="${mail.recipients}">받는사람</td>
+            <td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
         </tr>
         </tbody>
     </table>

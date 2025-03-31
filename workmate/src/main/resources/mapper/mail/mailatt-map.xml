@@ -14,4 +14,8 @@
     <select id="selectAttachmentById" resultType="AttachmentVO">
         SELECT * FROM ATTACHMENT WHERE FILE_ID = #{fileId}
     </select>
+    
+    <delete id="deleteAttachmentsByMailId" parameterType="int">
+    DELETE FROM ATTACHMENT WHERE MAIL_ID = #{mailId}
+</delete>
 </mapper>

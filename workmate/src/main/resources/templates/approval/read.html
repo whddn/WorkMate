@@ -221,6 +221,14 @@
 			'signNo': null
 		};
 		
+		if($('input[name="apprResult"]:checked').length < 1) {
+			return;
+		}
+		
+		if($('input[name="signNo"]:checked').length < 1) {
+			return;
+		}
+		
 		$('input[name]:checked, select[name], textarea[name], button[name]').each(function() {
 		    let name = $(this).attr('name');
 		    let value = $(this).val();

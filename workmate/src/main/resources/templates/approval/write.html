@@ -361,7 +361,15 @@
 	
 	// 결재문서 데이터를 JSON으로 서버로 전송한다.
 	$('#submitBtn').on('click', function(event) {
-		if ((!Array.isArray(apprElmntList) || apprElmntList.length < 2) && apprForm.apprType != 'AF004') {
+		if($('input[name="apprTitle"]').val() == '') {
+			return;
+		}
+		
+		if($('input[name="apprContent"]').val() == '') {
+			return;
+		}
+		
+		if((!Array.isArray(apprElmntList) || apprElmntList.length < 2) && apprForm.apprType != 'AF004') {
 			alert('결재선을 2명 이상으로 설정해 주세요!');
         	return;
     	}
