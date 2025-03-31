@@ -8,7 +8,7 @@
 		u.user_name, u.resign_date, u.status_user, u.user_birth, u.address,
 		u.user_phone, 'ROLE_'||u.team_no  team_no, u.user_ip, t.team_name
 		FROM employee u 
-		JOIN TEAM t 
+		left outer JOIN TEAM t 
 		ON u.team_no = t.team_no
 		WHERE u.user_id = #{id}
 	</select>
