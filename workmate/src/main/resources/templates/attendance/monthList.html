@@ -119,9 +119,9 @@
 				<div class="dropdown-work" style="display: inline-flex; align-items: center; gap: 10px;">
 					<select id="work-type" class="form-select input-fixed">
 						<option value="">근무타입선택</option>
-						<option value="http://localhost:8099/workmate/approval/write?apprType=AF001">연차</option>
-						<option value="http://localhost:8099/workmate/approval/write?apprType=AF005">재택</option>
-						<option value="http://localhost:8099/workmate/approval/write?apprType=AF002">출장</option>
+						<option value="/workmate/approval/write?apprType=AF001">연차</option>
+						<option value="/workmate/approval/write?apprType=AF005">재택</option>
+						<option value="/workmate/approval/write?apprType=AF002">출장</option>
 					</select>
 					<button onclick="applyWorkType()" class="btn btn-primary btn-fw">신청</button>
 				</div>
@@ -285,6 +285,7 @@
 		    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 		}
 		
+		// 현재시간가져오기
 		function currentDate() {
 			const now = new Date();
 			document.getElementById("current-date").innerText = now.toISOString().split('T')[0];

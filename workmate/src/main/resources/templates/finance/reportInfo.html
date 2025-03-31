@@ -119,7 +119,7 @@
             <td></td>
         </tr>
     </table>
-    <button>수정</button>
+    <button type="button" th:onclick="|location.href='@{/finance/reportUpdate/{reportNo}(reportNo=${reportVO.reportNo})}'|">수정</button>
     <button type="button" th:onclick="|location.href='@{/finance/report}'|">목록으로</button>
 </div>
 </body>

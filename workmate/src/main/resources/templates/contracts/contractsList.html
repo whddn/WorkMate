@@ -20,19 +20,17 @@
 				<th>계약명</th>
 				<th>작성자</th>
 				<th>작성일자</th>
-				<th>계약상태</th>
+				<th>보험종류</th>
 			</tr>
 		</thead>
 		<tbody>
-			<th:block th:each="waiting, sts : ${waitingList}">
-				<tr
-					th:onclick="| location.href = '@{/approval/read(apprNo=${waiting.apprNo})}' |">
+			<th:block th:each="cntr, sts : ${contr}">
+				<tr>
 					<td>[[ ${sts.count} ]]</td>
-					<td>[[ ${waiting.apprNo} ]]</td>
-					<td>[[ ${waiting.userName} ]]</td>
-					<td
-						th:text="${#dates.format(waiting.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
-					<td>결재 중</td>
+					<td>[[ ${cntr.contrTitle} ]]</td>
+					<td>[[ ${cntr.contrB} ]]</td>
+					<td>[[${#dates.format(cntr.createDate, 'yyyy-MM-dd')}]]</td>
+					<td>[[${cntr.contrStatus}]]</td>
 				</tr>
 			</th:block>
 		</tbody>
@@ -49,7 +47,7 @@
 						dataIndex) {
 					var minDate = $('#min-date').val();
 					var maxDate = $('#max-date').val();
-					var date = data[6]; // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
+					var date = data[3]; // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
 
 					if (!minDate && !maxDate) {
 						return true; // 날짜 입력이 없으면 필터링 없이 표시

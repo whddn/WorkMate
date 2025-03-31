@@ -29,6 +29,7 @@
 		    , th.DEPOSIT
 		    , th.WITHDRAWAL
 		    , th.BALANCE
+		    , th.TRANS_ID
 		FROM REPORT r
 		JOIN TRANS_HISTORY th
 		  ON r.REPORT_NO = th.REPORT_NO
@@ -56,15 +57,17 @@
 			    , USER_NO
 			    , TEAM_NO
 			    , TRANS_START
-			    , TRANS_END ) 
+			    , TRANS_END
+			    , REPORT_STATUS ) 
 			    
-		VALUES ( REPORT_NO_SEQ.NEXTVAL
+		VALUES ( #{reportNo}
 		        , #{reportTitle}
 		        , SYSDATE
 		        , #{userNo}
 		        , #{teamNo}
 		        , #{transStart}
-		        , #{transEnd} ) 
+		        , #{transEnd} 
+		        , '결재 중') 
 	</insert>
 	
 	<!-- TransHistory 테이블 insert -->
@@ -88,5 +91,60 @@
 		            , #{purposeUse}
 		            , #{reportNo}
 		            ) 
+	</insert>
+	
+	<!-- Report 수정 -->
+	<update id="updateReportOne" parameterType="ReportVO">
+		UPDATE REPORT
+  		   SET REPORT_TITLE   = #{reportTitle},
+       WRITE_DATE     = SYSDATE,
+       USER_NO        = #{userNo},
+       TEAM_NO        = #{teamNo},
+       TRANS_START    = #{transStart},
+       TRANS_END      = #{transEnd},
+       REPORT_STATUS  = '결재 중'
+	   WHERE REPORT_NO      = #{reportNo}
+	</update>
+	<!-- TransHistory 수정 -->
+	<update id="updateTransHistory" parameterType="ReportVO">
+	UPDATE TRANS_HISTORY
+   SET TRANS_TYPE   = #{transType},
+       TRANS_DATE   = #{transDate},
+       WITHDRAWAL   = #{withdrawal},
+       DEPOSIT      = #{deposit},
+       BALANCE      = #{balance},
+       PURPOSE_USE  = #{purposeUse},
+       REPORT_NO    = #{reportNo}
+ WHERE TRANS_ID     = #{transId}
+	
+	</update>
+	<!-- 법인카드 등록  -->
+	<insert id="insertCorCard" parameterType="CorcardVO">
+    INSERT INTO CORCARD (
+        					CORCARD_NO
+        					, CORCARD_NUM
+        					, OWNER_NO
+        					, CORCARD_START
+        					, CORCARD_END
+        					, CORCARD_COMP
+        					, CORCARD_STATUS
+        					, BANK_NAME
+        					, M_LIMIT
+        					, D_LIMIT
+        					, USER_NO
+    					 ) 
+    					VALUES (
+       						  CORCARD_NO_SEQ.NEXTVAL
+       						  , #{corcardNum}
+       						  , #{ownerNo}
+       						  , #{corcardStart}
+       						  , #{corcardEnd}
+       						  , #{corcardComp}
+       						  , #{corcardStatus}
+       						  , #{bankName}
+       						  , #{mLimit}
+       						  , #{dLimit}
+       						  , #{userNo}
+    					)
 	</insert>
 </mapper>

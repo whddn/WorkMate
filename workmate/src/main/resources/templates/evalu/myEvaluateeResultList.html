@@ -157,7 +157,7 @@
             </div>
         </div>
         <!-- 게시글 목록 테이블 -->
-        <table class="table-container">
+        <table class="table-container" id="myEvaluList">
             <thead>
                 <tr>
                     <th><input type="checkbox" name="postSelection"></th>
@@ -182,20 +182,31 @@
             </tbody>
         </table>
 
-        <!-- 페이징 -->
-        <div class="paging">
-            <a href="#">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-        </div>
 
         <!-- 버튼들 -->
         <div class="button-container">
             <button>작성</button>
-            <button class="delete">삭제</button>
         </div>
     </div>
+    <script>
+    // 페이징 / 검색
+    $(document).ready(function() {
+      $('#myEvaluList').DataTable({
+        pageLength: 10,
+        lengthChange: false,
+        ordering: true,
+        language: {
+          search: "검색:",
+          lengthMenu: "_MENU_ 개씩 보기",
+          info: "총 _TOTAL_건 중 _START_ ~ _END_",
+          paginate: {
+            previous: "이전",
+            next: "다음"
+          },
+          zeroRecords: "일치하는 데이터가 없습니다."
+        }
+      });
+    });
+    </script>
 </body>
 </html>

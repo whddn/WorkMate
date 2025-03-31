@@ -14,5 +14,10 @@ public interface FinanceService {
 	
 	// 리포트 insert 기능
 	public int inputReportPage(ReportVO reportVO);
-
+	
+	// 리포트 수정 기능
+	public int modifyReportPage(ReportVO reportVO);
+	
+	// 법인카드 등록
+	public void inputCorCard(CorcardVO card) throws Exception;
 }

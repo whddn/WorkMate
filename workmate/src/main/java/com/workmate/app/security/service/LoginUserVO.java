@@ -23,7 +23,7 @@ public class LoginUserVO implements UserDetails{
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> auths = new ArrayList<>();
 		auths.add(new SimpleGrantedAuthority(userVO.getTeamNo()));
-		auths.add(new SimpleGrantedAuthority(userVO.getUserPosition()));
+		//auths.add(new SimpleGrantedAuthority(userVO.getUserPosition()));
 		
 		if ("관리자".equals(userVO.getUserPosition())) {
 	        auths.add(new SimpleGrantedAuthority("ROLE_ADMIN"));

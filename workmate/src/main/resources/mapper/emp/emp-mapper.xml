@@ -2,16 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.employee.mapper.EmpMapper">
 	<!-- 사원 전체 조회 (조직도/사원이름/부서명) -->
-	<!-- <select id="selectAllName" resultType="EmpVO">
- 		SELECT u.user_name
- 				, u.user_no
-		        , d.department_name
-		FROM employee u 
-		JOIN  team t 
-		ON u.team_no = t.team_no
-		JOIN department d 
-		ON d.department_id = t.department_id 
-	</select> -->
+	<select id="selectAllEmpList" resultType="EmpVO">
+	  SELECT 
+	      USER_NO
+	      , USER_NAME
+	      , USER_MAIL
+	      , USER_PHONE
+	  FROM EMPLOYEE
+	  ORDER BY USER_NO
+	</select>
+	<!-- 이미 부서장으로 등록된 사원 조회 쿼리 -->
+	<select id="selectDepartmentHeadList" resultType="Integer">
+	    SELECT d.DEPARTMENT_HEAD
+	    FROM DEPARTMENT d
+	    WHERE d.DEPARTMENT_HEAD IS NOT NULL
+	</select>
+	
 	<!--/* 조직도의 사원 상세 조회 */-->
 	<select id="selectEmpById" resultType="EmpVO">
 		SELECT u.user_name
@@ -144,21 +150,8 @@
 		   ON i.EVALU_ITEM_NO = ef.EVALU_ITEM_NO
 		 JOIN EVALU_FORM f 
 		   ON f.EVALU_FORM_NO = ef.EVALU_FORM_NO
-		WHERE f.EVALU_FORM_NO = 1
+		WHERE f.EVALU_FORM_NO = #{evaluFormNo}
 	</select>
-	<!-- 진행할 평가 단건 (왜 있는 건지 모르겠음) -->
-	<!-- <select id="selectOneEvaluById" resultType="EvaluVO">
-				SELECT g.EVALU_GROUP_ID
-			        , ga.EVALUATEE_GROUP_ID
-			        , f.EVALU_FORM_NO
-				FROM EVALU_GROUP g
-				JOIN EVALU_FORM f
-				ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
-				JOIN EVALUATEE_GROUP ga
-				ON f.EVALU_FORM_NO = ga.EVALU_FORM_NO
-				WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-	</select> -->
-
 
 	<!-- 지난 평가 리스트 조회 (전체 출력 / 관리자) -->
 	<select id="selectBeforeEvaluList" resultType="EvaluVO">
@@ -196,10 +189,12 @@
 		    ON r.EVALU_NO = fm.EVALU_NO
 		JOIN EVALU_ITEM i 
 		    ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
-		WHERE r.EVALU_FORM_NO = #{evaluFormNo}           
+		WHERE r.EVALU_FORM_NO = #{evaluFormNo}     
+			  AND r.USER_NO = #{userNo}       
 		ORDER BY u.USER_NO, fm.ORDER_NO
+		
 	</select>
-	<!-- 평가 결과 단순 조회 (관리자, formNo, userNo 기반) -->
+	<!-- 평가 결과 단순 조회 - 목록 불러옴 (관리자, formNo 기반) -->
 		<select id="selectAdminBeforeEvaluById" resultType="EvaluVO">
 					SELECT    
 			      f.EVALU_FORM_NO,
@@ -238,8 +233,8 @@
 	</select>
 	
 	<!-- 관리자 단건 조회 - 개인에 대한 결과 쿼리문 -->
-	<select id="selectAdminBeforeUserEvaluById" resultType="EvaluVO">
-					SELECT    
+	<select id="selectAdminBeforeUserEvaluById"  parameterType="EvaluVO" resultType="EvaluVO">
+			 SELECT    
 			      f.EVALU_FORM_NO,
 			      f.EVALU_NAME,              
 			      f.EVALU_START,               
@@ -258,7 +253,15 @@
 				        JOIN EVALU_FORMAT fm2 ON r2.EVALU_NO = fm2.EVALU_NO
 				        WHERE fm2.EVALU_ITEM_NO = i.EVALU_ITEM_NO
 				          AND r2.EVALU_FORM_NO = f.EVALU_FORM_NO
-				      ) AS avgScore
+				      ) AS avgScore,
+				          -- 전체 평균 점수 (다른 사람 포함)
+				    (
+				        SELECT AVG(r3.EVALU_SCORE)
+				        FROM EVALU_RESULT r3
+				        JOIN EVALU_FORMAT fm3 ON r3.EVALU_NO = fm3.EVALU_NO
+				        WHERE fm3.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+				          AND r3.EVALU_FORM_NO = f.EVALU_FORM_NO
+				    ) AS otherAvgScore
 				FROM EVALU_FORM f              
 				JOIN EVALUATEE_GROUP g ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
 				JOIN EMPLOYEE u ON g.USER_NO = u.USER_NO        
@@ -309,6 +312,7 @@
 		ORDER BY u.USER_NO, fm.ORDER_NO
 	</select>
 
+	
 		<!-- 내가 평가한 평가 리스트 (전체 조회) -->
 	<select id="selectMyEvaluList" resultMap="formEmpMyList">
  			SELECT DISTINCT f.EVALU_NAME
@@ -399,8 +403,7 @@
 		<selectKey keyProperty="evaluFormNo"
 			   resultType="Integer"
 			   order="BEFORE">
-		 	SELECT MAX(EVALU_FORM_NO) + 1
-       		FROM EVALU_FORM
+		 	SELECT EVALU_FORM_NO_SEQ.NEXTVAL FROM DUAL
 		</selectKey>
 		INSERT INTO EVALU_FORM
 					(EVALU_FORM_NO
@@ -409,7 +412,7 @@
 		            , EVALU_START
 		            , EVALU_END
 		            , USAGE_STATUS)
-		VALUES 	(EVALU_FORM_NO_SEQ.NEXTVAL
+		VALUES 	(#{evaluFormNo}
 		            , #{evaluName}
 		            , SYSDATE
 		            , #{evaluStart}
@@ -486,10 +489,11 @@
 		       , #{userNo} )
 	</insert>
 	
-	<!-- 평가 제출 후 평가 상태 '평가 완료' 로 수정하는 쿼리문 -->
+	<!-- 평가 제출 후 평가 상태 '제출 완료' 로 수정하는 쿼리문 -->
 	<update id="updateEvaluStatus" parameterType="EvaluVO">
 		UPDATE EVALU_FORM 
-		SET USAGE_STATUS = '평가 완료'
+		SET USAGE_STATUS = '제출 완료'
+		WHERE EVALU_FORM_NO = #{evaluFormNo}
 	</update>
 	<!-- 평가 상태 조회 쿼리 -->
 	<select id="getEvaluStatus" resultType="String" parameterType="int">
@@ -547,46 +551,120 @@
 	
 	<!-- 내가 평가 받은 평가 단건 조회 -->
 	<select id="selectMyEvaluScoreResultById" resultType="EvaluVO">
-			SELECT 
-			    u.USER_NO,
-			    u.USER_NAME,
-			    i.EVALU_COMPET,
-			    i.EVALU_CONTENT,
-			    d.DEPARTMENT_NAME,
-			    t.TEAM_NAME,
-			    f.EVALU_NAME,
-			    ROUND(AVG(r.EVALU_SCORE), 1) AS avgScore,  -- 내 평균 점수
-			    (SELECT ROUND(AVG(r2.EVALU_SCORE), 1) 
-			     FROM EVALU_RESULT r2
-			     JOIN EVALUATEE_GROUP g2 ON r2.EVALUATEE_GROUP_ID = g2.EVALUATEE_GROUP_ID
-			     WHERE g2.EVALU_FORM_NO = #{evaluFormNo} 
-			       AND g2.USER_NO != #{userNo}) AS otherAvgScore,  -- 다른 사원들의 평균 점수
-			    fm.ORDER_NO
-			FROM EVALU_FORM f
-			JOIN EVALUATEE_GROUP g ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
-			JOIN EMPLOYEE u ON g.USER_NO = u.USER_NO
-			JOIN EVALU_FORMAT fm ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO
-			JOIN EVALU_ITEM i ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO
-			JOIN EVALU_RESULT r ON r.EVALU_NO = fm.EVALU_NO 
-			                     AND r.EVALUATEE_GROUP_ID = g.EVALUATEE_GROUP_ID
-			JOIN TEAM t ON t.team_no = u.team_no
-			JOIN DEPARTMENT d ON d.department_id = t.department_id
-			WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-			  AND u.USER_NO = #{userNo}
-			GROUP BY 
-			    u.USER_NO,
-			    u.USER_NAME,
-			    i.EVALU_COMPET,
-			    i.EVALU_CONTENT,
-			    fm.ORDER_NO,
-			    d.DEPARTMENT_NAME,
-			    f.EVALU_NAME,
-			    t.TEAM_NAME
-			ORDER BY fm.ORDER_NO
-
+		SELECT 
+		    u.USER_NO,
+		    u.USER_NAME,
+		    i.EVALU_COMPET,
+		    i.EVALU_CONTENT,
+		    d.DEPARTMENT_NAME,
+		    t.TEAM_NAME,
+		    f.EVALU_NAME,
+		    ROUND(AVG(r.EVALU_SCORE), 1) AS avgScore,  -- 내 평균 점수
+		    (
+		        SELECT ROUND(AVG(r2.EVALU_SCORE), 1) 
+		        FROM EVALU_RESULT r2
+		        JOIN EVALUATEE_GROUP g2 ON r2.EVALUATEE_GROUP_ID = g2.EVALUATEE_GROUP_ID
+		        WHERE g2.EVALU_FORM_NO = #{evaluFormNo} 
+		          AND g2.USER_NO != #{userNo}
+		          AND r2.EVALU_NO = r.EVALU_NO
+		    ) AS otherAvgScore,  -- 다른 사람들의 평균 점수 (항목별)
+		    fm.ORDER_NO
+		FROM EVALU_FORM f
+		JOIN EVALUATEE_GROUP g ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
+		JOIN EMPLOYEE u ON g.USER_NO = u.USER_NO
+		JOIN EVALU_FORMAT fm ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO
+		JOIN EVALU_ITEM i ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO
+		JOIN EVALU_RESULT r ON r.EVALU_NO = fm.EVALU_NO 
+		                     AND r.EVALUATEE_GROUP_ID = g.EVALUATEE_GROUP_ID
+		JOIN TEAM t ON t.team_no = u.team_no
+		JOIN DEPARTMENT d ON d.department_id = t.department_id
+		WHERE f.EVALU_FORM_NO = #{evaluFormNo}
+		  AND u.USER_NO = #{userNo}
+		GROUP BY 
+		    u.USER_NO,
+		    u.USER_NAME,
+		    i.EVALU_COMPET,
+		    i.EVALU_CONTENT,
+		    fm.ORDER_NO,
+		    d.DEPARTMENT_NAME,
+		    f.EVALU_NAME,
+		    t.TEAM_NAME,
+		    r.EVALU_NO  <!-- 이 부분 반드시 포함 -->
+		ORDER BY fm.ORDER_NO
 	</select>
-	
 
 	
-
+	<!-- 부서 전체 -->
+	<select id="selectDepartmentList" resultType="DepartmentVO">
+		SELECT d.DEPARTMENT_ID 
+	        , u.USER_NAME
+	        , d.DEPARTMENT_NAME
+	        , t.TEAM_NAME
+		FROM DEPARTMENT d 
+		JOIN TEAM t
+		ON d.DEPARTMENT_ID = t.department_id
+		JOIN EMPLOYEE u
+		ON u.USER_NO = d.department_head
+		ORDER BY DEPARTMENT_ID 
+	</select>
+	<!-- 부서 단건 조회 -->
+	<select id="selectDepartmentById" resultType="DepartmentVO">
+		SELECT 
+	        d.DEPARTMENT_ID
+	        , d.DEPARTMENT_NAME
+	        , u.USER_NAME
+	        , u.USER_MAIL
+	        , u.USER_PHONE
+	        , d.DEPT_WORK
+	        , d.DEPT_LOCATION
+	        , d.BUDGET
+	        , t.TEAM_NAME
+        FROM DEPARTMENT d 
+		JOIN TEAM t
+		ON d.DEPARTMENT_ID = t.department_id
+		JOIN EMPLOYEE u
+		ON u.USER_NO = d.department_head
+		WHERE d.DEPARTMENT_ID = #{departmentId}
+		ORDER BY d.DEPARTMENT_ID
+	</select>
+	<!-- 부서 등록 -->
+	<insert id="insertNewDepartment" parameterType="DepartmentVO">
+	  <selectKey keyProperty="departmentId" resultType="String" order="BEFORE">
+	    SELECT 'D' || LPAD(DEPT_SEQ.NEXTVAL, 3, '0') FROM DUAL
+	  </selectKey>
+	
+	  INSERT INTO DEPARTMENT (
+	    DEPARTMENT_ID,
+	    DEPARTMENT_NAME,
+	    DEPARTMENT_HEAD,
+	    DEPT_WORK,
+	    DEPT_LOCATION,
+	    BUDGET
+	  )
+	  VALUES (
+	    #{departmentId},
+	    #{departmentName},
+	    #{departmentHead},
+	    #{deptWork},
+	    #{deptLocation},
+	    #{budget}
+	  )
+	</insert>
+	<!-- 팀 등록 -->
+	<insert id="insertNewTeam" parameterType="TeamVO">
+  <selectKey keyProperty="teamNo" resultType="String" order="BEFORE">
+    SELECT 'T' || LPAD(TEAM_SEQ.NEXTVAL, 3, '0') FROM DUAL
+  </selectKey>
+	
+	  INSERT INTO TEAM (
+	    TEAM_NO,
+	    TEAM_NAME,
+	    DEPARTMENT_ID
+	  ) VALUES (
+	    #{teamNo},
+	    #{teamName},
+	    #{departmentId}
+	  )
+</insert>
+	<!-- 부서 수정 -->
 </mapper>

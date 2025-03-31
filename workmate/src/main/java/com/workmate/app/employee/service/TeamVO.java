@@ -11,4 +11,5 @@ public class TeamVO {
 	private int leaderNo;			// 팀장 번호 (사원번호)
 	private String teamPermission; 	// 팀 권한 
 	List<EmpVO> empList;
+	private String departmentId;
 }

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html 
-	xmlns:th="https://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/contracts_layout}"
-	layout:fragment="content">
-
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/contracts_layout}"
+      layout:fragment="content">
 <head>
-	<meta charset="UTF-8">
-	<title>전자 계약 양식</title>
-	<style>
-	  /* 가운데 정렬 */
+  <meta charset="UTF-8">
+  <title>전자 계약</title>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+  <style>
+    /* 가운데 정렬 */
   .dataTables_wrapper .dataTables_paginate {
     text-align: center !important;
     float: none !important;
@@ -21,6 +21,7 @@
     float: right;
     margin-bottom: 15px;
   }
+
   .dataTables_wrapper .dataTables_filter input {
     padding-left: 2.5rem;
     height: 40px;
@@ -30,53 +31,93 @@
     background: url("https://cdn-icons-png.flaticon.com/512/622/622669.png") no-repeat 10px center;
     background-size: 20px 20px;
   }
-  .btn { padding: 6px 12px; };
-	</style>
+.btn { padding: 6px 12px; };
+    
+  </style>
 </head>
-
 <body>
-	<h3>결재 양식</h3>
-	<span>
-		<select>
-			<option value="formName" selected>양식명</option>
-			<option value="dept">담당부서</option>
-			<option value="manager">담당자</option>
-		</select>
-	</span>
-	<h3>[[ ${formList} ]]</h3>
-	<table id="FormsTable" class="display">
-		<thead>
-			<tr>
-				<th>NO</th>
-				<th>양식명</th>
-				<th>담당부서</th>
-				<th>담당자</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="form, sts : ${formList}">
-				<tr th:onclick="| location.href = '@{/contracts/write(apprType=${form.apprType})}' |">
-					<td>[[ ${sts.count} ]]</td>
-					<td>[[ ${form.formName} ]]</td>
-					<td>[[ ${form.departmentName} ]]</td>
-					<td>[[ ${form.userName} ]]</td>
-				</tr>
-			</th:block>
-		</tbody>
+<div class="container mt-4">
+  <h2>전자계약 등록</h2>
+  
+	  <table id="Table" class="display">
+	  <br>
+	  <thead>
+	    <tr>
+	      <th>계약번호</th>
+	      <th>계약명</th>
+	      <th>등록일</th>
+	      <th>비고</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <tr>
+	      <td>WM-250330-001</td>
+	      <td><a th:href="@{'/contracts/view/standard'}">표준근로계약서</a></td>
+	      <td>2025-01-01</td>
+	      <td>전자서명으로 계약가능</td>
+	    </tr>
+	    <tr>
+	      <td>WM-250401-002</td>
+	      <td><a th:href="@{'/contracts/view/trade'}">거래처 계약서</td>
+	      <td>2025-02-25</td>
+	      <td>최근 거래처 불러오기</td>
+	    </tr>
+	  </tbody>
 	</table>
-</body>
+</div>
 
 <script>
-	$(document).ready(function() {
-		$('#FormsTable').DataTable({
-			"language": {
-				"search": "검색:",
-				"lengthMenu":"",
-				"infoEmpty":"",
-				"infoFiltered": "(전체 _MAX_ 개 중 검색결과)",
-			}
-		});
-	});
-</script>
+  $(document).ready(function() {
+    $('#Table').DataTable({
+    	"pageLength": 5,
+    	
+      "language": {
+        "search": "검색:",
+        "lengthMenu": " ",
+        "info": " ",
+        "infoEmpty": "",
+        "zeroRecords": "일치하는 데이터가 없습니다.",
+        "infoFiltered": "(전체 _MAX_ 개 중 검색결과)",
+        "paginate": {
+          "next": "다음",
+          "previous": "이전"
+        }
+      }
+    });
+  });
+  
+  function openModal(contrNo) {
+	  fetch('/contracts/modal/' + contrNo)
+	    .then(res => res.text())
+	    .then(html => {
+	      const container = document.getElementById('contractModalContainer');
+	      container.innerHTML = html;
 
+	      // ✨ DOM 반영 후 모달 요소 탐색 & 실행
+	      setTimeout(() => {
+	        const modalEl = document.querySelector('.modal'); // 혹은 #standardContractModal
+	        if (!modalEl) {
+	          alert("모달 요소를 찾을 수 없습니다.");
+	          return;
+	        }
+
+	        const modal = new bootstrap.Modal(modalEl);
+	        modal.show();
+	      }, 10);
+	    })
+	    .catch(error => {
+	      console.error('오류 발생:', error);
+	      alert('계약서 로딩에 실패했습니다.');
+	    });
+	}
+
+
+
+
+	function closeModal() {
+	  document.getElementById('contractModal').style.display = 'none';
+	}
+  
+</script>
+</body>
 </html>

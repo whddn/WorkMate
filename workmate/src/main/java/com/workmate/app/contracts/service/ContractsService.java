@@ -15,8 +15,6 @@ public interface ContractsService {
 	// 수정
 	public int modifyContracts(ContractsVO contractsVO);
 	// 삭제
-	public Map<String, Object>dropContracts(String contrNo);
+	public int dropContracts(String contrNo);
 	
-	//전자계약 폼 전체조회
-	public List<ApprFormVO> findFormList();
 }

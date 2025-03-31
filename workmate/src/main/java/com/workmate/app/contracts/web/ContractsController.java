@@ -1,39 +1,42 @@
 package com.workmate.app.contracts.web;
 
+import java.util.Base64;
 import java.util.List;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.common.WhoAmI;
 import com.workmate.app.contracts.service.ContractsService;
 import com.workmate.app.contracts.service.ContractsVO;
 import com.workmate.app.employee.service.EmpService;
-import com.workmate.app.employee.service.EmpVO;
-import com.workmate.app.security.service.LoginUserVO;
+
 import lombok.RequiredArgsConstructor;
 
 /**
- * 전자 계약 페이지
+ * 전자계약 페이지
  * 
  * @author 이종우
- * @since 2025-03-20
+ * @since 2025-03-28
  * 
  * <pre>
  * 수정일자	수정자	수정내용
- * -------------------------
- * 03-20	이종우	계약페이지 생성
- * 03-27	이종우	계약폼 불러오기
- * 03-28  이종우 전자계약 목록
+ * ----------------------
+ * 03-28	이종우	전자계약 목록
+ * 03-30	이종우	전자계약 등록, 조회
  * 
  * </pre>
  */
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/contracts")
 public class ContractsController {
 
 	private final ContractsService contractsService;
@@ -42,45 +45,66 @@ public class ContractsController {
 	private final WhoAmI whoAmI;
 
 	/**
-	 * 전자계약 폼 불러옴
-	 * @param model
-	 * @param approvalVO, contractsVO
-	 * @param standard
-	 * @return 전자계약 페이지
+	 * 전자계약 양식 리스트 페이지 (표 테이블로 나옴)
 	 */
-	
-	// 결재 신청하려 할때 결재 양식 목록 불러옴
-	@GetMapping("contracts/form")
+	@GetMapping("/form")
 	public String getFormList(Model model) {
-		model.addAttribute("formList", contractsService.findFormList());
-		System.out.print("The result is : ");
-		System.out.println(contractsService.findFormList());
-		return "contracts/contractsForm";
+		model.addAttribute("formList", contractsService.findContractsList());
+		return "contracts/contractsForm"; // 리스트 페이지
 	}
+
+	@GetMapping("/view/{contrNo}")
+	public String viewContractPage(@PathVariable String contrNo) {
+	    switch (contrNo) {
+	        case "standard":
+	            return "forms/contracts/Standard_Contract_Form"; // 전체 페이지
+	        case "trade":
+	            return "forms/contracts/Trade_Contract_Form";    // 전체 페이지
+	        default:
+	            return "error/404";
+	    }
+	}
+
 	
-	// 전자계약 조회
-	@GetMapping("contracts/main")
+	@GetMapping("/test")
+	public String testView() {
+	    return "forms/contracts/Standard_Contract_Form";
+	}
+
+	
+	@PostMapping("/submit")
+	public String submitContract(@ModelAttribute ContractsVO contract, Model model) {
+
+	    // Base64 서명 이미지 디코딩 처리
+	    if (contract.getSignImageBase64() != null && contract.getSignImageBase64().startsWith("data:image")) {
+	        try {
+	            String base64 = contract.getSignImageBase64().split(",")[1];
+	            byte[] decodedImage = Base64.getDecoder().decode(base64);
+	            contract.setSignImage(decodedImage);
+	        } catch (IllegalArgumentException e) {
+	            model.addAttribute("error", "서명 이미지 처리 중 오류가 발생했습니다.");
+	            return "error/500";
+	        }
+	    }
+
+	    // 계약 등록 처리
+	    int result = contractsService.inputContracts(contract);
+
+	    if (result > 0) {
+	        return "redirect:/contracts/main"; // 등록 후 목록으로 이동
+	    } else {
+	        model.addAttribute("error", "계약서 등록에 실패했습니다.");
+	        return "error/500";
+	    }
+	}
+
+	/**
+	 * 전자계약 메인 리스트
+	 */
+	@GetMapping("/main")
 	public String contractsList(Model model) {
 		List<ContractsVO> list = contractsService.findContractsList();
 		model.addAttribute("contr", list);
 		return "contracts/contractsList";
 	}
-
-	// 전자계약 템플릿 양식 불러오기
-	 @GetMapping("contracts/forms/{type}")
-	    public String loadContractForm(@PathVariable String type) {
-	        switch (type) {
-	            case "standard":
-	                return "forms/contracts/Standard_Contract_Form";
-	            case "trade":
-	                return "forms/contracts/Trade_Contract_Form";
-	            case "electronic":
-	                return "forms/contracts/Electronic_Contract_Form";
-	            default:
-	                return "error/404"; // 예외 처리도 가능
-	        }
-	    }
-	
-	 
-	
 }

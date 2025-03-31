@@ -1,7 +1,10 @@
 package com.workmate.app.finance.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -9,8 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.workmate.app.finance.service.CorcardVO;
 import com.workmate.app.finance.service.FinanceService;
 import com.workmate.app.finance.service.ReportVO;
 import com.workmate.app.security.service.LoginUserVO;
@@ -60,19 +66,82 @@ public class FinanceController {
 		return "finance/reportInsert";
 	}
 	
-	// 입출금 보고서 등록
+	// 리포트 등록 AJAX 
 	@PostMapping("finance/reportInsert")
-	public ResponseEntity<ReportVO> ReportInsertAjax(@RequestBody ReportVO reportVO) {
-		financeService.inputReportPage(reportVO);
-		return ResponseEntity.ok().build();
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> ReportInsertAjax(@RequestBody ReportVO reportVO) {
+	    financeService.inputReportPage(reportVO);
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("success", true);
+
+	    return ResponseEntity.ok(result); // JSON 리턴!
 	}
 	
-	
+	// 리포트 수정 페이지
+	@GetMapping("finance/reportUpdate/{reportNo}")
+	public String ReportUpdatePage(ReportVO reportVO, @PathVariable int reportNo,
+								   Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+		
+		List<ReportVO> reportList = financeService.findTransList(reportVO); // 리포트 조회 쿼리문
+		
+	    System.out.println("📌 수정된 리포트 제목: " + reportVO.getReportTitle());
+		int userNo = loginUser.getUserVO().getUserNo();
+		String userName = loginUser.getUserVO().getUserName();
+		String teamName = loginUser.getUserVO().getTeamName();
+		String teamNo = loginUser.getUserVO().getTeamNo();
+		String userPosition = loginUser.getUserVO().getUserPosition();
+		
 
+		model.addAttribute("report", reportList);
+		model.addAttribute("userNo", userNo);
+		model.addAttribute("userName", userName);
+		model.addAttribute("teamName", teamName);
+		model.addAttribute("teamNo", teamNo);
+		model.addAttribute("position", userPosition);
+		
+		return "finance/reportUpdate";
+	}
+	
+	// 리포트 수정 AJAX
+	@PutMapping("finance/reportUpdate/{reportNo}")
+	@ResponseBody
+	public ResponseEntity <Map<String, Object>> ReportUpdateAjax(@RequestBody  ReportVO reportVO) {
+		financeService.modifyReportPage(reportVO); 	// 수정 쿼리문
+		 Map<String, Object> result = new HashMap<>();
+		    result.put("success", true);
+		    return ResponseEntity.ok(result); // JSON 리턴!
+	}
+	
 	
 	// 법인카드 전체 조회 페이지 
 	@GetMapping("finance/corcardList")
 	public String CorcardListPage(ReportVO reportVO) {
 		return "finance/corcard"; 
 	}
+	
+	
+	// 법인카드 등록
+	@GetMapping("finance/newCard")
+	public String CorcardInsertPage() {
+		return "finance/newCard"; 
+	}
+	
+		 
+	 // 법인카드 등록
+	@PostMapping("/finance/newCard")
+	public ResponseEntity<?> register(@RequestBody CorcardVO card) {
+	    System.out.println("월한도: " + card.getMLimit());  // mLimit 값 출력
+	    System.out.println("일한도: " + card.getDLimit());  // dLimit 값 출력
+	    
+	    try {
+	        financeService.inputCorCard(card);
+	        return ResponseEntity.ok("법인카드 등록 완료");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("등록 실패: " + e.getMessage());
+	    }
+	}
+
+	
 }

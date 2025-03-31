@@ -2,6 +2,7 @@ package com.workmate.app.finance.mapper;
 
 import java.util.List;
 
+import com.workmate.app.finance.service.CorcardVO;
 import com.workmate.app.finance.service.ReportVO;
 
 public interface FinanceMapper {
@@ -20,11 +21,17 @@ public interface FinanceMapper {
 	// 입출금 보고서의 거래 내역 insert 기능
 	public int insertReportTransOne(ReportVO reportVO);
 	
+	// 입출금 보고서 수정 기능 (Report 테이블)
+	public int updateReportOne(ReportVO reportVO);
+	
+	// 거래 내역 수정 기능 (TransHistory 테이블)
+	public int updateTransHistory(ReportVO reportVO);
+	
 	// 법인 카드 전체 조회 (관리자만 가능)
 	public List<ReportVO> selectCorCardList(ReportVO reportVO);
 	
 	// 법인 카드 등록 
-	public int insertCorCardInfo(ReportVO reportVO);
+	public void insertCorCard(CorcardVO card);
 	
 	// 법인 카드 상세 조회 
 	public List<ReportVO> selectCorCardById(ReportVO reportVO);

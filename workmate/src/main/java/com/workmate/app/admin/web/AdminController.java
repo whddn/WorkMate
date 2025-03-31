@@ -7,7 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +33,9 @@ import com.workmate.app.admin.service.AdminService;
 import com.workmate.app.approval.service.ApprFormService;
 import com.workmate.app.approval.service.ApprFormVO;
 import com.workmate.app.common.FileHandler;
+import com.workmate.app.employee.service.DepartmentVO;
+import com.workmate.app.employee.service.EmpVO;
+import com.workmate.app.employee.service.TeamVO;
 import com.workmate.app.reservation.service.CommonItemVO;
 
 import lombok.RequiredArgsConstructor;
@@ -46,6 +52,7 @@ import lombok.RequiredArgsConstructor;
  * 03-19	이종우	사진/날짜 추가
  * 03-25	이지응	결재문서 양식 조작기능 추가
  * 03-27	이종우	관리자만 사용 권한 추가
+ * 03-29	박혜원	부서 관리 기능 구현
  * </pre>
  */
 
@@ -111,6 +118,7 @@ public class AdminController {
 			commonItemVO.setImage(subDir + uniqueFileName); // DB에 저장될 경로
 			adminService.inputCommonItem(commonItemVO);
 		} catch (IOException e) {
+			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("errorMessage", "🚨 파일 저장 중 오류 발생!");
 			return "redirect:commonItemList";
 		}
@@ -197,7 +205,58 @@ public class AdminController {
 	}
 
 	// 부서관리
+	// 1) 부서 조회
+	@GetMapping("admin/deptList")
+	public String getAdminDeptList(DepartmentVO deptVO, Model model) {
+		model.addAttribute("dept", adminService.findDeptList(deptVO));
+		return "admin/deptList";
+	}
+	
+	// 2) 부서 단건 조회
+	@GetMapping("admin/deptInfo/{dpNo}")
+	public String getAdminDeptById(DepartmentVO deptVO, Model model, @PathVariable String dpNo) {
+		deptVO.setDepartmentId(dpNo);
+		model.addAttribute("dept", adminService.findDeptById(deptVO));
+		return "admin/deptInfo";
+	}
+	
+	// 3) 부서 등록 페이지
+	@GetMapping("admin/deptInsert")
+	public String getAdminNewDepartPage(DepartmentVO deptVO, Model model) {
+		EmpVO empVO = new EmpVO();
+	    List<EmpVO> empList = adminService.findAllEmployees(empVO); // 사원 목록
+	    List<Integer> existingHeads = adminService.findCurrentHeads(); 
+	    model.addAttribute("headList", existingHeads); // 부서장 목록
+	    model.addAttribute("empList", empList);                // → select용
+	    
+		return "admin/newDept";
+	}
+	
+	// ✅ [1] 부서장 중복 확인 Controller (AJAX)
+	@GetMapping("/admin/checkHead/{userNo}")
+	@ResponseBody
+	public boolean checkIfAlreadyHead(@PathVariable int userNo) {
+	    List<Integer> headList = adminService.findCurrentHeads(); // 기존 부서장 리스트
+	    return headList.contains(userNo); // 포함 여부 반환
+	}
 
+	// ✅ [2] 부서 등록 Controller (AJAX)
+	@PostMapping("/admin/deptInsert")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> insertNewDept(@RequestBody DepartmentVO deptVO, TeamVO teamVO) {
+	    Map<String, Object> result = new HashMap<>();
+
+	    try {
+	        int insertResult = adminService.inputNewDeptAndTeam(deptVO, teamVO);
+	        result.put("success", insertResult > 0);
+	    } catch (Exception e) {
+	        result.put("success", false);
+	        result.put("message", e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(result);
+	}
+	
 	// 결재문서 리스트 보기/삭제 페이지
 	@GetMapping("admin/apprFormList")
 	public String getAdminApprFormList(Model model) {

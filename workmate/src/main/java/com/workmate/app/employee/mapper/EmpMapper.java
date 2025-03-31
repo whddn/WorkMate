@@ -5,8 +5,11 @@ import java.util.List;
 import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
+import com.workmate.app.employee.service.TeamVO;
 
 public interface EmpMapper {
+	// 사원 전헤
+	public List<EmpVO> selectAllEmpList(EmpVO empVO);
 	// 단건 조회 
 	public EmpVO selectEmpById(EmpVO empVO);
 
@@ -90,4 +93,24 @@ public interface EmpMapper {
 	// 피평가자 그룹 ID 조회
 	int selectEvaluateeGroupId(EvaluVO evaluVO);
 	
+	// 부서 조회
+	public List<DepartmentVO> selectDepartmentList(DepartmentVO deptVO);
+	
+	// 부서 단건 조회
+	public DepartmentVO selectDepartmentById(DepartmentVO deptVO);
+	
+	// 팀 등록
+	public int insertNewTeam(TeamVO teamVO);
+	
+	// 부서 등록 
+	public int insertNewDepartment(DepartmentVO deptVO);
+	
+	// 부서 수정
+	public int updateDepartment(DepartmentVO deptVO);
+	
+	// 부서장 
+	public List<Integer> selectDepartmentHeadList();
+	
+	// 제출한 평가 (나 : 평가자) 수정
+	public int updateSubmitEvalu(EvaluVO evaluVO);
 }

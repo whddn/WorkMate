@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layouts/finance_layout}" layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>법인카드 등록</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+
+        input, select {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #fcfcfc;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        button {
+            grid-column: span 2;
+            margin-top: 30px;
+            padding: 14px;
+            background-color: #3498db;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>법인카드 등록</h2>
+    <form id="corpCardForm" class="form-grid">
+        <div class="form-group">
+            <label>카드번호</label>
+            <input type="text" name="corcardNum" required>
+        </div>
+        <div class="form-group">
+            <label>카드 소유자 사번</label>
+            <input type="number" name="ownerNo" required>
+        </div>
+
+        <div class="form-group">
+            <label>발급일</label>
+            <input type="date" name="corcardStart" required>
+        </div>
+        <div class="form-group">
+            <label>만료일</label>
+            <input type="date" name="corcardEnd" required>
+        </div>
+
+        <div class="form-group">
+            <label>카드사</label>
+            <input type="text" name="corcardComp" required>
+        </div>
+        <div class="form-group">
+            <label>카드 상태</label>
+            <select name="corcardStatus" required>
+                <option value="사용중">사용중</option>
+                <option value="정지">정지</option>
+                <option value="만료">만료</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>은행명</label>
+            <input type="text" name="bankName" required>
+        </div>
+        <div class="form-group">
+            <label>월 한도</label>
+            <input type="number" name="mLimit" required>
+        </div>
+
+        <div class="form-group">
+            <label>일일 한도</label>
+            <input type="number" name="dLimit" required>
+        </div>
+        <div class="form-group">
+            <label>등록한 사용자 사번</label>
+            <input type="number" name="userNo" required>
+        </div>
+
+        <button type="submit">법인카드 등록</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('corpCardForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const jsonData = {};
+
+
+
+        formData.forEach((value, key) => {
+        
+            if (key === "mLimit" || key === "dLimit" || key === "ownerNo" || key === "userNo") {
+		        jsonData[key] = Number(value); 
+		    } else {
+		        jsonData[key] = value;
+   			}
+        });
+
+        fetch('/workmate/finance/newCard', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+
+        })
+            .then(response => response.text())
+            .then(result => {
+                this.reset();
+                console.log("보내는 데이터:", jsonData);
+            })
+            .catch(error => {
+                alert('등록 실패: ' + error);
+            });
+    });
+</script>
+</body>
+</html>

@@ -1,25 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.workmate.app.contracts.mapper.ContractsMapper">
-	
-	<!-- 결재 폼 전체조회 -->
-	<select id="selectApprFormList" resultType="ApprFormVO">
-		SELECT appr_type
-		    , form_name
-		    , form_path
-		    , appr_form.contact_no
-		    , user_name
-		    , department_name
-		    , upload_date
-		FROM appr_form
-		    JOIN employee
-		    ON appr_form.contact_no=employee.user_no
-		    LEFT JOIN team
-		    ON employee.team_no=team.team_no
-		    LEFT JOIN department
-		    ON team.department_id=department.department_id
-		WHERE form_name like '%계약%'
-	</select>
 	<!-- 전체조회 -->
 	<select id="selectContractsList" resultType="ContractsVO">
 		select vend_code
@@ -35,18 +16,87 @@
 	      ,sign_date_B
 	      ,contr_start
 	      ,contr_end
+	      ,sign_image
+	      ,sign_image_base64
+	      ,cntr_location
+	      ,cntr_money
 		from contracts
 		order by vend_code
 	</select>
 	
 	<!-- 단건 -->
 	<select id="selectContractsById" resultType="ContractsVO" parameterType="ContractsVO">
-	
+		select vend_code
+	      ,contr_no
+	      ,contr_title
+	      ,contr_content
+	      ,contr_type
+	      ,create_date
+	      ,contr_status
+	      ,contr_A
+	      ,contr_B
+	      ,sign_date_A
+	      ,sign_date_B
+	      ,contr_start
+	      ,contr_end
+	      ,sign_image
+	      ,sign_image_base64
+	      ,cntr_location
+	      ,cntr_money
+		from contracts
+		order by vend_code=#{vendCode}
 	</select>
 	
 	<!-- 등록 -->
-	
+	<insert id="insertContracts" parameterType="ContractsVO">
+		<selectKey keyProperty="contrNo" resultType="String" order="BEFORE">
+			<!-- keyProperty는 결과를 담을 필드/변수를 뜻한다 -->
+			SELECT contr_no_seq.NEXTVAL
+			FROM dual
+		</selectKey>
+			INSERT INTO contracts(
+		      contr_no
+		      ,vend_code
+		      ,contr_title
+		      ,contr_content
+		      ,contr_type
+		      ,create_date
+		      ,contr_status
+		      ,contr_A
+		      ,contr_B
+		      ,sign_date_A
+		      ,sign_date_B
+		      ,contr_start
+		      ,contr_end
+		      ,SIGN_IMAGE
+		      ,cntr_location
+		      ,cntr_money
+				)
+			VALUES (
+			  #{contrNo}
+		      ,#{vendCode}
+		      ,#{contrTitle}
+		      ,#{contrContent}
+		      ,#{contrType}
+		      ,#{createDate}
+		      ,#{contrStatus}
+		      ,#{contrA}
+		      ,#{contrB}
+		      ,#{signDateA}
+		      ,#{signDateB}
+		      ,#{contrStart}
+		      ,#{contrEnd}
+		      ,#{signImage, jdbcType=BLOB}
+		      ,#{cntrLocation}
+		      ,#{cntrMoney}
+			)
+	</insert>
 	<!-- 수정 -->
+	
+	<!-- 조회 시 -->
+	<resultMap id="contractsMap" type="ContractsVO">
+	  <result property="signImage" column="SIGN_IMAGE" jdbcType="BLOB"/>
+	</resultMap>
 	
 	<!-- 삭제 -->
 	

@@ -5,9 +5,6 @@ import com.workmate.app.approval.service.ApprFormVO;
 import com.workmate.app.contracts.service.ContractsVO;
 
 public interface ContractsMapper {
-	// 결재 폼 전체 조회
-	public List<ApprFormVO> selectApprFormList();
-	
 	// 전자계약 전체조회
 	public List<ContractsVO> selectContractsList();
 	// 단건조회
