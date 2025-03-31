@@ -13,6 +13,7 @@ public class ModelAttributeAdvice {
     public void addCommonAttributes(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
         if (loginUser != null && loginUser.getUserVO() != null) {
             model.addAttribute("userId", loginUser.getUserVO().getUserId());
+            model.addAttribute("userName", loginUser.getUserVO().getUserName());
             model.addAttribute("teamNo", loginUser.getUserVO().getTeamNo());
         }
     }

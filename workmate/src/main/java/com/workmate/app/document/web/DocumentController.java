@@ -38,7 +38,20 @@ import com.workmate.app.document.service.DocumentService;
 import com.workmate.app.security.service.LoginUserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
-
+/**
+ * 자료실
+ * @author 박지희
+ * @since 2025-03-10
+ * <pre>
+ * <pre>
+ * * 수정일자           수정자          수정일자
+ * ------------------------------------------
+ * 
+ * 
+ * 
+ * </pre>
+ * 
+ */
 @RequestMapping("/document")
 @Controller
 public class DocumentController {
@@ -55,7 +68,12 @@ public class DocumentController {
 	private String uploadDir;
 
 	private String subDir ="document/";
-	
+	/**
+	 * 자료실 전체 조회
+	 * @param model
+	 * @param loginUser
+	 * @return 전자 자료실 조회
+	 */
 	//자료실 전체 조회
 	@GetMapping("/list")
 	public String documentList(Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
@@ -81,7 +99,12 @@ public class DocumentController {
 		return "document/list";
 	}
 	
-	//자료실 이력 전체조회
+	/**
+	 * 자료실 다운로드 이력 전체조회
+	 * @param model
+	 * @param docVO
+	 * @return
+	 */	
 	@GetMapping("/downloadHistory")
 	public String downhistoryList(Model model, DocVO docVO) {
 				
@@ -92,7 +115,7 @@ public class DocumentController {
 		
 	}
 	
-	//파일사이즈
+	//파일사이즈 입력
 	private String formatSize(long size) {
 		  if (size >= 1024 * 1024) {
 	            return String.format("%.2f MB", size / (1024.0 * 1024.0));
@@ -103,7 +126,14 @@ public class DocumentController {
 	        }
 	}
 	
-	//자료 업로드	
+	/**
+	 * 자료실파일 업로드	
+	 * @param file
+	 * @param docVO
+	 * @param model
+	 * @param loginUser
+	 * @return 자료실 파일 추가
+	 */
 	@PostMapping("/upload")
 	public  ResponseEntity<String> uploadFileProcess(@RequestParam("uploadFile") MultipartFile file,
                                     DocVO docVO,
@@ -139,7 +169,15 @@ public class DocumentController {
 		
 	}
 	
-	//자료 첨부파일 다운로드
+	/**
+	 * 
+	 * 자료 첨부파일 다운로드
+	 * @param documentNo
+	 * @param loginUser
+	 * @param request
+	 * @return
+	 * @throws IOException
+	 */
 	@GetMapping("/download/{documentNo}")
 	public ResponseEntity<Resource> downloadDocument(@PathVariable int documentNo,
 											@AuthenticationPrincipal LoginUserVO loginUser,
@@ -190,7 +228,12 @@ public class DocumentController {
 		
 	}
 	
-	//자료 단건 삭제
+	/**
+	 * 자료파일 단건 삭제
+	 * @param documentNo
+	 * @param docVO
+	 * @return DB/파일 전체 삭제
+	 */	
 	@DeleteMapping("/delete/{documentNo}")
 	public ResponseEntity<String> documentDelete(@PathVariable Integer documentNo, DocVO docVO ) {
 	    try {
@@ -217,7 +260,5 @@ public class DocumentController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
 	    }
 	}
-	
-	//다운로드 이력 전체조회
-	
+		
 }
