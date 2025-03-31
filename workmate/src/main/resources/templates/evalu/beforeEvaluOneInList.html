@@ -159,24 +159,21 @@ button:hover {
 		</div>
 		<div class="con" id="resultArea" style="display:none">
 		<!-- 3. 평가항목 -->
-		
 		</div>
 
 	
 	<script>
 
 	
-		// 사원 전환하면 내용 바뀌게 
-		document.querySelector('#userSelect').addEventListener('change', e => {
+	document.querySelector('#userSelect').addEventListener('change', e => {
 	    const selectedOption = e.target.selectedOptions[0];
 	    const userNo = selectedOption.dataset.userno;
 	    const formNo = selectedOption.dataset.formno;
-	
-	
+
 	    console.log("userNo: ", userNo);
 	    console.log("formNo: ", formNo);
 	    if (!userNo) return;
-	
+
 	    fetch(`/workmate/emp/bfoneevalu/${formNo}/${userNo}`, {
 	        method: 'post',
 	        headers: {
@@ -186,81 +183,102 @@ button:hover {
 	    .then(res => res.text())
 	    .then(html => {
 	        const resultArea = document.querySelector('#resultArea');
-	        resultArea.style.display = 'block'; // 처음에 숨긴 부분을 보여줌
-	        resultArea.innerHTML = html;        // 결과 덮어쓰기
-			drawEvaluationGraph(data);
+	        resultArea.style.display = 'block';
+	        resultArea.innerHTML = html; // ✅ 먼저 삽입
+
+	        // ✅ 그리고 나서 JSON 파싱
+	        const scoreScript = resultArea.querySelector('#scoreData');
+	        if (scoreScript) {
+	            try {
+	                const jsonText = scoreScript.textContent.trim();
+	                const data = JSON.parse(jsonText);
+	                drawEvaluationGraph(data); // ✅ 차트 그리기
+	            } catch (err) {
+	                console.error("📛 JSON 파싱 실패:", err);
+	            }
+	        } else {
+	            console.warn("⚠️ scoreData 태그 못 찾음");
+	        }
 	    });
-	  });
+	});
 
 
-function drawEvaluationGraph(data) {
-    var labels = [];  // 평가 항목명
-    var scores = [];  // 해당 항목의 점수
+		function drawEvaluationGraph(data) {
+		    const labels = [];
+		    const myScores = [];
+		    const otherAvgScores = [];
 
-    // 서버에서 받은 데이터를 처리하여 레이더 차트에 사용할 데이터 형식으로 변환
-    data.forEach(function(item) {
-        labels.push(item.EVALU_COMPET);  // 평가 항목
-        scores.push(item.EVALU_SCORE);   // 점수
-    });
+		    data.forEach(item => {
+		        labels.push(item.evaluCompet);
+		        myScores.push(item.avgScore);
+		        otherAvgScores.push(item.otherAvgScore);
+		    });
 
-    var ctx = document.getElementById('evaluationChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'radar',  // 레이더 차트
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Evaluation Scores',
-                data: scores,
-                fill: true,
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                borderColor: 'rgba(0, 123, 255, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                r: {
-                    angleLines: {
-                        display: true
-                    },
-                    suggestedMin: 0,
-                    suggestedMax: 10
-                }
-            }
-        }
-    });
-}
+		    const ctx = document.getElementById('evaluationChart').getContext('2d');
+		    new Chart(ctx, {
+		        type: 'radar',
+		        data: {
+		            labels: labels,
+		            datasets: [
+		                {
+		                    label: '나의 평균 점수',
+		                    data: myScores,
+		                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+		                    borderColor: 'rgba(59, 130, 246, 1)',
+		                    borderWidth: 2
+		                },
+		                {
+		                    label: '전체 평균 점수',
+		                    data: otherAvgScores,
+		                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+		                    borderColor: 'rgba(75, 192, 192, 1)',
+		                    borderWidth: 2
+		                }
+		            ]
+		        },
+		        options: {
+		            scales: {
+		                r: {
+		                    suggestedMin: 0,
+		                    suggestedMax: 5
+		                }
+		            }
+		        }
+		    });
+		}
+
 
 	</script>
 	<script th:inline="javascript">
   /*<![CDATA[*/
-  // 평가 항목명
-// 평가 항목명 (evaluCompet가 null이 아닌 값만 배열로 반환)
-  [[${scores}]].forEach(function(item) {
+let scores = [[${scores}]];
+let labels = [];
+let myScores = [];
+let otherAvgScores = [];
+
+if (scores && scores.length > 0) {
+  scores.forEach(function(item) {
     if (item.evaluCompet != null) {
-      labels.push(item.evaluCompet);  // 평가 항목명
+      labels.push(item.evaluCompet);
     }
     if (item.avgScore != null) {
-      myScores.push(item.avgScore);   // 내 평균 점수
+      myScores.push(item.avgScore);
     }
     if (item.otherAvgScore != null) {
-      otherAvgScores.push(item.otherAvgScore);  // 다른 사원들의 평균 점수
+      otherAvgScores.push(item.otherAvgScore);
     }
-  });
-	
-	console.log('Labels:', labels);
-	console.log('My Scores:', myScores);
-	console.log('Other Avg Scores:', otherAvgScores);
-   // 차트 데이터 설정
+  }); 
+  
+
   const data = {
     labels: labels,
     datasets: [
       {
         label: '나의 평균 점수',
         data: myScores,
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',     // 블루 계열 투명 배경
-        borderColor: 'rgba(59, 130, 246, 1)',           // 선 색상
-        pointBackgroundColor: 'rgba(59, 130, 246, 1)',  // 점 색상
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        borderColor: 'rgba(59, 130, 246, 1)',
+        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
@@ -269,9 +287,9 @@ function drawEvaluationGraph(data) {
       {
         label: '전체 평균 점수',
         data: otherAvgScores,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',    // 초록 계열 투명 배경
-        borderColor: 'rgba(75, 192, 192, 1)',          // 선 색상
-        pointBackgroundColor: 'rgba(75, 192, 192, 1)', // 점 색상
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
@@ -280,12 +298,12 @@ function drawEvaluationGraph(data) {
     ]
   };
 
-  // 차트 설정
   const config = {
-    type: 'radar',  // 레이더 차트
+    type: 'radar',
     data: data,
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       aspectRatio: 3,
       scales: {
         r: {
@@ -328,9 +346,13 @@ function drawEvaluationGraph(data) {
     }
   };
 
-  // 차트 그리기
+  // ✅ config 정의된 후에만 실행됨
   new Chart(document.getElementById('evaluationChart'), config);
+}
+/*]]>*/
+
   /*]]>*/
 </script>
 </body>
+
 </html>

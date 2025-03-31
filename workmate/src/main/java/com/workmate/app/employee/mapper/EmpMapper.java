@@ -76,7 +76,7 @@ public interface EmpMapper {
 	public int insertEvaluScore(EvaluVO evaluVO);
 	
 	// 평가 완료 시 -> 평가 상태를 : 평가 완료로 
-	public int updateEvaluStatus(int formNo);
+	public int updateEvaluStatus(EvaluVO vo);
 	
 	// 평가 상태 조회 
 	public String getEvaluStatus(int formNo);
@@ -113,4 +113,10 @@ public interface EmpMapper {
 	
 	// 제출한 평가 (나 : 평가자) 수정
 	public int updateSubmitEvalu(EvaluVO evaluVO);
+	
+	// 내가 제출한 평가의 상태 확인
+	public String selectMyEvaluStatus(EvaluVO vo);
+	
+	// 평가 종료일이 지나면 평가 완료로 
+	public int updateStatusByEvaluEndDate();
 }

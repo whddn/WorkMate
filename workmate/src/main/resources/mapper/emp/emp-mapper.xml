@@ -173,30 +173,31 @@
 	</select>
 	<!--  내가 평가자로서 진행한 평가 항목 + 점수 단건 조회 (formNo, userNo 기준)-->
 	<select id="selectMyEvaluingById" resultType="EvaluVO">
-		SELECT 
-		    g.USER_NO  ,  
-		    u.USER_NAME ,     
-		    i.EVALU_COMPET,                   
-		    i.EVALU_CONTENT,                
-		    r.EVALU_SCORE AS evaluScore,                 
-		    fm.ORDER_NO                      
-		FROM EVALU_RESULT r
-		JOIN EVALUATEE_GROUP g 
-		    ON r.EVALUATEE_GROUP_ID = g.EVALUATEE_GROUP_ID
-		JOIN EMPLOYEE u 
-		    ON g.USER_NO = u.USER_NO
-		JOIN EVALU_FORMAT fm 
+		  SELECT 
+			    ee.USER_NO
+			    , ee.USER_NAME             
+			    , i.EVALU_COMPET                       
+			    , i.EVALU_CONTENT                      
+			    , r.EVALU_SCORE AS evaluScore         
+			    , fm.ORDER_NO                           
+		  FROM EVALU_RESULT r
+		  JOIN EVALU_GROUP eg 
+		    ON r.EVALU_GROUP_ID = eg.EVALU_GROUP_ID         
+		  JOIN EVALUATEE_GROUP eeg 
+		    ON r.EVALUATEE_GROUP_ID = eeg.EVALUATEE_GROUP_ID  
+		  JOIN EMPLOYEE ee 
+		    ON eeg.USER_NO = ee.USER_NO                        
+		  JOIN EVALU_FORMAT fm 
 		    ON r.EVALU_NO = fm.EVALU_NO
-		JOIN EVALU_ITEM i 
-		    ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
-		WHERE r.EVALU_FORM_NO = #{evaluFormNo}     
-			  AND r.USER_NO = #{userNo}       
-		ORDER BY u.USER_NO, fm.ORDER_NO
+		  JOIN EVALU_ITEM i ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+		  WHERE eg.USER_NO = #{userNo}                                        
+		    AND r.EVALU_FORM_NO = #{evaluFormNo}          
+		  ORDER BY ee.USER_NO, fm.ORDER_NO
 		
 	</select>
 	<!-- 평가 결과 단순 조회 - 목록 불러옴 (관리자, formNo 기반) -->
 		<select id="selectAdminBeforeEvaluById" resultType="EvaluVO">
-					SELECT    
+				SELECT    
 			      f.EVALU_FORM_NO,
 			      f.EVALU_NAME,              
 			      f.EVALU_START,               
@@ -234,48 +235,65 @@
 	
 	<!-- 관리자 단건 조회 - 개인에 대한 결과 쿼리문 -->
 	<select id="selectAdminBeforeUserEvaluById"  parameterType="EvaluVO" resultType="EvaluVO">
-			 SELECT    
-			      f.EVALU_FORM_NO,
-			      f.EVALU_NAME,              
-			      f.EVALU_START,               
-			      u.USER_NO,
-			      u.USER_NAME,          
-			      i.EVALU_COMPET,       
-			      i.EVALU_CONTENT,
-			      fm.ORDER_NO,
-			      d.DEPARTMENT_NAME,
-			      t.TEAM_NAME,
-			      fm.EVALU_NO,
-			      r.EVALU_SCORE,  
-				      (
-				        SELECT AVG(r2.EVALU_SCORE)
-				        FROM EVALU_RESULT r2
-				        JOIN EVALU_FORMAT fm2 ON r2.EVALU_NO = fm2.EVALU_NO
-				        WHERE fm2.EVALU_ITEM_NO = i.EVALU_ITEM_NO
-				          AND r2.EVALU_FORM_NO = f.EVALU_FORM_NO
-				      ) AS avgScore,
-				          -- 전체 평균 점수 (다른 사람 포함)
-				    (
-				        SELECT AVG(r3.EVALU_SCORE)
-				        FROM EVALU_RESULT r3
-				        JOIN EVALU_FORMAT fm3 ON r3.EVALU_NO = fm3.EVALU_NO
-				        WHERE fm3.EVALU_ITEM_NO = i.EVALU_ITEM_NO
-				          AND r3.EVALU_FORM_NO = f.EVALU_FORM_NO
-				    ) AS otherAvgScore
-				FROM EVALU_FORM f              
-				JOIN EVALUATEE_GROUP g ON f.EVALU_FORM_NO = g.EVALU_FORM_NO
-				JOIN EMPLOYEE u ON g.USER_NO = u.USER_NO        
-				JOIN EVALU_FORMAT fm ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO  
-				JOIN EVALU_ITEM i ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO 
-				JOIN TEAM t ON t.TEAM_NO = u.TEAM_NO
-				JOIN DEPARTMENT d ON t.DEPARTMENT_ID = d.DEPARTMENT_ID
-				JOIN EVALU_RESULT r ON r.EVALU_NO = fm.EVALU_NO
-				                    AND r.EVALU_FORM_NO = f.EVALU_FORM_NO
-                                    AND r.EVALUATEE_GROUP_ID = g.EVALUATEE_GROUP_ID
-				
-				WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-				AND u.USER_NO = #{userNo}
-				ORDER BY u.USER_NO
+					SELECT 
+						    f.EVALU_FORM_NO,
+						    f.EVALU_NAME,
+						    f.EVALU_START,
+						    u.USER_NO,
+						    u.USER_NAME,
+						    i.EVALU_COMPET,
+						    i.EVALU_CONTENT,
+						    fm.ORDER_NO,
+						    d.DEPARTMENT_NAME,
+						    t.TEAM_NAME,
+						    fm.EVALU_NO,
+						    
+						    -- 평균 점수 (선택 유저 기준)
+						    ROUND(AVG(r.EVALU_SCORE), 1) AS avgScore,
+						
+						    -- 다른 피평가자들의 평균 점수 (JOIN으로 가져옴)
+						    ROUND(other.avg_score, 1) AS otherAvgScore
+						
+						FROM EVALU_FORM f
+						JOIN EVALUATEE_GROUP eg ON f.EVALU_FORM_NO = eg.EVALU_FORM_NO
+						JOIN EMPLOYEE u ON eg.USER_NO = u.USER_NO
+						JOIN EVALU_FORMAT fm ON fm.EVALU_FORM_NO = f.EVALU_FORM_NO
+						JOIN EVALU_ITEM i ON i.EVALU_ITEM_NO = fm.EVALU_ITEM_NO
+						JOIN TEAM t ON t.TEAM_NO = u.TEAM_NO
+						JOIN DEPARTMENT d ON d.DEPARTMENT_ID = t.DEPARTMENT_ID
+						JOIN EVALU_RESULT r ON r.EVALU_NO = fm.EVALU_NO
+						                    AND r.EVALU_FORM_NO = f.EVALU_FORM_NO
+						                    AND r.EVALUATEE_GROUP_ID = eg.EVALUATEE_GROUP_ID
+						
+						-- 🔽 다른 사람들의 평균 점수 테이블 LEFT JOIN (이름만 다르게 avg 처리)
+						LEFT JOIN (
+						    SELECT 
+						        fm2.EVALU_ITEM_NO,
+						        r2.EVALU_FORM_NO,
+						        ROUND(AVG(r2.EVALU_SCORE), 1) AS avg_score
+						    FROM EVALU_RESULT r2
+						    JOIN EVALUATEE_GROUP eg2 ON r2.EVALUATEE_GROUP_ID = eg2.EVALUATEE_GROUP_ID
+						    JOIN EVALU_FORMAT fm2 ON r2.EVALU_NO = fm2.EVALU_NO
+						    WHERE eg2.USER_NO != #{userNo}
+						    GROUP BY fm2.EVALU_ITEM_NO, r2.EVALU_FORM_NO
+						) other
+						    ON fm.EVALU_ITEM_NO = other.EVALU_ITEM_NO
+						   AND f.EVALU_FORM_NO = other.EVALU_FORM_NO
+						
+						WHERE f.EVALU_FORM_NO = #{evaluFormNo}
+						  AND u.USER_NO = #{userNo}
+						
+						GROUP BY 
+						    f.EVALU_FORM_NO, f.EVALU_NAME, f.EVALU_START,
+						    u.USER_NO, u.USER_NAME,
+						    i.EVALU_COMPET, i.EVALU_CONTENT,
+						    fm.ORDER_NO,
+						    d.DEPARTMENT_NAME, t.TEAM_NAME,
+						    fm.EVALU_NO,
+						    other.avg_score
+						
+						ORDER BY fm.ORDER_NO
+
 	</select>
 	
 	<!-- 진행할 평가 조회 1건 / 내가 평가자 그룹으로 등록되어 있는 폼에 대한 피평가자 정보와 등록된 평가폼 조회 -->
@@ -312,9 +330,30 @@
 		ORDER BY u.USER_NO, fm.ORDER_NO
 	</select>
 
-	
-		<!-- 내가 평가한 평가 리스트 (전체 조회) -->
+	<!-- 내가 평가한 평가 리스트 (전체 조회)-->
 	<select id="selectMyEvaluList" resultMap="formEmpMyList">
+	SELECT DISTINCT 
+		f.EVALU_NAME,
+		f.EVALU_FORM_NO,
+		f.EVALU_START,
+		f.EVALU_END,
+		t.TEAM_NAME,
+		g.USAGE_STATUS,
+		f.EVALU_START,
+		f.EVALU_END 
+	FROM EVALU_GROUP g
+	JOIN EVALU_FORM f ON g.EVALU_FORM_NO = f.EVALU_FORM_NO
+	JOIN EMPLOYEE u ON g.USER_NO = u.USER_NO
+	JOIN TEAM t ON t.TEAM_NO = u.TEAM_NO
+	WHERE g.USER_NO = #{userNo}
+	AND f.EVALU_FORM_NO IN ( SELECT EVALU_FORM_NO
+					                FROM EVALU_GROUP
+					                WHERE USER_NO = #{userNo} )
+	ORDER BY f.EVALU_FORM_NO DESC
+</select>
+	
+		<!-- 내가 평가한 평가 리스트 (전체 조회)
+	 <select id="selectMyEvaluList" resultMap="formEmpMyList">
  			SELECT DISTINCT f.EVALU_NAME
 		 					, f.EVALU_FORM_NO
 					        , f.EVALU_START
@@ -334,7 +373,7 @@
 					                            FROM EVALU_GROUP
 					                            WHERE USER_NO = #{userNo} )
 					ORDER BY f.EVALU_FORM_NO DESC
-	</select>
+	</select> -->
 	
 		<resultMap id="formEmpMyList" type="EvaluVO">
 			  <id property="evaluFormNo" column="evalu_form_no" />
@@ -439,12 +478,14 @@
 			(
 			    EVALU_GROUP_ID
 			    , EVALU_FORM_NO
-			    , USER_NO                
+			    , USER_NO    
+			    , USAGE_STATUS            
 			)
 			SELECT 
 			    EVALU_G_ID_SEQ.NEXTVAL
 			    , #{evaluFormNo}
 			    , u.user_no
+			    , '진행 중'
 			FROM EMPLOYEE u 
 			JOIN TEAM t ON u.team_no = t.team_no
 			WHERE t.team_no = #{evaluGroupId}
@@ -489,12 +530,20 @@
 		       , #{userNo} )
 	</insert>
 	
-	<!-- 평가 제출 후 평가 상태 '제출 완료' 로 수정하는 쿼리문 -->
+	<!-- 평가 제출 후 개인 평가 상태 '제출 완료' 로 수정하는 쿼리문 -->
 	<update id="updateEvaluStatus" parameterType="EvaluVO">
-		UPDATE EVALU_FORM 
+		UPDATE EVALU_GROUP 
 		SET USAGE_STATUS = '제출 완료'
 		WHERE EVALU_FORM_NO = #{evaluFormNo}
+		  AND USER_NO = #{userNo}
 	</update>
+	<!-- EVALU_GROUP에서 개인 평가 상태 조회 -->
+	<select id="selectMyEvaluStatus" resultType="String" parameterType="EvaluVO">
+	    SELECT USAGE_STATUS
+	    FROM EVALU_GROUP
+	    WHERE EVALU_FORM_NO = #{evaluFormNo}
+	      AND USER_NO = #{userNo}
+	</select>
 	<!-- 평가 상태 조회 쿼리 -->
 	<select id="getEvaluStatus" resultType="String" parameterType="int">
 	    SELECT USAGE_STATUS
@@ -534,6 +583,7 @@
 		JOIN EVALU_FORM f ON eg.EVALU_FORM_NO = f.EVALU_FORM_NO
 		JOIN EMPLOYEE u ON eg.USER_NO = u.USER_NO
 		JOIN TEAM t ON t.TEAM_NO = u.TEAM_NO
+		
 		WHERE eg.USER_NO = #{userNo}
 		ORDER BY f.EVALU_FORM_NO DESC
 	</select>
@@ -666,5 +716,13 @@
 	    #{departmentId}
 	  )
 </insert>
+
+<!-- 평가 종료일이 지난 폼 : 평가 완료로 -->
+<update id="updateStatusByEvaluEndDate">
+    UPDATE EVALU_FORM
+    SET USAGE_STATUS = '평가 완료'
+    WHERE EVALU_END <![CDATA[<]]> SYSDATE
+      AND USAGE_STATUS != '평가 완료'
+</update>
 	<!-- 부서 수정 -->
 </mapper>
