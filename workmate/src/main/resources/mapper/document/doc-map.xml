@@ -34,7 +34,7 @@
 	  JOIN employee e ON h.down_user = e.user_no 
 	  WHERE 1 = 1 
 	  <if test="downloadDate != null">
-	  	AND h.download_date = #{downloadDate}
+	  	AND TRUNC(h.download_date) = #{downloadDate}
 	  </if>
 	  <if test="fileName != null and fileName != ''">
         	AND h.file_name LIKE '%' || #{fileName} || '%'

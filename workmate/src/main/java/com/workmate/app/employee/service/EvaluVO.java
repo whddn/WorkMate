@@ -34,11 +34,8 @@ public class EvaluVO {
 	// 평가 폼 (문제은행에서 랜덤으로 골라서 평가 양식을 생성함)
 	private String evaluName;		// 평가 이름 
 	private String evaluDescript;	// 평가 설명
-	//@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date insertDate;		// 평가 폼 등록 날짜
-	//@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date evaluStart;		// 평가 시작 날짜
-	//@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date evaluEnd;			// 평가 종료 날짜
 	List<EmpVO> empOne;
 	List<TeamVO> teamList;

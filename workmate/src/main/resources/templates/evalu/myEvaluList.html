@@ -132,7 +132,6 @@
 
         <!-- 기간 및 검색창 -->
         <div class="search-bar">
-
             <div>
                 <label for="dateRange">기간 선택:</label>
                 <select id="dateRange">
@@ -168,7 +167,7 @@
                 <tr>
                     <td><input type="checkbox" name="postSelection"></td>
                     <td><a th:href="@{/emp/evalu/{eva}(eva=${one.evaluFormNo})}">[[ ${one.evaluName} ]]</a></td>
-                    <td>[[ ${one.usageStatus} ]]</td>
+                    <td th:text="${one.usageStatus}">[없음]</td>
                     <td>[[ ${one.teamName} ]]</td>
                     <td th:text="${#dates.format(one.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(one.evaluEnd, 'yyyy-MM-dd')}"></td>
                     <td>추가 설명</td>

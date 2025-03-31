@@ -233,7 +233,7 @@
 				            </div>
 				            <div class="modal-body">
 				                <p class="small">지각 사유를 입력하세요.</p>
-				                <form id="uploadForm" method="post"  name="uploadForm" action="/workmate/attendance/lateReason">
+				                <form id="uploadForm" method="post" name="uploadForm" action="/workmate/attendance/lateReason" onsubmit="return validateForm()">
 				                    <input type="hidden" name="workNo" id="workNoHidden">
 				                    <div class="row">
 				                        <div class="col-sm-12">
@@ -283,6 +283,15 @@
 
 		    // backdrop 강제 제거
 		    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+		}
+		
+		function validateForm() {
+		    var reason = document.getElementById("addName").value.trim();
+		    if (reason === "") {
+		        alert("내용을 입력해주세요.");
+		        return false; // 제출 중단
+		    }
+		    return true; // 제출 진행
 		}
 		
 		// 현재시간가져오기
