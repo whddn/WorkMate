@@ -253,6 +253,15 @@
   </div>
 <script th:inline="javascript">
 
+  const today = new Date().toISOString().split('T')[0];
+  const startDate = document.querySelector('#start-date');
+	startDate.setAttribute('min', today); // 현재 날짜 이전의 평가 등록 불가능
+  const endDate = document.querySelector('#end-date');
+  
+  startDate.addEventListener('change', function() {
+  	endDate.setAttribute('min', this.value);
+  })
+	
 	// 평가 항목과 내용을 동적으로 연결하는 로직
 	let compet = [[ ${content} ]];  // 타임리프에서 가져온 compet 배열
 	let competSelect = document.querySelectorAll("#evaCompet");  // 왼쪽 드롭다운들
