@@ -58,7 +58,7 @@
                 <thead>
                 <tr>
                     <th><input type="checkbox" id="selectAll"></th>
-                    <th>보낸 사람</th>
+                    <th>보낸 사람 (또는 수신자)</th>
                     <th>제목</th>
                     <th>수신자</th>
                     <th>삭제일</th>
@@ -70,11 +70,10 @@
                 </tr>
                 <tr th:each="mail : ${trashMails}" class="trash-mail-row">
                     <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
-                     <td><span class="badge bg-secondary ms-2"
-              th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
-        <span th:text="${mail.recipients}">보낸사람</span>
-        
-    </td>
+                     <td>
+  
+  <span th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.recipients}"></span>
+</td>
                     <td>
                         <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}">제목</a>
                     </td>

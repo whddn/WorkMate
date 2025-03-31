@@ -87,7 +87,7 @@
                     <td>
   <span class="badge bg-secondary me-1"
         th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
-  <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}"></a>
+  <span th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.recipients}"></span>
 </td>
                     <td>
                         <a th:href="@{/mail/view(mailId=${mail.mailId})}" th:text="${mail.subject}"></a>

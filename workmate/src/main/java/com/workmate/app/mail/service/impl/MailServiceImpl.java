@@ -345,6 +345,7 @@ public class MailServiceImpl implements MailService {
 	//폴더삭제
 	@Override
 	public void dropMailFolder(int folderId, int userNo) {
+		
 	    mailMapper.deleteMailFolder(folderId, userNo);
 	}
 	
@@ -374,6 +375,8 @@ public class MailServiceImpl implements MailService {
 	@Override
 	public void dropMail(List<Integer> mailIds) {
 	    for (Integer mailId : mailIds) {
+	    	// 1. 첨부파일 먼저 삭제
+	        attachmentMapper.deleteAttachmentsByMailId(mailId);
 	        mailMapper.deleteMail(mailId); // 진짜 DB 삭제
 	    }
 	}
