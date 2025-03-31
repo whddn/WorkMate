@@ -158,9 +158,9 @@
       <div class="buttons-container">
         <div class="action-buttons">
         <br>
-          <button id="add-employee" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
+          <button id="add-employee" th:onclick="|location.href='@{/emp/newemp}'|" class="btn btn-primary">+ 새로운 사원 추가</button>
           <button id="update-employee"
-            th:data-no="${update.userNo}" type="button">저장하기</button>
+            th:data-no="${update.userNo}" type="button" class="btn btn-warning">저장하기</button>
         </div>
       </div>
   </div>
