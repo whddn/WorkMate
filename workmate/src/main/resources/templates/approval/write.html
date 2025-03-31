@@ -361,11 +361,11 @@
 	
 	// 결재문서 데이터를 JSON으로 서버로 전송한다.
 	$('#submitBtn').on('click', function(event) {
-		if($('input[name="apprTitle"]:checked').val() == '') {
+		if($('input[name="apprTitle"]').val() == '') {
 			return;
 		}
 		
-		if($('input[name="apprContent":checked]').val() == '') {
+		if($('input[name="apprContent"]').val() == '') {
 			return;
 		}
 		
