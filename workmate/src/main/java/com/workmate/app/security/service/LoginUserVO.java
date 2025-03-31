@@ -25,6 +25,7 @@ public class LoginUserVO implements UserDetails{
 		if(userVO.getTeamNo() != null) {
 			auths.add(new SimpleGrantedAuthority(userVO.getTeamNo() ));
 		}else {
+			
 			auths.add(new SimpleGrantedAuthority("T000"));
 		}
 		//auths.add(new SimpleGrantedAuthority(userVO.getUserPosition()));
