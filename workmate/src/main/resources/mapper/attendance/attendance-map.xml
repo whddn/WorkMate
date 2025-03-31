@@ -273,7 +273,7 @@
 		JOIN team t ON e.team_no = t.team_no  
 		WHERE 1 = 1
 		<if test="stDate != null and endDate != null">
-		    AND w.start_work >= #{stDate} AND w.start_work <![CDATA[<]]> #{endDate}
+		    AND w.start_work >= TO_DATE(#{stDate},'yyyy-MM-dd') AND w.start_work <![CDATA[<]]> TO_DATE(#{endDate},'yyyy-MM-dd')
 		</if>
 		  <if test="userName != null and userName != ''">
         	AND e.user_name LIKE '%' || #{userName} || '%'

@@ -10,4 +10,5 @@ public interface AttachmentMapper {
     void insertAttachment(AttachmentVO file);
     List<AttachmentVO> selectAttachmentsByMailId(@Param("mailId") int mailId);
     AttachmentVO selectAttachmentById(@Param("fileId") Long fileId);
+    void deleteAttachmentsByMailId(@Param("mailId") int mailId);
 }

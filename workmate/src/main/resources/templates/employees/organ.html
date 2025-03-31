@@ -22,17 +22,19 @@ body, html {
 	padding: 20px;
 	border-radius: 8px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	display: flex;
+	align-items: center; /* 세로 가운데 정렬 */
 	justify-content: center;
-    align-items: center;
-
-    padding: 20px;
-    display: flex;
+	gap: 20px;
+	min-height: 600px;
 }
-/* 화면 전체 레이아웃 */
+.wrapper {
+  width: 100%;
 
-    
+  flex-direction: column; /* 세로 정렬 */
+  align-items: center;
+}
 
-/* 조직도 패널 */
 .tree-panel {
 	background: #fff;
 	padding: 20px;
@@ -40,36 +42,36 @@ body, html {
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 	min-width: 250px;
 	width: 300px;
-	margin-right: 20px;
-	/* 오른쪽에 약간의 간격 추가 */
 	max-height: 500px;
 	overflow-y: auto;
-	/* 내용이 넘칠 경우 스크롤 추가 */
 }
 
-/* 상세 정보 카드 */
 .card {
 	background: #ffffff;
 	border-radius: 12px;
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 	padding: 20px;
-	width: 100%;
-	max-width: 500px;
-	/* 고정된 최대 너비 */
-	flex-direction: column;
-	justify-content: center;
+	width: 500px; /* 고정 너비 */
 	height: 500px;
 	overflow: hidden;
+	transition: all 0.3s ease;
+	align-self: center; /* 세로 중앙 정렬 */
 }
 
-/* 내부 정보 리스트 */
+.card.hidden {
+  visibility: hidden;
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 .info-list {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
 
-/* 각 줄 */
 .info-row {
 	display: flex;
 	align-items: center;
@@ -79,7 +81,6 @@ body, html {
 	display: none;
 }
 
-/* 라벨 */
 .label {
 	width: 100px;
 	font-weight: bold;
@@ -90,7 +91,6 @@ body, html {
 	text-align: left;
 }
 
-/* 값 */
 .value {
 	flex: 1;
 	background: #f2f4f8;
@@ -102,9 +102,7 @@ body, html {
 
 h1 {
 	text-align: center;
-	/* 중앙 정렬 */
 	margin-bottom: 20px;
-	/* 제목 아래 간격 */
 }
 
 .tree li {
@@ -117,12 +115,22 @@ h1 {
 .tree ul {
 	padding-left: 20px;
 }
+.section-title {
+  width: 100%;
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #333;
+  display: block;
+}
 </style>
 </head>
 
 <body>
+<div class="wrapper">
+ <div class="section-title">조직도</div>
   <div class="container">
-    <!-- 왼쪽: 조직도 -->
     <div class="tree-panel">
       <ul class="tree">
         <li th:each="dpt : ${names}">
@@ -132,8 +140,7 @@ h1 {
               <span class="teamN" th:data-tn="${team.teamName}">[[ ${team.teamName} ]]</span>
               <ul>
                 <li th:each="name : ${team.empList}">
-                  <span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}">[[ ${name.userName}
-                    ]]</span>
+                  <span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span>
                 </li>
               </ul>
             </li>
@@ -141,11 +148,9 @@ h1 {
         </li>
       </ul>
     </div>
-	<div id="replace"  th:fragment="employeeFrag">
-	
 
-    <!-- 오른쪽: 상세 정보 카드 -->
-    <div class="card" id="detailsBox">
+  <div id="replace" th:fragment="employeeFrag">
+    <div class="card hidden" id="detailsBox">
       <div class="info-list">
         <div class="info-row">
           <span class="label">ID</span>
@@ -181,77 +186,55 @@ h1 {
         </div>
       </div>
       <br>
-      <div class="buttons-container"> <!--  th:if="${teamNo == 'ROLE_T001'}" -->
-        <div class="action-buttons">
-          <button id="add-employee" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
-          <button id="evaluate-employee-update" 
-            th:data-no="${oneinfo.userNo}">수정하기</button>
-        </div>
+      <div class="buttons-container">
       </div>
+        <div class="action-buttons">
+          <button id="add-employee" class="btn btn-primary" th:onclick="|location.href='@{/emp/newemp}'|">+ 새로운 사원 추가</button>
+          <button id="evaluate-employee-update" class="btn btn-warning" th:data-no="${oneinfo.userNo}">수정하기</button>
+        </div>
     </div>
+  </div>
 </div>
+  <script>
+    const names = document.querySelectorAll('.employee');
+    const teamNames = document.querySelectorAll('.teamN');
 
-    <script>
-      let hireD = document.querySelector('#info-hire').value;
-      console.log(hireD);
-
-      let names = document.querySelectorAll('.employee'); // 사원이름 
-      let teamNames = document.querySelectorAll('.teamN'); // 팀이름
-
-      for (let teamclick of teamNames) {
-        teamclick.addEventListener('click', e => {
-          const team = e.target.dataset.tn; // 클릭된 팀의 data-tn 값 가져오기
-          document.querySelectorAll('.employee').forEach(namedisplay => { // 사원 이름 보이게
-              if (namedisplay.dataset.tn === team) {
-                namedisplay.style.display = 'block'; // 클릭된 팀에 속한 사원만 보이게
-              } else {
-                namedisplay.style.display = 'none'; // 클릭된 팀 이외의 사원은 숨기기
-              }
-            });
+    teamNames.forEach(teamclick => {
+      teamclick.addEventListener('click', e => {
+        const team = e.target.dataset.tn;
+        document.querySelectorAll('.employee').forEach(namedisplay => {
+          namedisplay.style.display = namedisplay.dataset.tn === team ? 'block' : 'none';
         });
-      }
+      });
+    });
 
+    names.forEach(nameclick => {
+      nameclick.addEventListener('click', function (event) {
+        const userNo = event.target.dataset.id;
+        document.getElementById("detailsBox").classList.remove('hidden');
 
-      for (let nameclick of names) {
-        nameclick.addEventListener('click', function (event) {
-          const userNo = event.target.dataset.id;
-          document.getElementById("detailsBox").style.display = 'block'; // 사원 이름 클릭시 상세 페이지 표시
+        fetch(`/workmate/emp/organ/${userNo}`)
+          .then(res => res.json())
+          .then(result => {
+            let hireDate = result.hireDate.split('T')[0];
+            document.querySelector('#info-name').textContent = result.userName;
+            document.querySelector('#info-department').textContent = result.departmentName;
+            document.querySelector('#info-team').textContent = result.teamName;
+            document.querySelector('#info-userNo').textContent = result.userNo;
+            document.querySelector('#info-id').textContent = result.userId;
+            document.querySelector('#info-hire').textContent = hireDate;
+            document.querySelector('#info-phone').textContent = result.userPhone;
+            document.querySelector('#info-address').textContent = result.address;
+          })
+          .catch(err => console.log(err));
+      });
+    });
 
-
-          fetch(`/workmate/emp/organ/${userNo}`)
-            .then(res => res.json())
-            .then(result => {
-              let hireDate = result.hireDate.split('T')[0];
-              document.querySelector('#info-name').textContent = result.userName;
-              document.querySelector('#info-department').textContent = result.departmentName;
-              document.querySelector('#info-team').textContent = result.teamName;
-              document.querySelector('#info-userNo').textContent = result.userNo;
-              document.querySelector('#info-id').textContent = result.userId;
-              document.querySelector('#info-hire').textContent = hireDate;
-              document.querySelector('#info-phone').textContent = result.userPhone;
-              document.querySelector('#info-address').textContent = result.address;
-            })
-            .catch(err => console.log(err));
-        });
-      }
-      
-      document.querySelector('#evaluate-employee-update').addEventListener('click', e => {
-    	  let userNo = document.querySelector('#info-userNo').innerHTML;
-    	  
-    	  $('#replace').load(`/workmate/emp/update?userNo=${userNo}`)
-    	 /* fetch(`/workmate/emp/update?userNo=${userNo}`, {
-    		  headers : {
-    			  'Content-Type' : 'text/html; charset=utf-8'
-    		  }
-    	  })
-    	  .then(res => res.text())
-    	  .then(result => {
-    		 document.querySelector('#replace').innerHTML = result;
-    	  })
-    	  .catch(err => console.log(err)); */
-      })
-    </script>
+    document.querySelector('#evaluate-employee-update').addEventListener('click', e => {
+      let userNo = document.querySelector('#info-userNo').innerHTML;
+      $('#replace').load(`/workmate/emp/update?userNo=${userNo}`);
+    });
+  </script>
 </div>
 </body>
-
 </html>

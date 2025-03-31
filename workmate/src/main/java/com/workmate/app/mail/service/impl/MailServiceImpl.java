@@ -345,6 +345,7 @@ public class MailServiceImpl implements MailService {
 	//폴더삭제
 	@Override
 	public void dropMailFolder(int folderId, int userNo) {
+		
 	    mailMapper.deleteMailFolder(folderId, userNo);
 	}
 	
@@ -374,6 +375,8 @@ public class MailServiceImpl implements MailService {
 	@Override
 	public void dropMail(List<Integer> mailIds) {
 	    for (Integer mailId : mailIds) {
+	    	// 1. 첨부파일 먼저 삭제
+	        attachmentMapper.deleteAttachmentsByMailId(mailId);
 	        mailMapper.deleteMail(mailId); // 진짜 DB 삭제
 	    }
 	}
@@ -720,7 +723,7 @@ public class MailServiceImpl implements MailService {
 	    return mailMapper.selectEmployeesByTeam(teamNo);
 	}
 	// 1분마다 예약된 메일 중 발송 시간이 지난 메일들을 전송 시도
-	@Scheduled(fixedDelay = 60000)
+	//@Scheduled(fixedDelay = 60000)
 	public void sendScheduledMails() {
 	    List<MailVO> scheduledMails = mailMapper.selectScheduledMails();
 
