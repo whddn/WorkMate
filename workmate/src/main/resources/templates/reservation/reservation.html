@@ -61,22 +61,26 @@ body {
             	 const imagePath = `/workmate/upload/${reser.image}`;  // ✅ 이미지 경로 설정
                  const detailPageUrl = `detail/${reser.commonNo}`;  // ✅ 예약 상세 페이지 경로 설정
             	
-                 const card = `
-                    <div class="col-md-4 mb-4">
-                        <div class="card card-post card-round">
-                            <img src="${imagePath}" class="card-img-top" alt="공용품목록" >
-                            <div class="card-body">
-                                <p class="card-category">${reser.commonKind}</p>
-                                <h5 class="card-title">
-                                    <a href="${detailPageUrl}" class="text-dark">${reser.commonName}</a>
-                                </h5>
-                                <p class="card-text text-muted">${reser.content}</p>
-                                <a href="${detailPageUrl}" class="btn btn-primary btn-sm">예약하기</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
+                 const card = ` 
+                	    <div class="col-md-4 mb-4">
+                	        <div class="card card-post card-round position-relative h-100">
+                	            <img src="${imagePath}" class="card-img-top" alt="공용품목록">
+                	            <div class="card-body">
+                	                <p class="card-category">${reser.commonKind}</p>
+                	                <h5 class="card-title">${reser.commonName}</h5>
+                	                <p class="card-text text-muted">${reser.content}</p>
+                	                
+                	                <!-- 버튼은 겹치는 걸 방지하기 위해 position-relative 추가 -->
+                	                <a href="${detailPageUrl}" class="btn btn-primary btn-sm position-relative">예약하기</a>
+                	                
+                	                <!-- 카드 전체를 클릭 가능하게 만드는 stretched-link -->
+                	                <a href="${detailPageUrl}" class="stretched-link"></a>
+                	            </div>
+                	        </div>
+                	    </div>
+                	`;
+                	container.innerHTML += card;
+
             });
         } catch (error) {
             console.error("예약 목록을 불러오는 중 오류 발생:", error);
