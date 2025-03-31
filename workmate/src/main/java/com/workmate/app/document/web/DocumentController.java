@@ -88,7 +88,6 @@ public class DocumentController {
 		List<DocVO> list = documentService.findDownhistory(docVO);
 		
 		model.addAttribute("lists", list);
-		
 		return "document/downloadHistory";
 		
 	}
