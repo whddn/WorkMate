@@ -235,7 +235,7 @@ let formNo = document.querySelector('[name="score"]').dataset.form;
   .then(result => {
 	  if (result != null) {
 		    alert('평가가 성공적으로 제출되었습니다!');		 
-		    location.href = `/workmate/emp/update?formNo=${formNo}` 
+		    location.href = `/workmate/emp/evalu/${formNo}` 
 	  } 
 
   })
