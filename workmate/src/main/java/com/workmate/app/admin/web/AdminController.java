@@ -118,6 +118,7 @@ public class AdminController {
 			commonItemVO.setImage(subDir + uniqueFileName); // DB에 저장될 경로
 			adminService.inputCommonItem(commonItemVO);
 		} catch (IOException e) {
+			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("errorMessage", "🚨 파일 저장 중 오류 발생!");
 			return "redirect:commonItemList";
 		}
