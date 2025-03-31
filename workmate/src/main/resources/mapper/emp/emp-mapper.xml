@@ -264,8 +264,6 @@
 						JOIN EVALU_RESULT r ON r.EVALU_NO = fm.EVALU_NO
 						                    AND r.EVALU_FORM_NO = f.EVALU_FORM_NO
 						                    AND r.EVALUATEE_GROUP_ID = eg.EVALUATEE_GROUP_ID
-						
-						-- 🔽 다른 사람들의 평균 점수 테이블 LEFT JOIN (이름만 다르게 avg 처리)
 						LEFT JOIN (
 						    SELECT 
 						        fm2.EVALU_ITEM_NO,
