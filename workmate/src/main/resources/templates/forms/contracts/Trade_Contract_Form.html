@@ -29,8 +29,9 @@
 </head>
 <body>
 <div class="container mt-5">
-  <h2 class="mb-4 text-center">📝 거래처 계약서 작성</h2>
+  <h2 class="mb-4 text-center">거래처 계약서 작성</h2>
   <form id="tradeContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
+  <input type="hidden" name="contrTitle" value="거래처 계약서">
     <table class="table table-bordered contract-table">
       <tr><th colspan="4">기본 정보</th></tr>
       <tr>

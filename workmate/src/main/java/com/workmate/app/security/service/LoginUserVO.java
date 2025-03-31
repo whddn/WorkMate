@@ -22,7 +22,12 @@ public class LoginUserVO implements UserDetails{
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> auths = new ArrayList<>();
-		auths.add(new SimpleGrantedAuthority(userVO.getTeamNo()));
+		if(userVO.getTeamNo() != null) {
+			auths.add(new SimpleGrantedAuthority(userVO.getTeamNo() ));
+		}else {
+			
+			auths.add(new SimpleGrantedAuthority("T000"));
+		}
 		//auths.add(new SimpleGrantedAuthority(userVO.getUserPosition()));
 		
 		if ("관리자".equals(userVO.getUserPosition())) {

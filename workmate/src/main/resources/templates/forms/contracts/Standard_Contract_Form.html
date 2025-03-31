@@ -36,8 +36,9 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h2 class="mb-4 text-center" name="contrTitle" value="표준근로계약서"> 표준근로계약서 (기간의 정함이 없는 경우)</h2>
+    <h2 class="mb-4 text-center"> 표준근로계약서 (기간의 정함이 없는 경우)</h2>
     <form id="standardContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
+    <input type="hidden" name="contrTitle" value="표준근로계약서">
 
         <div class="contract-section">
             <p>(이하 "사업주"라 함)과 <input type="text" name="employeeName"> (이하 "근로자"라 함)은 다음과 같이 근로계약을 체결한다.</p>
@@ -87,7 +88,7 @@
         </div>
 
         <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary">📌 제출</button>
+            <button type="submit" class="btn btn-primary">제출</button>
         </div>
     </form>
 </div>
