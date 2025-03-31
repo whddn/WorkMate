@@ -129,28 +129,6 @@
 <body>
     <div class="container">
         <h1>평가 관리</h1>
-
-        <!-- 기간 및 검색창 -->
-        <div class="search-bar">
-
-            <div>
-                <label for="dateRange">기간 선택:</label>
-                <select id="dateRange">
-                    <option value="7">최근 7일</option>
-                    <option value="30">최근 30일</option>
-                    <option value="90">최근 90일</option>
-                    <option value="custom">직접 입력</option>
-                </select>
-                <div id="customDateInput" style="display:none;">
-                    <label for="startDate">시작일:</label>
-                    <input type="date" id="startDate">
-                    <label for="endDate">끝일:</label>
-                    <input type="date" id="endDate">
-                </div>
-            </div>
-                <!--직접 입력 버튼을 누르면 시작일과 끝일이 나오게 가렸다가 저쩌고 하게-->
-        </div>
-
         <!-- 게시글 목록 테이블 -->
         <table class="table-container" id="beforeList">
             <thead>
@@ -179,7 +157,6 @@
         <!-- 버튼들 -->
         <div class="button-container">
             <button th:onclick="|location.href='@{/emp/neweva}'|">평가 등록</button>
-            <button class="delete">삭제</button>
         </div>
     </div>
     <script>

@@ -137,10 +137,10 @@ h1 {
           <span class="folder">[[ ${dpt.departmentName} ]]</span>
           <ul>
             <li th:each="team : ${dpt.teamList}">
-              <span class="teamN" th:data-tn="${team.teamName}">[[ ${team.teamName} ]]</span>
+              <span class="teamN" th:data-tn="${team.teamName}" style="cursor: pointer">[[ ${team.teamName} ]]</span>
               <ul>
                 <li th:each="name : ${team.empList}">
-                  <span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}">[[ ${name.userName} ]]</span>
+                  <span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}" style="cursor: pointer">[[ ${name.userName} ]]</span>
                 </li>
               </ul>
             </li>
