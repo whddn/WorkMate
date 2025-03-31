@@ -222,10 +222,12 @@
 		};
 		
 		if($('input[name="apprResult"]:checked').length < 1) {
+			alert('결재 의사를 정해주세요!');
 			return;
 		}
 		
 		if($('input[name="signNo"]:checked').length < 1) {
+			alert('서명을 선택하세요!');
 			return;
 		}
 		
