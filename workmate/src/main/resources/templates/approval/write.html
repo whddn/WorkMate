@@ -9,6 +9,93 @@
 <head>
 	<meta charset="UTF-8">
 	<title>전자 결재</title>
+	<style>    
+		/* 조직도 패널 */
+		.tree-panel {
+			background: #fff;
+			padding: 20px;
+			border-radius: 12px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+			min-width: 250px;
+			width: 300px;
+			margin-right: 20px;
+			/* 오른쪽에 약간의 간격 추가 */
+			max-height: 500px;
+			overflow-y: auto;
+			/* 내용이 넘칠 경우 스크롤 추가 */
+		}
+		
+		/* 상세 정보 카드 */
+		.card {
+			background: #ffffff;
+			border-radius: 12px;
+			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+			padding: 20px;
+			width: 100%;
+			max-width: 500px;
+			/* 고정된 최대 너비 */
+			flex-direction: column;
+			justify-content: center;
+			height: 500px;
+			overflow: hidden;
+		}
+		
+		/* 내부 정보 리스트 */
+		.info-list {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+		
+		/* 각 줄 */
+		.info-row {
+			display: flex;
+			align-items: center;
+		}
+		
+		.employee {
+			display: none;
+		}
+		
+		/* 라벨 */
+		.label {
+			width: 100px;
+			font-weight: bold;
+			color: #333;
+			background: #e7edf7;
+			padding: 8px 12px;
+			border-radius: 6px;
+			text-align: left;
+		}
+		
+		/* 값 */
+		.value {
+			flex: 1;
+			background: #f2f4f8;
+			padding: 8px 12px;
+			border-radius: 6px;
+			color: #222;
+			margin-left: 10px;
+		}
+		
+		h1 {
+			text-align: center;
+			/* 중앙 정렬 */
+			margin-bottom: 20px;
+			/* 제목 아래 간격 */
+		}
+		
+		.tree li {
+			list-style: none;
+			margin: 8px 0;
+			font-weight: 500;
+			color: #333;
+		}
+		
+		.tree ul {
+			padding-left: 20px;
+		}
+	</style>
 </head>
 
 <body>
@@ -66,8 +153,7 @@
 																<span class="employee" 
 																	th:data-tn="${team.teamName}"
 																	th:data-id="${name.userNo}"
-																	th:onclick="| addElmnt(${name.userNo}) |"
-																	>
+																	th:onclick="| addElmnt(${name.userNo}) |">
 																	[[ ${name.userName}]]
 																</span>
 															</li>
@@ -77,6 +163,7 @@
 											</li>
 										</ul>
 									</div>
+
 								</td>
 								<td id="apprOrRef" rowspan="2">
 									<input type="radio" class="form-check-input" name="apprOrRef" value="appr">결재선으로
@@ -302,6 +389,22 @@
 		$('#departmentName').text(creator.departmentName);
 		$('#userNo').text(creator.userNo);
 		$('#userName').text(creator.userName);
+		
+		let names = document.querySelectorAll('.employee'); // 사원이름 
+	    let teamNames = document.querySelectorAll('.teamN'); // 팀이름
+
+	    for (let teamclick of teamNames) {
+	    	teamclick.addEventListener('click', e => {
+	   			const team = e.target.dataset.tn; // 클릭된 팀의 data-tn 값 가져오기
+	    		document.querySelectorAll('.employee').forEach(namedisplay => { // 사원 이름 보이게
+		    		if (namedisplay.dataset.tn === team) {
+		    			namedisplay.style.display = 'block'; // 클릭된 팀에 속한 사원만 보이게
+		    		} else {
+		    			namedisplay.style.display = 'none'; // 클릭된 팀 이외의 사원은 숨기기
+		    		}
+		    	});
+	    	});
+	    }
 	});
 
 	// apprElmntList의 정보를 결재선 양식에, refElmntList의 정보를 참조자에 등록한다
@@ -362,10 +465,12 @@
 	// 결재문서 데이터를 JSON으로 서버로 전송한다.
 	$('#submitBtn').on('click', function(event) {
 		if($('input[name="apprTitle"]').val() == '') {
+			alert('제목을 입력하세요!');
 			return;
 		}
 		
 		if($('input[name="apprContent"]').val() == '') {
+			alert('내용을 입력하세요!');
 			return;
 		}
 		
