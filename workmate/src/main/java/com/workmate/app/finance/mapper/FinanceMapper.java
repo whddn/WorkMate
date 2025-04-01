@@ -36,5 +36,7 @@ public interface FinanceMapper {
 	// 법인 카드 상세 조회 
 	public CorcardVO selectCorcardById(CorcardVO corcardVO);
 	
+	public int updateReportTotalAmounts(ReportVO reportVO);
+	
 	
 }

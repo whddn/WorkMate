@@ -353,6 +353,11 @@
     let teamNoRaw  = document.querySelector('#teamNo').dataset.teamno;
     let teamNo = teamNoRaw.replace(/^ROLE_/, '');  // → "T003"
 
+    // 합계값
+    let totalDeposit = parseInt(document.querySelector('#totalDeposit').value) || 0;
+    let totalWithdraw = parseInt(document.querySelector('#totalWithdraw').value) || 0;
+    let totalBalance = parseInt(document.querySelector('#totalBalance').value) || 0;
+    
     // 1. 거래 내역 수집
     let transList = [];
     document.querySelectorAll('#financeTable tbody tr').forEach(row => {
@@ -381,6 +386,9 @@
         transEnd: eDate,
         userNo: userNo,
         teamNo: teamNo,
+        totalDep: totalDeposit,
+        totalDrawal: totalWithdraw,
+        totalBal: totalBalance,
         transHistoryList: transList
     };
 
