@@ -77,14 +77,15 @@
 .fc-daygrid-day {
 	cursor: pointer !important;
 }
-h1{
+.card-title{
 	margin-top:20px;
 	margin-left:30px;
+	font-size:30px;
 }
 </style>
 </head>
 <body>
-<h1>예약목록</h1>
+<h1 class="card-title">예약목록</h1>
 	<form th:action="@{/reservation/input}" method="POST" name="reservationForm">
 		<div class="container mt-5">
 			<div class="row equal-height">
