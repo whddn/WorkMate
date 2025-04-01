@@ -116,7 +116,9 @@ public class FinanceController {
 	
 	// 법인카드 전체 조회 페이지 
 	@GetMapping("finance/corcardList")
-	public String CorcardListPage(ReportVO reportVO) {
+	public String CorcardListPage(CorcardVO corcardVO, Model model) {
+		model.addAttribute("card", financeService.findCorcardList(corcardVO));
+		model.addAttribute("maskedCardNum", corcardVO.maskedCardNum());
 		return "finance/corcard"; 
 	}
 	

@@ -44,14 +44,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>국민카드</td>
-                        <td>2021-07-19</td>
-                        <td>승인 / 67,000</td>
-                        <td>길동상사</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary">보기</button>
-                        </td>
+                    <tr th:each="card : ${card}">
+                        <td th:text="${card.corcardComp}"></td>
+                        <td th:text="${card.maskedCardNum}"></td>
+                        <td th:text="${card.userName}"></td>
+                        <td th:text="${#dates.format(card.corcardStart, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${#dates.format(card.corcardEnd, 'yyyy-MM-dd')}"></td>
                     </tr>
                 </tbody>
             </table>
