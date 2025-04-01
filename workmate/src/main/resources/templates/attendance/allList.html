@@ -34,7 +34,8 @@
 }
 .date-select {
 	width: 300px;
-	padding-bottom: 10px;
+	padding-bottom: 20px;
+	margin-top: 20px;
 }
 table {
 	width: 100%;
@@ -72,6 +73,7 @@ table {
 					<!-- 년도 월별 조회 기능 -->	
 					 <input type="hidden" name="stDate" th:value="${#dates.format(workVO.stDate, 'yyyy-MM-dd')}" >
 				     <input type="hidden" name="endDate" th:value="${#dates.format(workVO.endDate, 'yyyy-MM-dd')}">
+				     
 					<div class="date-select">
 					<label><b><i class="fas fa-calendar-alt"></i> 기간 조회 <b></label>				
 					 <input type="text" name="daterange" id="date-select" />
