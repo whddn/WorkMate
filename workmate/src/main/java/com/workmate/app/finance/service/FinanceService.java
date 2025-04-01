@@ -20,4 +20,7 @@ public interface FinanceService {
 	
 	// 법인카드 등록
 	public void inputCorCard(CorcardVO card) throws Exception;
+	
+	// 법인카드 조회
+	public List<CorcardVO> findCorcardList(CorcardVO corcardVO);
 }

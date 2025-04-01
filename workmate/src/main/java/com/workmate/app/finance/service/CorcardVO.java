@@ -17,12 +17,16 @@ public class CorcardVO {
 	private Long mLimit;			// 월한도
 	private Long dLimit;			// 일한도
 	private int userNo;				// 등록 사원번호
+	private String userName;
 	
 	// 마스킹된 카드 번호
 	public String maskedCardNum() {
-		if(corcardNum != null && corcardNum.length() >= 16) {
-			return corcardNum.substring(0, 4) + "-****-****-" + corcardNum.substring(12);
-		}
-		return corcardNum;
+	    if (corcardNum != null) {
+	        String digits = corcardNum.replaceAll("[^0-9]", ""); // 숫자만 추출
+	        if (digits.length() == 16) {
+	            return digits.substring(0, 4) + "-****-****-" + digits.substring(12);
+	        }
+	    }
+	    return corcardNum; // 마스킹 불가능할 경우 원본 반환
 	}
 }

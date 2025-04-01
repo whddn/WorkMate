@@ -118,6 +118,21 @@
  WHERE TRANS_ID     = #{transId}
 	
 	</update>
+	<!-- 법인카드 조회 -->
+	<select id="selectCorCardList" resultType="CorcardVO">
+		SELECT c.CORCARD_NO
+		        , c.CORCARD_NUM
+		        , c.OWNER_NO
+		        , c.CORCARD_START
+		        , c.CORCARD_END
+		        , c.CORCARD_COMP
+		        , c.CORCARD_STATUS
+		        , c.BANK_NAME
+		        , u.USER_NAME
+		FROM CORCARD c
+        JOIN EMPLOYEE u
+        ON c.owner_no = u.user_no
+	</select>
 	<!-- 법인카드 등록  -->
 	<insert id="insertCorCard" parameterType="CorcardVO">
     INSERT INTO CORCARD (

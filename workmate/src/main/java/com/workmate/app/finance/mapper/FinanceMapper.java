@@ -28,13 +28,13 @@ public interface FinanceMapper {
 	public int updateTransHistory(ReportVO reportVO);
 	
 	// 법인 카드 전체 조회 (관리자만 가능)
-	public List<ReportVO> selectCorCardList(ReportVO reportVO);
+	public List<CorcardVO> selectCorCardList(CorcardVO corcardVO);
 	
 	// 법인 카드 등록 
 	public void insertCorCard(CorcardVO card);
 	
 	// 법인 카드 상세 조회 
-	public List<ReportVO> selectCorCardById(ReportVO reportVO);
+	public List<CorcardVO> selectCorCardById(CorcardVO corcardVO);
 	
-
+	
 }

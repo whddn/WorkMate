@@ -116,10 +116,16 @@ public class FinanceServiceImpl implements FinanceService {
 	private AES256Util aes256;
 	
 	// 법인카드
+	@Override
 	public void inputCorCard(CorcardVO card) throws Exception {
 		String encryptedCardNum = aes256.encrypt(card.getCorcardNum());
 		card.setCorcardNum(encryptedCardNum);
 		financeMapper.insertCorCard(card);
+	}
+	
+	@Override
+	public List<CorcardVO> findCorcardList(CorcardVO corcardVO) {
+		return financeMapper.selectCorCardList(corcardVO);
 	}
 	
 }
