@@ -40,7 +40,8 @@
 		STATUS,
 		IS_READ AS isRead,
 		FOLDER_ID,
-		ENCRYPTED
+		ENCRYPTED,
+		SENDER_EMAIL
 		FROM MAIL
 		WHERE MAIL_ID = #{mailId}
 	</select>
