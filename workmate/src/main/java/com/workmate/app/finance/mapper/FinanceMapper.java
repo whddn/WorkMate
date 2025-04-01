@@ -34,7 +34,7 @@ public interface FinanceMapper {
 	public void insertCorCard(CorcardVO card);
 	
 	// 법인 카드 상세 조회 
-	public List<CorcardVO> selectCorCardById(CorcardVO corcardVO);
+	public CorcardVO selectCorcardById(CorcardVO corcardVO);
 	
 	
 }

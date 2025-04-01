@@ -162,4 +162,20 @@
        						  , #{userNo}
     					)
 	</insert>
+	<!-- 법인 카드 상세 -->
+	<select id="selectCorcardById" resultType="CorcardVO" parameterType="CorcardVO">
+		SELECT c.CORCARD_NO
+		        , c.CORCARD_NUM
+		        , c.OWNER_NO
+		        , c.CORCARD_START
+		        , c.CORCARD_END
+		        , c.CORCARD_COMP
+		        , c.CORCARD_STATUS
+		        , c.BANK_NAME
+		        , u.USER_NAME
+		FROM CORCARD c
+        JOIN EMPLOYEE u
+        ON c.owner_no = u.user_no
+        WHERE CORCARD_NO = #{corcardNo}
+	</select>
 </mapper>

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.workmate.app.finance.mapper.FinanceMapper;
-import com.workmate.app.finance.security.AES256Util;
 import com.workmate.app.finance.service.CorcardVO;
 import com.workmate.app.finance.service.FinanceService;
 import com.workmate.app.finance.service.ReportVO;
@@ -113,15 +112,21 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 	
 	
-	// 법인카드
+	// 법인카드 등록
 	@Override
 	public void inputCorCard(CorcardVO card) throws Exception {
 		financeMapper.insertCorCard(card);
 	}
-	
+	// 법인카드 리스트 전체 조회
 	@Override
 	public List<CorcardVO> findCorcardList(CorcardVO corcardVO) {
 		return financeMapper.selectCorCardList(corcardVO);
+	}
+	
+	// 법인 카드 상세
+	@Override
+	public CorcardVO findCorcardById(CorcardVO corcardVO) {
+		return financeMapper.selectCorcardById(corcardVO);
 	}
 	
 }

@@ -139,10 +139,6 @@
             <label>일일 한도</label>
             <input type="number" name="dLimit" required>
         </div>
-        <div class="form-group">
-            <label>등록한 사용자 사번</label>
-            <input type="number" name="userNo" required>
-        </div>
 
         <button type="submit">법인카드 등록</button>
     </form>
@@ -177,7 +173,7 @@
             .then(response => response.text())
             .then(result => {
                 this.reset();
-                console.log("보내는 데이터:", jsonData);
+                alert('정상 등록되었습니다.')
                 location.href="/workmate/finance/corcardList"
             })
             .catch(error => {
