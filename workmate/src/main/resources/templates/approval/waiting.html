@@ -13,8 +13,11 @@
 
 <body>
 	<h3>결재 진행</h3>
-	<input type="date" id="min-date" placeholder="시작 날짜 (YYYY-MM-DD)">
-	<input type="date" id="max-date" placeholder="끝 날짜 (YYYY-MM-DD)">
+	<div class="d-inline-flex gap-2">
+		<input type="date" id="min-date" class="form-control" style="width: 150px;" placeholder="시작 날짜 (YYYY-MM-DD)">
+		<h3>~</h3>
+		<input type="date" id="max-date" class="form-control" style="width: 150px;" placeholder="끝 날짜 (YYYY-MM-DD)">
+	</div>
 	<table id="WaitingsTable" class="display">
 		<thead>
 			<tr>
@@ -51,9 +54,9 @@
 		
 		// 날짜 필터 함수 정의
 	    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-	        var minDate = $('#min-date').val();
-	        var maxDate = $('#max-date').val();
-	        var date = data[6].trim(); // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
+	        let minDate = $('#min-date').val();
+	        let maxDate = $('#max-date').val();
+	        let date = data[6].trim(); // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
 
 	        if (!minDate && !maxDate) {
 	            return true; // 날짜 입력이 없으면 필터링 없이 표시

@@ -13,8 +13,11 @@
 
 <body>
 	<h3>결재 반려</h3>
-	<input type="date" id="min-date" placeholder="시작 날짜 (YYYY-MM-DD)">
-	<input type="date" id="max-date" placeholder="끝 날짜 (YYYY-MM-DD)">
+	<div class="d-inline-flex gap-2">
+		<input type="date" id="min-date" class="form-control" style="width: 150px;" placeholder="시작 날짜 (YYYY-MM-DD)">
+		<h3>~</h3>
+		<input type="date" id="max-date" class="form-control" style="width: 150px;" placeholder="끝 날짜 (YYYY-MM-DD)">
+	</div>
 	<table id="RejectionsTable" class="display">
 		<thead>
 			<tr>
