@@ -44,7 +44,7 @@ form {
     width: 100%; /* 입력 필드가 부모 컨테이너에 꽉 차도록 */
 }
 
-button{
+.search-container button{
 	margin-top: 20px;
 	height: 40px;
 }
@@ -69,7 +69,7 @@ a {
 				        <!-- 기간 -->
 				        <div class="search-group">				        
 				            <label><b>날짜</b></label>
-				            <input type="date" name="downloadDate" class="search-input" 
+				            <input type="date" name="downloadDate" class="search-input" id="searchDate"
 				            		th:value="${#dates.format(docVO.downloadDate, 'yyyy-MM-dd')}"/>
 				        </div>
 				        
