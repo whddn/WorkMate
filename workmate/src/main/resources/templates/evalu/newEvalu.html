@@ -5,21 +5,18 @@
     <meta charset="UTF-8">
     <title>신규 평가 등록</title>
     <style>
-     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
-    }
-    
     .container {
       max-width: 800px;
       margin: 50px auto;
       margin-bottom: 30px;
-      background: #fff;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
     }
-
+	.form-box {
+	background-color: white; /* ✅ 여기만 흰색 */
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			}
     h1 {
       text-align: center;
       margin-bottom: 30px;
@@ -174,12 +171,21 @@
     .form-row .form-group input {
       flex: 1;
     }
+    .title{
+		    text-align: center;
+		    font-size: 28px;
+		    font-weight: bold;
+		    color: #333;
+		    display: block;
+		    margin-left: 0px;
+		}
   </style>
   </head>
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script> <!--draggable-->
 <body>
   <div class="container">
-    <h1>신규 평가 등록</h1>
+  	<div class="form-box">
+    <h1 class="title">신규 평가 등록</h1>
     <form id="evaluation-form">
       <!-- 평가 제목 부분 -->
       <div class="form-row">
@@ -255,12 +261,13 @@
         </div>
       </div>
 
-      <!-- 등록하기 버튼과 취소 버튼 -->
+      <!-- 등록하기 버튼과 목록 버튼 -->
       <div class="button-container">
         <button type="button" id="submit-btn">등록하기</button>
         <button type="button" th:onclick="|location.href='@{/emp/bfevalu}'|">목록으로</button>
       </div>
     </form>
+  </div>
   </div>
 <script th:inline="javascript">
 
