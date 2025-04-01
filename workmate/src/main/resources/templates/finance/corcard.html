@@ -7,7 +7,7 @@
     <title>카드 사용 내역</title>
     <style>
   
-
+		
         .card-buttons button {
             margin-right: 10px;
         }
@@ -45,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="card : ${card}">
+                    <tr th:each="card : ${card}" th:onclick="|location.href='@{/finance/cardDetail/{no}(no=${card.corcardNo})}'|" style="cursor: pointer;">
                         <td th:text="${card.corcardComp}"></td>
                         <td th:text="${card.maskedCardNumDecrypted}"></td>  
                         <td th:text="${card.userName}"></td>

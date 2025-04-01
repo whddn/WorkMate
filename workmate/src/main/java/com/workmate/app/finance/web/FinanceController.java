@@ -131,13 +131,10 @@ public class FinanceController {
 	
 		 
 	 // 법인카드 등록
-	@PostMapping("/finance/newCard")
-	public ResponseEntity<?> register(@RequestBody CorcardVO card) {
-		 System.out.println("월한도: " + card.getMLimit());  // mLimit 값 출력
-		    System.out.println("일한도: " + card.getDLimit());  // dLimit 값 출력
-		    System.out.println("입력된 카드번호: " + card.getCorcardNum());
-
-		    
+	@PostMapping("finance/newCard")
+	public ResponseEntity<?> register(@RequestBody CorcardVO card, @AuthenticationPrincipal LoginUserVO loginUser) {
+			int userNo = loginUser.getUserVO().getUserNo();
+		    card.setUserNo(userNo);
 		    try {
 		        // 카드번호에서 하이픈 제거
 		        String rawCardNum = card.getCorcardNum().replaceAll("-", "");
@@ -154,5 +151,13 @@ public class FinanceController {
 		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 		                .body("등록 실패: " + e.getMessage());
 		    }
-}
+	}
+	
+	// 법인 카드 상세
+	@GetMapping("finance/cardDetail/{corcardNo}")
+	public String selectCorcardById(CorcardVO corcardVO, @PathVariable int corcardNo, Model model) {
+		corcardVO.setCorcardNo(corcardNo);
+		model.addAttribute("card", financeService.findCorcardById(corcardVO));
+		return "finance/corcardById";
+	}
 }

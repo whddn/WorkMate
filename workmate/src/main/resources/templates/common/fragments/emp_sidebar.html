@@ -87,35 +87,24 @@
                   <p>조직도</p>
                 </a>
               </li>
-              
-                <li class="nav-item submenu">
-                <a data-bs-toggle="collapse" href="#sidebarLayouts" class="" aria-expanded="true">
-                  <i class="fas fa-th-list"></i>
-                  <p>평가</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="sidebarLayouts">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a th:href="@{/emp/myEvalu}">
-                        <span class="sub-item">평가 목록</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a th:href="@{/emp/myResult}">
-                        <span class="sub-item">나의 평가</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>      
-              <li class="nav-item" th:if="${teamNo == 'ROLE_T001'}"><!--   이거 추가하면 인사관리팀으로 접속했을 때만 확인 가능 -->
-                <a th:href="@{/emp/bfevalu}">
-                  <i class="fas fa-pen-square"></i>
-                  <p>평가 관리</p>
-                </a>
-              </li>
-            </ul>
+			  <li class="nav-item">
+			  	<a th:href="@{/emp/myEvalu}"> 
+			  	  <i class="fas fa-pen-square"></i>
+					<p>내가 진행할 평가</p>
+				</a>
+		     </li>
+			 <li class="nav-item">
+			  	<a th:href="@{/emp/myResult}"> 
+			  	  <i class="fas fa-th-list"></i>
+					<p>내가 받은 평가</p>
+				</a>
+		     </li>
+		     <li class="nav-item">
+			  	<a th:href="@{/emp/bfevalu}" th:if="${teamNo == 'ROLE_T001'}"> 
+			  	  <i class="fas fa-address-book"></i>
+					<p>평가 관리</p>
+				</a>
+		     </li>
           </div>
         </div>
       </div>
