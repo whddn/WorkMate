@@ -163,13 +163,9 @@
 											</li>
 										</ul>
 									</div>
-
-								</td>
-								<td id="apprOrRef" rowspan="2">
-									<input type="radio" class="form-check-input" name="apprOrRef" value="appr">결재선으로
-									<input type="radio" class="form-check-input" name="apprOrRef" value="ref">참조자로
 								</td>
 								<td>
+									<input type="radio" class="form-check-input" name="apprOrRef" value="appr">결재선으로
 									<table id="ApprovalTable" class="display">
 										<thead>
 											<tr>
@@ -194,6 +190,7 @@
 									</ul>
 								</td>
 								<td>
+									<input type="radio" class="form-check-input" name="apprOrRef" value="ref">참조자로
 									<table id="ReferrersTable" class="display">
 										<thead>
 											<tr>
@@ -329,7 +326,7 @@
 	
 	// 조직도의 사원을 클릭하면 apprElmntList에 저장할지, refElmntList에 저장할지 알아서 해준다
 	function addElmnt(userNo) {
-		const result = $('#apprOrRef > input[type="radio"]:checked').val();
+		const result = $('input[type="radio"]:checked').val();
 		if(result == 'appr') {
 			addApprElmnt(userNo);
 		}
@@ -368,8 +365,11 @@
 		const month = (today.getMonth() + 1).toString().padStart(2, '0');
 		const day = today.getDate().toString().padStart(2, '0');
 		
-		$('#ApprovalsTable').DataTable();
-		$('#AttachTable').DataTable();
+		$('#AttachTable').DataTable({
+			searching: false,
+	        lengthChange: false,
+	        info: false
+	    });
 		$('#ApprovalTable').DataTable({
 		    lengthChange: false,
 		    searching: false,

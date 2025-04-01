@@ -133,8 +133,16 @@
 	
 	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
-		$('#ApprovalsTable').DataTable();
-		$('#AttachTable').DataTable();
+		$('#ApprovalsTable').DataTable({
+			searching: false,
+	        lengthChange: false,
+	        info: false
+	    });
+		$('#AttachTable').DataTable({
+			searching: false,
+	        lengthChange: false,
+	        info: false
+	    });
 		
 		$('#apprNo').text(approval.apprNo);
 		$('#userName').text(approval.userName);
