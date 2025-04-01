@@ -40,7 +40,8 @@
 - **Frontend** : HTML5, CSS3, JavaScript  
 - **Backend** : Java, Spring Framework  
 - **Database** : Oracle  
-- **Version Control** : Git, GitHub  
+- **Version Control** : Git, GitHub
+- **DevOps & Infra** : Docker, Jekins, AWS EC2  
 
 ---
 
@@ -63,4 +64,7 @@
 
 ---
 
+## ✅ 프로젝트 목적
+ 
+> 팀 협업을 위한 네이밍 규칙을 설계하여 진행되었습니다.
 > 본 프로젝트는 팀워크 기반의 협업과 실제 업무 환경을 반영한 실전형 시스템 구축을 목표로 진행되었습니다.
