@@ -140,6 +140,7 @@ public class DocumentController {
                                     Model model,
                                     @AuthenticationPrincipal LoginUserVO loginUser) {
 		
+		Integer userNo = loginUser.getUserVO().getUserNo();
 		String userId = loginUser.getUserVO().getUserId();
 		String teamNo = loginUser.getUserVO().getTeamNo();
 		
@@ -153,6 +154,7 @@ public class DocumentController {
 			String saveFileName = fileHandler.fileUpload(file, uploadDir + subDir, false);
 			String fileExtension = fileName.substring(fileName.lastIndexOf(".")+1).toUpperCase();
 			
+			docVO.setUserNo(userNo);
 			docVO.setFileName(fileName);
 			docVO.setAttachment(saveFileName); //다운받을 파일이름
 			docVO.setFileSize(file.getSize());

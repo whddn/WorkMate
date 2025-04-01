@@ -13,9 +13,9 @@ public class ReportVO {
 	private String reportStatus;		// 보고서 결재 상태
 	private Date writeDate;				// 보고서 작성 날짜
 	private Date updateDate;			// 수정 날짜
-	private int totalDep;				// 입금액
-	private int totalDrawal;				// 출금액
-	private int totalBal;				// 잔액
+	private Integer totalDep;				// 입금액
+	private Integer totalDrawal;				// 출금액
+	private Integer totalBal;				// 잔액
 	private String userPosition;		// 직급
 	private String reportNote;			// 비고
 	private Date apprDate;				// 결재 완료 날짜
@@ -35,9 +35,9 @@ public class ReportVO {
 	private Date transDate;				// 거래 날짜
 	private Date transStart;			// 총 거래 시작일
 	private Date transEnd;				// 총 거래 마감일
-	private int balance;				// 잔액
+	private Integer balance;				// 잔액
 	private String purposeUse;			// 상세
 	private String transMethod;			// 거래 방법
-	private int deposit;				// 입금액
-	private int withdrawal;				// 출금액
+	private Integer deposit;				// 입금액
+	private Integer withdrawal;				// 출금액
 }

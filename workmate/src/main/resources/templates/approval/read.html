@@ -12,9 +12,9 @@
 </head>
 
 <body>
-	<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
-	<div>
-		<table id="AttachTable" class="display">
+	<div id="apprForm" class="card mx-5 px-3 py-5" th:insert="~{|forms/approval/${approval.formPath}|}"></div>
+	<div class="card mx-5 px-3 py-5">
+		<table id="AttachTable" class="display table table-striped table-bordered mt-2">
 		    <thead>
 		        <tr>
 		            <th>파일 이름</th>
@@ -32,7 +32,7 @@
 		        </tr>
 		    </tbody>
 		</table>
-		<table id="ApprovalsTable" class="display">
+		<table id="ApprovalsTable" class="display table table-striped table-bordered mt-2">
 			<thead>
 				<tr>
 					<th>결재</th>
@@ -56,27 +56,11 @@
 				</th:block>
 			</tbody>
 		</table>
-		<button
-			id="delApprBtn"
-			type="button" 
-			class="btn btn-secondary">
-			삭제
-		</button>
-		<button 
-			id="apprBtn"
-			type="button" 
-			class="btn btn-primary" 
-			data-bs-toggle="modal" 
-			data-bs-target="#approveModal" 
-			data-bs-whatever="@mdo">
-			결재
-		</button>
-		<button
-			type="button"
-			class="btn btn-primary"
-			onclick="history.back();">
-			취소
-		</button>
+		<div class="d-flex justify-content-start gap-2 mt-3">
+			<button id="delApprBtn" type="button" class="btn btn-secondary">삭제</button>
+			<button id="apprBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approveModal">결재</button>
+			<button type="button" class="btn btn-primary" onclick="history.back();">취소</button>
+		</div>
 	</div>
 	
 	<!-- 모달 창 -->
@@ -133,25 +117,36 @@
 	
 	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
-		$('#ApprovalsTable').DataTable();
-		$('#AttachTable').DataTable();
+		$('#ApprovalsTable').DataTable({
+			searching: false,
+	        lengthChange: false,
+	        info: false
+	    });
+		$('#AttachTable').DataTable({
+			searching: false,
+	        lengthChange: false,
+	        info: false
+	    });
 		
 		$('#apprNo').text(approval.apprNo);
 		$('#userName').text(approval.userName);
 		$('#userNo').text(approval.userNo);
 		$('#departmentName').text(approval.departmentName);
-		$('#createDate').text(approval.createDate);
-		$('#expireDate').text(approval.expireDate);
+		$('#createDate').text(approval.createDate.split("T")[0]);
+		$('#expireDate').text(approval.expireDate.split("T")[0]);
 
 		Object.keys(approval).forEach(function(key) {
 			let target = $(`
 				input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']
 			`);
-			if (target.length > 0) {
+			if(target.length > 0) {
 				let value = approval[key] !== null ? approval[key] : 'null';
-				target.val(approval[key]).attr('readonly', true);
+		        target.val(value);
 			}
 		});
+		
+		$('#apprForm').find('input[name], select[name], textarea[name], button[name]').attr('readonly', true);
+		$('#apprForm').find('input[name][type="radio"], input[name][type="checkbox"]').attr('onclick', 'return false;');
 		
 		$('#setApprLine').remove();
 		

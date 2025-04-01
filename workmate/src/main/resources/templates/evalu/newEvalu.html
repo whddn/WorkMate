@@ -3,7 +3,7 @@
   layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
   <head>
     <meta charset="UTF-8">
-    <title>new Evalu</title>
+    <title>신규 평가 등록</title>
     <style>
      body {
       font-family: 'Segoe UI', sans-serif;
@@ -13,10 +13,11 @@
     .container {
       max-width: 800px;
       margin: 50px auto;
+      margin-bottom: 30px;
       background: #fff;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     h1 {
@@ -25,14 +26,15 @@
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     label {
       font-weight: bold;
       color: #333;
       display: block;
-      margin-bottom: 5px;
+      margin: 0px 0px 5px 0px;
+      text-align: center;
     }
 
     input, select {
@@ -83,6 +85,9 @@
       cursor: pointer;
     }
 
+	#evaCompet{
+	width: 135px;
+	}
     .button-container button#cancel-btn {
       background-color: #e7edf7;
       color: #333;
@@ -171,28 +176,37 @@
     }
   </style>
   </head>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script> <!--draggable-->
 <body>
   <div class="container">
-    <h1>다면 평가 등록</h1>
+    <h1>신규 평가 등록</h1>
     <form id="evaluation-form">
       <!-- 평가 제목 부분 -->
       <div class="form-row">
         <div class="form-group">
-          <label for="evaluName">평가 제목</label>
-          <input type="text" id="evaluName" name="evaluName" required>
+          <label for="evaluName">제목</label>
+          <input type="text" id="evaluName" name="evaluName" required placeholder="평가 제목을 입력하세요.">
         </div>
       </div>
 
       <!-- 기간 설정 -->
       <div class="form-row">
         <div class="form-group">
-          <label for="start-date">평가 시작일</label>
+          <label for="start-date">시작일</label>
           <input type="date" id="start-date" name="start-date" required>
         </div>
 
         <div class="form-group">
-          <label for="end-date">평가 종료일</label>
+          <label for="end-date">종료일</label>
           <input type="date" id="end-date" name="end-date" required>
+        </div>
+      </div>
+
+		<!-- 평가 설명 -->
+	  <div class="form-row">
+        <div class="form-group">
+          <label for="evaluName">설명</label>
+          <input type="text" id="evaluDescript" name="evaluDescript" required placeholder="평가 설명을 입력하세요.">
         </div>
       </div>
 
@@ -204,18 +218,15 @@
             <th>내용</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="sortable">
         <th:block th:each="con : ${content}">
           <tr>
-			<td>
-              <select id="evaCompet">
-                <option th:each="com : ${content}">[[ ${com.key} ]]</option> 
-                <!-- [[ ${con.key} ]] 로 바꾸기 -->
-              </select>
+			<td class="ui-state-default">
+			<input th:value="${con.key}" id="evaCompet">
             </td>
             <td>
               <select id="allContent">
-                <option>내용을 선택하세요.</option>
+                <option th:each="content : ${con.value}" th:text="${content.evaluContent}" th:value="${content.evaluItemNo}">내용을 선택하세요.</option>
               </select>
             </td>
           </tr>
@@ -268,7 +279,7 @@
 	let contentSelect = document.querySelectorAll("#allContent"); // 오른쪽 드롭다운들
 	
 	// 각 드롭다운에 대해 이벤트 리스너 추가
-	for (let i = 0; i < competSelect.length; i++) {
+	/* for (let i = 0; i < competSelect.length; i++) {
 	    competSelect[i].addEventListener('change', function() {
 	        let selectedCompet = competSelect[i].value;  // 선택된 평가 항목
 	        let rightAll = contentSelect[i]; // 해당 평가 항목에 맞는 오른쪽 드롭다운
@@ -287,7 +298,7 @@
 	        }
 	    });
 	     competSelect[i].dispatchEvent(new Event('change'));
-	}
+	} */
 
 		// '등록하기' 버튼 클릭 시 실행되는 이벤트
 		document.querySelector('#submit-btn').addEventListener('click', e => {
@@ -298,6 +309,7 @@
 	function inputNewEvalu() {
 	    // 폼에서 입력된 값 가져오기
 	    let evaluName = document.querySelector('#evaluName').value;
+	    let evaluDescript = document.querySelector('#evaluDescript').value;
 	    let evaluStart = document.querySelector('#start-date').value;
 	    let evaluEnd = document.querySelector('#end-date').value;
 	    let competSelect = document.querySelectorAll("#evaCompet");
@@ -335,7 +347,8 @@
 	        'evaluEnd': evaluEnd,		// 평가 끝
 	        'evaluGroupId': department,  // 평가자 (팀)
 	        'evaluateeGroupId': team,  // 피평가자 (팀)
-	        'evaluItem': itemList  // 선택된 항목 리스트
+	        'evaluItem': itemList,  // 선택된 항목 리스트
+	        'evaluDescript' : evaluDescript // 평가 설명
 	    };
         console.log(EvaluItem);
 	
@@ -360,6 +373,15 @@
 	        console.error('에러 발생:', err);
 	    });
 	}
+	
+	// 드래그 가능
+	$(function() {
+	  $("#sortable").sortable({
+	    revert: true,
+	    helper: "clone",
+	    placeholder: "sortable-placeholder"
+	  });
+	});
 </script>
 </body>
 </html>

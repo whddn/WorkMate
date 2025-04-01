@@ -187,18 +187,18 @@ public class EmpServiceImpl implements EmpService {
 	// 평가 등록 페이지
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {
-		 LocalDate startDate = evaluVO.getEvaluStart().toInstant()
-                 .atZone(ZoneId.systemDefault())
-                 .toLocalDate();
-
-		LocalDate today = LocalDate.now();
-		
-		if (startDate.equals(today)) {
-		evaluVO.setUsageStatus("진행 중"); 
-		} else {
-		evaluVO.setUsageStatus("대기 중");
-		}
-		
+//		 LocalDate startDate = evaluVO.getEvaluStart().toInstant()
+//                 .atZone(ZoneId.systemDefault())
+//                 .toLocalDate();
+//
+//		LocalDate today = LocalDate.now();
+//		
+//		if (startDate.equals(today)) {
+//		evaluVO.setUsageStatus("진행 중"); 
+//		} else {
+//		evaluVO.setUsageStatus("대기 중");
+//		}
+//		
 		return empMapper.insertOneEvalu(evaluVO);
 		}
 

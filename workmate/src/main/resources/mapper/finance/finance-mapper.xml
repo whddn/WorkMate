@@ -92,7 +92,14 @@
 		            , #{reportNo}
 		            ) 
 	</insert>
-	
+	<!-- transHistory insert 후 report 업데이트 -->
+	<update id="updateReportTotalAmounts" parameterType="ReportVO">
+	    UPDATE REPORT
+	    SET TOTAL_DEP = #{totalDep},
+	        TOTAL_DRAWAL = #{totalDrawal},
+	        TOTAL_BAL = ${totalBal}
+	    WHERE REPORT_NO = #{reportNo}
+	</update>
 	<!-- Report 수정 -->
 	<update id="updateReportOne" parameterType="ReportVO">
 		UPDATE REPORT
@@ -118,6 +125,21 @@
  WHERE TRANS_ID     = #{transId}
 	
 	</update>
+	<!-- 법인카드 조회 -->
+	<select id="selectCorCardList" resultType="CorcardVO">
+		SELECT c.CORCARD_NO
+		        , c.CORCARD_NUM
+		        , c.OWNER_NO
+		        , c.CORCARD_START
+		        , c.CORCARD_END
+		        , c.CORCARD_COMP
+		        , c.CORCARD_STATUS
+		        , c.BANK_NAME
+		        , u.USER_NAME
+		FROM CORCARD c
+        JOIN EMPLOYEE u
+        ON c.owner_no = u.user_no
+	</select>
 	<!-- 법인카드 등록  -->
 	<insert id="insertCorCard" parameterType="CorcardVO">
     INSERT INTO CORCARD (
@@ -147,4 +169,20 @@
        						  , #{userNo}
     					)
 	</insert>
+	<!-- 법인 카드 상세 -->
+	<select id="selectCorcardById" resultType="CorcardVO" parameterType="CorcardVO">
+		SELECT c.CORCARD_NO
+		        , c.CORCARD_NUM
+		        , c.OWNER_NO
+		        , c.CORCARD_START
+		        , c.CORCARD_END
+		        , c.CORCARD_COMP
+		        , c.CORCARD_STATUS
+		        , c.BANK_NAME
+		        , u.USER_NAME
+		FROM CORCARD c
+        JOIN EMPLOYEE u
+        ON c.owner_no = u.user_no
+        WHERE CORCARD_NO = #{corcardNo}
+	</select>
 </mapper>
