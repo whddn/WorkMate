@@ -31,28 +31,18 @@
             <ul class="nav nav-secondary">
               <!-- 고정 메뉴 -->
               <li class="nav-item">
-                <a href="#dashboard">
+                <a th:href="@{/}">
                   <i class="fas fa-home"></i>
                   <p>메인화면</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#dashboard">
+               <a th:href="@{/search}">
                   <i class="fas fa-search"></i>
                   <p>검색</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a
-                  data-bs-toggle="collapse"
-                  href="#dashboard"
-                  class="collapsed"
-                  aria-expanded="false"
-                >
-                  <i class="fas fa-star"></i>
-                  <p>즐겨찾기</p>
-                  <span class="caret"></span>
-                </a>
+              <li class="nav-item">               
                 <div class="collapse" id="dashboard">
                   <ul class="nav nav-collapse">
                     <li>
