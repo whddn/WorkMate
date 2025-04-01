@@ -31,7 +31,7 @@ public class SpringSecurityConfig {
 
 				    // 중간 권한
 					.requestMatchers("/attendance/attendanceManage").hasRole("T001")
-					.requestMatchers("/vendor/insert").hasRole("T004")
+					.requestMatchers("/vendor/insert").hasRole("T003")
 					.requestMatchers("/emp/bfevalu").hasRole("T001")	// 평가 관리 권한 (인사관리팀)
 					// 관리자 권한
 					.requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN") // 관리자만 접근 허용 ROLE_ADMIN
