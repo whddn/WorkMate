@@ -88,14 +88,13 @@
 	    <label><strong>서명</strong></label>
 	    <canvas id="signatureCanvas"></canvas>
 	    <input type="hidden" name="signatureImage" id="signatureImage">
-	    <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="clearSignature()">서명 초기화</button>
 	  </td>
 	</tr>
 
     </table>
 
     <div class="d-flex justify-content-end mt-3">
-      <button type="submit" class="btn btn-success">등록</button>
+      <a th:href="@{/contracts/main}" class="btn btn-primary">목록으로</a>
     </div>
   </form>
 </div>
