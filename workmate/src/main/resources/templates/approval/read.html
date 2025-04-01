@@ -140,8 +140,8 @@
 		$('#userName').text(approval.userName);
 		$('#userNo').text(approval.userNo);
 		$('#departmentName').text(approval.departmentName);
-		$('#createDate').text(approval.createDate);
-		$('#expireDate').text(approval.expireDate);
+		$('#createDate').text(approval.createDate.split("T")[0]);
+		$('#expireDate').text(approval.expireDate.split("T")[0]);
 
 		Object.keys(approval).forEach(function(key) {
 			let target = $(`
