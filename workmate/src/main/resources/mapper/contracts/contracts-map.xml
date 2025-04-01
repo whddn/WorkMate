@@ -21,7 +21,7 @@
 	      ,cntr_location
 	      ,cntr_money
 		from contracts
-		order by vend_code
+		order by contr_no
 	</select>
 	
 	<!-- 단건 -->
@@ -44,7 +44,7 @@
 	      ,cntr_location
 	      ,cntr_money
 		from contracts
-		order by vend_code=#{vendCode}
+		where contr_no=#{contrNo}
 	</select>
 	
 	<!-- 등록 -->

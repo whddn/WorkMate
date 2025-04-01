@@ -42,12 +42,12 @@
               <td>
                 <!-- 표준근로계약서 -->
                 <a th:if="${cntr.contrTitle == '표준근로계약서'}"
-                   th:href="@{'/contract/Standard_Detail_Form/' + ${cntr.contrNo}}"
+                   th:href="@{'/contracts/Standard_Detail_Form/' + ${cntr.contrNo}}"
                    th:text="${cntr.contrTitle}"></a>
 
                 <!-- 거래처계약서 -->
                 <a th:if="${cntr.contrTitle == '거래처계약서'}"
-                   th:href="@{'/contract/Trade_Detail_Form/' + ${cntr.contrNo}}"
+                   th:href="@{'/contracts/Trade_Detail_Form/' + ${cntr.contrNo}}"
                    th:text="${cntr.contrTitle}"></a>
 
                 <!-- 기타 -->

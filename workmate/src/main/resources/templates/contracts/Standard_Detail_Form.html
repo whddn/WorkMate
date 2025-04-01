@@ -38,14 +38,13 @@
 <div class="container mt-5">
     <h2 class="mb-4 text-center"> 표준근로계약서 (기간의 정함이 없는 경우)</h2>
     <form id="standardContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
-    <input type="hidden" name="contrTitle" value="표준근로계약서">
 
         <div class="contract-section">
-            <p>(이하 "사업주"라 함)과 <input type="text" name="employeeName"> (이하 "근로자"라 함)은 다음과 같이 근로계약을 체결한다.</p>
+            <p>(이하 "사업주"라 함)과 <input type="text" name="employeeName" th:value="${contr.contrB}"> (이하 "근로자"라 함)은 다음과 같이 근로계약을 체결한다.</p>
             <ol>
-                <li>근로 개시일 : <input type="date" name="contrStart"></li>
-                <li>근무 장소 : <input type="text" name="cntrLocation" class="wide-input"></li>
-                <li>업무의 내용 : <input type="text" name="contrContent" class="wide-input"></li>
+                <li>근로 개시일 : <input type="date" name="contrStart" th:value="${#dates.format(contr.contrStart, 'yyyy-MM-dd')}"></li>
+                <li>근무 장소 : <input type="text" name="cntrLocation" class="wide-input" th:value="${contr.cntrLocation}"></li>
+                <li>업무의 내용 : <input type="text" name="contrContent" class="wide-input" th:value="${contr.contrContent}"></li>
                 <li>소정근로시간 : <input type="number" value="07" readonly>시 <input type="number" value="00" readonly>분부터
                     <input type="number" value="18" readonly>시 <input type="number" value="00" readonly>분까지
                 </li>
@@ -61,26 +60,29 @@
                 <li>연차유급휴가는 근로기준법에 따라 부여함</li>
                 <li>
                     사회보험 적용여부:<br>
-                    <input type="checkbox" name="contrStatus" value="고용보험"> 고용보험
-                    <input type="checkbox" name="contrStatus" value="산재보험"> 산재보험
-                    <input type="checkbox" name="contrStatus" value="국민연금"> 국민연금
-                    <input type="checkbox" name="contrStatus" value="건강보험"> 건강보험
+                    <input type="radio" name="contrStatus" value="고용보험" th:checked="${contr.contrStatus == '고용보험'}"> 고용보험
+                    <input type="radio" name="contrStatus" value="산재보험" th:checked="${contr.contrStatus == '산재보험'}"> 산재보험
+                    <input type="radio" name="contrStatus" value="국민연금" th:checked="${contr.contrStatus == '국민연금'}"> 국민연금
+                    <input type="radio" name="contrStatus" value="건강보험" th:checked="${contr.contrStatus == '건강보험'}"> 건강보험
                 </li>
                 <li>근로계약서 교부 : 계약 체결 시 본 계약서를 교부함 (근로기준법 제17조)</li>
                 <li>근로계약 및 취업규칙 등의 성실한 이행의무</li>
                 <li>기타 : 본 계약서에 정함이 없는 사항은 근로기준법에 의함</li>
             </ol>
 
-            <p class="mt-4 text-end">작성일 : <input type="date" name="createDate"></p>
+            <p class="mt-4 text-end">작성일 : <input type="date" name="createDate" th:value="${#dates.format(contr.createDate, 'yyyy-MM-dd')}"></p>
 
             <table class="table table-bordered">
                 <tr>
                     <th style="width: 20%">근로자 성명</th>
-                    <td><input type="text" name="contrB" class="form-control"></td>
+                    <td><input type="text" name="contrB" class="form-control" th:value="${contr.contrB}"></td>
                     <th style="width: 20%">서명</th>
                     <td>
-                        <canvas id="signatureCanvas" width="300" height="100" style="border:1px solid #ccc;"></canvas>
-                        <input type="hidden" name="signImageBase64" id="signImageInput">
+                        <img th:src="'data:image/png;base64,' + ${contr.signImageBase64}"
+					     alt="근로자 서명"
+					     style="max-width: 300px; border: 1px solid #ccc;" />
+                        
+                        <input type="hidden" name="signImageBase64" id="signImageInput" th:value="${contr.signImageBase64}">
                         <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="clearSignature()">서명 지우기</button>
                     </td>
                 </tr>
@@ -88,7 +90,7 @@
         </div>
 
         <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary">제출</button>
+            <a th:href="@{/contracts/main}" class="btn btn-primary">목록으로</a>
         </div>
     </form>
 </div>
