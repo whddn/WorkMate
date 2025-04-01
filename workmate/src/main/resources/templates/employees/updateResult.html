@@ -1,0 +1,46 @@
+<div th:fragment="employeeFrag">
+    <!-- 오른쪽: 상세 정보 카드 -->
+    <div class="card" id="detailsBox">
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">ID</span>
+          <input class="value" id="info-id" th:value="${update.userId}" readonly>
+        </div>
+        <div class="info-row">
+          <span class="label">성명</span>
+          <input class="value" id="info-name" th:value="${update.userName}">
+        </div>
+        <div class="info-row">
+          <span class="label">팀이름</span>
+          <select class="value"  id="info-team">
+          	<option th:value="${team.teamNo}" th:each="team : ${teams}" th:text="${team.teamName}" th:selected="${team.teamNo} == ${update.teamNo}"></option>
+          </select>
+        </div>
+        <div class="info-row">
+          <span class="label">사원번호</span>
+          <input class="value" id="info-userNo" th:value="${update.userNo}" readonly>
+        </div>
+        <div class="info-row">
+          <span class="label">입사일</span>
+          <input class="value" type="date" id="info-hire" th:value="${#dates.format(update.hireDate, 'yyyy-MM-dd')}">
+        </div>
+        <div class="info-row">
+          <span class="label">휴대폰</span>
+          <input class="value" id="info-phone" th:value="${update.userPhone}">
+        </div>
+        <div class="info-row">
+          <span class="label">집주소</span>
+          <input class="value" id="info-address" th:value="${update.address}">
+          <span id="search_icon" style="cursor: pointer">
+          <i class="fa fa-search"></i>
+          </span>
+        </div>
+      </div>
+      <div class="buttons-container">
+        <div class="action-buttons">
+        <br>
+          <button id="update-employee"
+            th:data-no="${update.userNo}" type="button" class="btn btn-warning">저장하기</button>
+        </div>
+      </div>
+  </div>

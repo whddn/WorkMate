@@ -114,6 +114,19 @@ public class EmpController {
 		// employeeFrag : fragment 교체(html의)
 	}
 
+	// 조직도 수정 페이지 - 수정 후 단건 조회로 이동 (fragment)
+	/* @GetMapping("emp/organ")
+	public String empUpdateResultPage(EmpVO empVO, Model model) {
+
+		EmpVO userVO = empService.findEmpByEmpNo(empVO);
+		// 2) 서비스
+		model.addAttribute("update", userVO);
+		model.addAttribute("teams", empService.findTeamList()); // 팀명
+		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
+		model.addAttribute("rank", empService.findPositionList()); // 직급명
+		return "employees/updateResult::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
+		// employeeFrag : fragment 교체(html의)
+	} */
 
 	// 조직도 수정 AJAX 단건 조회
 	@GetMapping("emp/update/{userNo}")
@@ -133,7 +146,6 @@ public class EmpController {
 		EmpVO updatedEmp = empService.findEmpByEmpNo(empVO); // 수정된 사원 조회
 		return ResponseEntity.ok(updatedEmp); // 수정된 사원 정보 반환
 	}
-
 
 	// 내 평가 리스트 (일반 사용자)
 	@GetMapping("emp/myEvalu")
@@ -226,7 +238,7 @@ public class EmpController {
 	    return "evalu/ajaxResult :: resultFragment";
 	}
 
-	
+
 
 	// 평가 등록 페이지 (관리자)
 	@GetMapping("emp/neweva")
