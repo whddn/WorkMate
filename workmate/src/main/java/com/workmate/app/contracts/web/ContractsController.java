@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
  * ----------------------
  * 03-28	이종우	전자계약 목록
  * 03-30	이종우	전자계약 등록, 조회
+ * 04-01	이종우	전자계약 상세페이지
  * 
  * </pre>
  */
@@ -53,6 +54,11 @@ public class ContractsController {
 		return "contracts/contractsForm"; // 리스트 페이지
 	}
 
+	/**
+	 * 
+	 * @param contrNo
+	 * @return
+	 */
 	@GetMapping("/view/{contrNo}")
 	public String viewContractPage(@PathVariable String contrNo) {
 	    switch (contrNo) {
@@ -64,14 +70,12 @@ public class ContractsController {
 	            return "error/404";
 	    }
 	}
-
-	
-	@GetMapping("/test")
-	public String testView() {
-	    return "forms/contracts/Standard_Contract_Form";
-	}
-
-	
+	/**
+	 * 
+	 * @param contract
+	 * @param model
+	 * @return
+	 */
 	@PostMapping("/submit")
 	public String submitContract(@ModelAttribute ContractsVO contract, Model model) {
 
@@ -99,7 +103,9 @@ public class ContractsController {
 	}
 
 	/**
-	 * 전자계약 메인 리스트
+	 * 전자계약한 목록들 조회
+	 * @param model
+	 * @return
 	 */
 	@GetMapping("/main")
 	public String contractsList(Model model) {
@@ -107,4 +113,21 @@ public class ContractsController {
 		model.addAttribute("contr", list);
 		return "contracts/contractsList";
 	}
+	
+	// 표준근로계약서 상세
+    @GetMapping("/Standard_Detail_Form/{contrNo}")
+    public String standardDetail(ContractsVO contractsVO, Model model) {
+        ContractsVO contract = contractsService.findContractsById(contractsVO);
+        model.addAttribute("contract", contract);
+        return "contracts/Standard_Detail_Form";
+    }
+
+    // 거래처계약서 상세
+    @GetMapping("/Trade_Detail_Form/{contrNo}")
+    public String tradeDetail(ContractsVO contractsVO, Model model) {
+        ContractsVO contract = contractsService.findContractsById(contractsVO);
+        model.addAttribute("contract", contract);
+        return "contracts/Trade_Detail_Form";
+    }
+	
 }
