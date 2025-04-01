@@ -5,17 +5,17 @@
 <meta charset="UTF-8">
 <title>입출금 내역서</title>
 <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-        }
+		.form-box {
+			background-color: white; /* ✅ 여기만 흰색 */
+			padding: 30px;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			margin-top: 50px;
+			}
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: #fff;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
         }
         table {
             width: 100%;
@@ -67,6 +67,7 @@
 </head>
 <body>
 <div class="container">
+<div class="form-box">
 
     <h2>[[ ${trans[0].reportTitle} ]] </h2>
 
@@ -121,6 +122,7 @@
     </table>
     <button type="button" th:onclick="|location.href='@{/finance/reportUpdate/{reportNo}(reportNo=${reportVO.reportNo})}'|">수정</button>
     <button type="button" th:onclick="|location.href='@{/finance/report}'|">목록으로</button>
+</div>
 </div>
 </body>
 </html>

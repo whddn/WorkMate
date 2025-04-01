@@ -12,6 +12,13 @@
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
   <style>
+  	  .form-box {
+			background-color: white; /* ✅ 여기만 흰색 */
+			padding: 30px;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			margin-bottom: 100px;
+			}
     .center-wrapper {
       display: flex;
       justify-content: center;
@@ -79,6 +86,7 @@
 <body>
 
   <div class="center-wrapper">
+  <div class="form-box">
     <div class="dept-box">
       <h2>📌 부서 등록</h2>
 
@@ -127,7 +135,7 @@
       </form>
     </div>
   </div>
-
+</div>
   <!-- ✅ 필수 스크립트들 (순서 중요!) -->
   <script src="/assets/js/core/jquery-3.7.1.min.js"></script>
   <script src="/assets/js/plugins/jquery.scrollbar.min.js"></script>

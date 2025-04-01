@@ -3,28 +3,14 @@
   layout:decorate="~{common/layouts/finance_layout}" layout:fragment="content">
 <head>
     <meta charset="UTF-8">
-    <title>법인카드 등록</title>
+    <title>법인 카드 등록</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f8f9fc;
-            margin: 0;
-            padding: 0;
-        }
-
         .container {
             max-width: 800px;
             margin: 50px auto;
             padding: 40px;
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
         }
-
+		
         h2 {
             text-align: center;
             color: #2c3e50;
@@ -93,6 +79,7 @@
 </head>
 <body>
 <div class="container">
+<div class="form-box">
     <h2>법인카드 등록</h2>
     <form id="corpCardForm" class="form-grid">
         <div class="form-group">
@@ -143,7 +130,7 @@
         <button type="submit">법인카드 등록</button>
     </form>
 </div>
-
+</div>
 <script>
     document.getElementById('corpCardForm').addEventListener('submit', function (e) {
         e.preventDefault();

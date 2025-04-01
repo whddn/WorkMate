@@ -6,19 +6,17 @@
 	<meta charset="UTF-8" />
 	<title>리포트 수정</title>
 	<style>
-		body {
-			font-family: 'Arial', sans-serif;
-			background-color: #f9f9f9;
-
-		}
-
+	  .form-box {
+			background-color: white; /* ✅ 여기만 흰색 */
+			padding: 30px;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			margin-top: 50px;
+			}
 		#container {
 			max-width: 1000px;
 			margin: 0 auto;
-			background-color: #fff;
-			border-radius: 10px;
 			padding: 40px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		}
 
 		input[type="date"] {
@@ -143,7 +141,7 @@
 
 <body>
 	<div id="container">
-		
+		<div class="form-box">
 		<input type="text" name="reportTitle" th:value="${report[0].reportTitle}" id="reportTitle">
 		<h3>기본 정보</h3>
 		<table>
@@ -241,7 +239,7 @@
 			</div>
 		</div>
 	</div>
-
+	</div>
 	<script>
 
 		function calculateTotals() {
