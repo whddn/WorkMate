@@ -55,37 +55,13 @@
                   <p>검색</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a
-                  data-bs-toggle="collapse"
-                  href="#dashboard"
-                  class="collapsed"
-                  aria-expanded="false"
-                  >
-                  <i class="fas fa-star"></i>
-                  <p>즐겨찾기</p>
-                  <span class="caret"></span>
+              <li class="nav-item" sec:authorize="hasAuthority('ROLE_ADMIN')">
+                <a th:href="@{/admin/apprFormList}">
+                  <i class="fas fa-portrait"></i>
+                  <p>관리자</p>
                 </a>
-                <div class="collapse" id="dashboard">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="">
-                        <span class="sub-item">즐겨찾기 설정</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="">
-                        <span class="sub-item">즐겨찾기1</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="">
-                        <span class="sub-item">즐겨찾기2</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
               </li>
+              
               
             </ul>
           </div>
