@@ -13,6 +13,7 @@
 		        , d.file_reg_date
 		        , d.update_user
 		        , e.user_id
+		        , e.user_no
 		FROM document d 
 		LEFT JOIN EMPLOYEE e ON d.user_no = e.user_no
 		LEFT JOIN team t ON e.team_no = t.team_no
@@ -42,6 +43,7 @@
 	  <if test="userName != null and userName != ''">
         	AND e.user_name LIKE '%' || #{userName} || '%'
 	   </if>
+	   ORDER BY h.download_date DESC
 	</select>
 	
 	<!-- 자료실 단건조회, 파일삭제 및 업로드에 사용 -->

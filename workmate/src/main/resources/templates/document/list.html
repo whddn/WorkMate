@@ -43,7 +43,7 @@
 				                <form id="uploadForm" method="post" enctype="multipart/form-data"  name="uploadForm" action="/archive/upload">
 				                    <div class="row">
 				                        <div class="col-sm-12">
-				                            <div class="form-group form-group-default">
+				                            <div class="form-group form-group-default">				                           
 				                                <label>파일설명</label>
 				                                <input id="addName" name="fileDesc" type="text" class="form-control" placeholder="파일 설명을 입력하세요">
 				                            </div>
@@ -81,7 +81,7 @@
 								        <th>파일설명</th>
 								        <th>파일크기</th>
 								        <th>확장자</th>
-								        <th>업로드날짜</th>
+								        <th>업로드날짜</th>												        
 								        <th><i class="fas fa-download"></i></th>
 								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 								        <th> <i class="fas fa-trash-alt"></i></th>
@@ -96,7 +96,7 @@
 										<td>[[ ${item.fileDesc} ]]</td>
 										<td>[[ ${item.formattedSize} ]]</td>
 										<td>[[ ${item.extenstion} ]]</td>
-										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>
+										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>									
 										<td><a th:href="@{/document/download/{documentNo}(documentNo=${item.documentNo})}">
 										    <i class="fas fa-download"></i>
 											</a>
