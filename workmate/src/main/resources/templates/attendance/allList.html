@@ -34,7 +34,8 @@
 }
 .date-select {
 	width: 300px;
-	padding-bottom: 10px;
+	padding-bottom: 20px;
+	margin-top: 20px;
 }
 table {
 	width: 100%;
@@ -72,6 +73,7 @@ table {
 					<!-- 년도 월별 조회 기능 -->	
 					 <input type="hidden" name="stDate" th:value="${#dates.format(workVO.stDate, 'yyyy-MM-dd')}" >
 				     <input type="hidden" name="endDate" th:value="${#dates.format(workVO.endDate, 'yyyy-MM-dd')}">
+				     
 					<div class="date-select">
 					<label><b><i class="fas fa-calendar-alt"></i> 기간 조회 <b></label>				
 					 <input type="text" name="daterange" id="date-select" />
@@ -97,7 +99,12 @@ table {
 										<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
 										<td>[[ ${work.workTime} ]]</td>
 										<td>[[ ${work.addWorkTime} ]]</td>
-										<td>[[ ${work.workStatus} ]]</td>
+										<td>
+											<span th:if="${work.workStatus == '지각'}" class="btn btn-warning btn-sm">[[ ${work.workStatus} ]]</span>
+											<span th:if="${work.workStatus == '조퇴'}" class="btn btn-danger btn-sm">[[ ${work.workStatus} ]]</span>
+											<span th:if="${work.workStatus == '정상'}" class="btn btn-success btn-sm">[[ ${work.workStatus} ]]</span>
+											<span th:if="${work.workStatus != '지각' and work.workStatus != '조퇴' and work.workStatus != '정상'}" class="btn btn-secondary btn-sm">[[ ${work.workStatus} ]]</span>
+										</td>
 										<td>[[ ${work.lateReason} ]]</td>
 									</tr>
 								</tbody>

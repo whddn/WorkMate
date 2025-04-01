@@ -6,43 +6,48 @@
 <head>
 	<meta charset="UTF-8">
 	<title>근태관리</title>
-	<style>
+<style>
+.attendance-wrapper {
+	padding: 0 30px;  /* 좌우 동일 여백 부여 */
+	box-sizing: border-box;
+}
 	.main-container {
 	display: flex;
 	width: 100%;
 	align-items: flex-start; /* 위쪽 정렬 */
 	gap: 20px;
-}
-
-#card-left {
-	width: 400px;
-	height: 630px;
-	padding: 30px;
-	margin-top: 30px;
-	margin-left: 30px;
-	box-sizing: border-box;
 	
-}
+	}
 
-.right-container {
-	flex-grow: 1;
-	padding: 30px 30px 0 0;
-	box-sizing: border-box;
-}
-
-#card-center {
-	width: 100%;
-	padding: 20px;
-	margin-bottom: 20px;
-	box-sizing: border-box;
-}
-
-#card-right {
-	width: 100%;
-	margin: 0 auto 30px auto;
-	padding: 30px;
-	box-sizing: border-box;
-}
+	#card-left {
+		width: 400px;
+		height: 630px;
+		padding: 30px;
+		margin-top: 30px;
+		margin-left: 30px;
+		box-sizing: border-box;
+		
+	}
+	
+	.right-container {
+		flex-grow: 1;
+		padding: 30px 30px 0 0;
+		box-sizing: border-box;
+	}
+	
+	#card-right {
+		width: 100%;
+		padding: 20px;
+		margin-bottom: 20px;
+		box-sizing: border-box;
+	}
+	
+	#card-bottom {
+		width: 97%;
+		margin: 0 auto 30px auto;
+		padding: 30px;
+		box-sizing: border-box;
+	}
 	.date-box {
 		font-size: 20px;
 		margin-top: 30px;
@@ -99,6 +104,7 @@
 	</style>
 </head>
 <body>
+<div class="attendance-wrapper">
 	<div class="main-container">
 		<div class="card" id="card-left">
 			<div class="card-body">			
@@ -130,7 +136,7 @@
 		
 		<!-- 오른쪽 (center card) -->
 		<div class="right-container">
-			<div class="card" id="card-center">
+			<div class="card" id="card-right">
 				<div class="card-body">
 					<div class="container mt-4">
 						<div class="user-icon">
@@ -146,7 +152,7 @@
 										<h3 class="text-info fw-bold">월 근무시간</h3>
 										<h1 class="text-info fw-bold" th:text="${totalWorkTime} + 'h'"></h1>
 									</div>
-									<div class="progress progress-sm" style="height: 22px;">
+									<div class="progress progress-sm" style="height: 28px;">
 										<div class="progress-bar bg-info" role="progressbar"
 											th:style="'width:' + ((${totalWorkTime} - ${addWorkTime}) / 208.0 * 100) + '%'"
 											th:aria-valuenow="${totalWorkTime} - ${addWorkTime}" aria-valuemin="0" aria-valuemax="208">
@@ -183,7 +189,7 @@
 	</div>
 
 	<!-- card-right는 main-container 아래 전체 너비로 배치 -->
-	<div class="card" id="card-right">
+	<div class="card" id="card-bottom">
 		<div class="card-body">
 			<h4 class="card-title">이번달 근태 현황</h4>
 			<div class="table-responsive">
@@ -206,10 +212,15 @@
 							<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
 							<td>[[ ${work.workTime} ]] h</td>
 							<td>[[ ${work.addWorkTime} ]] h</td>
-							<td>[[ ${work.workStatus} ]]</td>
+							<td>
+								<span th:if="${work.workStatus == '지각'}" class="btn btn-warning btn-sm">[[ ${work.workStatus} ]]</span>
+								<span th:if="${work.workStatus == '조퇴'}" class="btn btn-danger btn-sm">[[ ${work.workStatus} ]]</span>
+								<span th:if="${work.workStatus == '정상'}" class="btn btn-success btn-sm">[[ ${work.workStatus} ]]</span>
+								<span th:if="${work.workStatus != '지각' and work.workStatus != '조퇴' and work.workStatus != '정상'}" class="btn btn-secondary btn-sm">[[ ${work.workStatus} ]]</span>
+							</td>
 							<td>
 							[[ ${work.lateReason} ]]
-								<button class="btn btn-info" 
+								<button class="btn btn-info btn-sm" 
 									th:if="${work.workStatus == '지각'} and (${work.lateReason} == null or ${work.lateReason} == '')" 
 									th:onclick="'showLateReasonModal(' + ${work.workNo} + ')'">
 									<b>지각사유 제출 ＞</b>
@@ -220,7 +231,8 @@
 				</table>
 			</div>
 		</div>
-	</div>	
+	</div>
+	</div>
 		<!-- Modal -->
 				<div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true" >
 				    <div class="modal-dialog" role="work">

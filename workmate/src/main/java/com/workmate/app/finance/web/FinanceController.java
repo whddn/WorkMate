@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.workmate.app.finance.security.AES256Util;
 import com.workmate.app.finance.service.CorcardVO;
 import com.workmate.app.finance.service.FinanceService;
 import com.workmate.app.finance.service.ReportVO;
@@ -116,7 +117,8 @@ public class FinanceController {
 	
 	// 법인카드 전체 조회 페이지 
 	@GetMapping("finance/corcardList")
-	public String CorcardListPage(ReportVO reportVO) {
+	public String CorcardListPage(CorcardVO corcardVO, Model model) {
+		model.addAttribute("card", financeService.findCorcardList(corcardVO));
 		return "finance/corcard"; 
 	}
 	
@@ -129,19 +131,33 @@ public class FinanceController {
 	
 		 
 	 // 법인카드 등록
-	@PostMapping("/finance/newCard")
-	public ResponseEntity<?> register(@RequestBody CorcardVO card) {
-	    System.out.println("월한도: " + card.getMLimit());  // mLimit 값 출력
-	    System.out.println("일한도: " + card.getDLimit());  // dLimit 값 출력
-	    
-	    try {
-	        financeService.inputCorCard(card);
-	        return ResponseEntity.ok("법인카드 등록 완료");
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body("등록 실패: " + e.getMessage());
-	    }
-	}
+	@PostMapping("finance/newCard")
+	public ResponseEntity<?> register(@RequestBody CorcardVO card, @AuthenticationPrincipal LoginUserVO loginUser) {
+			int userNo = loginUser.getUserVO().getUserNo();
+		    card.setUserNo(userNo);
+		    try {
+		        // 카드번호에서 하이픈 제거
+		        String rawCardNum = card.getCorcardNum().replaceAll("-", "");
+		        // 암호화 수행
+		        String encryptedCardNum = AES256Util.encrypt(rawCardNum);
+		        // VO에 암호화된 값 다시 세팅
+		        card.setCorcardNum(encryptedCardNum);
 
+		        financeService.inputCorCard(card);
+
+		        return ResponseEntity.ok("법인카드 등록 완료");
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+		                .body("등록 실패: " + e.getMessage());
+		    }
+	}
 	
+	// 법인 카드 상세
+	@GetMapping("finance/cardDetail/{corcardNo}")
+	public String selectCorcardById(CorcardVO corcardVO, @PathVariable int corcardNo, Model model) {
+		corcardVO.setCorcardNo(corcardNo);
+		model.addAttribute("card", financeService.findCorcardById(corcardVO));
+		return "finance/corcardById";
+	}
 }

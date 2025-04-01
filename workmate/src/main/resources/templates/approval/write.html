@@ -25,21 +25,6 @@
 			/* 내용이 넘칠 경우 스크롤 추가 */
 		}
 		
-		/* 상세 정보 카드 */
-		.card {
-			background: #ffffff;
-			border-radius: 12px;
-			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-			padding: 20px;
-			width: 100%;
-			max-width: 500px;
-			/* 고정된 최대 너비 */
-			flex-direction: column;
-			justify-content: center;
-			height: 500px;
-			overflow: hidden;
-		}
-		
 		/* 내부 정보 리스트 */
 		.info-list {
 			display: flex;
@@ -99,33 +84,25 @@
 </head>
 
 <body>
-	<div th:insert="~{|forms/approval/${apprForm.formPath}|}"></div>
-	<table id="AttachTable" class="display">
-		<thead>
-			<tr>
-				<th>파일명</th>
-				<th>삭제</th>
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-	<input type="file" id="fileInput" multiple style="display: none;">
-	<button
-		id="attachBtn"
-		class="btn btn-primary">
-		첨부
-	</button>
-	<button
-		id="submitBtn"
-		class="btn btn-secondary">
-		결재요청
-	</button>
-	<button
-		id="cancelBtn"
-		class="btn btn-primary">
-		취소
-	</button>
+	<div class="card mx-5 px-3 py-5" th:insert="~{|forms/approval/${apprForm.formPath}|}"></div>
+	<div class="card mx-5 px-3 py-5">
+		<table id="AttachTable" class="display table table-striped table-bordered mt-2">
+			<thead>
+				<tr>
+					<th>파일명</th>
+					<th>삭제</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<input type="file" id="fileInput" multiple style="display: none;">
+		<div class="d-flex justify-content-start gap-2 mt-3">
+			<button id="attachBtn" class="btn btn-primary">첨부</button>
+			<button id="submitBtn" class="btn btn-secondary">결재요청</button>
+			<button id="cancelBtn" class="btn btn-primary">취소</button>
+		</div>
+	</div>
 	
 	<!-- 모달 창 -->
 	<div class="modal fade" id="addApprLineModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -139,7 +116,7 @@
 					<table class="table mt-3">
 						<tbody>
 							<tr>
-								<td>
+								<td class="col-3">
 									<h5>조직도</h5>
 									<div class="tree-panel">
 										<ul class="tree">
@@ -163,19 +140,16 @@
 											</li>
 										</ul>
 									</div>
-
-								</td>
-								<td id="apprOrRef" rowspan="2">
-									<input type="radio" class="form-check-input" name="apprOrRef" value="appr">결재선으로
-									<input type="radio" class="form-check-input" name="apprOrRef" value="ref">참조자로
 								</td>
 								<td>
-									<table id="ApprovalTable" class="display">
+									<input type="radio" class="form-check-input" name="apprOrRef" value="appr">결재선으로
+									<table id="ApprovalTable" class="display table table-striped table-bordered mt-2">
 										<thead>
 											<tr>
 												<th>결재 순서</th>
 												<th>이름</th>
 												<th>직책</th>
+												<th>팀</th>
 												<th>부서</th>
 											</tr>
 										</thead>
@@ -185,7 +159,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td>
+								<td class="col-6">
 									<h5>내 결재선</h5>										
 									<ul class="list-group">
 										<th:block th:each="apprLine : ${apprLineList}">
@@ -194,7 +168,8 @@
 									</ul>
 								</td>
 								<td>
-									<table id="ReferrersTable" class="display">
+									<input type="radio" class="form-check-input" name="apprOrRef" value="ref">참조자로
+									<table id="ReferrersTable" class="display table table-striped table-bordered mt-2">
 										<thead>
 											<tr>
 												<th>이름</th>
@@ -242,6 +217,7 @@
 	        	<tr onclick="delApprElmnt()">
 	        		<td>${index + 1}</td>
 	        		<td>${element.userName}</td>
+	        		<td>${element.userPosition}</td>
 	        		<td>${element.teamName}</td>
 	        		<td>${element.departmentName}</td>
 	        	</tr>
@@ -329,7 +305,8 @@
 	
 	// 조직도의 사원을 클릭하면 apprElmntList에 저장할지, refElmntList에 저장할지 알아서 해준다
 	function addElmnt(userNo) {
-		const result = $('#apprOrRef > input[type="radio"]:checked').val();
+		console.log('옵저빙');
+		const result = $('input[type="radio"]:checked').val();
 		if(result == 'appr') {
 			addApprElmnt(userNo);
 		}
@@ -368,8 +345,11 @@
 		const month = (today.getMonth() + 1).toString().padStart(2, '0');
 		const day = today.getDate().toString().padStart(2, '0');
 		
-		$('#ApprovalsTable').DataTable();
-		$('#AttachTable').DataTable();
+		$('#AttachTable').DataTable({
+			searching: false,
+	        lengthChange: false,
+	        info: false
+	    });
 		$('#ApprovalTable').DataTable({
 		    lengthChange: false,
 		    searching: false,

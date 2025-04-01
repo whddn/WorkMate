@@ -12,37 +12,42 @@
 </head>
 
 <body>
-	<h3>결재 진행</h3>
-	<input type="date" id="min-date" placeholder="시작 날짜 (YYYY-MM-DD)">
-	<input type="date" id="max-date" placeholder="끝 날짜 (YYYY-MM-DD)">
-	<table id="WaitingsTable" class="display">
-		<thead>
-			<tr>
-				<th>NO</th>
-				<th>결재문서번호</th>
-				<th>양식명</th>
-				<th>제목</th>
-				<th>기안자</th>
-				<th>기안부서</th>
-				<th>기안일</th>
-				<th>승인상태</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="waiting, sts : ${waitingList}">
-				<tr th:onclick="| location.href = '@{/approval/read(apprNo=${waiting.apprNo})}' |">
-					<td>[[ ${sts.count} ]]</td>
-					<td>[[ ${waiting.apprNo} ]]</td>
-					<td>[[ ${waiting.formName} ]]</td>
-					<td>[[ ${waiting.apprTitle} ]]</td>
-					<td>[[ ${waiting.userName} ]]</td>
-					<td>[[ ${waiting.departmentName} ]]</td>
-					<td th:text="${#dates.format(waiting.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
-					<td>결재 중</td>
+	<div class="card mx-5 px-3 py-5">
+		<h3 class="card-title pb-5">결재 진행</h3>
+		<div class="d-inline-flex gap-2">
+			<input type="date" id="min-date" class="form-control" style="width: 150px;" placeholder="시작 날짜 (YYYY-MM-DD)">
+			<h3>~</h3>
+			<input type="date" id="max-date" class="form-control" style="width: 150px;" placeholder="끝 날짜 (YYYY-MM-DD)">
+		</div>
+		<table id="WaitingsTable" class="display table table-striped table-bordered mt-2">
+			<thead>
+				<tr>
+					<th>NO</th>
+					<th>결재문서번호</th>
+					<th>양식명</th>
+					<th>제목</th>
+					<th>기안자</th>
+					<th>기안부서</th>
+					<th>기안일</th>
+					<th>승인상태</th>
 				</tr>
-			</th:block>
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				<th:block th:each="waiting, sts : ${waitingList}">
+					<tr th:onclick="| location.href = '@{/approval/read(apprNo=${waiting.apprNo})}' |">
+						<td>[[ ${sts.count} ]]</td>
+						<td>[[ ${waiting.apprNo} ]]</td>
+						<td>[[ ${waiting.formName} ]]</td>
+						<td>[[ ${waiting.apprTitle} ]]</td>
+						<td>[[ ${waiting.userName} ]]</td>
+						<td>[[ ${waiting.departmentName} ]]</td>
+						<td th:text="${#dates.format(waiting.createDate, 'yyyy.MM.dd')}"></td>
+						<td>결재 중</td>
+					</tr>
+				</th:block>
+			</tbody>
+		</table>
+	</div>
 </body>
 
 <script>
@@ -51,9 +56,9 @@
 		
 		// 날짜 필터 함수 정의
 	    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-	        var minDate = $('#min-date').val();
-	        var maxDate = $('#max-date').val();
-	        var date = data[6].trim(); // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
+	        let minDate = $('#min-date').val();
+	        let maxDate = $('#max-date').val();
+	        let date = data[6].trim(); // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
 
 	        if (!minDate && !maxDate) {
 	            return true; // 날짜 입력이 없으면 필터링 없이 표시
