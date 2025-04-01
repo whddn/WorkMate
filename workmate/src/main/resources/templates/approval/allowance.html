@@ -12,42 +12,50 @@
 </head>
 
 <body>
-	<h3>결재 승인</h3>
-	<div class="d-inline-flex gap-2">
-		<input type="date" id="min-date" class="form-control" style="width: 150px;" placeholder="시작 날짜 (YYYY-MM-DD)">
-		<h3>~</h3>
-		<input type="date" id="max-date" class="form-control" style="width: 150px;" placeholder="끝 날짜 (YYYY-MM-DD)">
-	</div>
-	<table id="AllowancesTable" class="display">
-		<thead>
-			<tr>
-				<th>NO</th>
-				<th>결재문서번호</th>
-				<th>양식명</th>
-				<th>제목</th>
-				<th>기안자</th>
-				<th>기안부서</th>
-				<th>기안일</th>
-				<th>승인상태</th>
-				<th>PDF</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="allowance, sts : ${allowanceList}">
-				<tr th:onclick="| location.href = '@{/approval/read(apprNo=${allowance.apprNo})}' |">
-					<td>[[ ${sts.count} ]]</td>
-					<td>[[ ${allowance.apprNo} ]]</td>
-					<td>[[ ${allowance.formName} ]]</td>
-					<td>[[ ${allowance.apprTitle} ]]</td>
-					<td>[[ ${allowance.userName} ]]</td>
-					<td>[[ ${allowance.departmentName} ]]</td>
-					<td th:text="${#dates.format(allowance.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
-					<td>결재 승인</td>
-					<td><button th:onclick="| event.stopPropagation(); location.href='@{/approval/pdf(apprNo=${allowance.apprNo})}' |">다운받기</button></td>
+	<h3 class="card mx-5 px-3 py-5">결재 승인</h3>
+	<div class="card mx-5 px-3 py-5">
+		<div class="d-inline-flex gap-2">
+			<input type="date" id="min-date" class="form-control" style="width: 150px;" placeholder="시작 날짜 (YYYY-MM-DD)">
+			<h3>~</h3>
+			<input type="date" id="max-date" class="form-control" style="width: 150px;" placeholder="끝 날짜 (YYYY-MM-DD)">
+		</div>
+		<table id="AllowancesTable" class="display table table-striped table-bordered mt-2">
+			<thead>
+				<tr>
+					<th>NO</th>
+					<th>결재문서번호</th>
+					<th>양식명</th>
+					<th>제목</th>
+					<th>기안자</th>
+					<th>기안부서</th>
+					<th>기안일</th>
+					<th>승인상태</th>
+					<th>PDF</th>
 				</tr>
-			</th:block>
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				<th:block th:each="allowance, sts : ${allowanceList}">
+					<tr th:onclick="| location.href = '@{/approval/read(apprNo=${allowance.apprNo})}' |">
+						<td>[[ ${sts.count} ]]</td>
+						<td>[[ ${allowance.apprNo} ]]</td>
+						<td>[[ ${allowance.formName} ]]</td>
+						<td>[[ ${allowance.apprTitle} ]]</td>
+						<td>[[ ${allowance.userName} ]]</td>
+						<td>[[ ${allowance.departmentName} ]]</td>
+						<td th:text="${#dates.format(allowance.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
+						<td>결재 승인</td>
+						<td>
+							<button
+								class="btn btn-secondary" 
+								th:onclick="| event.stopPropagation(); location.href='@{/approval/pdf(apprNo=${allowance.apprNo})}' |">
+								다운받기
+							</button>
+						</td>
+					</tr>
+				</th:block>
+			</tbody>
+		</table>
+	</div>
 </body>
 
 <script>
