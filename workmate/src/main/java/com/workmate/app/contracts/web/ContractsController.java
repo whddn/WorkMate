@@ -123,6 +123,10 @@ public class ContractsController {
     @GetMapping("/Standard_Detail_Form/{contrNo}")
     public String standardDetail(ContractsVO contractsVO, Model model) {
         ContractsVO contract = contractsService.findContractsById(contractsVO);
+        if (contract.getSignImage() != null) {
+            String base64 = Base64.getEncoder().encodeToString(contract.getSignImage());
+            contract.setSignImageBase64(base64); // 화면 전달용
+        }
         model.addAttribute("contr", contract);
         return "contracts/Standard_Detail_Form";
     }
@@ -131,6 +135,10 @@ public class ContractsController {
     @GetMapping("/Trade_Detail_Form/{contrNo}")
     public String tradeDetail(ContractsVO contractsVO, Model model) {
         ContractsVO contract = contractsService.findContractsById(contractsVO);
+        if (contract.getSignImage() != null) {
+            String base64 = Base64.getEncoder().encodeToString(contract.getSignImage());
+            contract.setSignImageBase64(base64); // 화면 전달용
+        }
         model.addAttribute("contr", contract);
         return "contracts/Trade_Detail_Form";
     }
