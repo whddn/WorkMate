@@ -41,15 +41,15 @@ public class SpringSecurityConfig {
 
 
 			.formLogin(login -> login
-					.loginPage("/login")
-				//	.loginProcessingUrl("/workmate")
-					.defaultSuccessUrl("/", true)
-					.permitAll())
-			.logout(logout -> logout
-					.logoutSuccessUrl("/login")
-					.invalidateHttpSession(true)
-		            .deleteCookies("JSESSIONID")  // 쿠키 삭제
-						.permitAll());
+				    .loginPage("/login")
+				    .defaultSuccessUrl("/", true)
+				    .failureUrl("/login?error=true") // 실패 시 error
+				    .permitAll())
+				.logout(logout -> logout
+				    .logoutSuccessUrl("/login?logout") // 로그아웃 시 메시지
+				    .invalidateHttpSession(true)
+				    .deleteCookies("JSESSIONID")
+				    .permitAll());
 		
 	    //CSRF 토큰 
 		http.csrf(csrf -> csrf.disable()); // <-- CSRF수정 바람
