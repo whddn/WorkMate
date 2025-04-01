@@ -212,10 +212,15 @@
 							<td>[[ ${#dates.format(work.afterWork, 'HH:mm')} ]]</td>
 							<td>[[ ${work.workTime} ]] h</td>
 							<td>[[ ${work.addWorkTime} ]] h</td>
-							<td>[[ ${work.workStatus} ]]</td>
+							<td>
+								<span th:if="${work.workStatus == '지각'}" class="btn btn-warning btn-sm">[[ ${work.workStatus} ]]</span>
+								<span th:if="${work.workStatus == '조퇴'}" class="btn btn-danger btn-sm">[[ ${work.workStatus} ]]</span>
+								<span th:if="${work.workStatus == '정상'}" class="btn btn-success btn-sm">[[ ${work.workStatus} ]]</span>
+								<span th:if="${work.workStatus != '지각' and work.workStatus != '조퇴' and work.workStatus != '정상'}" class="btn btn-secondary btn-sm">[[ ${work.workStatus} ]]</span>
+							</td>
 							<td>
 							[[ ${work.lateReason} ]]
-								<button class="btn btn-info" 
+								<button class="btn btn-info btn-sm" 
 									th:if="${work.workStatus == '지각'} and (${work.lateReason} == null or ${work.lateReason} == '')" 
 									th:onclick="'showLateReasonModal(' + ${work.workNo} + ')'">
 									<b>지각사유 제출 ＞</b>
