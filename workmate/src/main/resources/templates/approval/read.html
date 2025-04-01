@@ -12,7 +12,7 @@
 </head>
 
 <body>
-	<div class="card mx-5 px-3 py-5" th:insert="~{|forms/approval/${approval.formPath}|}"></div>
+	<div id="apprForm" class="card mx-5 px-3 py-5" th:insert="~{|forms/approval/${approval.formPath}|}"></div>
 	<div class="card mx-5 px-3 py-5">
 		<table id="AttachTable" class="display table table-striped table-bordered mt-2">
 		    <thead>
@@ -139,11 +139,14 @@
 			let target = $(`
 				input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']
 			`);
-			if (target.length > 0) {
+			if(target.length > 0) {
 				let value = approval[key] !== null ? approval[key] : 'null';
-				target.val(approval[key]).attr('readonly', true);
+		        target.val(value);
 			}
 		});
+		
+		$('#apprForm').find('input[name], select[name], textarea[name], button[name]').attr('readonly', true);
+		$('#apprForm').find('input[name][type="radio"], input[name][type="checkbox"]').attr('onclick', 'return false;');
 		
 		$('#setApprLine').remove();
 		
