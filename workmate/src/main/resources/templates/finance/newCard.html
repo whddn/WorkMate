@@ -178,6 +178,7 @@
             .then(result => {
                 this.reset();
                 console.log("보내는 데이터:", jsonData);
+                location.href="/workmate/finance/corcardList"
             })
             .catch(error => {
                 alert('등록 실패: ' + error);

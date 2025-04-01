@@ -25,6 +25,7 @@
 <body>
 <div id="container">
     <div class="card-container">
+    	<h3>법인카드 목록</h3>
         <div class="card-buttons mb-3">
             <button class="btn btn-warning">KB 국민카드</button>
             <button class="btn btn-primary">신한카드</button>
@@ -46,7 +47,7 @@
                 <tbody>
                     <tr th:each="card : ${card}">
                         <td th:text="${card.corcardComp}"></td>
-                        <td th:text="${card.maskedCardNum}"></td>
+                        <td th:text="${card.maskedCardNumDecrypted}"></td>  
                         <td th:text="${card.userName}"></td>
                         <td th:text="${#dates.format(card.corcardStart, 'yyyy-MM-dd')}"></td>
                         <td th:text="${#dates.format(card.corcardEnd, 'yyyy-MM-dd')}"></td>
