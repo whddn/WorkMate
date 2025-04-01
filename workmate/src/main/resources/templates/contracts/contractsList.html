@@ -1,76 +1,112 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{common/layouts/contracts_layout}"
-	layout:fragment="content">
-
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/contracts_layout}"
+      layout:fragment="content">
 <head>
-<meta charset="UTF-8">
-<title>전자 계약</title>
-</head>
+  <meta charset="UTF-8">
+  <title>전자 계약</title>
 
+  <style>
+    h3 {
+      margin: 20px 0;
+    }
+    .card{
+	margin:70px 150px;    
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
 <body>
-	<h3>전자 계약</h3>
-	<input type="text" id="min-date" placeholder="시작 날짜 (YYYY-MM-DD)">
-	<input type="text" id="max-date" placeholder="끝 날짜 (YYYY-MM-DD)">
-	<table id="WaitingsTable" class="display">
-		<thead>
-			<tr>
-				<th>계약번호</th>
-				<th>계약명</th>
-				<th>작성자</th>
-				<th>작성일자</th>
-				<th>보험종류</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="cntr, sts : ${contr}">
-				<tr>
-					<td>[[ ${sts.count} ]]</td>
-					<td>[[ ${cntr.contrTitle} ]]</td>
-					<td>[[ ${cntr.contrB} ]]</td>
-					<td>[[${#dates.format(cntr.createDate, 'yyyy-MM-dd')}]]</td>
-					<td>[[${cntr.contrStatus}]]</td>
-				</tr>
-			</th:block>
-		</tbody>
-	</table>
-</body>
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <table id="WaitingsTable" class="table table-striped table-bordered">
+ <h1>전자 계약</h1>
+        <thead class="table-light">
+          <tr>
+            <th>계약번호</th>
+            <th>계약명</th>
+            <th>작성자</th>
+            <th>작성일자</th>
+            <th>보험종류</th>
+          </tr>
+        </thead>
+        <tbody>
+          <th:block th:each="cntr, sts : ${contr}">
+            <tr>
+              <td th:text="${sts.count}"></td>
+              <td>
+                <!-- 표준근로계약서 -->
+                <a th:if="${cntr.contrTitle == '표준근로계약서'}"
+                   th:href="@{'/contract/Standard_Detail_Form/' + ${cntr.contrNo}}"
+                   th:text="${cntr.contrTitle}"></a>
+
+                <!-- 거래처계약서 -->
+                <a th:if="${cntr.contrTitle == '거래처계약서'}"
+                   th:href="@{'/contract/Trade_Detail_Form/' + ${cntr.contrNo}}"
+                   th:text="${cntr.contrTitle}"></a>
+
+                <!-- 기타 -->
+                <span th:if="${cntr.contrTitle != '표준근로계약서' and cntr.contrTitle != '거래처계약서'}"
+                      th:text="${cntr.contrTitle}"></span>
+              </td>
+              <td th:text="${cntr.contrB}"></td>
+              <td th:text="${#dates.format(cntr.createDate, 'yyyy-MM-dd')}"></td>
+              <td th:text="${cntr.contrStatus}"></td>
+            </tr>
+          </th:block>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <script>
-	$(document).ready(
-			function() {
-				let table = $('#WaitingsTable').DataTable();
+  $(document).ready(function () {
+    let table = $('#WaitingsTable').DataTable({
+      pageLength: 5,
+      language: {
+        search: "검색:",
+        lengthMenu: "",
+        info: "",
+        zeroRecords: "일치하는 데이터가 없습니다.",
+        infoFiltered: "(전체 _MAX_ 건 중에서 검색됨)",
+        paginate: {
+          next: "다음",
+          previous: "이전"
+        }
+      }
+    });
 
-				// 날짜 필터 함수 정의
-				$.fn.dataTable.ext.search.push(function(settings, data,
-						dataIndex) {
-					var minDate = $('#min-date').val();
-					var maxDate = $('#max-date').val();
-					var date = data[3]; // 테이블에서 날짜 컬럼의 인덱스 (0부터 시작)
+    // 날짜 필터 함수 정의
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+      var minDate = $('#min-date').val();
+      var maxDate = $('#max-date').val();
+      var date = data[3];
 
-					if (!minDate && !maxDate) {
-						return true; // 날짜 입력이 없으면 필터링 없이 표시
-					}
+      if (!minDate && !maxDate) return true;
 
-					if (date) {
-						var dateObj = new Date(date);
-						var min = minDate ? new Date(minDate) : null;
-						var max = maxDate ? new Date(maxDate) : null;
+      if (date) {
+        var dateObj = new Date(date);
+        var min = minDate ? new Date(minDate) : null;
+        var max = maxDate ? new Date(maxDate) : null;
 
-						if ((min === null || dateObj >= min)
-								&& (max === null || dateObj <= max)) {
-							return true;
-						}
-					}
-					return false;
-				});
+        if ((min === null || dateObj >= min) &&
+            (max === null || dateObj <= max)) {
+          return true;
+        }
+      }
+      return false;
+    });
 
-				// 날짜 입력 필드 변경 시 필터 적용
-				$('#min-date, #max-date').on('change', function() {
-					table.draw();
-				});
-			});
+    $('#min-date, #max-date').on('change', function () {
+      table.draw();
+    });
+  });
 </script>
-
+</body>
 </html>
