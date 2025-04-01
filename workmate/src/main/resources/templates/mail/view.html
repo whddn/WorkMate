@@ -8,69 +8,133 @@
     <title>받은 메일 보기</title>
     <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .container { width: 80%; margin: 20px auto; }
-        #editor-container {
-            height: 400px;
-            background: white;
-            border: 1px solid #ccc;
+        .info-label { width: 100px; font-weight: 600; }
+        .info-item { padding: 4px 0; }
+        .btn-group .btn { min-width: 80px; }
+        .attachment-icon { margin-right: 6px; }
+        .mail-body {
+            background: #fefefe;
             border-radius: 5px;
+            padding: 20px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            min-height: 300px;
+        }
+        .mail-subject {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #333;
         }
     </style>
 </head>
 <body>
 <div class="container mt-4">
-    <h2 class="mb-4">받은 메일 상세 조회</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📨 받은 메일 상세</h2>
+        <div class="btn-group">
+            <!-- 삭제 버튼 -->
+            <form id="deleteForm" method="post" th:action="@{/mail/deleteSelected}" style="display:inline;">
+                <input type="hidden" name="mailIds" th:value="${mail.mailId}" />
+                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+            </form>
 
-    <!-- 버튼 -->
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-danger btn-sm me-2" onclick="deleteMail()">삭제</button>
-        <button class="btn btn-secondary btn-sm me-2">이동</button>
-        <a th:href="@{/mail/composeReply(recipient=${mail.senderEmail})}" class="btn btn-primary btn-sm me-2">
-    회신
-</a>
+            <!-- 이동 버튼 -->
+            <div class="btn-group ms-2">
+                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    이동
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="moveToFolder(1001)">받은메일함</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="moveToFolder(1002)">보낸메일함</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="moveToFolder(1003)">임시보관함</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="moveToFolder(1004)">스팸메일함</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="moveToFolder(1006)">휴지통</a></li>
+                    <li th:each="folder : ${myFolders}">
+                        <a class="dropdown-item"
+                           th:text="${folder.folderName}"
+                           th:onclick="'moveToFolder(' + ${folder.folderId} + ')'"></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 이동 폼 -->
+            <form id="moveForm" method="post" th:action="@{/mail/moveSelected}" style="display:none;">
+                <input type="hidden" name="mailIds" th:value="${mail.mailId}" />
+                <input type="hidden" name="targetFolderId" id="targetFolderId" />
+            </form>
+
+            <!-- 회신 버튼 -->
+            <a th:href="@{/mail/composeReply(recipient=${mail.senderEmail})}" class="btn btn-sm btn-primary ms-2">회신</a>
+        </div>
     </div>
 
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
-            <!-- 📬 메일 상세 내용 -->
-            <p><strong>보낸 사람:</strong> <span th:text="${mail.senderEmail}"></span></p>
-            <p><strong>수신자:</strong> <span th:text="${mail.recipients}"></span></p>
-            <p><strong>참조:</strong> <span th:text="${mail.ccList}">-</span></p>
-            <p><strong>제목:</strong> <span th:text="${mail.subject}"></span></p>
-            <p><strong>날짜:</strong> <span th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+            <!-- 메일 정보 -->
+            <div class="row mb-2 info-item">
+                <div class="col-sm-2 info-label">제목</div>
+                <div class="col-sm-10 mail-subject" th:text="${mail.subject}"></div>
+            </div>
+            <div class="row mb-2 info-item">
+                <div class="col-sm-2 info-label">보낸 사람</div>
+                <div class="col-sm-10" th:text="${mail.senderEmail}"></div>
+            </div>
+            <div class="row mb-2 info-item">
+                <div class="col-sm-2 info-label">수신자</div>
+                <div class="col-sm-10" th:text="${mail.recipients}"></div>
+            </div>
+            <div class="row mb-2 info-item">
+                <div class="col-sm-2 info-label">참조</div>
+                <div class="col-sm-10" th:text="${mail.ccList} ?: '-'"></div>
+            </div>
+            <div class="row mb-3 info-item">
+                <div class="col-sm-2 info-label">날짜</div>
+                <div class="col-sm-10" th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}"></div>
+            </div>
 
             <hr>
 
             <!-- 본문 -->
-            <div class="border p-3">
-                <div th:utext="${mail.content}"></div>
+            <div class="mb-4">
+                <h5 class="mb-3">📄 본문</h5>
+                <div class="mail-body" th:utext="${mail.content}"></div>
             </div>
 
             <!-- 첨부파일 -->
-            <div th:if="${mail.attachmentList != null and #lists.size(mail.attachmentList) > 0}" class="mt-3">
-    <h5>📎 첨부파일</h5>
-    <ul>
-        <li th:each="file : ${mail.attachmentList}">
-            <a th:href="@{/mail/download/{fileId}(fileId=${file.fileId})}" th:text="${file.fileName}"></a>
-            (<span th:text="${#numbers.formatInteger(file.fileSize / 1024, 0)}"></span> KB)
-            <span th:if="${mail.encrypted == 'Y'}" class="text-danger"> - (암호화됨)</span>
-        </li>
-    </ul>
+            <div th:if="${mail.attachmentList != null and #lists.size(mail.attachmentList) > 0}" class="mb-4">
+                <h5 class="mb-3">📎 첨부파일</h5>
+                <ul class="list-unstyled">
+                    <li th:each="file : ${mail.attachmentList}">
+                        <i class="bi bi-paperclip attachment-icon"></i>
+                        <a th:href="@{/mail/download/{fileId}(fileId=${file.fileId})}" th:text="${file.fileName}"></a>
+                        (<span th:text="${#numbers.formatInteger(file.fileSize / 1024, 0)}"></span> KB)
+                        <span th:if="${mail.encrypted == 'Y'}" class="text-danger"> - 암호화됨</span>
+                    </li>
+                </ul>
+                <div th:if="${mail.encrypted == 'Y'}" class="alert alert-warning mt-3">
+                    이 메일의 첨부파일은 암호화되어 있습니다.<br>
+                    압축 파일을 열 때 비밀번호를 입력해주세요.
+                </div>
+            </div>
 
-    <!-- 🔒 암호화 안내문 -->
-    <div th:if="${mail.encrypted == 'Y'}" class="alert alert-warning mt-3">
-        이 메일의 첨부파일은 암호화되어 있습니다.<br>
-        압축 파일을 열 때 비밀번호를 입력해주세요.
-    </div>
-</div>
+            <!-- 목록으로 -->
+            <div class="text-end">
+                <a th:href="@{/mail/mailmain}" class="btn btn-dark">목록으로</a>
+            </div>
         </div>
     </div>
-
-    <!-- 목록으로 -->
-    <div class="mt-3">
-        <a th:href="@{/mail/mailmain}" class="btn btn-outline-dark">목록으로</a>
-    </div>
 </div>
+
+<!-- 이동 기능 스크립트 -->
+<script>
+    function moveToFolder(folderId) {
+        document.getElementById("targetFolderId").value = folderId;
+        document.getElementById("moveForm").submit();
+    }
+</script>
 </body>
 </html>

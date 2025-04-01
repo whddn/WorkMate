@@ -294,9 +294,9 @@ public class MailServiceImpl implements MailService {
 	private String getContent(Message message) {
 	    try {
 	    	System.out.println(message);
-	        if (message.isMimeType("text/plain")) {
+	        if (message.isMimeType("text/html")) {
 	            return (String) message.getContent();
-	        } else if (message.isMimeType("multipart/*")) {
+	        } else if (message.isMimeType("text/plain")) {
 	            Multipart multipart = (Multipart) message.getContent();
 	            for (int i = 0; i < multipart.getCount(); i++) {
 	                BodyPart part = multipart.getBodyPart(i);

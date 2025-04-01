@@ -80,14 +80,15 @@ public class MailController {
     
  // 메일 단건 조회
     @GetMapping("mail/view")
-    public String viewMail(@RequestParam("mailId") int mailId, Model model) {
+    public String viewMail(@RequestParam("mailId") int mailId, Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+    	int userNo = loginUser.getUserVO().getUserNo();
         MailVO mail = mailService.findMailById(mailId);
         mailService.markAsRead(mailId);
         List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId);
-        
+        List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
         // 🔥 첨부파일 리스트 mail VO에 세팅
         mail.setAttachmentList(attachments);
-
+        model.addAttribute("myFolders", myFolders);
         model.addAttribute("mail", mail);
         return "mail/view";
     }
@@ -163,15 +164,19 @@ public class MailController {
 
         return "mail/sent"; // 
     }
+    
+    
  // 보낸 메일 상세 
     @GetMapping("mail/sentview")
-    public String viewSentMail(@RequestParam("mailId") int mailId, Model model) {
+    public String viewSentMail(@RequestParam("mailId") int mailId, Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+    	int userNo = loginUser.getUserVO().getUserNo();
         MailVO mail = mailService.findSentMailById(mailId);
         List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId); // ✅ 첨부파일 조회
-
+        List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
+        model.addAttribute("myFolders", myFolders);
         model.addAttribute("mail", mail);
         model.addAttribute("attachments", attachments); // ✅ 추가됨
-
+        
         return "mail/sentview";
     }
     
