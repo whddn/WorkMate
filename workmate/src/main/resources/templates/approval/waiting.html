@@ -41,7 +41,7 @@
 						<td>[[ ${waiting.apprTitle} ]]</td>
 						<td>[[ ${waiting.userName} ]]</td>
 						<td>[[ ${waiting.departmentName} ]]</td>
-						<td th:text="${#dates.format(waiting.createDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
+						<td th:text="${#dates.format(waiting.createDate, 'yyyy.MM.dd')}"></td>
 						<td>결재 중</td>
 					</tr>
 				</th:block>
