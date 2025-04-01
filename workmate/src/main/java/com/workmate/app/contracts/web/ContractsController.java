@@ -90,6 +90,11 @@ public class ContractsController {
 	            return "error/500";
 	        }
 	    }
+	    if (contract.getSignImage() != null) {
+	        String base64Image = Base64.getEncoder().encodeToString(contract.getSignImage());
+	        contract.setSignImageBase64(base64Image); // 뷰용 필드에 주입
+	    }
+	    model.addAttribute("contr", contract);
 
 	    // 계약 등록 처리
 	    int result = contractsService.inputContracts(contract);
@@ -118,7 +123,7 @@ public class ContractsController {
     @GetMapping("/Standard_Detail_Form/{contrNo}")
     public String standardDetail(ContractsVO contractsVO, Model model) {
         ContractsVO contract = contractsService.findContractsById(contractsVO);
-        model.addAttribute("contract", contract);
+        model.addAttribute("contr", contract);
         return "contracts/Standard_Detail_Form";
     }
 
@@ -126,7 +131,7 @@ public class ContractsController {
     @GetMapping("/Trade_Detail_Form/{contrNo}")
     public String tradeDetail(ContractsVO contractsVO, Model model) {
         ContractsVO contract = contractsService.findContractsById(contractsVO);
-        model.addAttribute("contract", contract);
+        model.addAttribute("contr", contract);
         return "contracts/Trade_Detail_Form";
     }
 	
