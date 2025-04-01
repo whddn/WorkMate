@@ -25,21 +25,6 @@
 			/* 내용이 넘칠 경우 스크롤 추가 */
 		}
 		
-		/* 상세 정보 카드 */
-		.card {
-			background: #ffffff;
-			border-radius: 12px;
-			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-			padding: 20px;
-			width: 100%;
-			max-width: 500px;
-			/* 고정된 최대 너비 */
-			flex-direction: column;
-			justify-content: center;
-			height: 500px;
-			overflow: hidden;
-		}
-		
 		/* 내부 정보 리스트 */
 		.info-list {
 			display: flex;
@@ -99,10 +84,13 @@
 </head>
 
 <body>
-	<div>
+	<div class="card mx-5 px-3 py-5">
+		<h1>결재 관리</h1>
+	</div>
+	<div class="card mx-5 px-3 py-5">
 		<h3>서명 이미지 관리</h3>
 		<button id="addSignBtn" class="btn btn-primary">파일 첨부</button>
-		<table id="SignsTable" class="display">
+		<table id="SignsTable" class="display table table-striped table-bordered mt-2">
 			<thead>
 				<tr>
 					<th>서명</th>
@@ -133,7 +121,7 @@
 		<hr>
 	</div>
 	
-	<div class="mt-5">
+	<div class="card mx-5 px-3 py-5 mt-5">
 		<h3>결재선 리스트</h3>
 		<button 
 			id="setApprLine"
@@ -145,7 +133,7 @@
 			>
 			결재선 추가
 		</button>
-		<table id="ApprLines" class="display">
+		<table id="ApprLines" class="display table table-striped table-bordered mt-2">
 			<thead>
 				<tr>
 					<th>제목</th>
