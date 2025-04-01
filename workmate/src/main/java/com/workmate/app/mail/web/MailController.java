@@ -496,5 +496,12 @@ model.addAttribute("unreadCount", unreadCount);
         mailService.scheduleMail(mail, attachments);
         return "redirect:/mail/sent";
     }
-    
+    //회신기능
+    @GetMapping("/mail/composeReply")
+    public String composeReply(@RequestParam("recipient") String recipient, Model model) {
+        MailVO mail = new MailVO();
+        mail.setRecipients(recipient); // 수신자에 자동 세팅
+        model.addAttribute("draft", mail); // 기존 작성화면에서는 draft로 불러오니까 통일
+        return "mail/compose"; // 메일 쓰기 화면의 HTML (예: compose.html)
+    }
 }
