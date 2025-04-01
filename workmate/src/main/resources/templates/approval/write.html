@@ -116,7 +116,7 @@
 					<table class="table mt-3">
 						<tbody>
 							<tr>
-								<td>
+								<td class="col-3">
 									<h5>조직도</h5>
 									<div class="tree-panel">
 										<ul class="tree">
@@ -143,12 +143,13 @@
 								</td>
 								<td>
 									<input type="radio" class="form-check-input" name="apprOrRef" value="appr">결재선으로
-									<table id="ApprovalTable" class="display">
+									<table id="ApprovalTable" class="display table table-striped table-bordered mt-2">
 										<thead>
 											<tr>
 												<th>결재 순서</th>
 												<th>이름</th>
 												<th>직책</th>
+												<th>팀</th>
 												<th>부서</th>
 											</tr>
 										</thead>
@@ -158,7 +159,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td>
+								<td class="col-6">
 									<h5>내 결재선</h5>										
 									<ul class="list-group">
 										<th:block th:each="apprLine : ${apprLineList}">
@@ -168,7 +169,7 @@
 								</td>
 								<td>
 									<input type="radio" class="form-check-input" name="apprOrRef" value="ref">참조자로
-									<table id="ReferrersTable" class="display">
+									<table id="ReferrersTable" class="display table table-striped table-bordered mt-2">
 										<thead>
 											<tr>
 												<th>이름</th>
@@ -216,6 +217,7 @@
 	        	<tr onclick="delApprElmnt()">
 	        		<td>${index + 1}</td>
 	        		<td>${element.userName}</td>
+	        		<td>${element.userPosition}</td>
 	        		<td>${element.teamName}</td>
 	        		<td>${element.departmentName}</td>
 	        	</tr>
