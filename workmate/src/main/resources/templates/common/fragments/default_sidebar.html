@@ -31,10 +31,22 @@
           <div class="sidebar-content">
             <ul class="nav nav-secondary">
               <!-- 고정 메뉴 -->
+              <li class="nav-section">
+                <span class="sidebar-mini-icon">
+                  <i class="fa fa-ellipsis-h"></i>
+                </span>
+                <h4 class="text-section">대시보드</h4>
+              </li>
               <li class="nav-item">
                 <a th:href="@{/}">
                   <i class="fas fa-home"></i>
                   <p>메인화면</p>
+                </a>
+              </li>
+               <li class="nav-item">
+                <a th:href="@{/calendar}">
+                  <i class="fas fa-pen-square"></i>
+                  <p>캘린더</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -43,19 +55,38 @@
                   <p>검색</p>
                 </a>
               </li>
-              <!-- 가변 메뉴 -->
-              <li class="nav-section">
-                <span class="sidebar-mini-icon">
-                  <i class="fa fa-ellipsis-h"></i>
-                </span>
-                <h4 class="text-section">대시보드</h4>
-              </li>
               <li class="nav-item">
-                <a th:href="@{/calendar}">
-                  <i class="fas fa-pen-square"></i>
-                  <p>캘린더</p>
+                <a
+                  data-bs-toggle="collapse"
+                  href="#dashboard"
+                  class="collapsed"
+                  aria-expanded="false"
+                  >
+                  <i class="fas fa-star"></i>
+                  <p>즐겨찾기</p>
+                  <span class="caret"></span>
                 </a>
+                <div class="collapse" id="dashboard">
+                  <ul class="nav nav-collapse">
+                    <li>
+                      <a href="">
+                        <span class="sub-item">즐겨찾기 설정</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="">
+                        <span class="sub-item">즐겨찾기1</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="">
+                        <span class="sub-item">즐겨찾기2</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </li>
+              
             </ul>
           </div>
         </div>
