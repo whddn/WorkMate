@@ -13,6 +13,7 @@
   .dataTables_wrapper .dataTables_paginate {
     text-align: center !important;
     float: none !important;
+     justify-content: center;
     margin-top: 20px;
   }
 
@@ -39,7 +40,7 @@
 <div class="container mt-4">
   <h2>거래처 목록</h2>
 
-  <div class="mb-3" th:if="${teamNo == 'ROLE_T003'}">
+  <div class="mb-3">
     <a th:href="@{/vendor/insert}" class="btn btn-success">신규 등록</a>
   </div>
 
@@ -80,7 +81,7 @@
     	
       "language": {
         "search": "검색:",
-        "lengthMenu": " ",
+        "lengthMenu": "",
         "info": "현재 _START_ - _END_ / _TOTAL_건",
         "infoEmpty": "",
         "zeroRecords": "일치하는 데이터가 없습니다.",
