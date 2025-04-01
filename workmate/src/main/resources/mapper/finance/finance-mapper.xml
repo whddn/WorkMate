@@ -92,7 +92,14 @@
 		            , #{reportNo}
 		            ) 
 	</insert>
-	
+	<!-- transHistory insert 후 report 업데이트 -->
+	<update id="updateReportTotalAmounts" parameterType="ReportVO">
+	    UPDATE REPORT
+	    SET TOTAL_DEP = #{totalDep},
+	        TOTAL_DRAWAL = #{totalDrawal},
+	        TOTAL_BAL = ${totalBal}
+	    WHERE REPORT_NO = #{reportNo}
+	</update>
 	<!-- Report 수정 -->
 	<update id="updateReportOne" parameterType="ReportVO">
 		UPDATE REPORT

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.workmate.app.finance.mapper.FinanceMapper;
 import com.workmate.app.finance.service.CorcardVO;
@@ -35,6 +36,7 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 	
 	// 입출금 리포트 등록 
+	@Transactional
 	@Override
 	public int inputReportPage(ReportVO reportVO) {
 	    int result = 0;
@@ -45,7 +47,10 @@ public class FinanceServiceImpl implements FinanceService {
 	    if (reportInsert > 0) {
 	        Integer reportNo = reportVO.getReportNo();
 	        List<ReportVO> transList = reportVO.getTransHistoryList();
-
+	        
+	        int totalDeposit = 0;
+	        int totalWithdraw = 0;
+	        // 2. 거래 내역 등록
 	        if (transList != null && !transList.isEmpty()) {
 	            for (ReportVO trans : transList) {
 	                ReportVO transInsertVO = new ReportVO(); // 새 객체 생성
@@ -60,14 +65,28 @@ public class FinanceServiceImpl implements FinanceService {
 	                transInsertVO.setPurposeUse(trans.getPurposeUse());
 
 	                result += financeMapper.insertReportTransOne(transInsertVO);
+	                // 🧮 합계 계산
+	                if (trans.getDeposit() != null) totalDeposit += trans.getDeposit();
+	                if (trans.getWithdrawal() != null) totalWithdraw += trans.getWithdrawal();
 	            }
+	            int totalBalance = totalDeposit - totalWithdraw;
+	            // 3. 리포트에 합계 금액 update
+		            ReportVO updateVO = new ReportVO();
+		            updateVO.setReportNo(reportNo);
+		            updateVO.setTotalDep(totalDeposit);
+		            updateVO.setTotalDrawal(totalWithdraw);
+		            updateVO.setTotalBal(totalBalance);
+		            result += financeMapper.updateReportTotalAmounts(updateVO);
 	        }
 	    }
-
 	    return result;
 	    
 	}
 
+	@Override
+	public int updateReportTotalAmounts(ReportVO reportVO) {
+	    return financeMapper.updateReportTotalAmounts(reportVO);
+	}
 	// 입출금 리포트 수정 기능
 	@Override
 	public int modifyReportPage(ReportVO reportVO) {

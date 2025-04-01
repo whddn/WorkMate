@@ -26,4 +26,6 @@ public interface FinanceService {
 	
 	// 법인카드 상세
 	public CorcardVO findCorcardById(CorcardVO corcardVO);
+	
+	public int updateReportTotalAmounts(ReportVO reportVO);
 }
