@@ -81,7 +81,10 @@
 								        <th>파일설명</th>
 								        <th>파일크기</th>
 								        <th>확장자</th>
-								        <th>업로드날짜</th>												        
+								        <th>업로드날짜</th>	
+								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
+								        <th>업로드사원</th>
+   										</th:block>											        
 								        <th><i class="fas fa-download"></i></th>
 								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 								        <th> <i class="fas fa-trash-alt"></i></th>
@@ -96,7 +99,10 @@
 										<td>[[ ${item.fileDesc} ]]</td>
 										<td>[[ ${item.formattedSize} ]]</td>
 										<td>[[ ${item.extenstion} ]]</td>
-										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>									
+										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>
+										<th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
+										<td>[[ ${item.userId} ]]</td>
+										</th:block>									
 										<td><a th:href="@{/document/download/{documentNo}(documentNo=${item.documentNo})}">
 										    <i class="fas fa-download"></i>
 											</a>

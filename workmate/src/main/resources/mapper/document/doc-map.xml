@@ -4,19 +4,17 @@
 
 	<!-- 자료실 전체조회 -->
 	<select id="selectFileList" resultType="DocVO">	
-		SELECT d.file_tag
-				, d.file_name
-				, d.file_desc
-		        , d.file_size
-		        , d.document_no
-		        , d.extenstion
-		        , d.file_reg_date
-		        , d.update_user
-		        , e.user_id
-		        , e.user_no
-		FROM document d 
-		LEFT JOIN EMPLOYEE e ON d.user_no = e.user_no
-		LEFT JOIN team t ON e.team_no = t.team_no
+		SELECT d.file_tag,
+		       d.file_name,
+		       d.file_desc,
+		       d.file_size,
+		       d.document_no,
+		       d.extenstion,
+		       d.file_reg_date,
+		       d.update_user,
+		       updater.user_id     --update_user를 통해 가져온 user_id
+		FROM document d
+		LEFT JOIN EMPLOYEE updater ON d.update_user = updater.user_no
 	</select> 
 	
 	<!-- 자료실 다운로드 이력 전체조회 -->
