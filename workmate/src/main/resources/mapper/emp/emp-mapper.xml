@@ -448,13 +448,18 @@
 		            , INSERT_DATE
 		            , EVALU_START
 		            , EVALU_END
+		            , EVALU_DESCRIPT
 		            , USAGE_STATUS)
 		VALUES 	(#{evaluFormNo}
 		            , #{evaluName}
 		            , SYSDATE
 		            , #{evaluStart}
 		            , #{evaluEnd}
-		            , #{usageStatus})
+		            , #{evaluDescript}
+		            ,  (CASE WHEN TRUNC(#{evaluStart}) = TRUNC(SYSDATE) 
+		                THEN '진행 중' 
+		                ELSE '대기 중' 
+		                END ))
 	</insert>
 	<!-- 새 평가 등록 : format 부분 -->
 	<insert id="insertEvaluFormat" parameterType="EvaluVO">	
@@ -613,7 +618,6 @@
 		        FROM EVALU_RESULT r2
 		        JOIN EVALUATEE_GROUP g2 ON r2.EVALUATEE_GROUP_ID = g2.EVALUATEE_GROUP_ID
 		        WHERE g2.EVALU_FORM_NO = #{evaluFormNo} 
-		          AND g2.USER_NO != #{userNo}
 		          AND r2.EVALU_NO = r.EVALU_NO
 		    ) AS otherAvgScore,  -- 다른 사람들의 평균 점수 (항목별)
 		    fm.ORDER_NO

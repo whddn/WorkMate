@@ -23,7 +23,6 @@ public class EvaluVO {
 	private int evaluScore;			// 평가 점수 (1점~5점)
 	private Date regDate;			// 평가 항목 등록 일자
 	private String usageStatus;		// 사용 여부
-	private String evaluSummary;	// 평가 요약
 	// 평가 양식 (평가 양식 개별...?)
 	private Integer evaluNo;		// 평가 번호
 	private String orderNo;			// 평가 번호 나열 순서

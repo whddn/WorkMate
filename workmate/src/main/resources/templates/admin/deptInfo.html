@@ -7,17 +7,22 @@
     <meta charset="UTF-8">
     <title>부서 조회</title>
     <style>
-
-
     .center-wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: 75vh;
     }
 
     .dept-box {
       width: 700px;
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  
     }
 
     h2 {
@@ -92,12 +97,8 @@
         <tr>
           <th>위치</th>
           <td>[[ ${dept.deptLocation} ]]</td>
-          <th>예산 제한</th>
-          <td>1분기 ▼&nbsp;&nbsp;&nbsp;&nbsp;3,750만원 (연간 부서 전체 예산 10억 당)</td>
-        </tr>
-        <tr>
           <th>전체 예산</th>
-          <td colspan="3" th:text="${#numbers.formatInteger(dept.budget, 3, 'COMMA')} + '원'"></td>
+          <td th:text="${#numbers.formatInteger(dept.budget, 3, 'COMMA')} + '원'"></td>
         </tr>
       </table>
 
