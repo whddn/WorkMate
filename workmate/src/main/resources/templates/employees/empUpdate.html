@@ -17,18 +17,21 @@
 
 <div th:fragment="employeeFrag">
     <!-- 오른쪽: 상세 정보 카드 -->
-    <div class="card" id="detailsBox">
+    <div class="card" id="detailsBox" style="font-size:14px">
       <div class="info-list">
+      <span style="margin-top:10px; text-align:right">
+       <span style="color:red">* <span style="color:black;">수정 가능</span></span> 
+       </span>
         <div class="info-row">
           <span class="label">ID</span>
           <input class="value" id="info-id" th:value="${update.userId}" readonly>
         </div>
         <div class="info-row">
-          <span class="label">성명</span>
+          <span class="label">성명<span style="color:red"> *</span></span>
           <input class="value" id="info-name" th:value="${update.userName}">
         </div>
         <div class="info-row">
-          <span class="label">팀이름</span>
+          <span class="label">소속팀<span style="color:red"> *</span></span>
           <select class="value"  id="info-team">
           	<option th:value="${team.teamNo}" th:each="team : ${teams}" th:text="${team.teamName}" th:selected="${team.teamNo} == ${update.teamNo}"></option>
           </select>
@@ -38,19 +41,20 @@
           <input class="value" id="info-userNo" th:value="${update.userNo}" readonly>
         </div>
         <div class="info-row">
-          <span class="label">입사일</span>
+          <span class="label">입사일<span style="color:red"> *</span></span>
           <input class="value" type="date" id="info-hire" th:value="${#dates.format(update.hireDate, 'yyyy-MM-dd')}">
         </div>
         <div class="info-row">
-          <span class="label">휴대폰</span>
+          <span class="label">연락처<span style="color:red"> *</span></span>
           <input class="value" id="info-phone" th:value="${update.userPhone}">
         </div>
         <div class="info-row">
-          <span class="label">집주소</span>
-          <input class="value" id="info-address" th:value="${update.address}">
+          <span class="label">주소<span style="color:red"> *</span></span>
+          <div class="input-icon-wrapper">
+          <input class="value addresshome" id="info-address" th:value="${update.address}">
           <span id="search_icon" style="cursor: pointer">
-          <i class="fa fa-search"></i>
-          </span>
+          <i class="fa fa-search"></i></span>
+          </div>
         </div>
       </div>
       <div class="buttons-container">
@@ -164,7 +168,40 @@ function homeAddCode() {
           })
           .catch(err => console.log(err));
       }
+      
+      // 수정 중에 조직도를 누르면 해당 사원의 업데이트 페이지로 이동
+		teamNames.forEach(teamclick => {
+			teamclick.addEventListener('click', e => {
+				const team = e.target.dataset.tn;
+				document.querySelectorAll('.employee').forEach(namedisplay => {
+					namedisplay.style.display = namedisplay.dataset.tn === team ? 'block' : 'none';
+				});
+			});
+		});
 
+		names.forEach(nameclick => {
+			nameclick.addEventListener('click', function (event) {
+				const userNo = event.target.dataset.id;
+			
+				fetch(`/workmate/emp/update/${userNo}`)
+					.then(res => res.json())
+					.then(result => {
+						let hireDate = result.hireDate.split('T')[0];
+						document.querySelector('#info-id').value = result.userId;
+						document.querySelector('#info-name').value = result.userName;
+						document.querySelector('#info-team').value = result.teamName;
+						document.querySelector('#info-userNo').value = result.userNo;
+						document.querySelector('#info-hire').value = hireDate;
+						document.querySelector('#info-phone').value = result.userPhone;
+						document.querySelector('#info-address').value = result.address;
+						
+						document.querySelector('#info-team').value = result.teamNo;
+
+						document.querySelector('#update-employee').dataset.no = result.userNo;
+					})
+					.catch(err => console.log(err));
+			});
+		});
     </script>
 </div>
 </body>

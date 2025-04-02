@@ -16,7 +16,7 @@
 
 .container {
     max-width: 1000px;
-    margin: 50px auto;
+    margin: 0px auto;
     padding: 40px;
     border-radius: 8px;
     display: flex;
@@ -42,6 +42,7 @@
     width: 300px;
     max-height: 500px;
     overflow-y: auto;
+    margin-top: 35px;
 }
 
 .card {
@@ -50,7 +51,7 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     padding: 20px;
     width: 500px; /* 고정 너비 */
-    height: 500px;
+    height: 540px;
     overflow: hidden;
     transition: all 0.3s ease;
     align-self: center; /* 세로 중앙 정렬 */
@@ -187,8 +188,44 @@ h1 {
     align-items: flex-start; /* 세로 상단 정렬 */
     gap: 20px; /* 카드와 트리 사이 간격 */
     flex-direction: row;
+    
+}
+   #search_icon {
+        margin-left: 8px;
+        color: #2980b9;
+        transition: color 0.2s ease;
+    }
+
+    #search_icon:hover {
+        color: #1c5980;
+    }
+    
+    .input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
 }
 
+.input-icon-wrapper input {
+    width: 100%;
+    padding: 10px 40px 10px 10px; /* 오른쪽에 여유 공간 추가 */
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2d3436;
+}
+
+.input-icon-wrapper #search_icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #2980b9;
+    font-size: 16px;
+}
+
+.input-icon-wrapper #search_icon:hover {
+    color: #1c5980;
+}
 	</style>
 
 <body>
@@ -254,12 +291,16 @@ h1 {
 							<span class="label">주소</span>
 							<span class="value" id="info-address"></span>
 						</div>
+						<div class="info-row">
+							<span class="label">이메일</span>
+							<span class="value" id="info-email"></span>
+						</div>
 					</div>
 					<br>
 					<div class="buttons-container">
 					</div>
 					<div class="action-buttons-s">
-						<button id="evaluate-employee-update" class="btn btn-warning" th:data-no="${oneinfo.userNo}"
+						<button id="evaluate-employee-update" class="btn btn-warning updateButton" th:data-no="${oneinfo.userNo}"
 							th:if="${teamNo == 'ROLE_T001'}">수정하기</button>
 					</div>
 				</div>
@@ -270,7 +311,6 @@ h1 {
 				th:if="${teamNo == 'ROLE_T001'}">+ 새로운 사원 추가</button>
 		</div>
 	</div>
-</div>
 </div>
 	<script>
 		const names = document.querySelectorAll('.employee');
@@ -302,6 +342,7 @@ h1 {
 						document.querySelector('#info-hire').textContent = hireDate;
 						document.querySelector('#info-phone').textContent = result.userPhone;
 						document.querySelector('#info-address').textContent = result.address;
+						document.querySelector('#info-email').textContent = result.userMail;
 					})
 					.catch(err => console.log(err));
 			});
