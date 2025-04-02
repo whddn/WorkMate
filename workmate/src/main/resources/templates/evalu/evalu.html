@@ -8,20 +8,15 @@
 <meta charset="UTF-8">
 <title th:text="${evaluList[0].evaluName}">평가</title>
 <style>
-/*#container {
-  max-width: 1000px;
-  margin: 100px auto;
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}*/
-
 /* 제목 스타일 */
 h2, h3 {
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 20px;
+}
+.table-container {
+  overflow-x: auto;
+  width: 100%;
 }
 
 /* 테이블 공통 */
@@ -69,11 +64,11 @@ button:hover {
 }
 
 .evaluName {
-  min-width: 85px;
+  min-width: 40px;
 }
     /* 스타일 추가 */
     .con {
-	  max-width: 1000px;
+	  max-width: 1200px;
       border: 1px solid #ddd; /* 테두리 추가 */
       border-radius: 8px; /* 둥근 테두리 */
       padding: 20px; /* 안쪽 여백 추가 */
@@ -84,12 +79,23 @@ button:hover {
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
+	.evaluName {
+	  width: 40px;
+	}
+
+      .col-compet {
+    min-width: 80px;
+    width: 80px;
+  }
+    .col-content{
+    min-width: 200px;
+    width: 200px;
+    }
 </style>
 </head>
 
 <body>
 	<div id="container">
-		<h2></h2>
 
 		<form id="evaluationForm">
 		<div class="con">
@@ -114,20 +120,19 @@ button:hover {
 		</div>
 		<div class="con">
 		<!-- 디버깅용 -->
-		[[ ${tempScores} ]]
 			<h3>평가항목 및 채점표</h3>
 			<table border="1">
 				<thead>
 					<tr>
-						<th>평가분야</th>
-						<th>평가항목</th>
+						<th class="col-compet">평가분야</th>
+						<th class="col-content">평가항목</th>
 						<th th:each="user : ${userList}">[[${user.userName}]]</th>
 					</tr>
 				</thead>
 				<tbody>
 			 		<tr th:each="evalu : ${evaluList}">
-			          <td th:text="${evalu.evaluCompet}">평가분야</td>
-			          <td th:text="${evalu.evaluContent}">평가항목</td>
+			          <td class="col-compet" th:text="${evalu.evaluCompet}">평가분야</td>
+			          <td class="col-content" th:text="${evalu.evaluContent}">평가항목</td>
 			          <td th:each="user : ${userList}" class="evaluName">
 			            <select 
 			              th:data-evaluitemno="${evalu.evaluItemNo}"  
@@ -143,10 +148,10 @@ button:hover {
 			
 			              <option value="">선택</option>
 			              <option th:each="i : ${#numbers.sequence(1,5)}"
-			                      th:value="${i}"
-			                      th:text="${i + '점'}"
-			                      th:selected="${tempScores[evalu.evaluItemNo + '|' + user.userNo]} == i">
-			              </option>
+						          th:value="${i}"
+						          th:text="${i + '점'}"
+						          th:selected="${tempScores[evalu.evaluItemNo + '|' + user.userNo] == i}">
+						  </option>
 			            </select>
 			          </td>
 			        </tr>
@@ -183,10 +188,12 @@ button:hover {
 	  		let evaluNo = select.dataset.en;
 	  		let formNo = select.dataset.form;
 	  		
-	  	  if (isNaN(score)) {
-	            hasEmpty = true
-	            return;
-	        }
+	  	// 제출 모드일 때만 점수 누락 확인
+        if (mode === '제출 완료' && score === null) {
+            hasEmpty = true;
+        }
+        
+
 	  		scoreList.push({
 	  			evaluNo : evaluNo,
 	  			evaluItemNo : evaluItemNo,
@@ -203,7 +210,6 @@ button:hover {
 	        alert("모든 항목에 점수를 선택해주세요!");
 	        return;
 	    }
-	  		console.log(scoreList);
 	
 let formNo = document.querySelector('[name="score"]').dataset.form;
   // AJAX 전송

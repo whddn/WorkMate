@@ -130,4 +130,6 @@ public interface EmpMapper {
 	public List<EvaluVO> selectTempEvaluScore(EvaluVO vo); // 임시 저장 불러오기
 
 	public int updateEvaluGroupStatus(EvaluVO vo); // 평가자 상태 업데이트 (제출 완료 or 임시 저장)
+	// 임시저장 삭제
+	public void deleteTempEvaluScore(EvaluVO vo);
 }

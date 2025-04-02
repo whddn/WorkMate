@@ -1,0 +1,207 @@
+<!--관리자 평가 단건 조회-->
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/emp_layout}"
+	layout:fragment="content">
+
+<head>
+<meta charset="UTF-8">
+<title th:text="${evaluList[0].evaluName}">평가</title>
+<style>
+ 
+    .con {
+	  max-width: 1000px;
+      border: 1px solid #ddd; /* 테두리 추가 */
+      border-radius: 8px; /* 둥근 테두리 */
+      padding: 20px; /* 안쪽 여백 추가 */
+      margin: 0 auto;
+      margin-bottom: 20px; /* 항목 간 간격 추가 */
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+ 
+ /* 제목 스타일 */
+ h2, h3 {
+ 	font-weight: 600;
+ 	color: #333;
+   font-weight: 600;
+   color: #2c3e50;
+   margin-bottom: 20px;
+ }
+ 
+ /* 테이블 스타일 */
+ /* 테이블 공통 */
+ table {
+ 	width: 100%;
+ 	border-collapse: collapse;
+ 	margin-bottom: 20px;
+   width: 100%;
+   border-collapse: collapse;
+   margin-bottom: 30px;
+ }
+ 
+ th, td {
+ 	padding: 12px;
+ 	text-align: left;
+ 	border: 1px solid #ddd;
+   padding: 14px 12px;
+   text-align: center;
+   border: 1px solid #e0e0e0;
+   font-size: 14px;
+ }
+ 
+ th {
+ 	background-color: #f7f7f7;
+ 	color: #555;
+   background-color: #f9fafc;
+   color: #333;
+ }
+ 
+ td input, td select {
+ 	width: 100%;
+ 	padding: 8px;
+ 	border: 1px solid #ccc;
+ 	border-radius: 4px;
+ 	box-sizing: border-box;
+ 	font-size: 14px;
+ }
+ 
+ /* 폼 입력 필드 스타일 */
+ input[type="text"], select, textarea {
+ 	width: 100%;
+ 	padding: 10px;
+ 	margin-top: 8px;
+ 	font-size: 14px;
+ 	border: 1px solid #ccc;
+ 	border-radius: 4px;
+ 	box-sizing: border-box;
+ }
+ 
+ textarea {
+ 	height: 100px;
+ 	resize: vertical;
+ }
+ 
+ /* 평가 항목에 대한 선택지 */
+ select {
+ 	font-size: 14px;
+ 	background-color: #f9f9f9;
+ 	border-color: #ddd;
+   width: 100%;
+   padding: 8px;
+   font-size: 14px;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   box-sizing: border-box;
+ }
+ 
+ /* ver2 스타일 - 평가 설명 */
+ /* 평가 설명 영역 */
+ .ver2 {
+ 	padding: 12px;
+ 	background-color: #f9f9f9;
+ 	border: 1px solid #ddd;
+ 	border-radius: 4px;
+ 	margin-top: 15px;
+ 	font-size: 14px;
+   padding: 16px;
+   background-color: #f9f9f9;
+   border-left: 4px solid #3498db;
+   border-radius: 6px;
+   color: #555;
+   font-size: 14px;
+   margin-bottom: 30px;
+ }
+ 
+ /* 버튼 스타일 */
+ button {
+ 	padding: 10px 20px;
+ 	background-color: #007bff;
+ 	color: white;
+ 	border: none;
+ 	border-radius: 5px;
+ 	cursor: pointer;
+ 	font-size: 16px;
+ 	margin-top: 20px;
+   padding: 10px 20px;
+   background-color: #3498db;
+   color: white;
+   border: none;
+   border-radius: 6px;
+   cursor: pointer;
+   font-size: 15px;
+   transition: background-color 0.3s ease;
+   margin-right: 10px;
+ }
+ 
+ button:hover {
+ 	background-color: #0056b3;
+   background-color: #2980b9;
+ }
+ 
+ .evaluName {
+ 	width: 85px;
+   min-width: 85px;
+ }
+ </style>
+ </head>
+ 	<div class="con">
+ 		<form id="evaluationForm">
+ 			<!-- 1. 평가자 정보 -->
+ 			<h3>1. 평가 대상자 정보</h3>
+ 			<h3>평가 대상자 정보</h3>
+ 			<table>
+ 				<tr>
+ 					<th>팀명</th>
+ 			</table>
+ 	</div>
+ 	<div class="con">
+ 			<!-- 2. 평가 안내-->
+ 			<h3>2. 평가 설명</h3>
+ 			<h3>평가 설명</h3>
+ 			<div class="ver2">
+ 				<p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
+ 				<p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
+ 			</div>
+ 				</div>
+ 				<div class="con">
+ 			<h3>3. 평가항목 및 채점표</h3>
+ 			<h3>평가항목 및 채점표</h3>
+ 			<table border="1">
+ 				<thead>
+ 					<tr>
+ 						<th>평가분야</th>
+ 						<th>평가항목</th>
+ 						<th th:each="user : ${userList}">[[${user.userName}]]</th>
+ 					</tr>
+ 				</thead>
+ 				<tbody>
+ 					<tr th:each="evalu : ${evaluList}">
+ 						<td th:text="${evalu.evaluCompet}">평가분야 </td>
+ 						<td th:text="${evalu.evaluContent}">평가항목</td>
+ 						<!-- 사람 수만큼 반복해서 셀 생성 -->
+ 						<td th:each="user : ${userList}" class="evaluName">
+ 						<select th:data-evaluitemno="${evalu.evaluItemNo}"  th:data-form="${evalu.evaluFormNo}" 
+ 						th:data-userno="${user.userNo}" th:data-orderno="${evalu.orderNo}" th:data-teamno="${evalu.teamNo}" 
+ 						th:data-gid = "${user.evaluateeGroupId}" th:data-en="${evalu.evaluNo}" th:data-gd="${user.evaluGroupId}" 
+ 							name="score" 
+ 							id="score-select" disabled >
+ 								<option value="">선택</option>
+ 								<option value="1">1점</option>
+ 								<option value="2">2점</option>
+ 								<option value="3">3점</option>
+ 								<option value="4">4점</option>
+ 								<option value="5">5점</option>
+ 						</select></td>
+ 					</tr>
+ 				</tbody>
+ 			</table>
+ 		</form>
+ 		<button type="button" th:onclick="|location.href='@{/emp/bfevalu}'|">목록으로</button>
+ 	</div>
+ 	</div>
+ 	</body>
+
+</html>

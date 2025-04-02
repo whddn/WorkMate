@@ -81,6 +81,7 @@
 		.plus {
 			background-color: #28a745;
 			color: white;
+			margin-right: 10px;
 		}
 
 		.minus {
@@ -170,8 +171,6 @@
 		<div class="btn-group">
 			<button class="btn plus" onclick="addRow()">＋ 행 추가</button>
 			<button class="btn minus" onclick="removeRow()">－ 행 삭제</button>
-			<input type="file" id="excelFile" />
-			<button type="button" id="Excelupload">엑셀 업로드</button>
 		</div>
 
 		<table id="financeTable">
@@ -215,27 +214,22 @@
 					</tr>
 				</tbody>
 			</table>
-
-			<h3>추가 자료 첨부</h3>
-			<div class="attachment-area">
-				<textarea placeholder="사진 / 그래프 등 첨부" rows="5"></textarea>
-			</div>
-
 			<h3>첨부 파일</h3>
 			<div class="file-upload">
 				<div>
 					<input type="file">
-					<button type="button">첨부</button>
+					<button type="button" class="btn btn-black">첨부</button>
 				</div>
 				<div>
 					<input type="file">
-					<button type="button">첨부</button>
+					<button type="button" class="btn btn-black">첨부</button>
 				</div>
 			</div>
 
 			<div class="button-area">
-				<button type="button" class="btn-approve">결재선</button>
-				<button type="button" class="btn-submit" id="updateReport">저장</button>
+				<button type="button" class="btn-approve btn btn-primary">결재선</button>
+				<button type="button" class="btn-submit btn btn-primary" id="updateReport">저장</button>
+				<button type="button" th:onclick="|location.href='@{/finance/report}'|" class="btn btn-primary">목록으로</button>
 			</div>
 		</div>
 	</div>

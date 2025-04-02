@@ -292,14 +292,27 @@ public class EmpServiceImpl implements EmpService {
 	@Transactional
 	public int inputEvaluResultScore(List<EvaluVO> evaluList, String mode) {
 	    int result = 0;
+
+	    if (evaluList == null || evaluList.isEmpty()) return result;
+
+	    EvaluVO first = evaluList.get(0);
+
+	    // 1. 임시저장일 경우 기존 임시저장 결과 삭제
+	    if ("임시 저장".equals(mode) || "제출 완료".equals(mode)) {
+	    	 for (EvaluVO vo : evaluList) {
+	             empMapper.deleteTempEvaluScore(vo);  // ✅ 모든 평가자-피평가자 조합 삭제
+	         }
+	    }
+
+	    // 2. insert는 공통
 	    for (EvaluVO evalu : evaluList) {
 	        int inserted = empMapper.insertEvaluScore(evalu);
 	        result += inserted;
 	    }
+	    
 
 	    return result;
-	    }
-
+	}
 	
 	
 	@Override
@@ -327,8 +340,10 @@ public class EmpServiceImpl implements EmpService {
 	        // 이미 출력된 사람일 경우, 사람 관련 정보 비우기
 	        if (!seenUserNos.add(userNo)) {
 	            vo.setUserName(null);
+	            
 	        }
 	    }
+	    
 
 	    return oneList;
 	}
@@ -347,24 +362,30 @@ public class EmpServiceImpl implements EmpService {
 
 	// 임시저장
     @Override
-    public int updateEvaluScore(EvaluVO vo) {
+    public int modifyEvaluScore(EvaluVO vo) {
         return empMapper.updateEvaluScore(vo);
     }
-    // 임시 저장 점수 불러오기
+    // 임시저장 점수
     @Override
-    public Map<String, List<Integer>> findTempEvaluScore(EvaluVO vo) {
+    public Map<String, Integer> findTempEvaluScore(EvaluVO vo) {
         List<EvaluVO> tempList = empMapper.selectTempEvaluScore(vo);
-        
-        Map<String, List<Integer>> map = new HashMap<>();
+        Map<String, Integer> map = new HashMap<>();
+
         for (EvaluVO item : tempList) {
-        	String key = item.getEvaluItemNo() + "|" + item.getUserNo();
-            map.computeIfAbsent(key, k -> new ArrayList<>()).add(item.getEvaluScore());
+        	
+            String key = item.getEvaluItemNo() + "|" + item.getEvaluateeUserNo();
+         // 로그 추가
+            map.put(key, item.getEvaluScore());    
         }
         return map;
     }
-    
     @Override
     public int modifyEvaluGroupStatus(EvaluVO vo) {
         return empMapper.updateEvaluGroupStatus(vo);
+    }
+    
+    @Override
+    public void dropTempEvaluScore(EvaluVO vo) {
+        empMapper.deleteTempEvaluScore(vo);
     }
 }
