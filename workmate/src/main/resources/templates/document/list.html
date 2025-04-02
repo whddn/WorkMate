@@ -77,6 +77,20 @@
 				        </div>
 				    </div>
 				</div>
+				<!-- 파일 미리보기 모달 -->
+					<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+					  <div class="modal-dialog modal-xl modal-dialog-centered">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h6 class="modal-title"><b>파일 미리보기</b></h6>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					      </div>
+					      <div class="modal-body text-center">
+					        <iframe id="previewFrame" style="width:100%; height:80vh;" frameborder="0"></iframe>
+					      </div>
+					    </div>
+					  </div>
+					</div>
 
 					<div class="table-responsive">
 							<table id="documentTable" class="table">
@@ -94,7 +108,8 @@
 								        <th>업로드날짜</th>	
 								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 								        <th>업로드사원</th>
-   										</th:block>											        
+   										</th:block>	
+   										<th>미리보기</th>									        
 								        <th><i class="fas fa-download"></i></th>
 								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 								        <th> <i class="fas fa-trash-alt"></i></th>
@@ -112,7 +127,14 @@
 										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>
 										<th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 										<td>[[ ${item.userId} ]]</td>
-										</th:block>									
+										</th:block>
+										<td>
+										  <button class="btn btn-outline-secondary btn-sm me-2"
+										          th:data-file-url="@{/document/preview/{documentNo}(documentNo=${item.documentNo})}"
+										          onclick="previewFile(this)">
+										    <i class="fas fa-eye"></i> 미리보기
+										  </button>										  
+										</td>								
 										<td><a th:href="@{/document/download/{documentNo}(documentNo=${item.documentNo})}">
 										    <i class="fas fa-download"></i>
 											</a>
@@ -254,5 +276,14 @@ function addNewTag() {
 
     input.value = ""; // 입력창 비우기
   }
+  // 파일 미리보기
+  function previewFile(button) {
+    const fileUrl = button.getAttribute("data-file-url");
+    const iframe = document.getElementById("previewFrame");
+    iframe.src = fileUrl;
+
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
 </script>
 </html>

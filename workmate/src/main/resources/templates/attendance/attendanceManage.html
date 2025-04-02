@@ -43,6 +43,15 @@ table {
 	border-collapse: collapse;
 	margin-top: 20px;
 }
+
+table td, table th {    
+    vertical-align: middle;
+    white-space: nowrap;       /* 줄바꿈 방지 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;          /* 셀 너비 제한 (적당히 조절) */
+    padding: 10px;
+}
 .search-container {
     display: flex; /* 가로로 배치 */
     gap: 30px; /* 각 입력 필드 사이 간격 */
@@ -66,7 +75,7 @@ form {
 .search-group {
     display: flex;
     flex-direction: column; /* 라벨과 입력 필드를 세로로 배치 */
-    width: 30%; /* 각 입력 필드의 너비를 30%로 설정 (3개 항목을 한 줄에 배치) */
+    width: 200px; /* 각 입력 필드의 너비를 30%로 설정 (3개 항목을 한 줄에 배치) */
 }
 
 .search-input {
@@ -75,6 +84,14 @@ form {
     border-radius: 5px;
     font-size: 14px;
     width: 100%; /* 입력 필드가 부모 컨테이너에 꽉 차도록 */
+}
+
+.truncate-text {
+  white-space: nowrap;       /* 줄바꿈 안 함 */
+  overflow: hidden;          /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis;   /* 넘치면 ... 처리 */
+  max-width: 120px;          /* 최대 너비 설정 */
+  display: inline-block;     /* ellipsis가 적용되도록 block 또는 inline-block 필요 */
 }
 
 button{
@@ -95,7 +112,7 @@ a {
 		<div class="container">
 		 	<div class="card" id="card-top">
 				<div class="card-body">
-				<h4 class="card-title">전사 이번달 근태현황</h4>
+				<h4 class="card-title">전체사원 이번달 근태현황</h4>
 				<p class="date-box" id="current-date"></p>
 					<!-- 내용 추가 -->
 					<table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
@@ -131,7 +148,7 @@ a {
 				        <!-- 기간 -->
 				        <div class="search-group">
 				            <label><b>기간</b></label>
-				            <input name="searchDate" class="search-input" />
+				            <input id="searchDate" name="searchDate" class="search-input" />
 				        </div>
 				
 				        <!-- 이름 -->
@@ -141,10 +158,18 @@ a {
 				        </div>
 				
 				        <!-- 팀명 -->
-				        <div class="search-group">
-				            <label for="searchTeam">팀명</label>
-				            <input type="text" id="searchTeam" name="teamName" class="search-input" placeholder="팀명 입력" th:value="${workVO.teamName}">
-				        </div>
+				       <div class="search-group">
+						    <label for="searchTeam">팀명</label>
+						    <select id="searchTeam" name="teamName" class="search-input">
+						        <option value="">-- 팀 선택 --</option>
+						        <th:block th:each="team : ${teams}">
+						            <option th:value="${team.teamName}" 
+						                    th:text="${team.teamName}" 
+						                    th:selected="${workVO.teamName == team.teamName}">
+						            </option>
+						        </th:block>
+						    </select>
+						</div>
 				
 				        <button id="searchBtn" class="btn btn-primary"><i class="fas fa-search"></i></button>
 				        <button onclick="resetDate()" type="button" id="searchRe" name="searchRe" class="btn btn-black"><i class="fas fa-undo-alt"></i></button>
@@ -158,7 +183,7 @@ a {
 								<thead>
 									<tr>
 										<th>날짜</th>
-										<th>부서명</th>
+										<th>팀명</th>
 										<th>사원이름</th>
 										<th>출근시간</th>
 										<th>퇴근시간</th>
@@ -184,7 +209,14 @@ a {
 											<span th:if="${work.workStatus == '정상'}" class="btn btn-success btn-sm">[[ ${work.workStatus} ]]</span>
 											<span th:if="${work.workStatus != '지각' and work.workStatus != '조퇴' and work.workStatus != '정상'}" class="btn btn-secondary btn-sm">[[ ${work.workStatus} ]]</span>
 										</td>
-										<td>[[ ${work.lateReason} ]]</td>
+										<td>
+										<span class="truncate-text"
+										      th:text="${work.lateReason != null and #strings.length(work.lateReason) > 8
+										                 ? #strings.substring(work.lateReason, 0, 6) + '...'
+										                 : work.lateReason}"
+										      th:title="${work.lateReason}">
+										</span>
+										</td>
 									</tr>
 								</tbody>
 							</table>
@@ -200,7 +232,6 @@ a {
 <script src="resources/js/plugin/datepicker/bootstrap-datepicker.ko.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <script>
 
 //테이블 설정
