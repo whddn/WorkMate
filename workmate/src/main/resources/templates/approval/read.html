@@ -110,111 +110,105 @@
 	
 </body>
 
-<script th:inline="javascript">
+<script th:inline="javascript">	
 	let contextPath = [[ @{/upload/forms/approval/} ]];
 	let approval = [[ ${approval} ]];
 	let apprLine = [[ ${apprLine} ]];
 	let refLine = [[ ${refLine} ]];
 	
-	// apprForm의 내용을 화면에 띄운다
-	$('#apprForm').load(contextPath + approval.formPath + ".html", function() {
-		$('#apprLine').load(contextPath + "apprLine.html");
-	});
-	console.log(contextPath + apprForm.formPath + ".html");
-	console.log(contextPath + "apprLine.html");
-	
 	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
-		$('#ApprovalsTable').DataTable({
-			searching: false,
-	        lengthChange: false,
-	        info: false
-	    });
-		$('#AttachTable').DataTable({
-			searching: false,
-	        lengthChange: false,
-	        info: false
-	    });
-		
-		$('#apprNo').text(approval.apprNo);
-		$('#userName').text(approval.userName);
-		$('#userNo').text(approval.userNo);
-		$('#departmentName').text(approval.departmentName);
-		$('#createDate').text(approval.createDate.split("T")[0]);
-		$('#expireDate').text(approval.expireDate.split("T")[0]);
-
-		Object.keys(approval).forEach(function(key) {
-			let target = $(`
-				input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']
-			`);
-			if(target.length > 0) {
-				let value = approval[key] !== null ? approval[key] : 'null';
-		        target.val(value);
-			}
-		});
-		
-		$('#apprForm').find('input[name], select[name], textarea[name], button[name]').attr('readonly', true);
-		$('#apprForm').find('input[name][type="radio"], input[name][type="checkbox"]').attr('onclick', 'return false;');
-		
-		$('#setApprLine').remove();
-		
-		let table = $('#apprLine');
-		let departmentRow = table.find('tr').eq(0);
-		let signRow = table.find('tr').eq(1);
-		let nameRow = table.find('tr').eq(2);
-		
-		// 결재선 데이터 삽입
-		$.each(apprLine, function(index, element) {
-			if(index > 2)
-				return false;
-			
-			let colIndex = index + 1;
-			
-			departmentRow.find('td').eq(colIndex - 1).text(element.departmentName);
-			if(element.apprResult != 'a1') {
-				let contextPath = [[ @{/} ]];
-				let imgTag = $('<img>', {
-			        src: contextPath + element.signPath,	// 이미지 경로
-			        alt: '결재 사인',
-			        width: 50,  // 이미지 크기 (원하는 크기로 조절)
-			        height: 50
+		// apprForm의 내용을 화면에 띄운다
+		$('#apprForm').load(contextPath + approval.formPath + ".html", function() {
+			$('#apprLine').load(contextPath + "apprLine.html", function() {
+				$('#ApprovalsTable').DataTable({
+					searching: false,
+			        lengthChange: false,
+			        info: false
+			    });
+				$('#AttachTable').DataTable({
+					searching: false,
+			        lengthChange: false,
+			        info: false
 			    });
 				
-				signRow.find('td').eq(colIndex - 1).empty().append(imgTag);
-			}
-			nameRow.find('td').eq(colIndex - 1).text(element.userName);
+				$('#apprNo').text(approval.apprNo);
+				$('#userName').text(approval.userName);
+				$('#userNo').text(approval.userNo);
+				$('#departmentName').text(approval.departmentName);
+				$('#createDate').text(approval.createDate.split("T")[0]);
+				$('#expireDate').text(approval.expireDate.split("T")[0]);
+				
+				Object.keys(approval).forEach(function(key) {
+					let target = $(`
+						input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']
+					`);
+					if(target.length > 0) {
+						let value = approval[key] !== null ? approval[key] : 'null';
+				        target.val(value);
+					}
+				});
+				
+				$('#apprForm').find('input[name], select[name], textarea[name], button[name]').attr('readonly', true);
+				$('#apprForm').find('input[name][type="radio"], input[name][type="checkbox"]').attr('onclick', 'return false;');
+				
+				$('#setApprLine').remove();
+				
+				let table = $('#apprLine');
+				let departmentRow = table.find('tr').eq(0);
+				let signRow = table.find('tr').eq(1);
+				let nameRow = table.find('tr').eq(2);
+				
+				// 결재선 데이터 삽입
+				$.each(apprLine, function(index, element) {
+					if(index > 2) {
+						return false;
+					}
+
+					let colIndex = index + 1;
+					
+					departmentRow.find('td').eq(colIndex - 1).text(element.departmentName);
+					if(element.apprResult != 'a1') {
+						let contextPath = [[ @{/} ]];
+						let imgTag = $('<img>', {
+					        src: contextPath + element.signPath,	// 이미지 경로
+					        alt: '결재 사인',
+					        width: 50,  // 이미지 크기 (원하는 크기로 조절)
+					        height: 50
+					    });
+						console.log('옵저버', contextPath + element.signPath);
+						signRow.find('td').eq(colIndex - 1).empty().append(imgTag);
+					}
+					nameRow.find('td').eq(colIndex - 1).text(element.userName);
+				});
+				
+				// 참조선 데이터 삽입
+				$.each(refLine, function(index, element) {
+					console.log(refLine);
+					let liTag = $(`<li> ${element.departmentName} &gt; ${element.teamName} &gt; ${element.userName} </li>`);
+					$('#refLine').append(liTag);
+				});
+				
+				if(approval.apprStatus != 'a1') {
+					$('#delApprBtn').remove();
+					$('#apprBtn').remove();
+				}
+				
+				// 연차일 경우 연차 정보 보여주기
+				if(approval.apprType == 'AF001') {
+					let annual = [[ ${annual} ]];
+					console.log(annual);
+					
+					$(`input[name="annualType"][value="${annual.annualType}"]`).attr('checked', true);
+					$('input[name="annualStart"]').val(annual.annualStart.substr(0, 10));
+					$('input[name="annualEnd"]').val(annual.annualEnd.substr(0, 10));
+					$('input[name="annualCount"]').val(annual.annualCount);
+				}
+			});
 		});
 		
-		// 참조선 데이터 삽입
-		$.each(refLine, function(index, element) {
-			console.log(refLine);
-			let liTag = $(`<li> ${element.departmentName} &gt; ${element.teamName} &gt; ${element.userName} </li>`);
-			$('#refLine').append(liTag);
-		});
-		
-		if(approval.apprStatus != 'a1') {
-			$('#delApprBtn').remove();
-			$('#apprBtn').remove();
-		}
-		
-		function formatDate(date) {
-	        if (!date) return ''; // date가 null 또는 undefined일 경우 빈 문자열 반환
-	        const year = date.getFullYear();
-	        const month = String(date.getMonth() + 1).padStart(2, '0');
-	        const day = String(date.getDate()).padStart(2, '0');
-	        return `${year}-${month}-${day}`;
-	    }
-		
-		// 연차일 경우 연차 정보 보여주기
-		if(approval.apprType == 'AF001') {
-			let annual = [[ ${annual} ]];
-			console.log(annual);
-			
-			$(`input[name="annualType"][value="${annual.annualType}"]`).attr('checked', true);
-			$('input[name="annualStart"]').val(annual.annualStart.substr(0, 10));
-			$('input[name="annualEnd"]').val(annual.annualEnd.substr(0, 10));
-			$('input[name="annualCount"]').val(annual.annualCount);
-		}
+		console.log(contextPath + apprForm.formPath + ".html");
+		console.log(contextPath + "apprLine.html");	
 	});
 	
 	// 문서에 대해 결재한다

@@ -247,7 +247,6 @@ public class ApprovalController {
         	workVO.setApprNo(approvalVO.getApprNo());
 
         	workVO = attendantService.findAnnualByApprNo(workVO);
-        	System.out.println(workVO);
         	model.addAttribute("annual", workVO);
 		}
 		
