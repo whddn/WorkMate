@@ -42,6 +42,7 @@ import lombok.RequiredArgsConstructor;
  * 03-28	이종우	전자계약 목록
  * 03-30	이종우	전자계약 등록, 조회
  * 04-01	이종우	전자계약 상세페이지
+ * 04-02	이종우	파일 다운로드
  * 
  * </pre>
  */
@@ -64,6 +65,8 @@ public class ContractsController {
 
 	/**
 	 * 전자계약 양식 리스트 페이지 (표 테이블로 나옴)
+	 * @param model
+	 * @return
 	 */
 	@GetMapping("/form")
 	public String getFormList(Model model) {
@@ -71,8 +74,8 @@ public class ContractsController {
 		return "contracts/contractsForm"; // 리스트 페이지
 	}
 
-	/**
-	 * 
+	/** 
+	 * 파일 상세보기
 	 * @param contrNo
 	 * @return
 	 */
@@ -88,7 +91,7 @@ public class ContractsController {
 	    }
 	}
 	/**
-	 * 
+	 * 전자계약 등록
 	 * @param contract
 	 * @param model
 	 * @return
@@ -140,8 +143,11 @@ public class ContractsController {
 	    }
 	}
 
-	
-	// 파일 다운로드
+		/**
+		 * 파일 다운로드
+		 * @param contrNo
+		 * @return
+		 */
 		@GetMapping("/files/{contrNo}")
 		public ResponseEntity<FileSystemResource> downloadFile(@PathVariable String contrNo) {
 		    try {
@@ -177,7 +183,12 @@ public class ContractsController {
 		return "contracts/contractsList";
 	}
 	
-	// 표준근로계약서 상세
+	/**
+	 * 표준근로계약서 상세
+	 * @param contractsVO
+	 * @param model
+	 * @return
+	 */
     @GetMapping("/Standard_Detail_Form/{contrNo}")
     public String standardDetail(ContractsVO contractsVO, Model model) {
         ContractsVO contract = contractsService.findContractsById(contractsVO);
@@ -189,7 +200,12 @@ public class ContractsController {
         return "contracts/Standard_Detail_Form";
     }
 
-    // 거래처계약서 상세
+    /**
+     * 거래처계약서 상세
+     * @param contractsVO
+     * @param model
+     * @return
+     */
     @GetMapping("/Trade_Detail_Form/{contrNo}")
     public String tradeDetail(ContractsVO contractsVO, Model model) {
         ContractsVO contract = contractsService.findContractsById(contractsVO);

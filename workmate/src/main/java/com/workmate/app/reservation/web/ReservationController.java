@@ -40,7 +40,11 @@ public class ReservationController {
 	private final WhoAmI whoAmI;
 	
 
-	// 공용품 리스트 페이지
+	/**
+	 * 공용품 리스트 페이지
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("reservation/main")
 	public String ReserList(Model model) {
 		List<ReservationVO> list = reservationService.findAllReserList();
@@ -48,7 +52,12 @@ public class ReservationController {
 		return "reservation/reservation";
 	}
 
-	// 공용품 상세 페이지
+	/**
+	 * 공용품 상세 페이지
+	 * @param commonNo
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("/reservation/detail/{commonNo}")
 	public String reservationDetail(@PathVariable Integer commonNo, Model model) {
 	    ReservationVO vo = new ReservationVO();
@@ -65,7 +74,11 @@ public class ReservationController {
 	    return "reservation/reservationDetail";
 	}
 	
-	// 예약 신청
+	/**
+	 * 예약 신청
+	 * @param reservationVO
+	 * @return
+	 */
 	@PostMapping("reservation/input")
 	public String saveReservation(ReservationVO reservationVO) {
 	    if (reservationVO.getReserNo() == null) {
@@ -78,8 +91,11 @@ public class ReservationController {
 	    return "redirect:/reservation/List";
 	}
 
-	
-	// 내 예약 목록 페이지
+	/**
+	 * 내 예약 목록 페이지
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("reservation/List")
 	public String myReserList(Model model) {
 		EmpVO vo = whoAmI.whoAmI();
@@ -89,7 +105,12 @@ public class ReservationController {
 		return "reservation/reservationList";
 	}
 	
-	// 예약 수정 페이지
+	/**
+	 * 예약 수정 페이지
+	 * @param reserNo
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("/reservation/edit/{reserNo}")
 	public String editReservationForm(@PathVariable int reserNo, Model model) {
 	    ReservationVO reser = reservationService.findReserByNo(reserNo); // 조회 메서드로 변경

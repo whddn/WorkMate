@@ -22,13 +22,20 @@ public class RestReservationController {
 	// Rest API
 	private final ReservationService reservationService;
 
-	// 공용품목록 전체조회 - api요청
+	/**
+	 * 공용품목록 전체조회 - api요청
+	 * @return
+	 */
 	@GetMapping("api/reservation/main")
 	public List<ReservationVO> ReserList() {
 		return reservationService.findAllReserList();
 	}
 
-	// 공용품목록 단건조회
+	/**
+	 * 공용품목록 단건조회
+	 * @param commonNo
+	 * @return
+	 */
 	@GetMapping("api/reservation/detail/{commonNo}")
 	public ReservationVO ReserDetail(@PathVariable Integer commonNo) {
 		ReservationVO reservationVO = new ReservationVO();
@@ -36,7 +43,11 @@ public class RestReservationController {
 		return reservationService.findReserById(reservationVO);
 	}
 
-	// 예약 삭제
+	/**
+	 * 예약 삭제
+	 * @param reserNo
+	 * @return
+	 */
 	@DeleteMapping("/reservation/Delete/{reserNo}")
 	public ResponseEntity<String> deleteReservation(@PathVariable int reserNo) {
 	    int result = reservationService.dropReserInfo(reserNo);
