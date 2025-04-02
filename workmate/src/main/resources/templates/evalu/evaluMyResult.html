@@ -6,17 +6,27 @@
 
 <head>
 <meta charset="UTF-8">
-<title>평가</title>
+<title>[[ ${result[0].evaluName} ]]</title>
 <style>
-#container {
+/*#container {
   max-width: 1000px;
   margin: 100px auto;
   background-color: #fff;
   border-radius: 12px;
   padding: 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
+}*/
+    .con {
+	  max-width: 1000px;
+      border: 1px solid #ddd; /* 테두리 추가 */
+      border-radius: 8px; /* 둥근 테두리 */
+      padding: 20px; /* 안쪽 여백 추가 */
+      margin: 0 auto;
+      margin-bottom: 20px; /* 항목 간 간격 추가 */
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 /* 제목 스타일 */
 h2, h3 {
   font-weight: 600;
@@ -88,10 +98,12 @@ button:hover {
 
 <body>
 	<div id="container">
-		<h2></h2>
-
+		<div class="con">
+	    <h2 style="text-align:center">[[ ${result[0].evaluName} ]]</h2>
+	    </div>
 		<form id="evaluationForm">
 			<!-- 1. 평가자 정보 -->
+			<div class="con">
 			<h3>평가 대상자 정보</h3>
 			<table>
 				<tr>
@@ -99,13 +111,16 @@ button:hover {
 					<td>[[ ${result[0].teamName} ]]</td>
 				</tr>
 			</table>
-
+			</div>
+			
 			<!-- 2. 평가 안내-->
+			<div class="con">
 			<h3>평가 설명</h3>
 			<div class="ver2">
-				<p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
-				<p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
+				<p th:text="${result[0].evaluDescript}"></p>
 			</div>
+			</div>
+			<div class="con">
 			<h3>평가항목 및 채점표</h3>
 			<table border="1">
 				<thead>
@@ -132,9 +147,10 @@ button:hover {
 					</tr>
 				</tbody>
 			</table>
-		</form>
 		<button type="button" th:onclick="|location.href='@{/emp/bfevalu}'|">목록으로</button>
 		<button type="button" th:onclick="|location.href='@{/emp/evaluUpdate}'|">수정</button>
+			</div>
+		</form>
 	</div>
 </body>
 

@@ -155,7 +155,7 @@
             <th:block th:each="list : ${list}">
                 <tr> 
                     <td><a th:href="@{/emp/bfoneevalu/{eva}(eva=${list.evaluFormNo})}">[[ ${list.evaluName} ]]</a></td>
-                    <td>[[ ${list.usageStatus} ]]</td>
+                    <td>[[ ${list.formStatus} ]]</td>
                     <td>[[ ${list.teamName} ]]</td>
                   <td th:text="${#dates.format(list.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(list.evaluEnd, 'yyyy-MM-dd')}"></td>
                     <td>추가 설명</td>
@@ -173,7 +173,7 @@
     // 페이징 / 검색
     $(document).ready(function() {
       $('#beforeList').DataTable({
-        pageLength: 10,
+        pageLength: 5,
         lengthChange: false,
         ordering: true,
         language: {

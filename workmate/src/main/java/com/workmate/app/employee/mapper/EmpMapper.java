@@ -123,4 +123,11 @@ public interface EmpMapper {
 	
 	// 평가 시작일이 되면 진행 중으로
 	public int updateStatusToInProgress(LocalDate today);
+
+	// 임시 저장
+	public int updateEvaluScore(EvaluVO vo); // 임시 저장 수정
+
+	public List<EvaluVO> selectTempEvaluScore(EvaluVO vo); // 임시 저장 불러오기
+
+	public int updateEvaluGroupStatus(EvaluVO vo); // 평가자 상태 업데이트 (제출 완료 or 임시 저장)
 }

@@ -6,16 +6,16 @@
 
 <head>
 <meta charset="UTF-8">
-<title>평가</title>
+<title th:text="${evaluList[0].evaluName}">평가</title>
 <style>
-#container {
+/*#container {
   max-width: 1000px;
   margin: 100px auto;
   background-color: #fff;
   border-radius: 12px;
   padding: 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
+}*/
 
 /* 제목 스타일 */
 h2, h3 {
@@ -63,18 +63,6 @@ td input, td select {
   margin-bottom: 30px;
 }
 
-/* 버튼 스타일 */
-button {
-  padding: 10px 20px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
-  transition: background-color 0.3s ease;
-  margin-right: 10px;
-}
 
 button:hover {
   background-color: #2980b9;
@@ -83,6 +71,19 @@ button:hover {
 .evaluName {
   min-width: 85px;
 }
+    /* 스타일 추가 */
+    .con {
+	  max-width: 1000px;
+      border: 1px solid #ddd; /* 테두리 추가 */
+      border-radius: 8px; /* 둥근 테두리 */
+      padding: 20px; /* 안쪽 여백 추가 */
+      margin: 0 auto;
+      margin-bottom: 20px; /* 항목 간 간격 추가 */
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
 </style>
 </head>
 
@@ -91,23 +92,27 @@ button:hover {
 		<h2></h2>
 
 		<form id="evaluationForm">
+		<div class="con">
+		<h2 style="text-align:center">[[ ${evaluList[0].evaluName} ]]</h2>
+		 </div>
+		<div class="con">
 			<!-- 1. 평가자 정보 -->
 			<h3>평가 대상자 정보</h3>
 			<table>
 				<tr>
 					<th>팀명</th>
-				</tr>
-				<tr>
 					<td>[[ ${userList[0].teamName} ]]</td>
 				</tr>
 			</table>
-
+		</div>
+		<div class="con">
 			<!-- 2. 평가 안내-->
 			<h3>평가 설명</h3>
 			<div class="ver2">
-				<p>- 평가 개요 (다면평가의 목적, 방법, 추후 활용 방안)</p>
-				<p>- 평가 척도 정의 (1~5점 척도에 대한 간략한 설명, 추가의견 작성 안내)</p>
+				<p th:text="${evaluList[0].evaluDescript}"></p>
 			</div>
+		</div>
+		<div class="con">
 			<h3>평가항목 및 채점표</h3>
 			<table border="1">
 				<thead>
@@ -138,25 +143,31 @@ button:hover {
 					</tr>
 				</tbody>
 			</table>
-			<button type="button" id="selectAjax">제출</button>
+			<button type="button" id="selectAjax" class="btn btn-primary">제출</button>
+			<button type="button" id="saveTemp" class="btn btn-warning">임시저장</button>
+			<button type="button" th:onclick="|location.href='@{/emp/myEvalu}'|" class="btn btn-success">목록으로</button>
+			</div>
 		</form>
-		<button type="button" th:onclick="|location.href='@{/emp/myEvalu}'|">목록으로</button>
 	</div>
 	<script>
   	// 평가 채점한 거 제출 AJAX 
   	document.querySelector('#selectAjax').addEventListener('click', e => {
-  		evaluAjax();
+  		evaluAjax('제출 완료');
   	})
   	
+  	// 평가 채점한 거 임시 저장 AJAX
+  	document.querySelector('#saveTemp').addEventListener('click', e => {
+  		evaluAjax('임시 저장');
+  	})
   	
-  	function evaluAjax() {
+  	function evaluAjax(mode) {
 	    let scoreList = [];
 	    let hasEmpty = false; 
 	    
 	  	Array.from(document.querySelectorAll('[name="score"]')).forEach(select => {
 	  		let evaluItemNo = parseInt(select.dataset.evaluitemno);
 	  		let userNo = parseInt(select.dataset.userno);
-	  		let score = parseInt(select.value);
+	  		let score = select.value ? parseInt(select.value) : null;
 	  		let orderNo = select.dataset.orderno;
 	  		let evaluateeGroupId = select.dataset.gid;
 	  		let evaluGroupId = select.dataset.gd;
@@ -164,9 +175,9 @@ button:hover {
 	  		let formNo = select.dataset.form;
 	  		
 	  	  if (isNaN(score)) {
-	            hasEmpty = true;
+	            hasEmpty = true
+	            return;
 	        }
-	  	  
 	  		scoreList.push({
 	  			evaluNo : evaluNo,
 	  			evaluItemNo : evaluItemNo,
@@ -192,16 +203,22 @@ let formNo = document.querySelector('[name="score"]').dataset.form;
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(scoreList)
+    body: JSON.stringify({
+        mode: mode,           // "temp" or "submit"
+        scores: scoreList     
+    })
   })
   .then(res => res.json())
   .then(result => {
-	  if (result != null) {
-		    alert('평가가 성공적으로 제출되었습니다!');		 
-		    location.href = `/workmate/emp/evalu/${formNo}` 
-	  } 
-
-  })
+  if (result != null) {
+    if (mode === '제출 완료') {
+      alert('평가가 성공적으로 제출되었습니다!');
+    } else if (mode === '임시 저장') {
+      alert('평가가 임시 저장되었습니다!');
+    }
+    location.href = `/workmate/emp/evalu/${formNo}`;
+  }
+})
   .catch(err => {
     console.error('평가 제출 중 오류 발생:', err);
   });

@@ -179,6 +179,10 @@
 		    display: block;
 		    margin-left: 0px;
 		}
+	#evaluation-items{ 
+			margin-top: 5px;
+	}
+	
   </style>
   </head>
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script> <!--draggable-->
@@ -215,7 +219,9 @@
           <input type="text" id="evaluDescript" name="evaluDescript" required placeholder="평가 설명을 입력하세요.">
         </div>
       </div>
-
+		<div style="max-width: 1000px; margin: 0 auto 0px auto; font-weight: 500; color: black;">
+  		<span style="color:red">* </span>드래그 해서 항목 순서를 변경할 수 있습니다.
+		</div>
       <!-- 항목 1~7: 표 형태 -->
       <table id="evaluation-items">
         <thead>
