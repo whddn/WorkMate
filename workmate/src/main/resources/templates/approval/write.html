@@ -84,6 +84,7 @@
 </head>
 
 <body>
+
 	<div class="card mx-5 px-3 py-5" id="apprForm"></div>
 	<div class="card mx-5 px-3 py-5">
 		<table id="AttachTable" class="display table table-striped table-bordered mt-2">
@@ -203,7 +204,9 @@
 	const fileInput = $('#fileInput');
 	
 	// apprForm의 내용을 화면에 띄운다
-	$('#apprForm').load(contextPath + apprForm.formPath + ".html");
+	$('#apprForm').load(contextPath + apprForm.formPath + ".html", function() {
+		$('#apprLine').load(contextPath + "apprLine.html");
+	});
 	console.log(contextPath + apprForm.formPath + ".html");
 	
 	// apprElmntList의 내용을 모달화면에 띄운다
