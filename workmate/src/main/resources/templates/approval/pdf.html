@@ -30,63 +30,67 @@
 	let approval = [[ ${approval} ]];
 	let apprLine = [[ ${apprLine} ]];
 	
-	// apprForm의 내용을 화면에 띄운다
-	$('#apprForm').load(contextPath + approval.formPath + ".html", function() {
-		$('#apprLine').load(contextPath + "apprLine.html");
-	});
-	console.log(contextPath + apprForm.formPath + ".html");
-	console.log(contextPath + "apprLine.html");
-	
+	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
-		$('#createDate').text(approval.createDate);
-		$('#departmentName').text(approval.departmentName);
-		$('#userNo').text(approval.userNo);
-		$('#userName').text(approval.userName);
-		$('#apprNo').text(approval.apprNo);
+		// apprForm의 내용을 화면에 띄운다
+		$('#apprForm').load(contextPath + approval.formPath + ".html", function() {
+			$('#apprLine').load(contextPath + "apprLine.html", function() {
+				$('#createDate').text(approval.createDate);
+				$('#departmentName').text(approval.departmentName);
+				$('#userNo').text(approval.userNo);
+				$('#userName').text(approval.userName);
+				$('#apprNo').text(approval.apprNo);
 
-		Object.keys(approval).forEach(function(key) {
-			let target = $(`input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']`);
-			if (target.length > 0) {
-				let value = approval[key] !== null ? approval[key] : 'null';
-				target.val(approval[key]).attr('readonly', true);
-			}
-		});
-		
-		$('#setApprLine').remove();
-		
-		let table = $('#apprLine');
-		let departmentRow = table.find('tr').eq(0);
-		let signRow = table.find('tr').eq(1);
-		let nameRow = table.find('tr').eq(2);
-		
-		// 결재선 데이터 삽입
-		$.each(apprLine, function(index, element) {
-			if(index > 2)
-				return false;
-			
-			let colIndex = index + 1;
-			
-			departmentRow.find('td').eq(colIndex - 1).text(element.departmentName);
-			if(element.apprResult != 'a1') {
-				let imgTag = $('<img>', {
-			        src: element.signPath,  // 이미지 경로
-			        alt: '결재 사인',
-			        width: 50,  // 이미지 크기 (원하는 크기로 조절)
-			        height: 50
-			    });
+				Object.keys(approval).forEach(function(key) {
+					let target = $(`input[name='${key}'], select[name='${key}'], textarea[name='${key}'], button[name='${key}']`);
+					if (target.length > 0) {
+						let value = approval[key] !== null ? approval[key] : 'null';
+						target.val(approval[key]).attr('readonly', true);
+					}
+				});
 				
-				signRow.find('td').eq(colIndex - 1).empty().append(imgTag);
-			}
-			nameRow.find('td').eq(colIndex - 1).text(element.userName);
+				$('#setApprLine').remove();
+				
+				let table = $('#apprLine');
+				let departmentRow = table.find('tr').eq(0);
+				let signRow = table.find('tr').eq(1);
+				let nameRow = table.find('tr').eq(2);
+				
+				// 결재선 데이터 삽입
+				$.each(apprLine, function(index, element) {
+					if(index > 2) {
+						return false;
+					}
+					
+					let colIndex = index + 1;
+					
+					departmentRow.find('td').eq(colIndex - 1).text(element.departmentName);
+					if(element.apprResult != 'a1') {
+						let contextPath = [[ @{/} ]];
+						let imgTag = $('<img>', {
+					        src: element.signPath,  // 이미지 경로
+					        alt: '결재 사인',
+					        width: 50,  // 이미지 크기 (원하는 크기로 조절)
+					        height: 50
+					    });
+						
+						signRow.find('td').eq(colIndex - 1).empty().append(imgTag);
+					}
+					nameRow.find('td').eq(colIndex - 1).text(element.userName);
+				});
+				
+				if(approval.apprStatus != 'a1') {
+					$('#delApprBtn').remove();
+					$('#apprBtn').remove();
+				}
+				
+				// PDF 자동 다운로드 실행
+				generatePDF();
+			});
 		});
 		
-		if(approval.apprStatus != 'a1') {
-			$('#delApprBtn').remove();
-			$('#apprBtn').remove();
-		}
-		
-		// PDF 자동 다운로드 실행
-		generatePDF();
+		console.log(contextPath + apprForm.formPath + ".html");
+		console.log(contextPath + "apprLine.html");
 	});
 	
 	function generatePDF() {
