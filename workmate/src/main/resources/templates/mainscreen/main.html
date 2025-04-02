@@ -155,7 +155,6 @@
 		function currentDate() {
 			const now = new Date();
 			document.getElementById("current-date").innerText = now.toISOString().split('T')[0];
-			document.getElementById("current-month").innerText = now.toISOString().split('-')[1] + "월";
 			document.getElementById("current-time").innerText = now.toLocaleTimeString();
 		}
 		setInterval(currentDate, 1000);
