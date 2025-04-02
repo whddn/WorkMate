@@ -20,8 +20,10 @@
 	      ,sign_image_base64
 	      ,cntr_location
 	      ,cntr_money
+	      ,cntr_file
+	      ,cntr_attachment
 		from contracts
-		order by contr_no
+		order by contr_no desc
 	</select>
 	
 	<!-- 단건 -->
@@ -43,6 +45,8 @@
 	      ,sign_image_base64
 	      ,cntr_location
 	      ,cntr_money
+	      ,cntr_file
+	      ,cntr_attachment
 		from contracts
 		where contr_no=#{contrNo}
 	</select>
@@ -71,6 +75,8 @@
 		      ,SIGN_IMAGE
 		      ,cntr_location
 		      ,cntr_money
+		      ,cntr_file
+		      ,cntr_attachment
 				)
 			VALUES (
 			  #{contrNo}
@@ -78,7 +84,7 @@
 		      ,#{contrTitle}
 		      ,#{contrContent}
 		      ,#{contrType}
-		      ,#{createDate}
+		      ,sysdate
 		      ,#{contrStatus}
 		      ,#{contrA}
 		      ,#{contrB}
@@ -89,6 +95,8 @@
 		      ,#{signImage, jdbcType=BLOB}
 		      ,#{cntrLocation}
 		      ,#{cntrMoney}
+		      ,#{cntrFile}
+		      ,#{cntrAttachment}
 			)
 	</insert>
 	<!-- 수정 -->

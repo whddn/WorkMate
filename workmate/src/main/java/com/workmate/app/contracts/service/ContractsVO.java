@@ -28,6 +28,9 @@ public class ContractsVO {
 	private String vendCode;		// 거래처코드
 	private String cntrLocation;	// 근무장소
 	private String cntrMoney;		//  월급
+	private String cntrFile;		// 첨부파일
+	private String cntrAttachment;   // 서버에 저장된 파일명
+	
 	
 	private byte[] signImage; // 서명 이미지 (BLOB)
 	private String signImageBase64; // 프론트에서 넘어온 base64 문자열
