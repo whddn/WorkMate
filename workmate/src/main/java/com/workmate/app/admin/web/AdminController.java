@@ -274,7 +274,7 @@ public class AdminController {
 	        System.out.println(apprFormVO);
 	        
 	        // HTML 파일 경로 지정
-	        Path filePath = Paths.get(uploadDir, apprFormDir, apprFormVO.getFormPath(), ".html");
+	        Path filePath = Paths.get(uploadDir, apprFormDir, apprFormVO.getFormPath() + ".html");
 			
 	        try {
 	            String content = Files.readString(filePath, StandardCharsets.UTF_8);
