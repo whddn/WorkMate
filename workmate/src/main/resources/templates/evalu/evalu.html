@@ -113,6 +113,8 @@ button:hover {
 			</div>
 		</div>
 		<div class="con">
+		<!-- 디버깅용 -->
+		[[ ${tempScores} ]]
 			<h3>평가항목 및 채점표</h3>
 			<table border="1">
 				<thead>
@@ -123,24 +125,31 @@ button:hover {
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:each="evalu : ${evaluList}">
-						<td th:text="${evalu.evaluCompet}">평가분야 </td>
-						<td th:text="${evalu.evaluContent}">평가항목</td>
-						<!-- 사람 수만큼 반복해서 셀 생성 -->
-						<td th:each="user : ${userList}" class="evaluName">
-						<select th:data-evaluitemno="${evalu.evaluItemNo}"  th:data-form="${evalu.evaluFormNo}" 
-						th:data-userno="${user.userNo}" th:data-orderno="${evalu.orderNo}" th:data-teamno="${evalu.teamNo}" 
-						th:data-gid = "${user.evaluateeGroupId}" th:data-en="${evalu.evaluNo}" th:data-gd="${user.evaluGroupId}" 
-							name="score" 
-							id="score-select">
-								<option value="">선택</option>
-								<option value="1">1점</option>
-								<option value="2">2점</option>
-								<option value="3">3점</option>
-								<option value="4">4점</option>
-								<option value="5">5점</option>
-						</select></td>
-					</tr>
+			 		<tr th:each="evalu : ${evaluList}">
+			          <td th:text="${evalu.evaluCompet}">평가분야</td>
+			          <td th:text="${evalu.evaluContent}">평가항목</td>
+			          <td th:each="user : ${userList}" class="evaluName">
+			            <select 
+			              th:data-evaluitemno="${evalu.evaluItemNo}"  
+			              th:data-form="${evalu.evaluFormNo}" 
+			              th:data-userno="${user.userNo}" 
+			              th:data-orderno="${evalu.orderNo}" 
+			              th:data-teamno="${evalu.teamNo}" 
+			              th:data-gid="${user.evaluateeGroupId}" 
+			              th:data-en="${evalu.evaluNo}" 
+			              th:data-gd="${user.evaluGroupId}" 
+			              name="score"
+			              id="score-select">
+			
+			              <option value="">선택</option>
+			              <option th:each="i : ${#numbers.sequence(1,5)}"
+			                      th:value="${i}"
+			                      th:text="${i + '점'}"
+			                      th:selected="${tempScores[evalu.evaluItemNo + '|' + user.userNo]} == i">
+			              </option>
+			            </select>
+			          </td>
+			        </tr>
 				</tbody>
 			</table>
 			<button type="button" id="selectAjax" class="btn btn-primary">제출</button>

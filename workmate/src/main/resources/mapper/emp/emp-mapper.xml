@@ -755,17 +755,26 @@
         EVALU_FORM_NO = #{evaluFormNo}
         AND EVALU_ITEM_NO = #{evaluItemNo}
         AND USER_NO = #{userNo}
-        AND RESULT_STATUS = 'TEMP'
+        AND RESULT_STATUS = '임시 저장'
 </update>
 
 <!-- 2. 임시 저장된 점수 불러오기 -->
 <select id="selectTempEvaluScore" resultType="EvaluVO" parameterType="EvaluVO">
-    SELECT *
-    FROM EVALU_RESULT
-    WHERE 
-        EVALU_FORM_NO = #{evaluFormNo}
-        AND USER_NO = #{userNo}
-        AND RESULT_STATUS = 'TEMP'
+        SELECT 
+        r.EVALU_FORM_NO,
+        r.USER_NO,
+        r.EVALU_SCORE,
+        r.EVALU_NO,
+        r.ORDER_NO,
+        i.EVALU_COMPET,
+        i.EVALU_CONTENT,
+        fm.EVALU_ITEM_NO
+    FROM EVALU_RESULT r
+    JOIN EVALU_FORMAT fm ON r.EVALU_NO = fm.EVALU_NO
+    JOIN EVALU_ITEM i ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+    WHERE r.EVALU_FORM_NO = #{evaluFormNo}
+      AND r.USER_NO = #{userNo}
+      AND r.RESULT_STATUS = '임시 저장'
 </select>
 
 <!-- 3. EVALU_GROUP 상태를 '임시저장'으로 변경 -->
