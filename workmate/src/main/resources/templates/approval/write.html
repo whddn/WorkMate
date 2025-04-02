@@ -84,7 +84,7 @@
 </head>
 
 <body>
-	<div class="card mx-5 px-3 py-5" th:insert="~{|forms/approval/${apprForm.formPath}|}"></div>
+	<div class="card mx-5 px-3 py-5" id="apprForm"></div>
 	<div class="card mx-5 px-3 py-5">
 		<table id="AttachTable" class="display table table-striped table-bordered mt-2">
 			<thead>
@@ -195,11 +195,16 @@
 </body>
 
 <script th:inline="javascript">
+	let contextPath = [[ @{/upload/forms/approval/} ]];
 	let creator = [[ ${creator} ]];
 	let apprForm = [[ ${apprForm} ]];
 	let apprElmntList = [];
 	let refElmntList = [];
 	const fileInput = $('#fileInput');
+	
+	// apprForm의 내용을 화면에 띄운다
+	$('#apprForm').load(contextPath + apprForm.formPath + ".html");
+	console.log(contextPath + apprForm.formPath + ".html");
 	
 	// apprElmntList의 내용을 모달화면에 띄운다
 	function loadApprElmnts() {
