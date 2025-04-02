@@ -210,7 +210,7 @@ public class EmpController {
 			model.addAttribute("userList", userList);
 			model.addAttribute("evaluList", evaluList);
 
-			return "evalu/evalu"; // 평가 작성 페이지
+			return "evalu/adminEvaluById"; // 평가 작성 페이지
 		}
 	}
 	
@@ -326,7 +326,7 @@ public class EmpController {
 	        model.addAttribute("usageStatus", usageStatus);
 
 	        // 임시 저장 점수 가져오기 (Map<"userNo-itemNo", score>)
-	        Map<String, List<Integer>> tempScoreMap = empService.findTempEvaluScore(evaluVO);
+	        Map<String, Integer> tempScoreMap = empService.findTempEvaluScore(evaluVO);
 	        model.addAttribute("tempScores", tempScoreMap);
 	        System.out.println("🟡 tempScoreMap = " + tempScoreMap);
 	        return "evalu/evalu"; // 작성 + 임시저장 상태 모두 여기로

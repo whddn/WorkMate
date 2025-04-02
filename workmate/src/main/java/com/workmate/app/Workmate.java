@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync 
-//@EnableScheduling
+@EnableScheduling
 @SpringBootApplication
 @MapperScan(basePackages = "com.workmate.app.**.mapper")
 public class Workmate {

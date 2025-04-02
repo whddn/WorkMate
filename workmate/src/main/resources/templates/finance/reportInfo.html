@@ -5,7 +5,9 @@
 <meta charset="UTF-8">
 <title>[[ ${trans[0].reportTitle} ]]</title>
 <style>
-
+		* {
+			font-size: 14px;
+		}
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -57,6 +59,7 @@
         .delete-btn:hover {
             background-color: #c82333;
         }
+        
     	 .con {
 		  max-width: 1000px;
 	      border: 1px solid #ddd; /* 테두리 추가 */
@@ -73,10 +76,10 @@
 <body>
 <div class="container">
 	<div class="con">
-    <h2 class="title">[[ ${trans[0].reportTitle} ]] </h2>
+    <h2 style="text-align:center; font-size:22px; font-weight:bolder;">[[ ${trans[0].reportTitle} ]] </h2>
     </div>
 	<div class="con">
-    <h4>기본정보</h4>
+    <h4 style="font-size:22px; font-weight:bolder">기본정보</h4>
     <table>
         <tr>
             <th>기간</th>
@@ -93,7 +96,7 @@
     </table>
 	</div>
 	<div class="con">
-    <h4>입출금 내역</h4>
+    <h4 style="font-size:22px; font-weight:bolder">입출금 내역</h4>
     <table>
         <tr>
             <th>일자</th>
@@ -114,7 +117,7 @@
     </table>
 	</div>
     <div class="con">
-    <h4>월간합계</h4>
+    <h4 style="font-size:22px; font-weight:bolder">월간합계</h4>
     <table>
         <tr>
             <th>입금액 (원)</th>

@@ -42,7 +42,7 @@
     width: 300px;
     max-height: 500px;
     overflow-y: auto;
-    margin-top: 35px;
+    margin-top: 60px;
 }
 
 .card {
@@ -230,13 +230,39 @@ h1 {
   max-width: 300px;
   margin-bottom: 20px;
 }
-/*조직도 검색창*/
-.input-icon-wrapper.small-search input {
-  width: 100%;
-  text-align: right;
- margin-right: 30px;
+.card-tree-wrapper {
+  position: relative;
+}
+/* 검색창 박스 */
+.input-icon-wrapper.small-search {
+  position: absolute;
+  top: 0px;
+  left: 0;
+  max-width: 200px;
+  margin: 0px;
+  margin-top: 0px;
+  z-index: 10;
 }
 
+/* 검색 인풋 */
+.input-icon-wrapper.small-search input {
+  width: 100%;
+  padding: 6px 30px 6px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* 검색 아이콘 */
+.input-icon-wrapper #search_icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #2980b9;
+  cursor: pointer;
+}
 	</style>
 <body>
 <div class="container">
@@ -244,6 +270,10 @@ h1 {
 			<h2 class="organ-title">조직도</h2> <!-- 조직도를 최상단에 배치 -->
 			<div class="card-tree-wrapper">
 				<div class="tree-panel">
+				<div class="input-icon-wrapper small-search">
+				  <input type="text" id="employeeSearch" placeholder="이름/부서/팀명 검색" />
+				  <i class="fa fa-search" id="search_icon"></i>
+				</div>
 					<ul class="tree">
 						<li th:each="dpt : ${names}">
 							<svg width="16" height="16" fill="currentColor" class="bi bi-folder2">
@@ -267,10 +297,7 @@ h1 {
 					</ul>
 				</div>
 			<div id="replace" th:fragment="employeeFrag">
-				<div class="input-icon-wrapper small-search">
-				  <input type="text" id="employeeSearch" placeholder="이름/부서/팀명 검색" />
-				  <i class="fa fa-search" id="search_icon"></i>
-				</div>
+
 				<div class="card" id="detailsBox">
 					<div class="info-list">
 						<div class="info-row">

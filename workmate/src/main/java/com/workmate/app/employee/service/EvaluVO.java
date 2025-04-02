@@ -55,9 +55,11 @@ public class EvaluVO {
 	private String evaluateeGroupId;	// 피평가자 그룹 아이디
 	// 평가 결과 테이블
 	private String evaluResultId; 	//
-	private int evaluateeUserNo;	//피평가자 사번
-   
+	private Integer evaluateeUserNo;	//피평가자 사번
+	private Integer evaluatorUserNo;
+	
 	private Double otherAvgScore;	// 다른 사원의 평균 점수 
 	private String resultStatus;	// 평가 결과의 상태 (임시 저장 / 제출 완료)
+	
 	
 }

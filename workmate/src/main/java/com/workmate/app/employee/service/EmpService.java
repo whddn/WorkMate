@@ -90,10 +90,12 @@ public interface EmpService {
 	public int autoUpdateStatusByDate();
 	
 	// 임시저장
-	public int updateEvaluScore(EvaluVO vo);
+	public int modifyEvaluScore(EvaluVO vo);
 	
 	// 임시 저장된 점수 불러오기
-	public Map<String, List<Integer>> findTempEvaluScore(EvaluVO vo);
+	public Map<String, Integer> findTempEvaluScore(EvaluVO vo);
 
 	public int modifyEvaluGroupStatus(EvaluVO vo); // 평가자 상태 수정 (사용 중)
+	
+	public void dropTempEvaluScore(EvaluVO vo);
 }

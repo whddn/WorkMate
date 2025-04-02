@@ -754,15 +754,17 @@
     WHERE 
         EVALU_FORM_NO = #{evaluFormNo}
         AND EVALU_ITEM_NO = #{evaluItemNo}
-        AND USER_NO = #{userNo}
+        AND USER_NO = #{userNo}                          -- 평가자
+        AND EVALUATEE_GROUP_ID = #{evaluateeGroupId}     -- 피평가자 그룹 ID
         AND RESULT_STATUS = '임시 저장'
 </update>
 
 <!-- 2. 임시 저장된 점수 불러오기 -->
-<select id="selectTempEvaluScore" resultType="EvaluVO" parameterType="EvaluVO">
-        SELECT 
+<select id="selectTempEvaluScore" resultMap="tempScoreMap" parameterType="EvaluVO">
+      SELECT 
         r.EVALU_FORM_NO,
-        r.USER_NO,
+        r.USER_NO AS evaluatorUserNo,           -- 평가자
+        eeg.USER_NO AS evaluateeUserNo,         -- 피평가자 
         r.EVALU_SCORE,
         r.EVALU_NO,
         r.ORDER_NO,
@@ -772,11 +774,23 @@
     FROM EVALU_RESULT r
     JOIN EVALU_FORMAT fm ON r.EVALU_NO = fm.EVALU_NO
     JOIN EVALU_ITEM i ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+    JOIN EVALUATEE_GROUP eeg ON r.EVALUATEE_GROUP_ID = eeg.EVALUATEE_GROUP_ID  
     WHERE r.EVALU_FORM_NO = #{evaluFormNo}
-      AND r.USER_NO = #{userNo}
+      AND r.USER_NO = #{userNo}     -- 로그인한 평가자
       AND r.RESULT_STATUS = '임시 저장'
 </select>
 
+<resultMap id="tempScoreMap" type="EvaluVO">
+    <result property="evaluFormNo" column="EVALU_FORM_NO"/>
+    <result property="evaluatorUserNo" column="evaluatorUserNo"/>
+    <result property="evaluateeUserNo" column="evaluateeUserNo"/>
+    <result property="evaluScore" column="EVALU_SCORE"/>
+    <result property="evaluNo" column="EVALU_NO"/>
+    <result property="orderNo" column="ORDER_NO"/>
+    <result property="evaluCompet" column="EVALU_COMPET"/>
+    <result property="evaluContent" column="EVALU_CONTENT"/>
+    <result property="evaluItemNo" column="EVALU_ITEM_NO"/>
+</resultMap>
 <!-- 3. EVALU_GROUP 상태를 '임시저장'으로 변경 -->
 <update id="updateEvaluGroupStatus" parameterType="EvaluVO">
     UPDATE EVALU_GROUP
@@ -785,4 +799,13 @@
         EVALU_FORM_NO = #{evaluFormNo}
         AND USER_NO = #{userNo}
 </update>
+<!-- 임시저장된 거 삭제 -->
+<delete id="deleteTempEvaluScore" parameterType="EvaluVO">
+  DELETE FROM EVALU_RESULT
+    WHERE 
+        EVALU_FORM_NO = #{evaluFormNo}
+        AND USER_NO = #{userNo}                          -- 평가자
+        AND EVALUATEE_GROUP_ID = #{evaluateeGroupId}     -- 피평가자
+        AND RESULT_STATUS = '임시 저장'
+</delete>
 </mapper>
