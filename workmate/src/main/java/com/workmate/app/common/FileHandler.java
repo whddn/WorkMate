@@ -34,7 +34,7 @@ public class FileHandler {
 
 			// 파일 경로 설정
 	        Path filePath = Paths.get(fileDir, fileName);
-	        System.out.println(filePath.toString());
+	        System.out.println("The file path is : " + filePath.toString());
 	        
 	        // 파일로 저장
 	        Files.write(filePath, file.getBytes());

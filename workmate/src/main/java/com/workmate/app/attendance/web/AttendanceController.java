@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.workmate.app.attendance.service.AttendanceService;
 import com.workmate.app.attendance.service.WorkVO;
 import com.workmate.app.common.FileUtil;
+import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.security.service.LoginUserVO;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,6 +46,7 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceController {
 		
 	private final AttendanceService attendService; 
+	private final EmpService empService; 
 	
 	/**
 	 * 이번달 근태 조회 페이지 이동
@@ -203,6 +205,7 @@ public class AttendanceController {
 		List<WorkVO> count = attendService.findMothEmpWork(workVO);
 		List<WorkVO> list = attendService.findAllEmpWork(workVO);
 		
+		model.addAttribute("teams", empService.findTeamList()); // 팀명
 		model.addAttribute("works", list);
 		model.addAttribute("counts", count);
 		

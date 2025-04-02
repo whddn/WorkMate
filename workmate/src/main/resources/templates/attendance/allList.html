@@ -42,6 +42,13 @@ table {
 	border-collapse: collapse;
 	margin-top: 20px;
 }
+.truncate-text {
+  white-space: nowrap;       /* 줄바꿈 안 함 */
+  overflow: hidden;          /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis;   /* 넘치면 ... 처리 */
+  max-width: 120px;          /* 최대 너비 설정 */
+  display: inline-block;     /* ellipsis가 적용되도록 block 또는 inline-block 필요 */
+ }
 
 .table-container {
 	max-height: 300px;
@@ -105,7 +112,12 @@ table {
 											<span th:if="${work.workStatus == '정상'}" class="btn btn-success btn-sm">[[ ${work.workStatus} ]]</span>
 											<span th:if="${work.workStatus != '지각' and work.workStatus != '조퇴' and work.workStatus != '정상'}" class="btn btn-secondary btn-sm">[[ ${work.workStatus} ]]</span>
 										</td>
-										<td>[[ ${work.lateReason} ]]</td>
+										<td><span class="truncate-text"
+										      th:text="${work.lateReason != null and #strings.length(work.lateReason) > 8
+										                 ? #strings.substring(work.lateReason, 0, 6) + '...'
+										                 : work.lateReason}"
+										      th:title="${work.lateReason}">
+										</span></td>
 									</tr>
 								</tbody>
 							</table>

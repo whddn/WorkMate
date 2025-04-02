@@ -37,11 +37,19 @@ table {
 	margin-top: 20px;
 }
 
+
 .table-container {
 	max-height: 300px;
 	overflow-y: auto;
 	border: 1px solid #ccc;
 	display: block;
+}
+.truncate-text {
+  white-space: nowrap;       /* 줄바꿈 안 함 */
+  overflow: hidden;          /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis;   /* 넘치면 ... 처리 */
+  max-width: 120px;          /* 최대 너비 설정 */
+  display: inline-block;     /* ellipsis가 적용되도록 block 또는 inline-block 필요 */
 }
 
 .table-responsive {
@@ -67,7 +75,7 @@ table {
 					<!-- 내용 추가 -->
 					<h3 class="card-title">올해 연차</h3>
 					<p>연차 기준 : 1월 ~ 12월</p>
-					<table class="table table-head-bg-primary mt-4">
+					<table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
                       <thead>
                         <tr>
                           <th scope="col">올해발생연차</th>
@@ -116,7 +124,12 @@ table {
 										<td>[[ ${#dates.format(anl.annualStart, 'yyyy/MM/dd')} ]]</td>
 										<td>[[ ${anl.annualCount} ]]</td>
 										<td>[[ ${anl.annualType} ]]</td>
-										<td>[[ ${anl.apprContent} ]]</td>
+										<td><span class="truncate-text"
+										      th:text="${anl.apprContent != null and #strings.length(anl.apprContent) > 8
+										                 ? #strings.substring(anl.apprContent, 0, 6) + '...'
+										                 : anl.apprContent}"
+										      th:title="${anl.apprContent}">
+										</span></td>
 									</tr>
 								</tbody>
 							</table>

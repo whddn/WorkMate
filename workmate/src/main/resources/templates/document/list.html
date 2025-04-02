@@ -10,6 +10,12 @@
 	.card{
 		padding: 100px;
 	}
+	#newTagInput {
+    border: 1px solid #ced4da !important; /* Bootstrap 기본 border */
+    border-radius: 0.375rem; /* Bootstrap 기본 border-radius */
+    padding: 0.375rem 0.75rem;
+    margin-top: 30px;
+  }
 </style>
 </head>
 <body>
@@ -28,7 +34,7 @@
 					</div>
 				</div>
 				<div class="card-body">
-				<!-- Modal -->
+				<!-- File Upload Modal -->
 				<div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true" >
 				    <div class="modal-dialog" role="document">
 				        <div class="modal-content">
@@ -49,11 +55,15 @@
 				                            </div>
 				                             <div class="form-group form-group-default">
 				                                <label>파일분류</label>
-												<select name="fileTag"class="form-select input-fixed" id="notify_placement_from">
+												
+												<select id="fileTagSelect" name="fileTag" class="form-select input-fixed">
+												    <option value="">-- 분류를 선택하세요 --</option>
 												    <th:block th:each="tag : ${#sets.toSet(lists.![fileTag])}">
-												        <option th:value="${tag}">[[ ${tag} ]]</option>
+												        <option th:value="${tag}" th:text="${tag}"></option>
 												    </th:block>
 												</select>
+												  <input type="text" id="newTagInput" class="form-control mt-2" placeholder="새로운 분류 입력" />
+												  <button type="button" onclick="addNewTag()" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> ADD</button>
 				                            </div>
 				                        </div>
 				                        <input type="file" name="uploadFile" class="form-control-file" id="uploadFile">
@@ -67,6 +77,20 @@
 				        </div>
 				    </div>
 				</div>
+				<!-- 파일 미리보기 모달 -->
+					<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+					  <div class="modal-dialog modal-xl modal-dialog-centered">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h6 class="modal-title"><b>파일 미리보기</b></h6>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					      </div>
+					      <div class="modal-body text-center">
+					        <iframe id="previewFrame" style="width:100%; height:80vh;" frameborder="0"></iframe>
+					      </div>
+					    </div>
+					  </div>
+					</div>
 
 					<div class="table-responsive">
 							<table id="documentTable" class="table">
@@ -84,7 +108,8 @@
 								        <th>업로드날짜</th>	
 								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 								        <th>업로드사원</th>
-   										</th:block>											        
+   										</th:block>	
+   										<th>미리보기</th>									        
 								        <th><i class="fas fa-download"></i></th>
 								        <th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 								        <th> <i class="fas fa-trash-alt"></i></th>
@@ -102,7 +127,14 @@
 										<td>[[ ${#dates.format(item.fileRegDate, 'yyyy-MM-dd')} ]]</td>
 										<th:block th:if="${userId != null and teamNo == 'ROLE_T001'}">
 										<td>[[ ${item.userId} ]]</td>
-										</th:block>									
+										</th:block>
+										<td>
+										  <button class="btn btn-outline-secondary btn-sm me-2"
+										          th:data-file-url="@{/document/preview/{documentNo}(documentNo=${item.documentNo})}"
+										          onclick="previewFile(this)">
+										    <i class="fas fa-eye"></i> 미리보기
+										  </button>										  
+										</td>								
 										<td><a th:href="@{/document/download/{documentNo}(documentNo=${item.documentNo})}">
 										    <i class="fas fa-download"></i>
 											</a>
@@ -126,11 +158,6 @@
 	</div>
 </body>
 <script>
-//$('#documentTable').DataTable({
-//	order: [ [ 0, "desc" ] ],
-//	info: false,
-// });
-
 // 파일 등록 모달
 function uploadModal() {
     var modal = new bootstrap.Modal(document.getElementById('addRowModal'));
@@ -199,6 +226,7 @@ function deleteDocument(icon) {
         });
     }
 }
+// datatable 설정
 $(document).ready(function() {
     var table = $('#documentTable').DataTable({
         "paging": true,
@@ -223,5 +251,39 @@ $(document).ready(function() {
         }
     });
 });
+// 새로운 파일 분류 추가
+function addNewTag() {
+    const input = document.getElementById('newTagInput');
+    const select = document.getElementById('fileTagSelect');
+    const newValue = input.value.trim();
+
+    if (!newValue) {
+      alert("추가할 태그를 입력하세요.");
+      return;
+    }
+
+    // 중복 체크
+    const exists = Array.from(select.options).some(option => option.value === newValue);
+    if (exists) {
+      alert("이미 존재하는 태그입니다.");
+      return;
+    }
+
+    // 새로운 옵션 추가
+    const newOption = new Option(newValue, newValue);
+    select.add(newOption);
+    select.value = newValue; // 방금 추가한 값 선택되게
+
+    input.value = ""; // 입력창 비우기
+  }
+  // 파일 미리보기
+  function previewFile(button) {
+    const fileUrl = button.getAttribute("data-file-url");
+    const iframe = document.getElementById("previewFrame");
+    iframe.src = fileUrl;
+
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
 </script>
 </html>
