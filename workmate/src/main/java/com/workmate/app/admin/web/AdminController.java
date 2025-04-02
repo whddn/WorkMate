@@ -1,9 +1,11 @@
 package com.workmate.app.admin.web;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -11,12 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -66,7 +68,7 @@ public class AdminController {
 	@Value("${file.upload-dir}")
 	private String uploadDir;
 	private final String subDir = "CommonItemImage/";
-	private final String apprFormDir = "src/main/resources/templates/forms/approval/";
+	private final String apprFormDir = "/templates/forms/approval/";
 	
 	// 공용품 관리
 	@GetMapping("admin/commonItemList")
@@ -274,22 +276,18 @@ public class AdminController {
 	        model.addAttribute("apprForm", apprFormVO);
 	        System.out.println(apprFormVO);
 	        
-	        try {
-	        	// HTML 파일 경로 지정
-	        	Path path = Paths.get(apprFormDir, apprFormVO.getFormPath() + ".html");
-	        	File file = ResourceUtils.getFile(path.toString());
-	        	
-	        	// 파일 내용을 문자열로 변환
-	        	String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-	        	
-	        	// Thymeleaf 모델에 데이터 추가
-	        	model.addAttribute("editorContent", content);
-	        	System.out.println(content);
-	        }
-	        catch(IOException e) {
-	        	e.printStackTrace();
-	        	model.addAttribute("editorContent", "파일을 불러오는 데 실패했습니다.");
-	        }
+	        // HTML 파일 경로 지정
+			InputStream stream = getClass().getResourceAsStream(apprFormDir + apprFormVO.getFormPath() + ".html");
+			System.out.println(apprFormDir + apprFormVO.getFormPath() + ".html");
+			
+			// 파일 내용을 문자열로 변환
+			String content = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
+				.lines()
+				.collect(Collectors.joining("\n"));
+			System.out.println(content);
+			
+			// Thymeleaf 모델에 데이터 추가
+			model.addAttribute("editorContent", content);
 	    }
 	    return "admin/apprFormOne";
 	}
