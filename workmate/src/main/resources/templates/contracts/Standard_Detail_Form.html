@@ -40,11 +40,11 @@
     <form id="standardContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
 
         <div class="contract-section">
-            <p>(이하 "사업주"라 함)과 <input type="text" name="employeeName" th:value="${contr.contrB}"> (이하 "근로자"라 함)은 다음과 같이 근로계약을 체결한다.</p>
+            <p>(이하 "사업주"라 함)과 <input type="text" name="employeeName" th:value="${contr.contrB}" readonly> (이하 "근로자"라 함)은 다음과 같이 근로계약을 체결한다.</p>
             <ol>
-                <li>근로 개시일 : <input type="date" name="contrStart" th:value="${#dates.format(contr.contrStart, 'yyyy-MM-dd')}"></li>
-                <li>근무 장소 : <input type="text" name="cntrLocation" class="wide-input" th:value="${contr.cntrLocation}"></li>
-                <li>업무의 내용 : <input type="text" name="contrContent" class="wide-input" th:value="${contr.contrContent}"></li>
+                <li>근로 개시일 : <input type="date" name="contrStart" th:value="${#dates.format(contr.contrStart, 'yyyy-MM-dd')}" readonly></li>
+                <li>근무 장소 : <input type="text" name="cntrLocation" class="wide-input" th:value="${contr.cntrLocation}" readonly></li>
+                <li>업무의 내용 : <input type="text" name="contrContent" class="wide-input" th:value="${contr.contrContent}" readonly></li>
                 <li>소정근로시간 : <input type="number" value="07" readonly>시 <input type="number" value="00" readonly>분부터
                     <input type="number" value="18" readonly>시 <input type="number" value="00" readonly>분까지
                 </li>
@@ -60,22 +60,22 @@
                 <li>연차유급휴가는 근로기준법에 따라 부여함</li>
                 <li>
                     사회보험 적용여부:<br>
-                    <input type="radio" name="contrStatus" value="고용보험" th:checked="${contr.contrStatus == '고용보험'}"> 고용보험
-                    <input type="radio" name="contrStatus" value="산재보험" th:checked="${contr.contrStatus == '산재보험'}"> 산재보험
-                    <input type="radio" name="contrStatus" value="국민연금" th:checked="${contr.contrStatus == '국민연금'}"> 국민연금
-                    <input type="radio" name="contrStatus" value="건강보험" th:checked="${contr.contrStatus == '건강보험'}"> 건강보험
+                    <input type="radio" name="contrStatus" value="고용보험" th:checked="${contr.contrStatus == '고용보험'}" readonly> 고용보험
+                    <input type="radio" name="contrStatus" value="산재보험" th:checked="${contr.contrStatus == '산재보험'}" readonly> 산재보험
+                    <input type="radio" name="contrStatus" value="국민연금" th:checked="${contr.contrStatus == '국민연금'}" readonly> 국민연금
+                    <input type="radio" name="contrStatus" value="건강보험" th:checked="${contr.contrStatus == '건강보험'}" readonly> 건강보험
                 </li>
                 <li>근로계약서 교부 : 계약 체결 시 본 계약서를 교부함 (근로기준법 제17조)</li>
                 <li>근로계약 및 취업규칙 등의 성실한 이행의무</li>
                 <li>기타 : 본 계약서에 정함이 없는 사항은 근로기준법에 의함</li>
             </ol>
 
-            <p class="mt-4 text-end">작성일 : <input type="date" name="createDate" th:value="${#dates.format(contr.createDate, 'yyyy-MM-dd')}"></p>
+            <p class="mt-4 text-end">작성일 : <input type="date" name="createDate" th:value="${#dates.format(contr.createDate, 'yyyy-MM-dd')}" readonly></p>
 
             <table class="table table-bordered">
                 <tr>
                     <th style="width: 20%">근로자 성명</th>
-                    <td><input type="text" name="contrB" class="form-control" th:value="${contr.contrB}"></td>
+                    <td><input type="text" name="contrB" class="form-control" th:value="${contr.contrB}" readonly></td>
                     <th style="width: 20%">서명</th>
                     <td>
                         <img th:src="'data:image/png;base64,' + ${contr.signImageBase64}"

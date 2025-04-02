@@ -6,6 +6,9 @@
 <head>
   <meta charset="UTF-8">
   <title>거래처 계약서 작성</title>
+  
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  
   <style>
     .contract-table th {
       background-color: #f0f0f0;
@@ -33,10 +36,10 @@
   <form id="tradeContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
   <input type="hidden" name="contrTitle" value="거래처 계약서">
     <table class="table table-bordered contract-table">
-      <tr><th colspan="4">기본 정보</th></tr>
-      <tr>
-        <th style="width: 20%">계약명</th>
-        <td colspan="3"><input type="text" name="contrTitle"></td>
+      <tr><th colspan="4">거래처 정보</th></tr>
+       <tr>
+        <th>거래처명</th>
+        <td colspan="3"><input type="text" name="contrB"></td>
       </tr>
       <tr>
         <th>계약일자</th>
@@ -49,20 +52,23 @@
           <input type="date" name="contrEnd" style="width: 45%; display: inline-block">
         </td>
       </tr>
-
-      <tr><th colspan="4">거래처 정보</th></tr>
-      <tr>
-        <th>거래처명</th>
-        <td colspan="3"><input type="text" name="contrB"></td>
-      </tr>
       <tr>
         <th>연락처</th>
-        <td><input type="text" name="contrMoney"></td>
+        <td><input type="text" name="cntrMoney"></td>
       </tr>
       <tr>
-        <th>주소</th>
-        <td colspan="3"><input type="text" name="cntrLocation"></td>
-      </tr>
+		  <th>주소</th>
+		  <td colspan="3">
+		    <div style="position: relative;">
+		      <input type="text" name="cntrLocation" id="address" class="form-control" style="padding-right: 40px;">
+		      <div style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"
+		           onclick="execDaumPostcode()">
+		        <i class="fas fa-search text-secondary"></i>
+		      </div>
+		    </div>
+		  </td>
+	</tr>
+
 
       <tr><th colspan="4">계약 내용</th></tr>
       <tr>
@@ -72,7 +78,7 @@
       </tr>
       <tr>
         <th>첨부파일</th>
-        <td colspan="3"><input type="file" name="attachment"></td>
+        <td colspan="3"><input type="file" name="uploadFile"></td>
       </tr>
 
 	      <tr><th colspan="4">대표자 및 서명</th></tr>
@@ -87,7 +93,7 @@
 	  <td colspan="3" style="width: 50%; vertical-align: top;">
 	    <label><strong>서명</strong></label>
 	    <canvas id="signatureCanvas"></canvas>
-	    <input type="hidden" name="signatureImage" id="signatureImage">
+	    <input type="hidden" name="signImageBase64" id="signImageInput">
 	    <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="clearSignature()">서명 초기화</button>
 	  </td>
 	</tr>
@@ -101,43 +107,60 @@
 </div>
 
 <script>
-  const canvas = document.getElementById("signatureCanvas");
-  const ctx = canvas.getContext("2d");
-  let drawing = false;
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
 
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+    canvas.addEventListener('mousemove', draw);
 
-  canvas.addEventListener("mousedown", startDraw);
-  canvas.addEventListener("mousemove", draw);
-  canvas.addEventListener("mouseup", endDraw);
-  canvas.addEventListener("mouseleave", endDraw);
+    function draw(e) {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#000";
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
 
-  function startDraw(e) {
-    drawing = true;
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
-  }
+    document.getElementById('tradeContractForm').addEventListener('submit', function (e) {
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+        if (canvas.toDataURL() === blank.toDataURL()) {
+            alert("서명을 해주세요.");
+            e.preventDefault();
+            return;
+        }
+        document.getElementById('signImageInput').value = canvas.toDataURL('image/png');
+    });
+});
 
-  function draw(e) {
-    if (!drawing) return;
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-  }
-
-  function endDraw() {
-    drawing = false;
-  }
-
-  function clearSignature() {
+function clearSignature() {
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById("signatureImage").value = "";
-  }
+}
 
-  function saveSignature() {
-    const dataURL = canvas.toDataURL("image/png");
-    document.getElementById("signatureImage").value = dataURL;
-  }
+function execDaumPostcode() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            let fullAddr = data.address;
+            if (data.addressType === 'R' && data.buildingName) {
+                fullAddr += ' (' + data.buildingName + ')';
+            }
+            document.getElementById("address").value = fullAddr;
+        }
+    }).open();
+}
 </script>
 </body>
 </html>
