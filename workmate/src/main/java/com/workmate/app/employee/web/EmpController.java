@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.workmate.app.employee.service.EmpService;
 import com.workmate.app.employee.service.EmpVO;
 import com.workmate.app.employee.service.EvaluVO;
@@ -111,7 +113,6 @@ public class EmpController {
 		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
 		model.addAttribute("rank", empService.findPositionList()); // 직급명
 		return "employees/empUpdate::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
-		// employeeFrag : fragment 교체(html의)
 	}
 
 //	// 조직도 수정 페이지 - 수정 후 단건 조회로 이동 (fragment)
@@ -125,7 +126,6 @@ public class EmpController {
 //		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
 //		model.addAttribute("rank", empService.findPositionList()); // 직급명
 //		return "employees/updateResult::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
-//		// employeeFrag : fragment 교체(html의)
 //	} 
 
 	// 조직도 수정 AJAX 단건 조회
@@ -370,21 +370,31 @@ public class EmpController {
 		}
 	}
 	
-	// AJAX 결과
+	// AJAX 결과 (평가 점수 저장, 평가 진행)
 	@PostMapping("emp/evalu/{formNo}")
 	public ResponseEntity<Map<String, String>> evaluResultInsert(
-	        @RequestBody List<EvaluVO> evaList,
-	        @PathVariable int formNo,
-	        @AuthenticationPrincipal LoginUserVO loginUser) {
-
+	    @RequestBody Map<String, Object> data, 
+	    @PathVariable int formNo,
+	    @AuthenticationPrincipal LoginUserVO loginUser
+	) {
 	    Map<String, String> response = new HashMap<>();
 	    response.put("result", "success");
 
-	    int evaluatorUserNo = loginUser.getUserVO().getUserNo();  // ✔️ 평가자 본인 번호
+	    // 1. mode = "임시 저장" or "제출 완료"
+	    String mode = String.valueOf(data.get("mode"));
+
+	    // 2. JS를 List<EvaluVO>
+	    ObjectMapper mapper = new ObjectMapper();
+	    List<EvaluVO> evaList = mapper.convertValue(
+	        data.get("scores"),
+	        new TypeReference<List<EvaluVO>>() {}
+	    );
+
+	    // 3. 평가자 번호 세팅
+	    int evaluatorUserNo = loginUser.getUserVO().getUserNo();
 
 	    for (EvaluVO vo : evaList) {
 	        vo.setEvaluFormNo(formNo);
-	        vo.setOrderNo(vo.getOrderNo());
 	        vo.setUserNo(evaluatorUserNo);
 
 	        String teamNo = vo.getTeamNo();
@@ -397,13 +407,23 @@ public class EmpController {
 	        }
 	    }
 
-	    empService.inputEvaluResultScore(evaList); // ✔️ 평가 점수 저장
+	    // 4. 점수 저장 (상태: "임시 저장" 또는 "제출 완료")
+	    empService.inputEvaluResultScore(evaList, mode);
 
-	    // ✔️ 상태 변경 (평가자 단위로)
-	    EvaluVO statusVO = new EvaluVO();
-	    statusVO.setEvaluFormNo(formNo);
-	    statusVO.setUserNo(evaluatorUserNo);
-	    empService.modifyEvaluStatus(statusVO); // ✅ 변경된 메서드로 호출
+	    // 5. "제출 완료"인 경우 EVALU_GROUP 상태도 함께 변경
+	    if ("제출 완료".equals(mode)) {
+	        EvaluVO statusVO = new EvaluVO();
+	        statusVO.setEvaluFormNo(formNo);
+	        statusVO.setUserNo(evaluatorUserNo);
+	        statusVO.setUsageStatus("제출 완료");
+	        empService.modifyEvaluStatus(statusVO); // EVALU_GROUP 상태 변경
+	    } else if ("임시 저장".equals(mode)) {
+	        EvaluVO statusVO = new EvaluVO();
+	        statusVO.setEvaluFormNo(formNo);
+	        statusVO.setUserNo(evaluatorUserNo);
+	        statusVO.setUsageStatus("임시 저장");
+	        empService.modifyEvaluStatus(statusVO); // 원한다면 임시저장 상태도 저장
+	    }
 
 	    return ResponseEntity.ok(response);
 	}
@@ -440,5 +460,5 @@ public class EmpController {
 		model.addAttribute("result", myEvaluResult);
 		return "evalu/myEvaluateeResultById";
 	}
-
+	
 }

@@ -187,18 +187,6 @@ public class EmpServiceImpl implements EmpService {
 	// 평가 등록 페이지
 	@Override
 	public int inputNewEvalu(EvaluVO evaluVO) {
-//		 LocalDate startDate = evaluVO.getEvaluStart().toInstant()
-//                 .atZone(ZoneId.systemDefault())
-//                 .toLocalDate();
-//
-//		LocalDate today = LocalDate.now();
-//		
-//		if (startDate.equals(today)) {
-//		evaluVO.setUsageStatus("진행 중"); 
-//		} else {
-//		evaluVO.setUsageStatus("대기 중");
-//		}
-//		
 		return empMapper.insertOneEvalu(evaluVO);
 		}
 
@@ -302,15 +290,9 @@ public class EmpServiceImpl implements EmpService {
 	// 다면평가 진행(저장)
 	@Override
 	@Transactional
-	public int inputEvaluResultScore(List<EvaluVO> evaluList) {
+	public int inputEvaluResultScore(List<EvaluVO> evaluList, String mode) {
 	    int result = 0;
 	    for (EvaluVO evalu : evaluList) {
-	        // 평가자 그룹 ID 조회 
-	    
-	       
-	        // 피평가자 그룹 ID 조회 
-
-	        // 평가 결과 insert
 	        int inserted = empMapper.insertEvaluScore(evalu);
 	        result += inserted;
 	    }
@@ -363,5 +345,19 @@ public class EmpServiceImpl implements EmpService {
 	    return empMapper.updateStatusByEvaluEndDate();
 	}
 
+	// 임시저장
+    @Override
+    public int updateEvaluScore(EvaluVO vo) {
+        return empMapper.updateEvaluScore(vo);
+    }
 
+    @Override
+    public List<EvaluVO> findTempEvaluScore(EvaluVO vo) {
+        return empMapper.selectTempEvaluScore(vo);
+    }
+
+    @Override
+    public int modifyEvaluGroupStatus(EvaluVO vo) {
+        return empMapper.updateEvaluGroupStatus(vo);
+    }
 }

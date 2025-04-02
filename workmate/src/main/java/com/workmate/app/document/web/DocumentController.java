@@ -2,6 +2,7 @@ package com.workmate.app.document.web;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
+import org.springframework.http.MediaType;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -261,6 +262,38 @@ public class DocumentController {
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
 	    }
+	}
+	
+	@GetMapping("/preview/{documentNo}")
+	public ResponseEntity<Resource> previewFile(@PathVariable Integer documentNo) throws IOException {
+	    DocVO doc = documentService.findFileById(documentNo);
+
+	    if (doc == null || doc.getAttachment() == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
+
+	    Path filePath = Paths.get(uploadDir, subDir, doc.getAttachment());
+	    if (!Files.exists(filePath)) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    String ext = doc.getExtenstion().toLowerCase();
+	    String contentType = Files.probeContentType(filePath);
+	    if (contentType == null) {
+	        contentType = "application/octet-stream";
+	    }
+
+	    // 미리보기 가능한 확장자만 허용
+	    if (!List.of("pdf", "png", "jpg", "jpeg", "gif", "txt").contains(ext)) {
+	        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+	    }
+
+	    Resource resource = new UrlResource(filePath.toUri());
+
+	    return ResponseEntity.ok()
+	            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + doc.getFileName() + "\"")
+	            .contentType(MediaType.parseMediaType(contentType))
+	            .body(resource);
 	}
 		
 }

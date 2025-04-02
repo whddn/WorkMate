@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -66,9 +65,13 @@ public class AdminController {
 	@Value("${file.upload-dir}")
 	private String uploadDir;
 	private final String subDir = "CommonItemImage/";
-	private final String apprFormDir = "src/main/resources/templates/forms/approval/";
+	private final String apprFormDir = "forms/approval/";
 	
-	// 공용품 관리
+	/**
+	 * 공용품 관리
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("admin/commonItemList")
 	public String commonItemList(Model model) {
 		List<CommonItemVO> list = adminService.findItemList();
@@ -76,13 +79,22 @@ public class AdminController {
 		return "admin/commonItemList";
 	}
 
-	// 공용품 등록 - 페이지
+	/**
+	 *  공용품 등록 - 페이지
+	 * @return
+	 */
 	@GetMapping("admin/commonItem")
 	public String commonItemInsertForm() {
 		return "admin/commonItem";
 	}
 
-	// 공용품 등록 - 처리
+	/**
+	 * 공용품 등록 - 처리
+	 * @param commonItemVO
+	 * @param file
+	 * @param redirectAttributes
+	 * @return
+	 */
 	@PostMapping("admin/commonItem")
 	public String commonItemInsert( @ModelAttribute CommonItemVO commonItemVO,
 									@RequestParam("itemImage") MultipartFile file, 
@@ -126,7 +138,12 @@ public class AdminController {
 		return "redirect:commonItemList";
 	}
 
-	// 공용품 수정 - 페이지
+	/**
+	 * 공용품 수정 - 페이지
+	 * @param commonItemVO
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("admin/commonItemUpdate")
 	public String ItemUpdate(CommonItemVO commonItemVO, Model model) {
 		CommonItemVO updateVO = adminService.findItemById(commonItemVO);
@@ -134,12 +151,17 @@ public class AdminController {
 		return "admin/commonItemUpdate";
 	}
 
-	// 공용품 수정 - 처리
+	/**
+	 * 공용품 수정 - 처리
+	 * @param commonItemVO
+	 * @param file
+	 * @param redirectAttributes
+	 * @return
+	 */
 	@PostMapping("admin/commonItemUpdate")
 	public String ItemUpdateAJAX(@ModelAttribute CommonItemVO commonItemVO,
 								@RequestParam(value = "itemImage") MultipartFile file,
 								RedirectAttributes redirectAttributes) {
-
 		// ✅ 1. 기존 데이터 조회
 	    CommonItemVO existingItem = adminService.findItemById(commonItemVO);
 
@@ -186,7 +208,11 @@ public class AdminController {
 	    return "redirect:commonItemList";
 	}
 
-	// 공용품 삭제 - 처리
+	/**
+	 *  공용품 삭제 - 처리
+	 * @param commonNo
+	 * @return
+	 */
 	@GetMapping("admin/commonItemDelete")
 	public String commonItemDelete(Integer commonNo) {
 		// 1. 기존 데이터 조회
@@ -274,21 +300,15 @@ public class AdminController {
 	        model.addAttribute("apprForm", apprFormVO);
 	        System.out.println(apprFormVO);
 	        
+	        // HTML 파일 경로 지정
+	        Path filePath = Paths.get(uploadDir, apprFormDir, apprFormVO.getFormPath() + ".html");
+			
 	        try {
-	        	// HTML 파일 경로 지정
-	        	Path path = Paths.get(apprFormDir, apprFormVO.getFormPath() + ".html");
-	        	File file = ResourceUtils.getFile(path.toString());
-	        	
-	        	// 파일 내용을 문자열로 변환
-	        	String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-	        	
-	        	// Thymeleaf 모델에 데이터 추가
-	        	model.addAttribute("editorContent", content);
-	        	System.out.println(content);
-	        }
-	        catch(IOException e) {
-	        	e.printStackTrace();
-	        	model.addAttribute("editorContent", "파일을 불러오는 데 실패했습니다.");
+	            String content = Files.readString(filePath, StandardCharsets.UTF_8);
+	            model.addAttribute("editorContent", content);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            model.addAttribute("editorContent", "파일을 불러올 수 없습니다.\n" + e.getMessage());
 	        }
 	    }
 	    return "admin/apprFormOne";
@@ -298,11 +318,11 @@ public class AdminController {
 	@PostMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> postAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		Path path = Paths.get(apprFormDir);
+		Path fileDir = Paths.get(uploadDir, apprFormDir);
 		String pathResult = fileHandler.htmlStrUpload(
 			apprFormVO.getFormPath(), 
 			apprFormVO.getContent(), 
-			path.toString(), 
+			fileDir.toString(), 
 			true);
 		
 		if(pathResult == null || pathResult.equals("")) {
@@ -318,11 +338,11 @@ public class AdminController {
 	@PutMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> putAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		Path path = Paths.get(apprFormDir);
+		Path fileDir = Paths.get(uploadDir, apprFormDir);
 		String pathResult = fileHandler.htmlStrUpload(
 			apprFormVO.getFormPath(), 
 			apprFormVO.getContent(), 
-			path.toString(), 
+			fileDir.toString(), 
 			true);
 		
 		if(pathResult == null || pathResult.equals("")) {

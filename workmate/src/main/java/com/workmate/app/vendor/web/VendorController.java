@@ -54,7 +54,11 @@ public class VendorController {
 
 	private String subDir = "vendor/";
 
-	// 거래처 전체 조회 - 페이지
+	/**
+	 * 거래처 전체 조회 - 페이지
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("/list")
 	public String vendorList(Model model) {
 		List<VendorVO> list = vendorService.findVendorList(new VendorVO());
@@ -62,7 +66,12 @@ public class VendorController {
 		return "vendor/vendorList";
 	}
 	
-	// 거래처 상세보기(단건 조회) - 페이지
+	/**
+	 * 거래처 상세보기(단건 조회) - 페이지
+	 * @param vendCode
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("/detail/{vendCode}")
 	public String vendorDetail(@PathVariable String vendCode, Model model) {
 	    VendorVO vo = new VendorVO();
@@ -74,7 +83,11 @@ public class VendorController {
 	    return "vendor/vendorDetail"; // 상세 페이지 이름
 	}
 	
-	// 파일 다운로드
+	/**
+	 * 파일 다운로드
+	 * @param vendCode
+	 * @return
+	 */
 	@GetMapping("/files/{vendCode}")
 	public ResponseEntity<FileSystemResource> downloadFile(@PathVariable String vendCode) {
 	    try {
@@ -98,14 +111,23 @@ public class VendorController {
 	    }
 	}
 
-	
-
-	// 거래처 등록 - 페이지
+	/**
+	 * 거래처 등록 - 페이지
+	 * @return
+	 */
 	@GetMapping("/insert")
 	public String vendorInsert() {
 		return "vendor/vendorInsert";
 	}
-	// 거래처 등록 - 처리
+	
+	/**
+	 * 거래처 등록 - 처리
+	 * @param loginUser
+	 * @param file
+	 * @param vendorVO
+	 * @param model
+	 * @return
+	 */
 	@PostMapping("/insert")
 	public String vendorInsert(
 	        @AuthenticationPrincipal LoginUserVO loginUser,
@@ -134,15 +156,25 @@ public class VendorController {
 	    }
 	}
 
-
-	// 거래처 수정 - 페이지
+	/**
+	 * 거래처 수정 - 페이지
+	 * @param vendorVO
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("/edit/{vendCode}")
 	public String vendorEditForm(VendorVO vendorVO, Model model) {
 		VendorVO vendor = vendorService.findVendorById(vendorVO); 
 	    model.addAttribute("vendor", vendor);
 	    return "vendor/vendorEdit";
 	}
-	// 거래처 수정 - 처리
+	
+	/**
+	 * 거래처 수정 - 처리
+	 * @param vendorVO
+	 * @param file
+	 * @return
+	 */
 	@PostMapping("/update")
 	public String updateVendor(
 	        VendorVO vendorVO,

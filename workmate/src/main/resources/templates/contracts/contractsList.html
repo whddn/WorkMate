@@ -41,18 +41,15 @@
               <td th:text="${sts.count}"></td>
               <td>
                 <!-- 표준근로계약서 -->
-                <a th:if="${cntr.contrTitle == '표준근로계약서'}"
+                <a th:if="${cntr.contrTitle.contains('근로')}"
                    th:href="@{'/contracts/Standard_Detail_Form/' + ${cntr.contrNo}}"
                    th:text="${cntr.contrTitle}"></a>
 
                 <!-- 거래처계약서 -->
-                <a th:if="${cntr.contrTitle == '거래처계약서'}"
-                   th:href="@{'/contracts/Trade_Detail_Form/' + ${cntr.contrNo}}"
-                   th:text="${cntr.contrTitle}"></a>
+                <a th:if="${cntr.contrTitle.contains('거래')}"
+				   th:href="@{'/contracts/Trade_Detail_Form/' + ${cntr.contrNo}}"
+				   th:text="${cntr.contrTitle}"></a>
 
-                <!-- 기타 -->
-                <span th:if="${cntr.contrTitle != '표준근로계약서' and cntr.contrTitle != '거래처계약서'}"
-                      th:text="${cntr.contrTitle}"></span>
               </td>
               <td th:text="${cntr.contrB}"></td>
               <td th:text="${#dates.format(cntr.createDate, 'yyyy-MM-dd')}"></td>
