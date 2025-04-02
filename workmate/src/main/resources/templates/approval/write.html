@@ -306,7 +306,7 @@
 	// 조직도의 사원을 클릭하면 apprElmntList에 저장할지, refElmntList에 저장할지 알아서 해준다
 	function addElmnt(userNo) {
 		console.log('옵저빙');
-		const result = $('input[type="radio"]:checked').val();
+		const result = $('#addApprLineModal input[type="radio"]:checked').val();
 		if(result == 'appr') {
 			addApprElmnt(userNo);
 		}
