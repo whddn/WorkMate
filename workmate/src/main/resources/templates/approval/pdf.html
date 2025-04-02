@@ -21,13 +21,21 @@
 
 <body>
 	<div id="pdf-content">
-		<div th:insert="~{|forms/approval/${approval.formPath}|}"></div>
+		<div id="apprForm"></div>
 	</div>
 </body>
 
 <script th:inline="javascript">
+	let contextPath = [[ @{/upload/forms/approval/} ]];
 	let approval = [[ ${approval} ]];
 	let apprLine = [[ ${apprLine} ]];
+	
+	// apprForm의 내용을 화면에 띄운다
+	$('#apprForm').load(contextPath + approval.formPath + ".html", function() {
+		$('#apprLine').load(contextPath + "apprLine.html");
+	});
+	console.log(contextPath + apprForm.formPath + ".html");
+	console.log(contextPath + "apprLine.html");
 	
 	$(document).ready(function() {
 		$('#createDate').text(approval.createDate);
