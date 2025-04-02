@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <div xmlns:th="https://www.thymeleaf.org" th:fragment="FooterFrag">
 
-<div class="container-fluid d-flex justify-content-between">
-	<div class="pull-left copyright">
-		Made by 2gether, yedam. 
-		Thanks to <a href="http://www.themekita.com" target="_blank">ThemeKita</a> 
-		and <a href="https://themewagon.com/themes/kaiadmin/" target="_blank">ThemeWagon</a>.
-	</div>
-</div>
+<footer class="custom-footer text-center py-2 small">
+  &copy; WorkMate | Made by 🖤 team "Together" for Yedam GroupWare Project.
+</footer>
+
+<style>
+  .custom-footer {
+    background-color: #f8f9fa; /* 밝은 배경 (기본) */
+    color: #6c757d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .custom-footer {
+      background-color: #212529; /* 다크 배경 */
+      color: #adb5bd; /* 밝은 텍스트 */
+    }
+  }
+</style>
+
+
+
 
 </div>
