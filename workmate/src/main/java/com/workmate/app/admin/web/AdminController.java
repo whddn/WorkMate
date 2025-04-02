@@ -277,14 +277,13 @@ public class AdminController {
 	        System.out.println(apprFormVO);
 	        
 	        // HTML 파일 경로 지정
+	        System.out.println(apprFormDir + apprFormVO.getFormPath() + ".html");
 			InputStream stream = getClass().getResourceAsStream(apprFormDir + apprFormVO.getFormPath() + ".html");
-			System.out.println(apprFormDir + apprFormVO.getFormPath() + ".html");
 			
 			// 파일 내용을 문자열로 변환
 			String content = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
 				.lines()
 				.collect(Collectors.joining("\n"));
-			System.out.println(content);
 			
 			// Thymeleaf 모델에 데이터 추가
 			model.addAttribute("editorContent", content);
