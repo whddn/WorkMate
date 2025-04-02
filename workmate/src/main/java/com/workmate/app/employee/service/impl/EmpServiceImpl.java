@@ -350,12 +350,19 @@ public class EmpServiceImpl implements EmpService {
     public int updateEvaluScore(EvaluVO vo) {
         return empMapper.updateEvaluScore(vo);
     }
-
+    // 임시 저장 점수 불러오기
     @Override
-    public List<EvaluVO> findTempEvaluScore(EvaluVO vo) {
-        return empMapper.selectTempEvaluScore(vo);
+    public Map<String, List<Integer>> findTempEvaluScore(EvaluVO vo) {
+        List<EvaluVO> tempList = empMapper.selectTempEvaluScore(vo);
+        
+        Map<String, List<Integer>> map = new HashMap<>();
+        for (EvaluVO item : tempList) {
+        	String key = item.getEvaluItemNo() + "|" + item.getUserNo();
+            map.computeIfAbsent(key, k -> new ArrayList<>()).add(item.getEvaluScore());
+        }
+        return map;
     }
-
+    
     @Override
     public int modifyEvaluGroupStatus(EvaluVO vo) {
         return empMapper.updateEvaluGroupStatus(vo);

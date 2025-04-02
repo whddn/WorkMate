@@ -15,7 +15,7 @@
 <body>
 
 
-<div th:fragment="employeeFrag">
+<div id="replace" th:fragment="employeeFrag">
     <!-- 오른쪽: 상세 정보 카드 -->
     <div class="card" id="detailsBox" style="font-size:14px">
       <div class="info-list">
@@ -147,28 +147,45 @@ function homeAddCode() {
         };
         const updateNo = document.querySelector('#info-userNo').value;
         console.log(updateNo);
-        fetch('/workmate/emp/update/'+ updateNo, {
-            method: "put",
-            headers: {
-              'Content-type': "application/json"
-            },
-            body: JSON.stringify(updateEmpData),
-          })
-          .then(res => res.json())
-          .then(result => {
-        	let hireDateS = result.hireDate.split('T')[0];
-            document.querySelector('#info-name').value = result.userName;
-            document.querySelector('#info-team').value = result.teamNo;
-            document.querySelector('#info-phone').value = result.userPhone;
-            document.querySelector('#info-address').value = result.address;
-            document.querySelector('#info-hire').value = hireDateS;
-            alert('성공적으로 수정되었습니다.')
-            document.getElementById("fragmentContainer").innerHTML = fragmentHtml;
-			location.href=""
-          })
-          .catch(err => console.log(err));
-      }
-      
+        fetch('/workmate/emp/update/' + updateNo, {
+        	  method: "put",
+        	  headers: {
+        	    'Content-type': "application/json"
+        	  },
+        	  body: JSON.stringify(updateEmpData),
+        	})
+        	.then(res => res.json())
+        	.then(result => {
+        	  alert('성공적으로 수정되었습니다.');
+
+        	  // ✅ fragment 로드 후 → 콜백 안에서 다시 fetch 실행
+        	  $('#replace').load(`/workmate/emp/organInfo?userNo=${updateNo}`, function () {
+
+        	    // ✅ 조직도 정보 다시 JS로 채우기
+        	    fetch(`/workmate/emp/organ/${updateNo}`)
+        	      .then(res => res.json())
+        	      .then(result => {
+        	        let hireDate = result.hireDate.split('T')[0];
+        	        document.querySelector('#info-name').textContent = result.userName;
+        	        document.querySelector('#info-department').textContent = result.departmentName;
+        	        document.querySelector('#info-team').textContent = result.teamName;
+        	        document.querySelector('#info-userNo').textContent = result.userNo;
+        	        document.querySelector('#info-id').textContent = result.userId;
+        	        document.querySelector('#info-hire').textContent = hireDate;
+        	        document.querySelector('#info-phone').textContent = result.userPhone;
+        	        document.querySelector('#info-address').textContent = result.address;
+        	        document.querySelector('#info-email').textContent = result.userMail;
+
+        	        document.getElementById("detailsBox").classList.remove('hidden');
+        	        document.querySelector('.action-buttons-s').style.display = 'block';
+        	      });
+
+        	    // ✅ 수정 버튼 다시 동작하도록 이벤트 연결
+        	    rebindOrganButton();
+        	  });
+        	})
+        	.catch(err => console.log(err));
+
       // 수정 중에 조직도를 누르면 해당 사원의 업데이트 페이지로 이동
 		teamNames.forEach(teamclick => {
 			teamclick.addEventListener('click', e => {
@@ -179,6 +196,7 @@ function homeAddCode() {
 			});
 		});
 
+      // 이름 클릭하면 해당 사원의 수정 페이지로 바로 이동
 		names.forEach(nameclick => {
 			nameclick.addEventListener('click', function (event) {
 				const userNo = event.target.dataset.id;
@@ -202,6 +220,7 @@ function homeAddCode() {
 					.catch(err => console.log(err));
 			});
 		});
+      }
     </script>
 </div>
 </body>

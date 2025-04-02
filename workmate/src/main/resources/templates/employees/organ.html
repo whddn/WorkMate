@@ -226,8 +226,18 @@ h1 {
 .input-icon-wrapper #search_icon:hover {
     color: #1c5980;
 }
-	</style>
+.input-icon-wrapper.small-search {
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+/*조직도 검색창*/
+.input-icon-wrapper.small-search input {
+  width: 100%;
+  text-align: right;
+ margin-right: 30px;
+}
 
+	</style>
 <body>
 <div class="container">
 	<div class="form-box">
@@ -257,10 +267,14 @@ h1 {
 					</ul>
 				</div>
 			<div id="replace" th:fragment="employeeFrag">
+				<div class="input-icon-wrapper small-search">
+				  <input type="text" id="employeeSearch" placeholder="이름/부서/팀명 검색" />
+				  <i class="fa fa-search" id="search_icon"></i>
+				</div>
 				<div class="card" id="detailsBox">
 					<div class="info-list">
 						<div class="info-row">
-							<span class="label">ID</span>
+							<span class="label" >ID</span>
 							<span class="value" id="info-id"></span>
 						</div>
 						<div class="info-row">
@@ -352,6 +366,36 @@ h1 {
 			let userNo = document.querySelector('#info-userNo').innerHTML;
 			$('#replace').load(`/workmate/emp/update?userNo=${userNo}`);
 		});
+		
+		function rebindOrganButton() {
+			  const updateBtn = document.querySelector('#evaluate-employee-update');
+			  if (updateBtn) {
+			    updateBtn.addEventListener('click', () => {
+			      const userNo = document.querySelector('#info-userNo').textContent;
+			      $('#replace').load(`/workmate/emp/update?userNo=${userNo}`);
+			    });
+			  }
+			} 
+		
+		// 검색 
+		
+		document.querySelector('#employeeSearch').addEventListener('input', function () {
+  const keyword = this.value.trim();
+  const employees = document.querySelectorAll('.employee');
+
+  employees.forEach(emp => {
+    const name = emp.textContent.trim(); // 사원 이름
+    const team = emp.dataset.tn?.trim(); // 팀명 (data-tn에 있음)
+    const dept = emp.closest('.tree li')?.querySelector('.folder')?.textContent?.trim(); // 상위 부서명
+
+    const fullText = `${name} ${team} ${dept}`;
+    if (fullText.includes(keyword)) {
+      emp.style.display = 'block';
+    } else {
+      emp.style.display = 'none';
+    }
+  });
+});
 	</script>
 	</div>
 </body>

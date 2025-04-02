@@ -66,13 +66,38 @@ public class EmpController {
 		return "employees/organ";
 	}
 
+	// 조직도 수정 페이지 - 사원의 정보 수정 가능한 페이지 (input 활성화)
+		@GetMapping("emp/update") // 조직도 수정 페이지
+		public String empUpdatePage(EmpVO empVO, Model model) {
+
+			EmpVO userVO = empService.findEmpByEmpNo(empVO);
+			// 2) 서비스
+			model.addAttribute("update", userVO);
+			model.addAttribute("teams", empService.findTeamList()); // 팀명
+			model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
+			model.addAttribute("rank", empService.findPositionList()); // 직급명
+			return "employees/empUpdate::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
+		}
+
+		// 조직도 수정 페이지 - 수정 완료 후 단건 조회로 이동 (fragment)
+		 @GetMapping("emp/organInfo")
+		 public String empUpdateResultPage(EmpVO empVO, Model model) {
+			EmpVO userVO = empService.findEmpByEmpNo(empVO);
+			model.addAttribute("oneinfo", empVO);
+			// 2) 서비스
+			model.addAttribute("update", userVO);
+			model.addAttribute("teams", empService.findTeamList()); // 팀명
+			model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
+			model.addAttribute("rank", empService.findPositionList()); // 직급명
+			return "employees/organ::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
+		} 
+		 
 	// 조직도 단건 조회
 	@GetMapping("emp/organ/{userNo}") // 조직도 AJAX 단건 조회
 	public ResponseEntity<EmpVO> selectOrganEmpById(@PathVariable int userNo, EmpVO empVO) {
 		empVO.setUserNo(userNo);
 		EmpVO userVO = empService.findEmpByEmpNo(empVO);
 		HttpHeaders header = new HttpHeaders();
-		//header.add("Content-Type", "application/json;charset=UTF-8");
 		return new ResponseEntity<>(userVO, header, HttpStatus.OK);
 	}
 
@@ -90,43 +115,14 @@ public class EmpController {
 	public boolean empNew(@RequestBody EmpVO empVO) {
 		// 사용자가 입력한 비밀번호
 		String rawPassword = empVO.getUserPwd();
-		
 		// 비밀번호 암호화
 		String endocodedPassword = passwordEncoder.encode(rawPassword);
-		
 		// 암호화된 비밀번호로 덮어쓰기 
 		empVO.setUserPwd(endocodedPassword);
-		
 		// 서비스로 전달해 DB 저장
 		empService.inputNewEmp(empVO);
 		return true; // 등록 후 조직도로 반환 (fetch의 location.href), 페이지 이동
 	}
-
-	// 조직도 수정 페이지 - 수정된 사원 정보 조회
-	@GetMapping("emp/update") // 조직도 수정 페이지
-	public String empUpdatePage(EmpVO empVO, Model model) {
-
-		EmpVO userVO = empService.findEmpByEmpNo(empVO);
-		// 2) 서비스
-		model.addAttribute("update", userVO);
-		model.addAttribute("teams", empService.findTeamList()); // 팀명
-		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
-		model.addAttribute("rank", empService.findPositionList()); // 직급명
-		return "employees/empUpdate::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
-	}
-
-//	// 조직도 수정 페이지 - 수정 후 단건 조회로 이동 (fragment)
-//	 @GetMapping("emp/organ/{id}")
-//	public String empUpdateResultPage(EmpVO empVO, Model model, @PathVariable int id) {
-//		empVO.setUserNo(id);
-//		EmpVO userVO = empService.findEmpByEmpNo(empVO);
-//		// 2) 서비스
-//		model.addAttribute("update", userVO);
-//		model.addAttribute("teams", empService.findTeamList()); // 팀명
-//		model.addAttribute("names", empService.findDeptEmpNameList()); // 부서명
-//		model.addAttribute("rank", empService.findPositionList()); // 직급명
-//		return "employees/updateResult::employeeFrag"; // redirect 링크에는 context-path도 포함되어야 한다. 공통의 url이라면 생략 가능
-//	} 
 
 	// 조직도 수정 AJAX 단건 조회
 	@GetMapping("emp/update/{userNo}")
@@ -264,111 +260,79 @@ public class EmpController {
 	// 평가 상세 페이지 진입 (평가 진행 전 : evalu.html로 / 진행 후 : result.html)
 	@GetMapping("emp/evalu/{formNo}")
 	public String routeEvaluPage(@PathVariable int formNo, EvaluVO evaluVO, Model model,
-			@AuthenticationPrincipal LoginUserVO loginUser) {
+	        @AuthenticationPrincipal LoginUserVO loginUser) {
 
-		// 1. 로그인 체크
-		if (loginUser == null || loginUser.getUserVO() == null) {
-			return "redirect:/login";
-		}
+	    // 1. 로그인 체크
+	    if (loginUser == null || loginUser.getUserVO() == null) {
+	        return "redirect:/login";
+	    }
 
-		// 2. 상태 조회
-		evaluVO.setEvaluFormNo(formNo);
-		evaluVO.setUserNo(loginUser.getUserVO().getUserNo()); 
-		String status = Optional.ofNullable(empService.findEvaluStatusById(evaluVO)).orElse("진행 중");
-		if ("제출 완료".equals(status)) {
-	
-			List<EvaluVO> findResult = empService.findMyEvaluById(evaluVO);
-			List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
-			List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
-			List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
-			
-			// 1) 사용자 중복 제거
-			Set<Integer> userSet = new HashSet<>();
-			List<EvaluVO> userList = new ArrayList<>();
-			for (EvaluVO vo : fullList) {
-				if (userSet.add(vo.getUserNo())) {
-					userList.add(vo);
-					System.out.println("userList: ");
-					System.out.println("fullList size: " + fullList.size());
-					System.out.println(userList);
-					System.out.println("UserNo: " + vo.getUserNo());
-				}
-			}
+	    // 2. 평가 폼 번호 & 로그인 사용자 번호 설정
+	    evaluVO.setEvaluFormNo(formNo);
+	    evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
 
-			// 2) 평가 항목 중복 제거 (compet + content 기준)
-			Set<String> keySet = new HashSet<>();
-			List<EvaluVO> evaluList = new ArrayList<>();
-			for (EvaluVO vo : fullList) {
-				String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
-				if (keySet.add(key)) {
-					evaluList.add(vo);
-				}
-			}
-			
-			// 3) 사용자별 항목 - 점수 정보 매핑 
-			Map<Integer, Map<String, Integer>> userScore = new LinkedHashMap<>();
-			List<EvaluVO> rawList = empService.findMyEvaluProcess(evaluVO);
-			
-			for(EvaluVO vo : rawList) {
-				int userNo = vo.getUserNo();
-				String key = vo.getEvaluCompet().trim() + " - " + vo.getEvaluContent().trim();
-				int score = vo.getEvaluScore();
-				List<EvaluVO> list = empService.findMyEvaluProcess(evaluVO);
+	    // 3. EVALU_GROUP의 usage_status 가져오기
+	    String usageStatus = Optional.ofNullable(empService.findEvaluStatusById(evaluVO)).orElse("진행 중");
 
-				Map<String, Integer> scoreMap = userScore.get(userNo);
-				
-				if (scoreMap == null) {
-					scoreMap = new LinkedHashMap<>();
-					userScore.put(userNo, scoreMap);
-				}
-				scoreMap.put(key, score);
-			    // 디버깅 로그 추가: 점수 매핑 확인
-			}
-			
-			model.addAttribute("score", userScore);
-			model.addAttribute("userList", userList);
-			model.addAttribute("evaluList", evaluList);
-			
-			model.addAttribute("result", findResult);
-			model.addAttribute("evalu", evalu);
-			model.addAttribute("evaluatee", evaluatee);
-			
-			return "evalu/evaluMyResult";
+	    if ("제출 완료".equals(usageStatus)) {
+	        // 제출 완료된 경우 → 결과 페이지로 이동
+	        List<EvaluVO> findResult = empService.findMyEvaluById(evaluVO);
+	        List<EvaluVO> evalu = empService.findEvaluInfo(evaluVO);
+	        List<EvaluVO> evaluatee = empService.findEvaluateeInfo(evaluVO);
+	        List<EvaluVO> fullList = empService.findMyEvaluProcess(evaluVO);
 
-		} else {
-			// 평가 진행 페이지 (제출 전)
+	        // 사용자, 항목, 점수 매핑 처리
+	        Set<Integer> userSet = new HashSet<>();
+	        List<EvaluVO> userList = new ArrayList<>();
+	        Set<String> keySet = new HashSet<>();
+	        List<EvaluVO> evaluList = new ArrayList<>();
+	        Map<Integer, Map<String, Integer>> userScore = new LinkedHashMap<>();
 
-			evaluVO.setEvaluFormNo(formNo);
-			evaluVO.setUserNo(loginUser.getUserVO().getUserNo());
+	        for (EvaluVO vo : fullList) {
+	            if (userSet.add(vo.getUserNo())) userList.add(vo);
+	            String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
+	            if (keySet.add(key)) evaluList.add(vo);
 
-			List<EvaluVO> fullList = empService.findMyEvaluById(evaluVO);
-			System.out.println(fullList);
-			System.out.println("✅ 전달된 평가자 userNo: " + evaluVO.getUserNo());
-			System.out.println("✅ 전달된 평가폼 번호: " + evaluVO.getEvaluFormNo());
-			// 1) 사용자 중복 제거
-			Set<Integer> userSet = new HashSet<>();
-			List<EvaluVO> userList = new ArrayList<>();
-			for (EvaluVO vo : fullList) {
-				if (userSet.add(vo.getUserNo())) {
-					userList.add(vo);
-				}
-			}
+	            String scoreKey = vo.getEvaluCompet().trim() + " - " + vo.getEvaluContent().trim();
+	            userScore.computeIfAbsent(vo.getUserNo(), k -> new LinkedHashMap<>())
+	                     .put(scoreKey, vo.getEvaluScore());
+	        }
 
-			// 2) 평가 항목 중복 제거 (compet + content 기준)
-			Set<String> keySet = new HashSet<>();
-			List<EvaluVO> evaluList = new ArrayList<>();
-			for (EvaluVO vo : fullList) {
-				String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
-				if (keySet.add(key)) {
-					evaluList.add(vo);
-				}
-			}
-			model.addAttribute("userList", userList);
-			model.addAttribute("evaluList", evaluList);
+	        model.addAttribute("score", userScore);
+	        model.addAttribute("userList", userList);
+	        model.addAttribute("evaluList", evaluList);
+	        model.addAttribute("result", findResult);
+	        model.addAttribute("evalu", evalu);
+	        model.addAttribute("evaluatee", evaluatee);
 
-			return "evalu/evalu"; // 평가 작성 페이지
-		}
+	        return "evalu/evaluMyResult";
+	    } else {
+	        // 임시 저장 또는 진행 중인 경우 → 작성 페이지로 이동
+	        List<EvaluVO> fullList = empService.findMyEvaluById(evaluVO);
+
+	        Set<Integer> userSet = new HashSet<>();
+	        List<EvaluVO> userList = new ArrayList<>();
+	        Set<String> keySet = new HashSet<>();
+	        List<EvaluVO> evaluList = new ArrayList<>();
+
+	        for (EvaluVO vo : fullList) {
+	            if (userSet.add(vo.getUserNo())) userList.add(vo);
+	            String key = vo.getEvaluContent() + "|" + vo.getEvaluCompet();
+	            if (keySet.add(key)) evaluList.add(vo);
+	        }
+
+	        model.addAttribute("userList", userList);
+	        model.addAttribute("evaluList", evaluList);
+	        model.addAttribute("usageStatus", usageStatus);
+
+	        // 임시 저장 점수 가져오기 (Map<"userNo-itemNo", score>)
+	        Map<String, List<Integer>> tempScoreMap = empService.findTempEvaluScore(evaluVO);
+	        model.addAttribute("tempScores", tempScoreMap);
+	        System.out.println("🟡 tempScoreMap = " + tempScoreMap);
+	        return "evalu/evalu"; // 작성 + 임시저장 상태 모두 여기로
+	    }
 	}
+
 	
 	// AJAX 결과 (평가 점수 저장, 평가 진행)
 	@PostMapping("emp/evalu/{formNo}")
@@ -380,22 +344,20 @@ public class EmpController {
 	    Map<String, String> response = new HashMap<>();
 	    response.put("result", "success");
 
-	    // 1. mode = "임시 저장" or "제출 완료"
 	    String mode = String.valueOf(data.get("mode"));
 
-	    // 2. JS를 List<EvaluVO>
 	    ObjectMapper mapper = new ObjectMapper();
 	    List<EvaluVO> evaList = mapper.convertValue(
 	        data.get("scores"),
 	        new TypeReference<List<EvaluVO>>() {}
 	    );
 
-	    // 3. 평가자 번호 세팅
 	    int evaluatorUserNo = loginUser.getUserVO().getUserNo();
 
 	    for (EvaluVO vo : evaList) {
 	        vo.setEvaluFormNo(formNo);
 	        vo.setUserNo(evaluatorUserNo);
+	        vo.setResultStatus(mode); // 임시 저장/제출 완료 저장에 꼭 필요!
 
 	        String teamNo = vo.getTeamNo();
 	        if (teamNo != null) {
@@ -407,26 +369,17 @@ public class EmpController {
 	        }
 	    }
 
-	    // 4. 점수 저장 (상태: "임시 저장" 또는 "제출 완료")
 	    empService.inputEvaluResultScore(evaList, mode);
 
-	    // 5. "제출 완료"인 경우 EVALU_GROUP 상태도 함께 변경
-	    if ("제출 완료".equals(mode)) {
-	        EvaluVO statusVO = new EvaluVO();
-	        statusVO.setEvaluFormNo(formNo);
-	        statusVO.setUserNo(evaluatorUserNo);
-	        statusVO.setUsageStatus("제출 완료");
-	        empService.modifyEvaluStatus(statusVO); // EVALU_GROUP 상태 변경
-	    } else if ("임시 저장".equals(mode)) {
-	        EvaluVO statusVO = new EvaluVO();
-	        statusVO.setEvaluFormNo(formNo);
-	        statusVO.setUserNo(evaluatorUserNo);
-	        statusVO.setUsageStatus("임시 저장");
-	        empService.modifyEvaluStatus(statusVO); // 원한다면 임시저장 상태도 저장
-	    }
+	    EvaluVO statusVO = new EvaluVO();
+	    statusVO.setEvaluFormNo(formNo);
+	    statusVO.setUserNo(evaluatorUserNo);
+	    statusVO.setUsageStatus(mode); // "임시 저장" or "제출 완료"
+	    empService.modifyEvaluStatus(statusVO);
 
 	    return ResponseEntity.ok(response);
 	}
+
 
 
 	// 내가 평가받은 평가 리스트 (일반 사용자)
