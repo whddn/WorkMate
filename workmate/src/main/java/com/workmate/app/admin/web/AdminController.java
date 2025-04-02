@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -66,7 +65,7 @@ public class AdminController {
 	@Value("${file.upload-dir}")
 	private String uploadDir;
 	private final String subDir = "CommonItemImage/";
-	private final String apprFormDir = "src/main/resources/templates/forms/approval/";
+	private final String apprFormDir = "forms/approval/";
 	
 	// 공용품 관리
 	@GetMapping("admin/commonItemList")
@@ -274,21 +273,15 @@ public class AdminController {
 	        model.addAttribute("apprForm", apprFormVO);
 	        System.out.println(apprFormVO);
 	        
+	        // HTML 파일 경로 지정
+	        Path filePath = Paths.get(uploadDir, apprFormDir, apprFormVO.getFormPath() + ".html");
+			
 	        try {
-	        	// HTML 파일 경로 지정
-	        	Path path = Paths.get(apprFormDir, apprFormVO.getFormPath() + ".html");
-	        	File file = ResourceUtils.getFile(path.toString());
-	        	
-	        	// 파일 내용을 문자열로 변환
-	        	String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-	        	
-	        	// Thymeleaf 모델에 데이터 추가
-	        	model.addAttribute("editorContent", content);
-	        	System.out.println(content);
-	        }
-	        catch(IOException e) {
-	        	e.printStackTrace();
-	        	model.addAttribute("editorContent", "파일을 불러오는 데 실패했습니다.");
+	            String content = Files.readString(filePath, StandardCharsets.UTF_8);
+	            model.addAttribute("editorContent", content);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            model.addAttribute("editorContent", "파일을 불러올 수 없습니다.\n" + e.getMessage());
 	        }
 	    }
 	    return "admin/apprFormOne";
@@ -298,11 +291,11 @@ public class AdminController {
 	@PostMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> postAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		Path path = Paths.get(apprFormDir);
+		Path fileDir = Paths.get(uploadDir, apprFormDir);
 		String pathResult = fileHandler.htmlStrUpload(
 			apprFormVO.getFormPath(), 
 			apprFormVO.getContent(), 
-			path.toString(), 
+			fileDir.toString(), 
 			true);
 		
 		if(pathResult == null || pathResult.equals("")) {
@@ -318,11 +311,11 @@ public class AdminController {
 	@PutMapping("admin/apprForm")
 	@ResponseBody
 	public ResponseEntity<Boolean> putAdminApprForm(@RequestBody ApprFormVO apprFormVO) {
-		Path path = Paths.get(apprFormDir);
+		Path fileDir = Paths.get(uploadDir, apprFormDir);
 		String pathResult = fileHandler.htmlStrUpload(
 			apprFormVO.getFormPath(), 
 			apprFormVO.getContent(), 
-			path.toString(), 
+			fileDir.toString(), 
 			true);
 		
 		if(pathResult == null || pathResult.equals("")) {
