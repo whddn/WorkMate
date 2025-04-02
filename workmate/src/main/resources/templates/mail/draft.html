@@ -81,11 +81,13 @@
                 </tr>
                 <tr th:each="mail : ${mails}" class="mail-row">
                     <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
-                     <td><span class="badge bg-secondary ms-2"
-              th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}"></span>
-        <span th:text="${mail.recipients}">이메일</span>
-        
-    </td>
+                     <td>
+  <span class="badge ms-2"
+        th:if="${mail.status == '발송됨'}"
+        th:class="'bg-primary'"
+        th:text="'보낸 메일'"></span>
+  <span th:text="${mail.recipients}">이메일</span>
+</td>
                     <td th:text="${mail.subject}">제목</td>
                     <td th:text="${#dates.format(mail.sentAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
                     <td><a th:href="@{/mail/composeDraft(mailId=${mail.mailId})}" class="btn btn-outline-primary btn-sm">작성 계속</a></td>
