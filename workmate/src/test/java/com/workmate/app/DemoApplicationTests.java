@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.workmate.app;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
