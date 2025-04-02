@@ -263,7 +263,12 @@ public class DocumentController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
 	    }
 	}
-	
+	/**
+	 * 자료실 파일 미리보기
+	 * @param documentNo
+	 * @return documentNo
+	 * @throws IOException
+	 */
 	@GetMapping("/preview/{documentNo}")
 	public ResponseEntity<Resource> previewFile(@PathVariable Integer documentNo) throws IOException {
 	    DocVO doc = documentService.findFileById(documentNo);
