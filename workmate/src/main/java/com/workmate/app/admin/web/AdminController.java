@@ -278,13 +278,15 @@ public class AdminController {
 	        	// HTML 파일 경로 지정
 	        	Path path = Paths.get(apprFormDir, apprFormVO.getFormPath() + ".html");
 	        	File file = ResourceUtils.getFile(path.toString());
+	        	System.out.println(path);
+	        	System.out.println(file);
 	        	
 	        	// 파일 내용을 문자열로 변환
 	        	String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+	        	System.out.println(content);
 	        	
 	        	// Thymeleaf 모델에 데이터 추가
 	        	model.addAttribute("editorContent", content);
-	        	System.out.println(content);
 	        }
 	        catch(IOException e) {
 	        	e.printStackTrace();
