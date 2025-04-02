@@ -93,7 +93,7 @@ public class MainscreenController {
 	
 	@GetMapping("/calendar/schedule")
 	@ResponseBody
-	public List<ScheduleVO> getCalendatSchedule() {
+	public List<ScheduleVO> getCalendarSchedule() {
 		EmpVO myself = whoAmI.whoAmI();
 		
 		ScheduleVO scheduleVO = new ScheduleVO();
