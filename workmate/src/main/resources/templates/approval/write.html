@@ -205,7 +205,17 @@
 	
 	// apprForm의 내용을 화면에 띄운다
 	$('#apprForm').load(contextPath + apprForm.formPath + ".html", function() {
-		$('#apprLine').load(contextPath + "apprLine.html");
+		$('#apprLine').load(contextPath + "apprLine.html", function() {
+			const today = new Date();
+			const year = today.getFullYear();
+			const month = (today.getMonth() + 1).toString().padStart(2, '0');
+			const day = today.getDate().toString().padStart(2, '0');
+			
+			$('#createDate').text(`${year}-${month}-${day}`);
+			$('#departmentName').text(creator.departmentName);
+			$('#userNo').text(creator.userNo);
+			$('#userName').text(creator.userName);
+		});
 	});
 	console.log(contextPath + apprForm.formPath + ".html");
 	console.log(contextPath + "apprLine.html");
@@ -349,11 +359,6 @@
 	
 	// 화면이 준비되면 실행할 명령들
 	$(document).ready(function() {
-		const today = new Date();
-		const year = today.getFullYear();
-		const month = (today.getMonth() + 1).toString().padStart(2, '0');
-		const day = today.getDate().toString().padStart(2, '0');
-		
 		$('#AttachTable').DataTable({
 			searching: false,
 	        lengthChange: false,
@@ -373,11 +378,6 @@
 		    info: false,
 		    paging: false
 		});
-		
-		$('#createDate').text(`${year}-${month}-${day}`);
-		$('#departmentName').text(creator.departmentName);
-		$('#userNo').text(creator.userNo);
-		$('#userName').text(creator.userName);
 		
 		let names = document.querySelectorAll('.employee'); // 사원이름 
 	    let teamNames = document.querySelectorAll('.teamN'); // 팀이름
