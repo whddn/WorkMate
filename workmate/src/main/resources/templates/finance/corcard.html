@@ -28,21 +28,30 @@
 		    display: block;
 		    margin-left: 0px;
 		}
+		#cardTable thead th {
+		    background-color: #C3E1B3;
+  			color: black;
+		    text-align: center;
+		    vertical-align: middle;
+		  }
+		
+		 
+		  #cardTable td {
+		    text-align: center;
+		    vertical-align: middle;
+		  }
+		
+		  #cardTable {
+		    text-align: center;
+		  }
     </style>
 </head>
 <body>
 <div id="container">
     <div class="card-container">
     	<h3 class="title">법인카드 목록</h3>
-        <div class="card-buttons mb-3">
-            <button class="btn btn-warning">KB 국민카드</button>
-            <button class="btn btn-primary">신한카드</button>
-            <button class="btn btn-warning">NH농협카드</button>
-            <button class="btn btn-danger">비씨카드</button>
-            <button class="btn btn-primary">우리카드</button>
-        </div>
         <div class="table-responsive">
-            <table class="table table-bordered text-center">
+            <table class="table table-bordered text-center" id="cardTable">
                 <thead class="table-light">
                     <tr>
                         <th>카드종류</th>
@@ -68,6 +77,25 @@
         </div>
     </div>
     </div>
+    <script>
+    		$(document).ready(function () {
+			$('#cardTable').DataTable({
+				pageLength: 10,
+				lengthChange: false,
+				ordering: false,
+				language: {
+					search: "검색:",
+					lengthMenu: "_MENU_ 개씩 보기",
+					info: "총 _TOTAL_건 중 _START_ ~ _END_",
+					paginate: {
+						previous: "이전",
+						next: "다음"
+					},
+					zeroRecords: "일치하는 데이터가 없습니다."
+				}
+			});
+		});
+    </script>
 </body>
 </html>
 

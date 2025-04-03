@@ -328,7 +328,7 @@
 		SELECT
 		    f.EVALU_FORM_NO
 		    , f.EVALU_NAME
-		    , f.FORM_STATUS
+		    , g.USAGE_STATUS
 		    , f.EVALU_DESCRIPT
 		    , fm.ORDER_NO
 		    , fm.EVALU_NO

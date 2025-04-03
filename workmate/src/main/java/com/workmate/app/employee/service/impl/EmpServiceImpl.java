@@ -360,16 +360,16 @@ public class EmpServiceImpl implements EmpService {
     public int modifyEvaluScore(EvaluVO vo) {
         return empMapper.updateEvaluScore(vo);
     }
-    // 임시저장 점수
+    
+    // 임시저장 점수 불러오기
     @Override
     public Map<String, Integer> findTempEvaluScore(EvaluVO vo) {
         List<EvaluVO> tempList = empMapper.selectTempEvaluScore(vo);
         Map<String, Integer> map = new HashMap<>();
 
         for (EvaluVO item : tempList) {
-        	
+        					// 항목 번호 + 피평가자 사원 번호를 key 로 설정
             String key = item.getEvaluItemNo() + "|" + item.getEvaluateeUserNo();
-         // 로그 추가
             map.put(key, item.getEvaluScore());    
         }
         return map;

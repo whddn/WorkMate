@@ -12,7 +12,14 @@
 h2, h3 {
   font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 20px;
+
+  vertical-align: middle;
+}
+h3 {
+	  margin-bottom: 20px;
+}
+h2 {
+	  margin-bottom: 0px;
 }
 .table-container {
   overflow-x: auto;
@@ -91,6 +98,10 @@ button:hover {
     min-width: 200px;
     width: 200px;
     }
+    th{
+    	  background-color: #C3E1B3;
+  		  color: black;
+    }
 </style>
 </head>
 
@@ -106,7 +117,7 @@ button:hover {
 			<h3>평가 대상자 정보</h3>
 			<table>
 				<tr>
-					<th>팀명</th>
+					<th class="teamClass">팀명</th>
 					<td>[[ ${userList[0].teamName} ]]</td>
 				</tr>
 			</table>

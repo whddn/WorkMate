@@ -19,6 +19,22 @@
             padding: 20px;
             margin-top:100px;
         }
+         #myEvaluList thead th {
+			background-color: #C3E1B3;
+			color: black;
+		    text-align: center;
+		    vertical-align: middle;
+		  }
+		
+		  #myEvaluList td {
+		    text-align: center;
+		    vertical-align: middle;
+		  }
+		
+		  #myEvaluList {
+		    text-align: center;
+		  }
+        
 		th {
     		text-align: center !important;
     		padding-right: 10px  !important;
@@ -144,7 +160,7 @@
 
    
         <!-- 게시글 목록 테이블 -->
-        <table class="table-container" id="myEvaluList">
+        <table class="table table-striped table-bordered" id="myEvaluList">
             <thead>
                 <tr>
                     <th>평가 제목</th>
@@ -183,7 +199,7 @@
             previous: "이전",
             next: "다음"
           },
-          zeroRecords: "일치하는 데이터가 없습니다."
+          zeroRecords: "받은 평가를 조회할 수 없습니다."
         }
       });
     });
