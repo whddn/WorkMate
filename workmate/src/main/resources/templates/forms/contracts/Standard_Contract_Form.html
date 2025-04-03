@@ -94,6 +94,7 @@
 </div>
 
 <script>
+	// 캔버스(사인등록할때)
     document.addEventListener('DOMContentLoaded', function () {
         const canvas = document.getElementById('signatureCanvas');
         const ctx = canvas.getContext('2d');
@@ -117,7 +118,8 @@
             ctx.beginPath();
             ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         }
-
+		
+        // 폼 제출할때 확인
         document.getElementById('standardContractForm').addEventListener('submit', function (e) {
             const blank = document.createElement('canvas');
             blank.width = canvas.width;
@@ -130,7 +132,8 @@
             document.getElementById('signImageInput').value = canvas.toDataURL('image/png');
         });
     });
-
+	
+	// 캔버스 싸인 초기화
     function clearSignature() {
         const canvas = document.getElementById('signatureCanvas');
         const ctx = canvas.getContext('2d');

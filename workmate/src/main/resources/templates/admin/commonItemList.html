@@ -77,13 +77,15 @@
         </table>
     </div>
     
+    
     <script th:inline="javascript">
-
+		/* 에러 메세지 출력 */
 	    const msg = [[ ${errorMessage} ]]
 	    if(msg != null){
 	    	alert(msg);
 	    }
     
+		/* 모든 공용품 선택 */
         function toggleAll() {
             var checkboxes = document.querySelectorAll('.item-checkbox');
             var selectAll = document.getElementById('select-all');

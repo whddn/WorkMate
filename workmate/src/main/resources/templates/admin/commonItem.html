@@ -55,7 +55,7 @@
 
 <div class="container">
     <div class="card">
-        <h2 class="text-center">공용품 관리 등록</h2>
+        <h2 class="text-center">공용품 등록</h2>
         <form id="itemForm" th:action="@{commonItem}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label>공용품 종류</label>
@@ -98,7 +98,9 @@
     </div>
 </div>
 
+
 <script>
+	/* 이름 입력칸 */
     function addItem() {
         let itemName = document.getElementById("item-name").value;
         if (itemName.trim() === "") {
@@ -112,6 +114,7 @@
         document.getElementById("item-name").value = "";
     }
 
+	/* 시간 입력 칸 */
     function addTime() {
         let startTime = document.getElementById("start-time").value;
         let endTime = document.getElementById("end-time").value;
@@ -129,10 +132,12 @@
         list.appendChild(div);
     }
     
+	
     document.addEventListener("DOMContentLoaded", function() {
         let startTimeInput = document.getElementById("start-time");
         let endTimeInput = document.getElementById("end-time");
 
+        /* 무슨 시간이든 00분으로 설정 */
         function enforceFullHour(input) {
             input.addEventListener("change", function() {
                 let value = input.value;
@@ -149,6 +154,7 @@
         enforceFullHour(endTimeInput);
     });
 
+    /* 모든 값 초기화 */
     function cancelForm() {
         if (confirm("취소하시겠습니까? 입력한 데이터가 삭제됩니다.")) {
             document.getElementById("itemForm").reset();
