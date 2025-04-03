@@ -29,12 +29,12 @@ import lombok.RequiredArgsConstructor;
 public class FinanceController {
 	private final FinanceService financeService;
 	
-	// 입출금 보고서 메인 
+	// 입출금 보고서 메인 페이지 
 	@GetMapping("finance/report") 
 	public String ReportMainList(ReportVO reportVO, Model model) {
 		// 2) 서비스 
 		model.addAttribute("report", financeService.findReportList(reportVO)); 
-		return "finance/financeMain";
+		return "finance/reportList";
 	}
 	
 	// 입출금 보고서 단건 조회
@@ -123,16 +123,16 @@ public class FinanceController {
 	}
 	
 	
-	// 법인카드 등록
+	// 법인카드 등록 페이지
 	@GetMapping("finance/newCard")
 	public String CorcardInsertPage() {
 		return "finance/newCard"; 
 	}
 	
 		 
-	 // 법인카드 등록
+	 // 법인카드 등록 (AJAX)
 	@PostMapping("finance/newCard")
-	public ResponseEntity<?> register(@RequestBody CorcardVO card, @AuthenticationPrincipal LoginUserVO loginUser) {
+	public ResponseEntity<?> CorcardInsertAjax(@RequestBody CorcardVO card, @AuthenticationPrincipal LoginUserVO loginUser) {
 			int userNo = loginUser.getUserVO().getUserNo();
 		    card.setUserNo(userNo);
 		    try {
