@@ -32,6 +32,7 @@ public class CorcardVO {
 	    return corcardNum; // 마스킹 불가능할 경우 원본 반환
 	}
 	
+	// 암호화 & 복호화
 	public String getMaskedCardNumDecrypted() {
 	    if (corcardNum != null) {
 	        try {

@@ -82,9 +82,10 @@ public class FinanceServiceImpl implements FinanceService {
 	    return result;
 	    
 	}
-
+	
+	// 리포트에 합계 추가
 	@Override
-	public int updateReportTotalAmounts(ReportVO reportVO) {
+	public int modifyReportTotalAmounts(ReportVO reportVO) {
 	    return financeMapper.updateReportTotalAmounts(reportVO);
 	}
 	// 입출금 리포트 수정 기능
@@ -94,32 +95,31 @@ public class FinanceServiceImpl implements FinanceService {
 
 		    // 1. 리포트 수정
 		    int reportUpdate = financeMapper.updateReportOne(reportVO);
-		    System.out.println("📝 리포트 수정 결과: " + reportUpdate);
+		    System.out.println("리포트 수정 결과: " + reportUpdate);
 		    if (reportUpdate > 0) {
 		        Integer reportNo = reportVO.getReportNo();
 		        List<ReportVO> transList = reportVO.getTransHistoryList();
 		        
-		        System.out.println("🧪 전체 거래 내역 수: " + (transList == null ? "null" : transList.size()));
+		        System.out.println("전체 거래 내역 수: " + (transList == null ? "null" : transList.size()));
 		        if (transList != null && !transList.isEmpty()) {
 		        	
 		        	for (ReportVO trans : transList) {
 		        	    trans.setReportNo(reportNo);
 		        	    trans.setReportTitle(reportVO.getReportTitle());
 
-		        	    System.out.println("📦 거래내역 처리 중 → transId: " + trans.getTransId());
+		        	    System.out.println("거래내역 처리 중 → transId: " + trans.getTransId());
 
 		        	    if (trans.getTransId() != null) {
 		        	        int updateResult = financeMapper.updateTransHistory(trans);
-		        	        System.out.println("🟡 UPDATE 결과: " + updateResult + "건 | transId: " + trans.getTransId());
+		        	        System.out.println("UPDATE 결과: " + updateResult + "건 | transId: " + trans.getTransId());
 
 		        	        if (updateResult == 0) {
-		        	            System.out.println("⚠️ UPDATE 실패 or 변경된 데이터 없음 → transId: " + trans.getTransId());
+		        	            System.out.println("UPDATE 실패 / 변경된 데이터 없음 → transId: " + trans.getTransId());
 		        	        }
 
 		        	        result += updateResult;
 		        	    } else {
 		        	        int insertResult = financeMapper.insertReportTransOne(trans);
-		        	        System.out.println("🟢 INSERT 결과: " + insertResult + "건 | 신규 거래내역 추가됨");
 		        	        result += insertResult;
 		        	    }
 		        	}

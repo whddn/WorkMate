@@ -2,6 +2,7 @@ package com.workmate.app.employee.mapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.workmate.app.employee.service.DepartmentVO;
 import com.workmate.app.employee.service.EmpVO;
@@ -80,7 +81,7 @@ public interface EmpMapper {
 	public int updateEvaluStatus(EvaluVO vo);
 	
 	// 평가 상태 조회 
-	public String getEvaluStatus(int formNo);
+	public String selectEvaluStatus(int formNo);
 	
 	// 내가 피평가자로 등록된 평가 리스트 (나의 평가 결과 리스트)
 	public List<EvaluVO> selectMyEvaluResultList(EvaluVO evaluVO);
@@ -126,10 +127,16 @@ public interface EmpMapper {
 
 	// 임시 저장
 	public int updateEvaluScore(EvaluVO vo); // 임시 저장 수정
+	
+	// 임시 저장 점수 불러오기
+	public List<EvaluVO> selectTempEvaluScore(EvaluVO vo); 
 
-	public List<EvaluVO> selectTempEvaluScore(EvaluVO vo); // 임시 저장 불러오기
-
-	public int updateEvaluGroupStatus(EvaluVO vo); // 평가자 상태 업데이트 (제출 완료 or 임시 저장)
+	// 평가자 상태 업데이트 (제출 완료 or 임시 저장)
+	public int updateEvaluGroupStatus(EvaluVO vo); 
+	
 	// 임시저장 삭제
 	public void deleteTempEvaluScore(EvaluVO vo);
+	
+	// 관리자 평가 폼 단건 조회 (평과 결과 X)
+	public List<EvaluVO> selectInEvaluForm(EvaluVO vo);
 }

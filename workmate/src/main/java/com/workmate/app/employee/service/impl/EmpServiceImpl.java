@@ -59,11 +59,6 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.selectEmpNameList();
 	}
 
-	@Override
-	public EmpVO findOrganPage(EmpVO empVO) {
-		return null;
-	}
-
 	// 사원 수정
 	@Override
 	public int updateEmp(EmpVO empVO) {
@@ -97,13 +92,108 @@ public class EmpServiceImpl implements EmpService {
 	        if (seen.add(key)) {	// seen 리스트에 key 추가 
 	            result.add(vo);		// result 에 vo 추가 
 	        }
+	    }
+	    return result;
+	}
 
 
+
+	// 나의 진행된 평가 리스트 조회
+	@Override
+	public List<EvaluVO> findMyEvaluList(EvaluVO evaluVO) {
+		return empMapper.selectMyEvaluList(evaluVO);
+	}
+
+	// 내가 평가자로 지정된 평가 확인 (내가 제출한 평가) 
+	@Override
+	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO) {
+	    List<EvaluVO> rawList = empMapper.selectMyEvaluingById(evaluVO);
+
+	    Set<String> seen = new HashSet<>();	// set : 중복 제거 
+	    List<EvaluVO> result = new ArrayList<>(); // 새 리스트 생성 
+	    System.out.println("🔍 rawList size: " + rawList.size());
+	    for (EvaluVO vo : rawList) {	// selectOne의 쿼리값을 모두 반환할 동안 
+	        int userNo = vo.getUserNo();	// 유저 번호 
+	        String evaluCompet = vo.getEvaluCompet();	// 항목 
+	        String evaluContent = vo.getEvaluContent();	// 내용
+	        if (evaluCompet == null) continue;	// compet이 null이면 계속 추가 
+
+	        String key = userNo + "|" + evaluCompet.trim() + "|" + evaluContent.trim(); // key에 userNo, evaluCompet, evaluContent 기준 
+	        						
+	        if (seen.add(key)) {	// seen 리스트에 key 추가 
+	            result.add(vo);		// result 에 vo 추가 
+	        }
 	    }
 
 	    return result;
 	}
+	
+	// 평가 상태 변경 
+	@Override
+	public int modifyEvaluStatus(EvaluVO vo) {
+		return empMapper.updateEvaluStatus(vo);
+	}
 
+	// 다면평가 진행(저장)
+	@Override
+	@Transactional
+	public int inputEvaluResultScore(List<EvaluVO> evaluList, String mode) {
+	    int result = 0;
+
+	    if (evaluList == null || evaluList.isEmpty()) return result;
+
+	    EvaluVO first = evaluList.get(0);
+
+	    // 1. 임시저장일 경우 기존 임시저장 결과 삭제
+	    if ("임시 저장".equals(mode) || "제출 완료".equals(mode)) {
+	    	 for (EvaluVO vo : evaluList) {
+	             empMapper.deleteTempEvaluScore(vo);  // ✅ 모든 평가자-피평가자 조합 삭제
+	         }
+	    }
+
+	    // 2. insert는 공통
+	    for (EvaluVO evalu : evaluList) {
+	        int inserted = empMapper.insertEvaluScore(evalu);
+	        result += inserted;
+	    }
+	    
+
+	    return result;
+	}
+	
+	// 평가 폼 상태 확인
+	@Override
+	public String findEvaluStatus(int formNo) {
+	    return empMapper.selectEvaluStatus(formNo);
+	}
+
+
+	// 내가 피평가자로 속해 있는 평가의 리스트 
+	@Override
+	public List<EvaluVO> findMyEvaluResultList(EvaluVO evaluVO) {
+		return empMapper.selectMyEvaluResultList(evaluVO);
+	}
+	
+	// 내가 받은 평가 점수 확인 (단건)
+	@Override
+	public List<EvaluVO> findMyEvaluScoreResultById(EvaluVO evaluVO) {
+	    List<EvaluVO> oneList = empMapper.selectMyEvaluScoreResultById(evaluVO);
+
+	    Set<Integer> seenUserNos = new HashSet<>();
+	    
+	    for (EvaluVO vo : oneList) {
+	        int userNo = vo.getUserNo();
+	        
+	        // 이미 출력된 사람일 경우, 사람 관련 정보 비우기
+	        if (!seenUserNos.add(userNo)) {
+	            vo.setUserName(null);
+	            
+	        }
+	    }
+	    
+
+	    return oneList;
+	}
 	
 	// 지나간 평가 전체 리스트 조회 (관리자 - 평가 - 전체 조회)
 	@Override
@@ -190,7 +280,6 @@ public class EmpServiceImpl implements EmpService {
 		return empMapper.insertOneEvalu(evaluVO);
 		}
 
-	// 평가지 등록 AJAX
 
 	// 평가 등록시 평가 항목/평가 내용 조회
 	@Override
@@ -250,104 +339,6 @@ public class EmpServiceImpl implements EmpService {
 	}
 
 
-
-	// 나의 진행된 평가 리스트 조회
-	@Override
-	public List<EvaluVO> findMyEvaluList(EvaluVO evaluVO) {
-		return empMapper.selectMyEvaluList(evaluVO);
-	}
-
-	// 내가 평가자로 지정된 평가 확인 (내가 제출한 평가) 
-	@Override
-	public List<EvaluVO> findMyEvaluProcess(EvaluVO evaluVO) {
-	    List<EvaluVO> rawList = empMapper.selectMyEvaluingById(evaluVO);
-
-	    Set<String> seen = new HashSet<>();	// set : 중복 제거 
-	    List<EvaluVO> result = new ArrayList<>(); // 새 리스트 생성 
-	    System.out.println("🔍 rawList size: " + rawList.size());
-	    for (EvaluVO vo : rawList) {	// selectOne의 쿼리값을 모두 반환할 동안 
-	        int userNo = vo.getUserNo();	// 유저 번호 
-	        String evaluCompet = vo.getEvaluCompet();	// 항목 
-	        String evaluContent = vo.getEvaluContent();	// 내용
-	        if (evaluCompet == null) continue;	// compet이 null이면 계속 추가 
-
-	        String key = userNo + "|" + evaluCompet.trim() + "|" + evaluContent.trim(); // key에 userNo, evaluCompet, evaluContent 기준 
-	        						
-	        if (seen.add(key)) {	// seen 리스트에 key 추가 
-	            result.add(vo);		// result 에 vo 추가 
-	        }
-	    }
-
-	    return result;
-	}
-	
-	// 평가 상태 변경 
-	@Override
-	public int modifyEvaluStatus(EvaluVO vo) {
-		return empMapper.updateEvaluStatus(vo);
-	}
-
-	// 다면평가 진행(저장)
-	@Override
-	@Transactional
-	public int inputEvaluResultScore(List<EvaluVO> evaluList, String mode) {
-	    int result = 0;
-
-	    if (evaluList == null || evaluList.isEmpty()) return result;
-
-	    EvaluVO first = evaluList.get(0);
-
-	    // 1. 임시저장일 경우 기존 임시저장 결과 삭제
-	    if ("임시 저장".equals(mode) || "제출 완료".equals(mode)) {
-	    	 for (EvaluVO vo : evaluList) {
-	             empMapper.deleteTempEvaluScore(vo);  // ✅ 모든 평가자-피평가자 조합 삭제
-	         }
-	    }
-
-	    // 2. insert는 공통
-	    for (EvaluVO evalu : evaluList) {
-	        int inserted = empMapper.insertEvaluScore(evalu);
-	        result += inserted;
-	    }
-	    
-
-	    return result;
-	}
-	
-	
-	@Override
-	public String findEvaluStatus(int formNo) {
-	    return empMapper.getEvaluStatus(formNo);
-	}
-
-
-	// 내가 피평가자로 속해 있는 평가의 리스트 
-	@Override
-	public List<EvaluVO> findMyEvaluResultList(EvaluVO evaluVO) {
-		return empMapper.selectMyEvaluResultList(evaluVO);
-	}
-	
-	// 내가 받은 평가 점수 확인 (단건)
-	@Override
-	public List<EvaluVO> findMyEvaluScoreResultById(EvaluVO evaluVO) {
-	    List<EvaluVO> oneList = empMapper.selectMyEvaluScoreResultById(evaluVO);
-
-	    Set<Integer> seenUserNos = new HashSet<>();
-	    
-	    for (EvaluVO vo : oneList) {
-	        int userNo = vo.getUserNo();
-	        
-	        // 이미 출력된 사람일 경우, 사람 관련 정보 비우기
-	        if (!seenUserNos.add(userNo)) {
-	            vo.setUserName(null);
-	            
-	        }
-	    }
-	    
-
-	    return oneList;
-	}
-
 	// 내가 제출한 평가 상태
 	@Override
 	public String findEvaluStatusById(EvaluVO vo) {
@@ -379,13 +370,22 @@ public class EmpServiceImpl implements EmpService {
         }
         return map;
     }
+    
+    // 사원의 제출 상태 
     @Override
     public int modifyEvaluGroupStatus(EvaluVO vo) {
         return empMapper.updateEvaluGroupStatus(vo);
     }
     
+    // 임시 저장 삭제 
     @Override
     public void dropTempEvaluScore(EvaluVO vo) {
         empMapper.deleteTempEvaluScore(vo);
     }
+    
+ // 관리자 평가 폼 단건 조회 (평과 결과 X)
+	@Override
+	public List<EvaluVO> findInEvaluForm(EvaluVO vo) {
+		return empMapper.selectInEvaluForm(vo);
+	}
 }
