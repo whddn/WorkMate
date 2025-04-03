@@ -199,12 +199,16 @@ public class EmpServiceImpl implements EmpService {
 	@Override
 	public List<EvaluVO> findBeforeEvaluList(EvaluVO evaluVO) {
 		List<EvaluVO> result = empMapper.selectBeforeEvaluList(evaluVO);
-		Set<Integer> teamSet = new HashSet<>();
+		Set<Integer> teamSet = new LinkedHashSet<>();
 		List<EvaluVO> uniqueTeam = new ArrayList<>();
 		for (EvaluVO vo : result) {
 			if (teamSet.add(vo.getEvaluFormNo())) { // 폼 번호 기준으로 중복 제거
 				uniqueTeam.add(vo);
+				  System.out.println("폼번호: " + vo.getEvaluFormNo());
 			}
+		}
+		for (EvaluVO vo : uniqueTeam) {
+		    System.out.println("uni폼번호: " + vo.getEvaluFormNo());
 		}
 		return uniqueTeam;
 	}
