@@ -37,6 +37,7 @@ import com.workmate.app.mail.service.MailService;
 import com.workmate.app.mail.service.MailVO;
 import com.workmate.app.mail.util.AttachmentEncryptor;
 
+
 import jakarta.mail.Address;
 import jakarta.mail.BodyPart;
 import jakarta.mail.Folder;
@@ -49,8 +50,10 @@ import jakarta.mail.Store;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class MailServiceImpl implements MailService {
@@ -554,11 +557,13 @@ public class MailServiceImpl implements MailService {
 	            if (file.isEmpty()) continue;
 
 	            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-	            String fullPath = uploadDir + File.separator + fileName;
+	            String fullPath = uploadDir +  fileName;
 
 	            File localFile = new File(fullPath);
 	            try {
 	                file.transferTo(localFile);
+	                
+	                log.info(fullPath);
 	                originalFiles.add(localFile); // zip 압축용
 	            } catch (IOException e) {
 	                e.printStackTrace();
@@ -670,7 +675,7 @@ public class MailServiceImpl implements MailService {
 
 	            // 암호화된 zip 생성
 	            String zipName = UUID.randomUUID() + "_encrypted.zip";
-	            String zipPath = uploadDir + File.separator + zipName;
+	            String zipPath = uploadDir  + zipName;
 	            try {
 	                File encryptedZip = AttachmentEncryptor.encryptMultipleFiles(originalFiles, password, zipPath);
 
