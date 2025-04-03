@@ -44,7 +44,8 @@ import com.workmate.app.security.service.LoginUserVO;
 
 
 import jakarta.mail.MessagingException;
-
+import lombok.extern.log4j.Log4j2;
+@Log4j2
 @Controller
 public class MailController {
 	private final MailService mailService;
@@ -107,6 +108,7 @@ public class MailController {
         // 비동기 작업 수행
     	CompletableFuture.supplyAsync(() -> {
        try { 
+    	   log.warn("============="+hasAttachment);
 	    	if (hasAttachment) {
 	            // 첨부파일이 있을 경우 저장 + 첨부파일 처리 + 전송
 	            mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt);
@@ -142,7 +144,7 @@ public class MailController {
             String senderEmail = loginUser.getUserVO().getUserMail();
 
             boolean hasAttachment = attachments != null && Arrays.stream(attachments).anyMatch(f -> !f.isEmpty());
-
+            
             asyncMethod( senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt, hasAttachment);
 
             return "redirect:/mail/mailmain";
