@@ -168,7 +168,7 @@
                 	<th:block th:each="one : ${evlist}" >
                 <tr>
                     <td><a th:href="@{/emp/evalu/{eva}(eva=${one.evaluFormNo})}">[[ ${one.evaluName} ]]</a></td>
-                    <td th:text="${one.usageStatus}"></td>
+                    <td th:text="${one.formStatus}"></td>
                     <td>[[ ${one.teamName} ]]</td>
                     <td th:text="${#dates.format(one.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(one.evaluEnd, 'yyyy-MM-dd')}"></td>
                     <td>추가 설명</td>
