@@ -1,248 +1,403 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
+	layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>조직도</title>
-  <style>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>조직도</title>
+	<style>
+.tree {
+    display: flex;
+    flex-direction: column;
+    gap: 7px; /* 부서 간 여백 */
+}
+
 
 .container {
-	max-width: 1000px;
-	margin: 0 auto;
-	background-color: #fff;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	display: flex;
-	align-items: center; /* 세로 가운데 정렬 */
-	justify-content: center;
-	gap: 20px;
-	min-height: 600px;
+    max-width: 1000px;
+    margin: 0px auto;
+    padding: 40px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 600px;
 }
-#container {
-	max-width: 1000px;
-	margin: 0 auto;
-	background-color: #fff;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	display: flex;
-	align-items: center; /* 세로 가운데 정렬 */
-	justify-content: center;
-	gap: 20px;
-	min-height: 600px;
-	margin-top : 50px;
-}
-.wrapper {
-  width: 100%;
-  flex-direction: column; /* 세로 정렬 */
-  align-items: center;
+.form-box {
+  background-color: white; /* ✅ 여기만 흰색 */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+
+
 .tree-panel {
-	background: #fff;
-	padding: 20px;
-	border-radius: 12px;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-	min-width: 250px;
-	width: 300px;
-	max-height: 500px;
-	overflow-y: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    min-width: 250px;
+    width: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 35px;
 }
 
 .card {
-	background: #ffffff;
-	border-radius: 12px;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-	padding: 20px;
-	width: 500px; /* 고정 너비 */
-	height: 500px;
-	overflow: hidden;
-	transition: all 0.3s ease;
-	align-self: center; /* 세로 중앙 정렬 */
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 500px; /* 고정 너비 */
+    height: 540px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    align-self: center; /* 세로 중앙 정렬 */
+    margin-bottom: 0px;
+    margin-left: 20px;
 }
 
 .card.hidden {
-  visibility: hidden;
-  opacity: 0;
-  height: 0;
-  padding: 0;
-  overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 .info-list {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .info-row {
-	display: flex;
-	align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .employee {
-	display: none;
+    display: none;
+}
+
+.action-buttons {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.action-buttons-s {
+    margin-top: 5px;
+    text-align: right;
+    display: none;
 }
 
 .label {
-	width: 100px;
-	font-weight: bold;
-	color: #333;
-	background: #e7edf7;
-	padding: 8px 12px;
-	border-radius: 6px;
-	text-align: left;
+    width: 100px;
+    font-weight: bold;
+    color: #333;
+    background: #e7edf7;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.tree svg {
+    vertical-align: middle;
+    position: relative;
+    vertical-align: text-bottom;
 }
 
 .value {
-	flex: 1;
-	background: #f2f4f8;
-	padding: 8px 12px;
-	border-radius: 6px;
-	color: #222;
-	margin-left: 10px;
+    flex: 1;
+    background: #f2f4f8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #222;
+    margin-left: 10px;
+    height: 38px;
+}
+
+span.value {
+    flex: 1;
+    background: #f2f4f8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #222;
+    margin-left: 10px;
+    height: 38px;
+}
+
+input.value, select.value {
+    height: 38px;
+    background: #f2f4f8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #222;
+    border: 1px #ccc;
+    box-sizing: border-box;
+    font-size: 16px;
+    width: 100%;
 }
 
 h1 {
-	text-align: center;
-	margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .tree li {
-	list-style: none;
-	margin: 8px 0;
-	font-weight: 500;
-	color: #333;
+    list-style: none;
+    margin: 8px 0;
+    font-weight: 500;
+    color: #333;
 }
 
 .tree ul {
-	padding-left: 20px;
+    padding-left: 20px;
 }
+
 .section-title {
-  width: 100%;
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 30px;
-  color: #333;
-  display: block;
-  margin: 50px;
-  margin-left: 0px;
+    width: 100%;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    display: block;
+    margin: 50px;
+    margin-left: 0px;
 }
-</style>
-</head>
 
+.teamN {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.organ-title {
+	text-align: center;
+	font-size: 28px;
+	font-weight: bold;
+	margin-bottom: 30px;
+	color: #2c3e50;
+	width: 100%;
+}
+
+.card-tree-wrapper {
+    display: flex; /* 가로 정렬 */
+    align-items: flex-start; /* 세로 상단 정렬 */
+    gap: 20px; /* 카드와 트리 사이 간격 */
+    flex-direction: row;
+    
+}
+   #search_icon {
+        margin-left: 8px;
+        color: #2980b9;
+        transition: color 0.2s ease;
+    }
+
+    #search_icon:hover {
+        color: #1c5980;
+    }
+    
+    .input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.input-icon-wrapper input {
+    width: 100%;
+    padding: 10px 40px 10px 10px; /* 오른쪽에 여유 공간 추가 */
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2d3436;
+}
+
+.input-icon-wrapper #search_icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #2980b9;
+    font-size: 16px;
+}
+
+.input-icon-wrapper #search_icon:hover {
+    color: #1c5980;
+}
+.input-icon-wrapper.small-search {
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+/*조직도 검색창*/
+.input-icon-wrapper.small-search input {
+  width: 100%;
+  text-align: right;
+ margin-right: 30px;
+}
+
+	</style>
 <body>
-<div class="wrapper">
- <div class="section-title">조직도</div>
-  <div id="container">
-    <div class="tree-panel">
-      <ul class="tree">
-        <li th:each="dpt : ${names}">
-          <span class="folder">[[ ${dpt.departmentName} ]]</span>
-          <ul>
-            <li th:each="team : ${dpt.teamList}">
-              <span class="teamN" th:data-tn="${team.teamName}" style="cursor: pointer">[[ ${team.teamName} ]]</span>
-              <ul>
-                <li th:each="name : ${team.empList}">
-                  <span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}" style="cursor: pointer">[[ ${name.userName} ]]</span>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-
-  <div id="replace" th:fragment="employeeFrag">
-    <div class="card hidden" id="detailsBox">
-      <div class="info-list">
-        <div class="info-row">
-          <span class="label">ID</span>
-          <span class="value" id="info-id"></span>
-        </div>
-        <div class="info-row">
-          <span class="label">성명</span>
-          <span class="value" id="info-name"></span>
-        </div>
-        <div class="info-row">
-          <span class="label">부서명</span>
-          <span class="value" id="info-department"></span>
-        </div>
-        <div class="info-row">
-          <span class="label">팀이름</span>
-          <span class="value" id="info-team"></span>
-        </div>
-        <div class="info-row">
-          <span class="label">사원번호</span>
-          <span class="value" id="info-userNo"></span>
-        </div>
-        <div class="info-row">
-          <span class="label">입사일</span>
-          <span class="value" id="info-hire"></span>
-        </div>
-        <div class="info-row">
-          <span class="label">휴대폰</span>
-          <span class="value" id="info-phone"></span>
-        </div>
-        <div class="info-row">
-          <span class="label">집주소</span>
-          <span class="value" id="info-address"></span>
-        </div>
-      </div>
-      <br>
-      <div class="buttons-container">
-      </div>
-    </div>
-        <div class="action-buttons" style="display:none">
-          <button id="add-employee" class="btn btn-primary" th:onclick="|location.href='@{/emp/newemp}'|"  th:if="${teamNo == 'ROLE_T001'}">+ 새로운 사원 추가</button>
-          <button id="evaluate-employee-update" class="btn btn-warning" th:data-no="${oneinfo.userNo}"  th:if="${teamNo == 'ROLE_T001'}">수정하기</button>
-        </div>
-  </div>
+<div class="container">
+	<div class="form-box">
+			<h2 class="organ-title">조직도</h2> <!-- 조직도를 최상단에 배치 -->
+			<div class="card-tree-wrapper">
+				<div class="tree-panel">
+					<ul class="tree">
+						<li th:each="dpt : ${names}">
+							<svg width="16" height="16" fill="currentColor" class="bi bi-folder2">
+								<path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5zM2.5 3a.5.5 0 0 0-.5.5V6h12v-.5a.5.5 0 0 0-.5-.5H9c-.964 0-1.71-.629-2.174-1.154C6.374 3.334 5.82 3 5.264 3zM14 7H2v5.5a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5z" />
+							</svg>
+							<span class="folder">[[ ${dpt.departmentName} ]]</span>
+							<ul>
+								<li th:each="team : ${dpt.teamList}">
+									<svg width="16" height="16" fill="currentColor" class="bi bi-list">
+										<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+									</svg>
+									<span class="teamN" th:data-tn="${team.teamName}" style="cursor: pointer">[[ ${team.teamName} ]]</span>
+									<ul>
+										<li th:each="name : ${team.empList}">
+											<span class="employee" th:data-tn="${team.teamName}" th:data-id="${name.userNo}"  style="cursor: pointer">[[ ${name.userName} ]]</span>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			<div id="replace" th:fragment="employeeFrag">
+				<div class="input-icon-wrapper small-search">
+				  <input type="text" id="employeeSearch" placeholder="이름/부서/팀명 검색" />
+				  <i class="fa fa-search" id="search_icon"></i>
+				</div>
+				<div class="card" id="detailsBox">
+					<div class="info-list">
+						<div class="info-row">
+							<span class="label" >ID</span>
+							<span class="value" id="info-id"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">성명</span>
+							<span class="value" id="info-name"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">부서명</span>
+							<span class="value" id="info-department"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">팀이름</span>
+							<span class="value" id="info-team"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">사원번호</span>
+							<span class="value" id="info-userNo"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">입사일</span>
+							<span class="value" id="info-hire"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">연락처</span>
+							<span class="value" id="info-phone"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">주소</span>
+							<span class="value" id="info-address"></span>
+						</div>
+						<div class="info-row">
+							<span class="label">이메일</span>
+							<span class="value" id="info-email"></span>
+						</div>
+					</div>
+					<br>
+					<div class="buttons-container">
+					</div>
+					<div class="action-buttons-s">
+						<button id="evaluate-employee-update" class="btn btn-warning updateButton" th:data-no="${oneinfo.userNo}"
+							th:if="${teamNo == 'ROLE_T001'}">수정하기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="action-buttons">
+			<button id="add-employee" class="btn btn-primary" th:onclick="|location.href='@{/emp/newemp}'|"
+				th:if="${teamNo == 'ROLE_T001'}">+ 새로운 사원 추가</button>
+		</div>
+	</div>
 </div>
-  <script>
-    const names = document.querySelectorAll('.employee');
-    const teamNames = document.querySelectorAll('.teamN');
+	<script>
+		const names = document.querySelectorAll('.employee');
+		const teamNames = document.querySelectorAll('.teamN');
 
-    teamNames.forEach(teamclick => {
-      teamclick.addEventListener('click', e => {
-        const team = e.target.dataset.tn;
-        document.querySelectorAll('.employee').forEach(namedisplay => {
-          namedisplay.style.display = namedisplay.dataset.tn === team ? 'block' : 'none';
-        });
-      });
-    });
+		teamNames.forEach(teamclick => {
+			teamclick.addEventListener('click', e => {
+				const team = e.target.dataset.tn;
+				document.querySelectorAll('.employee').forEach(namedisplay => {
+					namedisplay.style.display = namedisplay.dataset.tn === team ? 'block' : 'none';
+				});
+			});
+		});
 
-    names.forEach(nameclick => {
-      nameclick.addEventListener('click', function (event) {
-        const userNo = event.target.dataset.id;
-        document.getElementById("detailsBox").classList.remove('hidden');
-		document.querySelector('.action-buttons').style.display = 'block';
-        fetch(`/workmate/emp/organ/${userNo}`)
-          .then(res => res.json())
-          .then(result => {
-            let hireDate = result.hireDate.split('T')[0];
-            document.querySelector('#info-name').textContent = result.userName;
-            document.querySelector('#info-department').textContent = result.departmentName;
-            document.querySelector('#info-team').textContent = result.teamName;
-            document.querySelector('#info-userNo').textContent = result.userNo;
-            document.querySelector('#info-id').textContent = result.userId;
-            document.querySelector('#info-hire').textContent = hireDate;
-            document.querySelector('#info-phone').textContent = result.userPhone;
-            document.querySelector('#info-address').textContent = result.address;
-          })
-          .catch(err => console.log(err));
-      });
-    });
+		names.forEach(nameclick => {
+			nameclick.addEventListener('click', function (event) {
+				const userNo = event.target.dataset.id;
+				document.getElementById("detailsBox").classList.remove('hidden');
+				document.querySelector('.action-buttons-s').style.display = 'block';
+				fetch(`/workmate/emp/organ/${userNo}`)
+					.then(res => res.json())
+					.then(result => {
+						let hireDate = result.hireDate.split('T')[0];
+						document.querySelector('#info-name').textContent = result.userName;
+						document.querySelector('#info-department').textContent = result.departmentName;
+						document.querySelector('#info-team').textContent = result.teamName;
+						document.querySelector('#info-userNo').textContent = result.userNo;
+						document.querySelector('#info-id').textContent = result.userId;
+						document.querySelector('#info-hire').textContent = hireDate;
+						document.querySelector('#info-phone').textContent = result.userPhone;
+						document.querySelector('#info-address').textContent = result.address;
+						document.querySelector('#info-email').textContent = result.userMail;
+					})
+					.catch(err => console.log(err));
+			});
+		});
 
-    document.querySelector('#evaluate-employee-update').addEventListener('click', e => {
-      let userNo = document.querySelector('#info-userNo').innerHTML;
-      $('#replace').load(`/workmate/emp/update?userNo=${userNo}`);
-    });
-  </script>
-</div>
+		document.querySelector('#evaluate-employee-update').addEventListener('click', e => {
+			let userNo = document.querySelector('#info-userNo').innerHTML;
+			$('#replace').load(`/workmate/emp/update?userNo=${userNo}`);
+		});
+		
+		function rebindOrganButton() {
+			  const updateBtn = document.querySelector('#evaluate-employee-update');
+			  if (updateBtn) {
+			    updateBtn.addEventListener('click', () => {
+			      const userNo = document.querySelector('#info-userNo').textContent;
+			      $('#replace').load(`/workmate/emp/update?userNo=${userNo}`);
+			    });
+			  }
+			} 
+		
+		// 검색 
+		
+		document.querySelector('#employeeSearch').addEventListener('input', function () {
+  const keyword = this.value.trim();
+  const employees = document.querySelectorAll('.employee');
+
+  employees.forEach(emp => {
+    const name = emp.textContent.trim(); // 사원 이름
+    const team = emp.dataset.tn?.trim(); // 팀명 (data-tn에 있음)
+    const dept = emp.closest('.tree li')?.querySelector('.folder')?.textContent?.trim(); // 상위 부서명
+
+    const fullText = `${name} ${team} ${dept}`;
+    if (fullText.includes(keyword)) {
+      emp.style.display = 'block';
+    } else {
+      emp.style.display = 'none';
+    }
+  });
+});
+	</script>
+	</div>
 </body>
+
 </html>

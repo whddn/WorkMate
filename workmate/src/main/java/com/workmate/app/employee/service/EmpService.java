@@ -68,7 +68,7 @@ public interface EmpService {
 	public int inputNewEvaluForm(EvaluVO evaluVO);
 	
 	// 평가한 결과 값 서버에 등록하는 AJAX (result 테이블)
-	public int inputEvaluResultScore(List<EvaluVO> evaluList);
+	public int inputEvaluResultScore(List<EvaluVO> evaluList,  String mode);
 	
 	// 평가 보내고 나면 상태를 평가 완료로 바꿈 
 	public int modifyEvaluStatus(EvaluVO vo);
@@ -88,4 +88,12 @@ public interface EmpService {
 	
 	// 자동 평가 종료로 
 	public int autoUpdateStatusByDate();
+	
+	// 임시저장
+	public int updateEvaluScore(EvaluVO vo);
+	
+	// 임시 저장된 점수 불러오기
+	public Map<String, List<Integer>> findTempEvaluScore(EvaluVO vo);
+
+	public int modifyEvaluGroupStatus(EvaluVO vo); // 평가자 상태 수정 (사용 중)
 }

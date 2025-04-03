@@ -10,13 +10,15 @@
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            background-color: #fff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 100px;
         }
-
+			 .form-box {
+			  background-color: white; /* ✅ 여기만 흰색 */
+			  padding: 30px;
+			  border-radius: 12px;
+			  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			}
         h1 {
             text-align: center;
             color: #333;
@@ -120,18 +122,29 @@
         .button-container button.delete:hover {
             background-color: #c82333;
         }
-
+		.title{
+		    text-align: center;
+		    font-size: 28px;
+		    font-weight: bold;
+		    color: #333;
+		    display: block;
+		    margin-left: 0px;
+		}
+		th {
+    		text-align: center !important;
+    		padding-right: 0px  !important;
+		}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>입출금 리포트 조회</h1>
+    <div class="form-box">
+        <h1 class="title">입출금 리포트 조회</h1>
 
         <!-- 게시글 목록 테이블 -->
         <table class="table-container" id="reportList">
             <thead>
                 <tr>
-                    <th><input type="checkbox" name="postSelection"></th>
                     <th>제목</th>
                     <th>상태</th>
                     <th>작성자</th>
@@ -142,7 +155,6 @@
             <tbody>
             	<th:block th:each="report : ${report}">
                 <tr>
-                    <td><input type="checkbox" name="postSelection"></td>
                     <td><a th:href="@{/finance/reportInfo/{reportNo}(reportNo=${report.reportNo})}">[[ ${report.reportTitle} ]]</a></td>
                     <td>[[ ${report.reportStatus} ]]</td>
                     <td>[[ ${report.userName} ]]</td>
@@ -157,7 +169,7 @@
         <!-- 버튼들 -->
         <div class="button-container">
             <button type="button" th:onclick="|location.href='@{/finance/reportInsert}'|">작성</button>
-            <button class="delete">삭제</button>
+        </div>
         </div>
     </div>
       <script>

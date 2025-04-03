@@ -82,9 +82,9 @@
             <div class="form-group">
                 <label>시간 추가(00분만 가능함)</label>
                 <div class="time-group">
-                    <input type="time" class="form-control" th:field="*{reserStartTime}" id="start-time" step="3600">
+                    <input type="time" class="form-control" th:field="*{reserStartTimeStr}" id="start-time" step="3600">
                     <span>~</span>
-                    <input type="time" class="form-control" th:field="*{reserEndTime}" id="end-time" step="3600">
+                    <input type="time" class="form-control" th:field="*{reserEndTimeStr}" id="end-time" step="3600">
                 </div>
             </div>
 

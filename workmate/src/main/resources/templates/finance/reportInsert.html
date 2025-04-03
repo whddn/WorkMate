@@ -6,19 +6,17 @@
 	<meta charset="UTF-8" />
 	<title>리포트 작성</title>
 	<style>
-		body {
-			font-family: 'Arial', sans-serif;
-			background-color: #f9f9f9;
-
-		}
-
+	  .form-box {
+			background-color: white; /* ✅ 여기만 흰색 */
+			padding: 30px;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			margin-top: 50px;
+			}
 		#container {
 			max-width: 1000px;
 			margin: 0 auto;
-			background-color: #fff;
-			border-radius: 10px;
 			padding: 40px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		}
 
 		input[type="date"] {
@@ -67,7 +65,7 @@
 		}
 
 		.btn-group {
-			margin: 15px 0;
+			margin: 0;
 			text-align: right;
 		}
 
@@ -83,13 +81,16 @@
 		.plus {
 			background-color: #28a745;
 			color: white;
+			margin-right: 10px;
 		}
 
 		.minus {
 			background-color: #dc3545;
 			color: white;
 		}
-
+		#excelFile{
+			margin-left: 170px;
+		}
 		.report-section {
 			margin-top: 40px;
 		}
@@ -143,7 +144,7 @@
 
 <body>
 	<div id="container">
-		<h3>신규 리포트 작성</h3>
+	<div class="form-box">
 		<input type="text" placeholder="리포트 제목을 입력하세요" required id="reportTitle">
 		<h3>기본 정보</h3>
 		<table>
@@ -171,8 +172,6 @@
 		<div class="btn-group">
 			<button class="btn plus" onclick="addRow()">＋ 행 추가</button>
 			<button class="btn minus" onclick="removeRow()">－ 행 삭제</button>
-			<input type="file" id="excelFile" />
-			<button type="button" id="Excelupload">엑셀 업로드</button>
 		</div>
 
 		<table id="financeTable">
@@ -225,30 +224,25 @@
 				</tbody>
 			</table>
 
-			<h3>추가 자료 첨부</h3>
-			<div class="attachment-area">
-				<textarea placeholder="사진 / 그래프 등 첨부" rows="5"></textarea>
-			</div>
-
 			<h3>첨부 파일</h3>
 			<div class="file-upload">
 				<div>
 					<input type="file">
-					<button type="button">첨부</button>
+					<button type="button" class="btn btn-black">첨부</button>
 				</div>
 				<div>
 					<input type="file">
-					<button type="button">첨부</button>
+					<button type="button" class="btn btn-black">첨부</button>
 				</div>
 			</div>
 
 			<div class="button-area">
-				<button type="button" class="btn-approve">결재선</button>
-				<button type="submit" class="btn-submit" id="insertReport">등록</button>
+				<button type="button" class="btn-approve btn btn-primary">결재선</button>
+				<button type="button" class="btn-submit btn btn-primary" id="insertReport">등록</button>
 			</div>
 		</div>
 	</div>
-
+</div>
 	<script>
 
 		function calculateTotals() {

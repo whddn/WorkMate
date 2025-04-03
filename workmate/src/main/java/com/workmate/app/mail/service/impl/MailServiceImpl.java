@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -19,6 +20,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -189,7 +191,8 @@ public class MailServiceImpl implements MailService {
 		return mailMapper.findSentMailById(mailId);
 	}
 	//스프링 스케쥴러
-		@Scheduled(fixedDelay = 300000) // 5분마다 실행 (ms 단위: 300,000ms = 5분)
+		
+		//@Scheduled(fixedDelay = 300000) // 5분마다 실행 (ms 단위: 300,000ms = 5분)
 		public void scheduledFetchEmails() {
 		    System.out.println("⏰ [스케쥴러] 외부 메일 자동 수신 실행 중...");
 		    fetchAndStoreEmails();
@@ -293,24 +296,67 @@ public class MailServiceImpl implements MailService {
 	 */
 	private String getContent(Message message) {
 	    try {
-	    	System.out.println(message);
-	        if (message.isMimeType("text/plain")) {
-	            return (String) message.getContent();
-	        } else if (message.isMimeType("multipart/*")) {
+	        if (message.isMimeType("text/html") || message.isMimeType("text/plain")) {
+	            return extractContentAsString(message);
+	        }
+
+	        if (message.isMimeType("multipart/*")) {
 	            Multipart multipart = (Multipart) message.getContent();
-	            for (int i = 0; i < multipart.getCount(); i++) {
-	                BodyPart part = multipart.getBodyPart(i);
-	                if (part.isMimeType("text/plain")) {
-	                    return (String) part.getContent(); // 텍스트 본문 반환
-	                } else if (part.isMimeType("text/html")) {
-	                    return (String) part.getContent(); // HTML 본문 반환
-	                }
+	            return getTextFromMultipart(multipart);
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("❌ 본문 파싱 실패: " + e.getMessage());
+	    }
+
+	    return "[본문 없음]";
+	}
+
+	private String getTextFromMultipart(Multipart multipart) throws Exception {
+	    for (int i = 0; i < multipart.getCount(); i++) {
+	        BodyPart part = multipart.getBodyPart(i);
+
+	        if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) continue;
+
+	        if (part.isMimeType("text/html") || part.isMimeType("text/plain")) {
+	            return extractContentAsString(part);
+	        }
+
+	        if (part.isMimeType("multipart/*")) {
+	            return getTextFromMultipart((Multipart) part.getContent());
+	        }
+	    }
+	    return "[본문 없음]";
+	}
+	// content를 InputStream으로 받아서 직접 디코딩
+	private String extractContentAsString(Part part) {
+	    try {
+	        Object content = part.getContent();
+	        if (content instanceof String) {
+	            return (String) content;
+	        } else if (content instanceof InputStream) {
+	            // 💡 base64 인코딩 직접 처리
+	            byte[] rawBytes = ((InputStream) content).readAllBytes();
+	            String decoded = new String(rawBytes, "UTF-8");
+
+	            // 일부 base64가 이스케이프된 경우 직접 디코딩
+	            if (Base64.getDecoder() != null && isBase64(decoded)) {
+	                byte[] decodedBytes = Base64.getDecoder().decode(decoded);
+	                return new String(decodedBytes, "UTF-8");
 	            }
+
+	            return decoded;
 	        }
 	    } catch (Exception e) {
-	        System.out.println("❌ 본문 파싱 중 오류 발생: " + e.getMessage());
+	        e.printStackTrace();
 	    }
-	    return "[본문 없음]"; // 본문이 없는 경우
+
+	    return "[본문 없음]";
+	}
+
+	private boolean isBase64(String text) {
+	    // base64 유효성 검사
+	    return text != null && text.matches("^[A-Za-z0-9+/=\\s]+$");
 	}
 	private String extractEmail(String address) {
         if (address.contains("<") && address.contains(">")) {
@@ -723,7 +769,8 @@ public class MailServiceImpl implements MailService {
 	    return mailMapper.selectEmployeesByTeam(teamNo);
 	}
 	// 1분마다 예약된 메일 중 발송 시간이 지난 메일들을 전송 시도
-	@Scheduled(fixedDelay = 60000)
+	
+	//@Scheduled(fixedDelay = 60000)
 	public void sendScheduledMails() {
 	    List<MailVO> scheduledMails = mailMapper.selectScheduledMails();
 

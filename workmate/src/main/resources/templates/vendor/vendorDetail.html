@@ -67,7 +67,7 @@
 					      <span th:if="${vendor.cntrFile != null and !vendor.cntrFile.isEmpty()}">
 					        <a th:href="@{'/vendor/files/' + ${vendor.vendCode}}"
 					           th:text="${vendor.cntrFile != null ? vendor.cntrFile : '파일 다운로드'}">
-					           </a>
+					        </a>
 					      </span>
 					      <span th:if="${vendor.cntrFile == null or vendor.cntrFile.isEmpty()}">첨부파일 없음</span>
 					    </td>

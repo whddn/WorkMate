@@ -77,9 +77,15 @@
 .fc-daygrid-day {
 	cursor: pointer !important;
 }
+.card-title{
+	margin-top:20px;
+	margin-left:30px;
+	font-size:30px;
+}
 </style>
 </head>
 <body>
+<h1 class="card-title">예약목록</h1>
 	<form th:action="@{/reservation/input}" method="POST" name="reservationForm">
 		<div class="container mt-5">
 			<div class="row equal-height">
@@ -184,8 +190,6 @@
 	
 	<!-- ✅ 2. 예약 관련 JS -->
 	<script>
-		
-	
 		function formatDate(dateStr) {
 		  const date = new Date(dateStr);
 		  const yyyy = date.getFullYear();
@@ -233,11 +237,6 @@
 		  return isSameDate;
 		});
 
-
-
-
-
-		
 		      // 🔧 시간 슬롯 기준으로 비활성화 처리
 		      let disabledSlots = new Set();
 		      for (let h = 6; h <= 23; h++) {
@@ -314,15 +313,21 @@
 		// 전체 선택
 		function toggleAllTimes() {
 		  const timeSlots = document.querySelectorAll(".time-slot");
-		  const allSelected = Array.from(timeSlots).every(slot => slot.classList.contains("selected") || slot.classList.contains("disabled"));
+		
+		  for (let slot of timeSlots) {
+		    if (slot.classList.contains("selected")) {
+		      alert("이미 선택된 시간이 있어 전체 선택을 할 수 없습니다.");
+		      return;
+		    }
+		  }
 		
 		  timeSlots.forEach(slot => {
 		    if (!slot.classList.contains("disabled")) {
-		      slot.classList.toggle("selected", !allSelected);
+		      slot.classList.add("selected");
 		    }
 		  });
 		}
-		
+
 		// submit 시 유효성 검사 + 시간 계산
 		document.querySelector("[name='reservationForm']").addEventListener("submit", function (e) {
 		  const content = document.querySelector("textarea[name='content']").value.trim();
@@ -363,7 +368,6 @@
 		  document.getElementById("reserEndTime").value = `${pad(maxHour)}:59`;
 		});
 		
-	
 		function handleCancel() {
 			  const reserNo = document.querySelector("input[name='reserNo']").value;
 			  if (reserNo) {
@@ -373,9 +377,7 @@
 			  }
 			}
 		
-		
 	</script>
-
 
 </body>
 </html>

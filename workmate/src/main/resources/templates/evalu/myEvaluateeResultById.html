@@ -3,7 +3,7 @@
       layout:decorate="~{common/layouts/emp_layout}" layout:fragment="content">
 <head>
   <meta charset="UTF-8">
-  <title>평가 결과 조회</title>
+  <title th:text="${result[0].evaluName}"></title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -70,13 +70,17 @@
     .con h3 {
       margin-bottom: 15px; /* 제목과 내용 간 간격 추가 */
     }
+    #gotolist {
+      margin-bottom: 20px;
+      margin-left: 1130px;
+    }
   </style>
 </head>
 
 <body>
   <div id="container">
 	<div class="con">
-    <h2>[[ ${result[0].evaluName} ]]</h2>
+    <h2 style="text-align:center">[[ ${result[0].evaluName} ]]</h2>
     </div>
     <!-- 1. 평가 대상자 정보 -->
     <div class="con">
@@ -99,8 +103,7 @@
     <div class="con">
       <h3>평가 설명</h3>
       <div class="ver2">
-        <p>- 이 평가는 다면평가로, 동료 및 상사의 피드백을 기반으로 구성됩니다.</p>
-        <p>- 각 항목은 1~5점 기준으로 평균 점수를 산출합니다.</p>
+        <p th:text="${result[0].evaluDescript}"></p>
       </div>
     </div>
 
@@ -130,6 +133,7 @@
   <div id="chart-container" class="con">
     <canvas id="scoreChart" width="500" height="500" style="max-width: 100%; height: auto;"></canvas>
   </div>
+      <button type="button" th:onclick="|location.href='@{/emp/myResult}'|" id="gotolist" class="btn btn-primary">목록으로</button>
   </div> <!-- #container -->
 
 

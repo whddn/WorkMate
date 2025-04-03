@@ -67,7 +67,11 @@ public class AdminController {
 	private final String subDir = "CommonItemImage/";
 	private final String apprFormDir = "forms/approval/";
 	
-	// 공용품 관리
+	/**
+	 * 공용품 관리
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("admin/commonItemList")
 	public String commonItemList(Model model) {
 		List<CommonItemVO> list = adminService.findItemList();
@@ -75,13 +79,22 @@ public class AdminController {
 		return "admin/commonItemList";
 	}
 
-	// 공용품 등록 - 페이지
+	/**
+	 *  공용품 등록 - 페이지
+	 * @return
+	 */
 	@GetMapping("admin/commonItem")
 	public String commonItemInsertForm() {
 		return "admin/commonItem";
 	}
 
-	// 공용품 등록 - 처리
+	/**
+	 * 공용품 등록 - 처리
+	 * @param commonItemVO
+	 * @param file
+	 * @param redirectAttributes
+	 * @return
+	 */
 	@PostMapping("admin/commonItem")
 	public String commonItemInsert( @ModelAttribute CommonItemVO commonItemVO,
 									@RequestParam("itemImage") MultipartFile file, 
@@ -125,7 +138,12 @@ public class AdminController {
 		return "redirect:commonItemList";
 	}
 
-	// 공용품 수정 - 페이지
+	/**
+	 * 공용품 수정 - 페이지
+	 * @param commonItemVO
+	 * @param model
+	 * @return
+	 */
 	@GetMapping("admin/commonItemUpdate")
 	public String ItemUpdate(CommonItemVO commonItemVO, Model model) {
 		CommonItemVO updateVO = adminService.findItemById(commonItemVO);
@@ -133,12 +151,17 @@ public class AdminController {
 		return "admin/commonItemUpdate";
 	}
 
-	// 공용품 수정 - 처리
+	/**
+	 * 공용품 수정 - 처리
+	 * @param commonItemVO
+	 * @param file
+	 * @param redirectAttributes
+	 * @return
+	 */
 	@PostMapping("admin/commonItemUpdate")
 	public String ItemUpdateAJAX(@ModelAttribute CommonItemVO commonItemVO,
 								@RequestParam(value = "itemImage") MultipartFile file,
 								RedirectAttributes redirectAttributes) {
-
 		// ✅ 1. 기존 데이터 조회
 	    CommonItemVO existingItem = adminService.findItemById(commonItemVO);
 
@@ -185,7 +208,11 @@ public class AdminController {
 	    return "redirect:commonItemList";
 	}
 
-	// 공용품 삭제 - 처리
+	/**
+	 *  공용품 삭제 - 처리
+	 * @param commonNo
+	 * @return
+	 */
 	@GetMapping("admin/commonItemDelete")
 	public String commonItemDelete(Integer commonNo) {
 		// 1. 기존 데이터 조회

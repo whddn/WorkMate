@@ -22,8 +22,8 @@ public class EvaluVO {
 	private String evaluContent;	// 평가 역량 설명
 	private int evaluScore;			// 평가 점수 (1점~5점)
 	private Date regDate;			// 평가 항목 등록 일자
-	private String usageStatus;		// 사용 여부
-	private String evaluSummary;	// 평가 요약
+	private String formStatus;		// 평가 폼의 상태 (대기 중 / 진행 중 / 평가 완료)
+
 	// 평가 양식 (평가 양식 개별...?)
 	private Integer evaluNo;		// 평가 번호
 	private String orderNo;			// 평가 번호 나열 순서
@@ -50,6 +50,7 @@ public class EvaluVO {
 	List<EvaluVO> evaluItem;		// AJAX로 보낼 배열 이름과 동일하게 (폼 양식 등록) 
 	// 평가자 그룹 
 	private String evaluGroupId;		// 평가자 그룹 아이디
+	private String usageStatus;		// 사용 여부 (평가자가 제출했는지 여부)
 	// 피평가자 그룹 
 	private String evaluateeGroupId;	// 피평가자 그룹 아이디
 	// 평가 결과 테이블
@@ -57,5 +58,6 @@ public class EvaluVO {
 	private int evaluateeUserNo;	//피평가자 사번
    
 	private Double otherAvgScore;	// 다른 사원의 평균 점수 
+	private String resultStatus;	// 평가 결과의 상태 (임시 저장 / 제출 완료)
 	
 }

@@ -7,23 +7,19 @@
 
     <title>신규 사원 등록</title>
 <style>
-
+	
     .container {
-    	margin-top: 200px;
+    	margin-top: 100px;
         max-width: 700px;
-        margin: 40px auto;
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+		padding:20px;
 
-    h3 {
-        text-align: center;
-        margin-bottom: 30px;
-        font-size: 24px;
-        color: #2c3e50;
-    }
+    }	
+		.form-box {
+		    background-color: white; /* 폼 영역만 흰색 */
+		    padding: 30px;
+		    border-radius: 12px;
+		    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+		}
 
     form {
         display: flex;
@@ -63,17 +59,7 @@
         width: 100%;
     }
 
-    .btn-submit {
-        margin-top: 30px;
-        padding: 12px 20px;
-        background-color: #3498db;
-        color: white;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+
    
     .btn-submit:hover {
         background-color: #2980b9;
@@ -92,10 +78,11 @@
     position: relative;
     display: flex;
     align-items: center;
+    flex: 1;
 }
 
 .input-icon-wrapper input {
-    width: 530px;
+    width: 100%;
     padding: 10px 40px 10px 10px; /* 오른쪽에 여유 공간 추가 */
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -114,12 +101,40 @@
 .input-icon-wrapper #search_icon:hover {
     color: #1c5980;
 }
+select {
+    width: 100%;
+    padding: 10px;
+    padding-right: 30px; /* 아이콘 영역 확보 */
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fdfdfd;
+    font-size: 14px;
+    color: #2d3436;
+
+    /* 드롭다운 화살표 제거 */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* 아이콘 이미지 추가 */
+    background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* ← 여기서 마진 조정 가능 */
+    background-size: 20px;
+}
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
     
 </style>
 </head>
 <body>
+
     <div class="container">
-        <h3 style="font-weight: bold;">신규 사원 등록</h3>
+      <div class="form-box">
+        <h3 style="font-weight: bold; text-align:center; margin-bottom:20px">신규 사원 등록</h3>
         <!--/* 신규 사원 등록을 하면 아이디와 비밀번호 자동 발급 */-->
         <form>
             <div class="info-row">
@@ -147,7 +162,7 @@
                 <input type="password" maxlength="13" name="userPwd" class="value"> 
             </div>
             <div class="info-row">
-                <span class="label">집주소</span>
+                <span class="label">주소</span>
                 <div class="input-icon-wrapper">
    				 <input type="text" maxlength="50" class="addresshome" name="address" placeholder="주소 검색">
     			 <span id="search_icon"><i class="fa fa-search"></i></span>
@@ -155,10 +170,15 @@
                 
 
             </div>
-            <button type="button" class="btn-submit">등록</button>
+            <div class="button-container">
+		<button type="button" th:onclick="|location.href='@{/emp/organ}'|" class="btn btn-primary">목록으로</button>
+            <button type="button" id="btn-submit" class="btn btn-primary">등록</button>
+        </div>
         </form>
+       </div>
     </div>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <script>
 
     function addCheck(){
@@ -218,7 +238,7 @@ function homeAddCode() {
 // AJAX로 사원 등록
 
 	
-	document.querySelector('.btn-submit').addEventListener('click', e => {
+	document.querySelector('#btn-submit').addEventListener('click', e => {
 		inputEmp();
 	})
 	

@@ -32,48 +32,25 @@
             <ul class="nav nav-secondary">
               <!-- 고정 메뉴 -->
               <li class="nav-item">
-                <a href="#dashboard">
+                <a th:href="@{/}">
                   <i class="fas fa-home"></i>
                   <p>메인화면</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#dashboard">
+                <a th:href="@{/search}">
                   <i class="fas fa-search"></i>
                   <p>검색</p>
+                <a th:href="@{/calendar}">
+                  <i class="fas fa-pen-square"></i>
+                  <p>캘린더</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a
-                  data-bs-toggle="collapse"
-                  href="#dashboard"
-                  class="collapsed"
-                  aria-expanded="false"
-                >
-                  <i class="fas fa-star"></i>
-                  <p>즐겨찾기</p>
-                  <span class="caret"></span>
+                <a th:href="@{/search}">
+                  <i class="fas fa-search"></i>
+                  <p>검색</p>
                 </a>
-                <div class="collapse" id="dashboard">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="">
-                        <span class="sub-item">메인화면</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="">
-                        <span class="sub-item">검색</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="">
-                        <span class="sub-item">즐겨찾기</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
               <!-- 가변 메뉴 -->
               <li class="nav-section">
                 <span class="sidebar-mini-icon">
@@ -93,12 +70,6 @@
                   <p>법인 카드</p>
                 </a>
               </li>              
-              <li class="nav-item">
-                <a>
-                  <i class="fas fa-pen-square"></i>
-                  <p>개인 경비</p>
-                </a>
-              </li>
             </ul>
           </div>
         </div>

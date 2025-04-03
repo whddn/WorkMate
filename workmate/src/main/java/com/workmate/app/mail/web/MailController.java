@@ -11,10 +11,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.core.io.UrlResource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -80,14 +82,15 @@ public class MailController {
     
  // 메일 단건 조회
     @GetMapping("mail/view")
-    public String viewMail(@RequestParam("mailId") int mailId, Model model) {
+    public String viewMail(@RequestParam("mailId") int mailId, Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+    	int userNo = loginUser.getUserVO().getUserNo();
         MailVO mail = mailService.findMailById(mailId);
         mailService.markAsRead(mailId);
         List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId);
-        
+        List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
         // 🔥 첨부파일 리스트 mail VO에 세팅
         mail.setAttachmentList(attachments);
-
+        model.addAttribute("myFolders", myFolders);
         model.addAttribute("mail", mail);
         return "mail/view";
     }
@@ -97,7 +100,32 @@ public class MailController {
 	public String compose() {
 		return "mail/compose";
 	}
+    
+    
+    @Async("taskExecutor")
+    public void asyncMethod(String senderName,String senderEmail,String recipients,String ccList,String subject,String content,MultipartFile[] attachments,boolean encrypt,boolean hasAttachment) {
+        // 비동기 작업 수행
+    	CompletableFuture.supplyAsync(() -> {
+       try { 
+	    	if (hasAttachment) {
+	            // 첨부파일이 있을 경우 저장 + 첨부파일 처리 + 전송
+	            mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt);
+	        } else {
+	            // 첨부파일 없으면 일반 전송만
+	            mailService.sendEmail(senderName, senderEmail, recipients, ccList, subject, content);
+	        }
+	    	
+       
+        } catch (Exception e) {
+            e.printStackTrace();
+            
+        }
+       return "";
+       });
+        
+    }
     //메일 보내는 기능
+    
     @PostMapping("/mail/send")
     public String sendMail(
             @AuthenticationPrincipal LoginUserVO loginUser,
@@ -109,26 +137,18 @@ public class MailController {
             @RequestParam(required = false, defaultValue = "false") boolean encrypt
             
     ) {
-        try {
+        
             String senderName = loginUser.getUserVO().getUserName();
             String senderEmail = loginUser.getUserVO().getUserMail();
 
             boolean hasAttachment = attachments != null && Arrays.stream(attachments).anyMatch(f -> !f.isEmpty());
 
-            if (hasAttachment) {
-                // 첨부파일이 있을 경우 저장 + 첨부파일 처리 + 전송
-                mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt);
-            } else {
-                // 첨부파일 없으면 일반 전송만
-                mailService.sendEmail(senderName, senderEmail, recipients, ccList, subject, content);
-            }
+            asyncMethod( senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt, hasAttachment);
 
             return "redirect:/mail/mailmain";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "메일 전송 실패: " + e.getMessage();
-        }
+        
     }
+    
     //보낸 메일함 전쳊
     @GetMapping("/mail/sent")
     public String sentMailList(@RequestParam(defaultValue = "1") int page,
@@ -163,15 +183,19 @@ public class MailController {
 
         return "mail/sent"; // 
     }
+    
+    
  // 보낸 메일 상세 
     @GetMapping("mail/sentview")
-    public String viewSentMail(@RequestParam("mailId") int mailId, Model model) {
+    public String viewSentMail(@RequestParam("mailId") int mailId, Model model, @AuthenticationPrincipal LoginUserVO loginUser) {
+    	int userNo = loginUser.getUserVO().getUserNo();
         MailVO mail = mailService.findSentMailById(mailId);
         List<AttachmentVO> attachments = mailService.findAttachmentsByMailId(mailId); // ✅ 첨부파일 조회
-
+        List<MailFolderVO> myFolders = mailService.findMailFolderList(userNo);
+        model.addAttribute("myFolders", myFolders);
         model.addAttribute("mail", mail);
         model.addAttribute("attachments", attachments); // ✅ 추가됨
-
+        
         return "mail/sentview";
     }
     

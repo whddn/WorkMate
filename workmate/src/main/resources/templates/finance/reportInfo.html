@@ -3,19 +3,13 @@
   layout:decorate="~{common/layouts/finance_layout}" layout:fragment="content">
 <head>
 <meta charset="UTF-8">
-<title>입출금 내역서</title>
+<title>[[ ${trans[0].reportTitle} ]]</title>
 <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: #fff;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
         }
         table {
             width: 100%;
@@ -63,13 +57,25 @@
         .delete-btn:hover {
             background-color: #c82333;
         }
+    	 .con {
+		  max-width: 1000px;
+	      border: 1px solid #ddd; /* 테두리 추가 */
+	      border-radius: 8px; /* 둥근 테두리 */
+	      padding: 20px; /* 안쪽 여백 추가 */
+	      margin: 0 auto;
+	      margin-bottom: 20px; /* 항목 간 간격 추가 */
+	      background-color: #fff;
+	      padding: 20px;
+	      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
     </style>
 </head>
 <body>
 <div class="container">
-
-    <h2>[[ ${trans[0].reportTitle} ]] </h2>
-
+	<div class="con">
+    <h2 class="title">[[ ${trans[0].reportTitle} ]] </h2>
+    </div>
+	<div class="con">
     <h4>기본정보</h4>
     <table>
         <tr>
@@ -85,7 +91,8 @@
             <td>[[ ${trans[0].userName} ]]</td>
         </tr>
     </table>
-	<br>
+	</div>
+	<div class="con">
     <h4>입출금 내역</h4>
     <table>
         <tr>
@@ -105,7 +112,8 @@
             <td>비고</td>
         </tr>
     </table>
-	<br>
+	</div>
+    <div class="con">
     <h4>월간합계</h4>
     <table>
         <tr>
@@ -119,6 +127,7 @@
             <td></td>
         </tr>
     </table>
+    </div>
     <button type="button" th:onclick="|location.href='@{/finance/reportUpdate/{reportNo}(reportNo=${reportVO.reportNo})}'|">수정</button>
     <button type="button" th:onclick="|location.href='@{/finance/report}'|">목록으로</button>
 </div>

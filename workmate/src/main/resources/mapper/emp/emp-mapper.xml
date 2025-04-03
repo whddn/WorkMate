@@ -34,6 +34,7 @@
 		        , u.address
 		        , u.user_ip
 		        , u.common_ip
+		        , u.user_mail
 		FROM employee u 
 		LEFT JOIN team t 
 		ON u.team_no = t.team_no
@@ -138,7 +139,7 @@
 					</collection>
 			</collection>
 	</resultMap> 
-	<!-- 평가해야 하는 페이지 단건 조회 -->
+	<!-- 해당 폼에 어떤 항목들이 있는지 -->
 	<select id="selectEvaluList" resultType="EvaluVO">
 		SELECT i.EVALU_SUMMARY
 		      , ef.EVALU_NO
@@ -155,13 +156,14 @@
 
 	<!-- 지난 평가 리스트 조회 (전체 출력 / 관리자) -->
 	<select id="selectBeforeEvaluList" resultType="EvaluVO">
-		SELECT f.EVALU_NAME
-            , f.USAGE_STATUS 
+        SELECT f.EVALU_NAME
+            , f.FORM_STATUS 
             , f.EVALU_START
             , f.EVALU_END
             , f.EVALU_FORM_NO
             , t.team_name
             , t.team_no
+        
 		FROM EVALU_FORM f
         JOIN EVALUATEE_GROUP eg
         ON eg.EVALU_FORM_NO = f.EVALU_FORM_NO 
@@ -169,7 +171,7 @@
         ON u.USER_NO = eg.USER_NO
         JOIN TEAM t
         ON t.TEAM_NO = u.TEAM_NO
-		ORDER BY EVALU_FORM_NO DESC
+		ORDER BY f.EVALU_FORM_NO DESC
 	</select>
 	<!--  내가 평가자로서 진행한 평가 항목 + 점수 단건 조회 (formNo, userNo 기준)-->
 	<select id="selectMyEvaluingById" resultType="EvaluVO">
@@ -200,7 +202,8 @@
 				SELECT    
 			      f.EVALU_FORM_NO,
 			      f.EVALU_NAME,              
-			      f.EVALU_START,               
+			      f.EVALU_START,
+			      f.EVALU_DESCRIPT,               
 			      u.USER_NO,
 			      u.USER_NAME,          
 			      i.EVALU_COMPET,       
@@ -299,7 +302,8 @@
 		SELECT
 		    f.EVALU_FORM_NO
 		    , f.EVALU_NAME
-		    , f.USAGE_STATUS
+		    , f.FORM_STATUS
+		    , f.EVALU_DESCRIPT
 		    , fm.ORDER_NO
 		    , fm.EVALU_NO
 		    , i.EVALU_ITEM_NO
@@ -328,7 +332,7 @@
 		ORDER BY u.USER_NO, fm.ORDER_NO
 	</select>
 
-	<!-- 내가 평가한 평가 리스트 (전체 조회)-->
+	<!-- 내가 평가해야 할 리스트 (전체 조회)-->
 	<select id="selectMyEvaluList" resultMap="formEmpMyList">
 	SELECT DISTINCT 
 		f.EVALU_NAME,
@@ -336,7 +340,8 @@
 		f.EVALU_START,
 		f.EVALU_END,
 		t.TEAM_NAME,
-		g.USAGE_STATUS,
+		g.USAGE_STATUS, -- 내가 제출한 상태
+		f.FORM_STATUS, -- 폼의 상태 
 		f.EVALU_START,
 		f.EVALU_END 
 	FROM EVALU_GROUP g
@@ -375,7 +380,7 @@
 	
 		<resultMap id="formEmpMyList" type="EvaluVO">
 			  <id property="evaluFormNo" column="evalu_form_no" />
-			  <result property="usageStatus" column="usage_status" />
+			  <result property="formStatus" column="form_status" />
 			  <result property="evaluName" column="evalu_name" />
 			  <result property="evaluStart" column="evalu_start" />
 			  <result property="evaluEnd" column="evalu_end" />
@@ -448,13 +453,18 @@
 		            , INSERT_DATE
 		            , EVALU_START
 		            , EVALU_END
-		            , USAGE_STATUS)
+		            , EVALU_DESCRIPT
+		            , FORM_STATUS)
 		VALUES 	(#{evaluFormNo}
 		            , #{evaluName}
 		            , SYSDATE
 		            , #{evaluStart}
 		            , #{evaluEnd}
-		            , #{usageStatus})
+		            , #{evaluDescript}
+		            ,  (CASE WHEN TRUNC(#{evaluStart}) = TRUNC(SYSDATE) 
+		                THEN '진행 중' 
+		                ELSE '대기 중' 
+		                END ))
 	</insert>
 	<!-- 새 평가 등록 : format 부분 -->
 	<insert id="insertEvaluFormat" parameterType="EvaluVO">	
@@ -483,7 +493,7 @@
 			    EVALU_G_ID_SEQ.NEXTVAL
 			    , #{evaluFormNo}
 			    , u.user_no
-			    , '진행 중'
+			    , '미제출'
 			FROM EMPLOYEE u 
 			JOIN TEAM t ON u.team_no = t.team_no
 			WHERE t.team_no = #{evaluGroupId}
@@ -516,7 +526,8 @@
 	             , EVALU_NO
 	             , EVALU_FORM_NO
 	             , ORDER_NO
-	             , USER_NO    )
+	             , USER_NO 
+                 , RESULT_STATUS )
 		VALUES ( EVALU_RESULT_ID_SEQ.NEXTVAL 
 		       , #{evaluScore}
 		       , SYSDATE
@@ -525,13 +536,14 @@
 		       , #{evaluNo}
 		       , #{evaluFormNo}
 		       , #{orderNo}
-		       , #{userNo} )
+		       , #{userNo} 
+               , #{resultStatus})
 	</insert>
 	
 	<!-- 평가 제출 후 개인 평가 상태 '제출 완료' 로 수정하는 쿼리문 -->
 	<update id="updateEvaluStatus" parameterType="EvaluVO">
 		UPDATE EVALU_GROUP 
-		SET USAGE_STATUS = '제출 완료'
+		SET USAGE_STATUS = #{usageStatus}
 		WHERE EVALU_FORM_NO = #{evaluFormNo}
 		  AND USER_NO = #{userNo}
 	</update>
@@ -544,7 +556,7 @@
 	</select>
 	<!-- 평가 상태 조회 쿼리 -->
 	<select id="getEvaluStatus" resultType="String" parameterType="int">
-	    SELECT USAGE_STATUS
+	    SELECT FORM_STATUS
 	    FROM EVALU_FORM
 	    WHERE EVALU_FORM_NO = #{formNo}
 	</select>
@@ -576,13 +588,13 @@
 		    f.EVALU_START,
 		    f.EVALU_END,
 		    t.TEAM_NAME,
-		    f.USAGE_STATUS
+		    f.FORM_STATUS
 		FROM EVALUATEE_GROUP eg
 		JOIN EVALU_FORM f ON eg.EVALU_FORM_NO = f.EVALU_FORM_NO
 		JOIN EMPLOYEE u ON eg.USER_NO = u.USER_NO
 		JOIN TEAM t ON t.TEAM_NO = u.TEAM_NO
-		
 		WHERE eg.USER_NO = #{userNo}
+		  AND f.FORM_STATUS = '평가 완료'
 		ORDER BY f.EVALU_FORM_NO DESC
 	</select>
 	
@@ -604,6 +616,7 @@
 		    u.USER_NAME,
 		    i.EVALU_COMPET,
 		    i.EVALU_CONTENT,
+		    f.EVALU_DESCRIPT,
 		    d.DEPARTMENT_NAME,
 		    t.TEAM_NAME,
 		    f.EVALU_NAME,
@@ -613,7 +626,6 @@
 		        FROM EVALU_RESULT r2
 		        JOIN EVALUATEE_GROUP g2 ON r2.EVALUATEE_GROUP_ID = g2.EVALUATEE_GROUP_ID
 		        WHERE g2.EVALU_FORM_NO = #{evaluFormNo} 
-		          AND g2.USER_NO != #{userNo}
 		          AND r2.EVALU_NO = r.EVALU_NO
 		    ) AS otherAvgScore,  -- 다른 사람들의 평균 점수 (항목별)
 		    fm.ORDER_NO
@@ -637,8 +649,10 @@
 		    d.DEPARTMENT_NAME,
 		    f.EVALU_NAME,
 		    t.TEAM_NAME,
-		    r.EVALU_NO  <!-- 이 부분 반드시 포함 -->
+		    r.EVALU_NO,
+		    f.EVALU_DESCRIPT
 		ORDER BY fm.ORDER_NO
+		
 	</select>
 
 	
@@ -725,9 +739,50 @@
 <!-- 평가 종료일이 지난 폼 : 평가 완료로 -->
 <update id="updateStatusByEvaluEndDate">
     UPDATE EVALU_FORM
-    SET USAGE_STATUS = '평가 완료'
+    SET FORM_STATUS = '평가 완료'
     WHERE EVALU_END <![CDATA[<]]> SYSDATE
-      AND USAGE_STATUS != '평가 완료'
+      AND FORM_STATUS != '평가 완료'
 </update>
-	<!-- 부서 수정 -->
+<!-- 임시 저장 -->
+<!-- 1. 임시 저장된 결과 UPDATE -->
+<update id="updateEvaluScore" parameterType="EvaluVO">
+    UPDATE EVALU_RESULT
+    SET 
+        EVALU_SCORE = #{evaluScore},
+        EVALU_DATE = SYSDATE,
+        RESULT_STATUS = #{resultStatus}
+    WHERE 
+        EVALU_FORM_NO = #{evaluFormNo}
+        AND EVALU_ITEM_NO = #{evaluItemNo}
+        AND USER_NO = #{userNo}
+        AND RESULT_STATUS = '임시 저장'
+</update>
+
+<!-- 2. 임시 저장된 점수 불러오기 -->
+<select id="selectTempEvaluScore" resultType="EvaluVO" parameterType="EvaluVO">
+        SELECT 
+        r.EVALU_FORM_NO,
+        r.USER_NO,
+        r.EVALU_SCORE,
+        r.EVALU_NO,
+        r.ORDER_NO,
+        i.EVALU_COMPET,
+        i.EVALU_CONTENT,
+        fm.EVALU_ITEM_NO
+    FROM EVALU_RESULT r
+    JOIN EVALU_FORMAT fm ON r.EVALU_NO = fm.EVALU_NO
+    JOIN EVALU_ITEM i ON fm.EVALU_ITEM_NO = i.EVALU_ITEM_NO
+    WHERE r.EVALU_FORM_NO = #{evaluFormNo}
+      AND r.USER_NO = #{userNo}
+      AND r.RESULT_STATUS = '임시 저장'
+</select>
+
+<!-- 3. EVALU_GROUP 상태를 '임시저장'으로 변경 -->
+<update id="updateEvaluGroupStatus" parameterType="EvaluVO">
+    UPDATE EVALU_GROUP
+    SET USAGE_STATUS = #{usageStatus}
+    WHERE 
+        EVALU_FORM_NO = #{evaluFormNo}
+        AND USER_NO = #{userNo}
+</update>
 </mapper>
