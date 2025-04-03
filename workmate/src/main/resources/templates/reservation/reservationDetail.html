@@ -85,10 +85,11 @@
 </style>
 </head>
 <body>
-<h1 class="card-title">예약목록</h1>
+<h1 class="card-title">예약 상세 정보</h1>
 	<form th:action="@{/reservation/input}" method="POST" name="reservationForm">
 		<div class="container mt-5">
 			<div class="row equal-height">
+			
 				<!-- ✅ 캘린더 영역 -->
 				<div class="col-md-6">
 					<div class="card shadow-sm">
@@ -121,8 +122,8 @@
 				</div>
 			</div>
 
+			<!-- ✅ 이미지 영역 -->
 			<div class="row equal-height mt-3">
-				<!-- ✅ 이미지 영역 -->
 				<div class="col-md-6">
 					<div class="card shadow-sm">
 						<div class="card-body text-center">
@@ -182,13 +183,13 @@
 	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 	<script	src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js"></script>
 	
-	<!-- ✅ 1. reservedList 넘기기 -->
+	<!-- 1. reservedList 넘기기 -->
 	<script th:inline="javascript">
 		let reservedList = [[${reservedList}]];
 		let reserNo = [[${reser.reserNo}]];
 	</script>
 	
-	<!-- ✅ 2. 예약 관련 JS -->
+	<!-- 2. 예약 관련 JS -->
 	<script>
 		function formatDate(dateStr) {
 		  const date = new Date(dateStr);
@@ -198,6 +199,7 @@
 		  return `${yyyy}-${mm}-${dd}`;
 		}
 		
+		/* 캘린더 */
 		function loadCalendar(initialDate) {
 		  const calendarEl = document.getElementById('calendar');
 		  const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -296,6 +298,7 @@
 		  }
 		}
 		
+		// 화면 실행시 시간되는 기능
 		document.addEventListener("DOMContentLoaded", function () {
 		  const dateInput = document.querySelector('input[name="reserDate"]');
 		  const initialDate = dateInput?.value || new Date().toISOString().split("T")[0];
@@ -337,6 +340,7 @@
 		    return;
 		  }
 		
+		  // 시간 미 선택시 알림 기능
 		  const selectedHours = Array.from(document.querySelectorAll(".time-slot.selected")).map(h => parseInt(h.getAttribute("data-value")));
 		  if (selectedHours.length === 0) {
 		    alert("❗ 시간을 선택해주세요.");
@@ -344,6 +348,7 @@
 		    return;
 		  }
 		
+		  // 시간 중복 체크
 		  const selectedDate = formatDate(document.querySelector('input[name="reserDate"]').value);
 		  const hasConflict = reservedList.some(res => {
 		    if (formatDate(res.reserDate) !== selectedDate) return false;
@@ -368,6 +373,7 @@
 		  document.getElementById("reserEndTime").value = `${pad(maxHour)}:59`;
 		});
 		
+		// 취소버튼 누르시 이동
 		function handleCancel() {
 			  const reserNo = document.querySelector("input[name='reserNo']").value;
 			  if (reserNo) {

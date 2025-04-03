@@ -57,7 +57,7 @@
 
 <div class="container">
     <div class="card">
-        <h2 class="text-center">공용품 관리 수정</h2>
+        <h2 class="text-center">공용품 수정</h2>
         <form name="updateForm" method="POST" th:object="${commonItemVO}" enctype="multipart/form-data" action="commonItemUpdate">
             <input type="hidden" class="common-no" th:field="*{commonNo}">
 
@@ -102,11 +102,13 @@
     </div>
 </div>
 
+
 <script>
 	document.addEventListener("DOMContentLoaded", function() {
 	    let startTimeInput = document.getElementById("start-time");
 	    let endTimeInput = document.getElementById("end-time");
 	
+	    /* 무슨 시간이든 00분으로 설정 */
 	    function enforceFullHour(input) {
 	        input.addEventListener("change", function() {
 	            let value = input.value;
@@ -122,13 +124,14 @@
         enforceFullHour(endTimeInput);
     });
 
-
+	/* alert으로 질문하고 폼 제출 */
     function updateItem() {
         if (confirm("공용품을 수정하시겠습니까?")) {
         	updateForm.submit()
         }
     }
-
+	
+	/* 목록으로 돌아가는 기능 */
     function cancelForm() {
         if (confirm("수정을 취소하시겠습니까?")) {
             window.location.href = "commonItemList";

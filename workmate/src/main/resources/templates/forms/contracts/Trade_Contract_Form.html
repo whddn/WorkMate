@@ -107,6 +107,7 @@
 </div>
 
 <script>
+//캔버스(사인등록할때)
 document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('signatureCanvas');
     const ctx = canvas.getContext('2d');
@@ -131,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
     }
 
+ 	// 폼 제출할때 확인
     document.getElementById('tradeContractForm').addEventListener('submit', function (e) {
         const blank = document.createElement('canvas');
         blank.width = canvas.width;
@@ -144,12 +146,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+//캔버스 싸인 초기화
 function clearSignature() {
     const canvas = document.getElementById('signatureCanvas');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+// 주소 불러오기
 function execDaumPostcode() {
     new daum.Postcode({
         oncomplete: function(data) {

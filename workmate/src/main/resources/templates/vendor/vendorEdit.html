@@ -143,6 +143,7 @@
 </div>
 
 <script>
+	// 에디터
     const quill = new Quill('#editor-container', {
         theme: 'snow',
         placeholder: '특별 조건을 입력하세요...'
@@ -155,11 +156,13 @@
         }
     });
 
+    // 등록할때 값 담아서 보내기
     function prepareSubmit() {
         document.getElementById("condition").value = quill.root.innerText;
         return true;
     }
 
+    // 폼 데이터 주소 등록
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
