@@ -95,7 +95,8 @@ public class MailServiceImpl implements MailService {
     // 이메일 전송
     @Override
     public void sendEmail(String senderName, String senderEmail, String recipients, String ccList, String subject, String content) throws MessagingException {
-        String[] recipientList = recipients.split(",");
+        log.warn("=================sendEmail");
+    	String[] recipientList = recipients.split(",");
         String[] ccListArray = ccList != null && !ccList.isBlank() ? ccList.split(",") : new String[0];
 
         MimeMessage message = mailSender.createMimeMessage();
