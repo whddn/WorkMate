@@ -406,23 +406,47 @@ h1 {
 		
 		// 검색 
 		
-		document.querySelector('#employeeSearch').addEventListener('input', function () {
-  const keyword = this.value.trim();
+document.querySelector('#employeeSearch').addEventListener('input', function () {
+  const keyword = this.value.trim().toLowerCase();
   const employees = document.querySelectorAll('.employee');
 
+  if (keyword === "") {
+    // 검색어가 없으면 초기 상태로 복귀
+    employees.forEach(emp => {
+      emp.style.display = 'none';
+    });
+    return;
+  }
+
+  // 검색어가 있을 경우 필터링
   employees.forEach(emp => {
-    const name = emp.textContent.trim(); // 사원 이름
-    const team = emp.dataset.tn?.trim(); // 팀명 (data-tn에 있음)
-    const dept = emp.closest('.tree li')?.querySelector('.folder')?.textContent?.trim(); // 상위 부서명
+    const name = emp.textContent.trim().toLowerCase(); // 사원 이름
+    const team = emp.dataset.tn?.trim().toLowerCase(); // 팀명
+    const dept = emp.closest('.tree li')?.querySelector('.folder')?.textContent?.trim().toLowerCase(); // 부서명
 
     const fullText = `${name} ${team} ${dept}`;
-    if (fullText.includes(keyword)) {
-      emp.style.display = 'block';
-    } else {
-      emp.style.display = 'none';
+    const match = fullText.includes(keyword);
+
+    emp.style.display = match ? 'block' : 'none';
+
+    // 관련 팀명 / 부서명도 열어주기
+    if (match) {
+      const teamLi = emp.closest('ul');
+      const teamNameSpan = teamLi?.previousElementSibling;
+      if (teamNameSpan && teamNameSpan.classList.contains('teamN')) {
+        teamNameSpan.style.display = 'inline';
+      }
+
+      const deptLi = emp.closest('.tree li');
+      const folderSpan = deptLi?.querySelector('.folder');
+      if (folderSpan) {
+        folderSpan.style.display = 'inline';
+      }
     }
   });
 });
+
+
 	</script>
 	</div>
 </body>

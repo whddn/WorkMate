@@ -626,7 +626,7 @@
 	
 		<resultMap id="myEvaluResultList" type="EvaluVO">
 		<id property="evaluFormNo" column="evalu_form_no" />
-		  <result property="usageStatus" column="usage_status" />
+		  <result property="formStatus" column="form_status" />
 			<result property="evaluName" column="evalu_name" />
 				<result property="evaluStart" column="evalu_start" />
 				<result property="evaluEnd" column="evalu_end" />
