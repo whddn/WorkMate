@@ -573,7 +573,7 @@ public class MailServiceImpl implements MailService {
 	            att.setFileName(file.getOriginalFilename());
 	            att.setFileType(file.getContentType());
 	            att.setFileSize(file.getSize());
-	            att.setFilePath(fullPath);
+	            att.setFilePath(fullPath);  
 	            savedAttachments.add(att);
 	        }
 	    }
