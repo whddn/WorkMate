@@ -103,29 +103,7 @@ public class MailController {
 	}
     
     
-    @Async("taskExecutor")
-    public void asyncMethod(String senderName,String senderEmail,String recipients,String ccList,String subject,String content,MultipartFile[] attachments,boolean encrypt,boolean hasAttachment) {
-        // 비동기 작업 수행
-    	CompletableFuture.supplyAsync(() -> {
-       try { 
-    	   log.warn("============="+hasAttachment);
-	    	if (hasAttachment) {
-	            // 첨부파일이 있을 경우 저장 + 첨부파일 처리 + 전송
-	            mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt);
-	        } else {
-	            // 첨부파일 없으면 일반 전송만
-	            mailService.sendEmail(senderName, senderEmail, recipients, ccList, subject, content);
-	        }
-	    	
-       
-        } catch (Exception e) {
-            e.printStackTrace();
-            
-        }
-       return "";
-       });
-        
-    }
+    
     //메일 보내는 기능
     
     @PostMapping("/mail/send")
@@ -137,18 +115,22 @@ public class MailController {
             @RequestParam String content,
             @RequestParam(required = false) MultipartFile[] attachments,
             @RequestParam(required = false, defaultValue = "false") boolean encrypt
-            
     ) {
-        
-            String senderName = loginUser.getUserVO().getUserName();
-            String senderEmail = loginUser.getUserVO().getUserMail();
+        String senderName = loginUser.getUserVO().getUserName();
+        String senderEmail = loginUser.getUserVO().getUserMail();
+        boolean hasAttachment = attachments != null && Arrays.stream(attachments).anyMatch(f -> !f.isEmpty());
 
-            boolean hasAttachment = attachments != null && Arrays.stream(attachments).anyMatch(f -> !f.isEmpty());
-            
-            asyncMethod( senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt, hasAttachment);
+        try {
+            if (hasAttachment) {
+                mailService.sendMailWithAttachment(senderName, senderEmail, recipients, ccList, subject, content, attachments, encrypt);
+            } else {
+                mailService.sendEmail(senderName, senderEmail, recipients, ccList, subject, content);
+            }
+        } catch (Exception e) {
+            log.error("메일 전송 실패", e);
+        }
 
-            return "redirect:/mail/mailmain";
-        
+        return "redirect:/mail/mailmain";
     }
     
     //보낸 메일함 전쳊
