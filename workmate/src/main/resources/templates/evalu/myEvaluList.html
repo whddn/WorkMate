@@ -20,7 +20,21 @@
 			  border-radius: 12px;
 			  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 			}
-	        
+	    #evaluTable thead th {
+		      background-color: #C3E1B3;
+  			 color: black;
+		    text-align: center;
+		    vertical-align: middle;
+		  }
+		
+		  #evaluTable td {
+		    text-align: center;
+		    vertical-align: middle;
+		  }
+		
+		  #evaluTable {
+		    text-align: center;
+		  }
 
         h1 {
             text-align: center;
@@ -154,7 +168,7 @@
            
         </div> 
         <!-- 게시글 목록 테이블 -->
-        <table class="table-container" id="evaluTable">
+        <table class="table table-striped table-bordered" id="evaluTable">
             <thead class="thead-box">
                 <tr>
                     <th>평가 제목</th>
@@ -168,7 +182,7 @@
                 	<th:block th:each="one : ${evlist}" >
                 <tr>
                     <td><a th:href="@{/emp/evalu/{eva}(eva=${one.evaluFormNo})}">[[ ${one.evaluName} ]]</a></td>
-                    <td th:text="${one.formStatus}"></td>
+                    <td th:text="${one.usageStatus}"></td>
                     <td>[[ ${one.teamName} ]]</td>
                     <td th:text="${#dates.format(one.evaluStart, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(one.evaluEnd, 'yyyy-MM-dd')}"></td>
                     <td>추가 설명</td>
