@@ -12,6 +12,7 @@
 		FROM report r 
 		JOIN employee u
 		ON u.user_NO = r.user_no 
+		ORDER BY r.report_no DESC 
 	</select>
 	<!-- 입출금 내역 - 입/출금 -->
 	<select id="selectTransList" resultType="ReportVO">
@@ -139,6 +140,7 @@
 		FROM CORCARD c
         JOIN EMPLOYEE u
         ON c.owner_no = u.user_no
+        ORDER BY c.CORCARD_NO DESC
 	</select>
 	<!-- 법인카드 등록  -->
 	<insert id="insertCorCard" parameterType="CorcardVO">
