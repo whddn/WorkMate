@@ -33,7 +33,7 @@ public class WorkVO {
 		private Date annualStart;	//연차시작일
 		@DateTimeFormat(pattern = "yyyy-MM-dd")
 		private Date annualEnd;		//연차종료일
-		private int annualCount;	//연차일수
+		private double annualCount;	//연차일수
 		private String annualType;	//연차유형
 		private String apprNo;		//결재번호
 		
