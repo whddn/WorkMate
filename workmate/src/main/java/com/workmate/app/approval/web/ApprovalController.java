@@ -202,10 +202,13 @@ public class ApprovalController {
             	String fileName = file.getOriginalFilename();
             	Path filePath = Paths.get(uploadDir, apprAttachDir);
             	fileName = fileHandler.fileUpload(file, filePath.toString(), false);
+            	// uploadDir = "C:/workmate/"
+            	// apprAttachDir = "apprAttach/"
+            	// filePath = Path("C:/workmate/apprAttach/")
                 
                 ReportAttachVO reportAttachVO = new ReportAttachVO();
                 reportAttachVO.setFileName(file.getOriginalFilename());
-                reportAttachVO.setFilePath(apprAttachDir + fileName);
+                reportAttachVO.setFilePath(fileName);
                 reportAttachVO.setApprNo(approvalVO.getApprNo());
                 
                 reportAttachService.insertApprovalRA(reportAttachVO);
@@ -306,9 +309,7 @@ public class ApprovalController {
 	
 	// 파일을 다운로드한다.
 	@GetMapping("approval/download")
-    public ResponseEntity<FileSystemResource> getDownload(
-    	@RequestParam("fileNo") Integer fileNo) throws IOException {
-		//
+    public ResponseEntity<FileSystemResource> getDownload(@RequestParam("fileNo") Integer fileNo) throws IOException {
 		ReportAttachVO reportAttachVO = reportAttachService.findApprovalRA(fileNo);
 		
 		FileSystemResource resource = fileHandler.fileDownload(reportAttachVO.getFilePath(), uploadDir + apprAttachDir);
