@@ -42,10 +42,10 @@ public class WorkVO {
 		private int occAnnualNo;	//발생연차번호
 		private int workYear;		//근무년도
 		private int useAnnualYear;	//사용년도
-		private int occAnnual;		//발생연차
+		private double occAnnual;		//발생연차
 		private int checkStatus;	//정산여부
-		private int usedAnnualCount;	//사용연차
-		private int remainAnlLeave;		//남은연차
+		private double usedAnnualCount;	//사용연차
+		private double remainAnlLeave;		//남은연차
 		
 		// 전체사원페이지
 		private int allStatusCount;	//근무상태수	
