@@ -6,14 +6,14 @@
                 <tr>
                     <th class="col-compet">평가 분야</th>
                     <th class="col-content">평가 항목</th>
-                    <th>[[${user.userName}]]</th>
+                    <th class="col-score">[[${user.userName}]]</th>
                 </tr>
             </thead>
 				<tbody>
 				    <tr th:each="score : ${scores}">
 				        <td class="col-compet">[[${score.evaluCompet}]]</td>
-				        <td class="col-content">[[${score.evaluContent}]]</td>
-				        <td>[[${score.avgScore}]] 점</td>
+				        <td class="col-conten">[[${score.evaluContent}]]</td>
+				        <td class="col-score">[[${score.avgScore}]] 점</td>
 				    </tr>
 				</tbody>
         </table>

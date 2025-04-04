@@ -19,7 +19,7 @@
             margin-top: 10px;
         }
         th, td {
-            border: 1px solid #000;
+            border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
         }
@@ -59,7 +59,10 @@
         .delete-btn:hover {
             background-color: #c82333;
         }
-        
+        th {
+        background-color: #17a2b8;
+  		color: white;
+        }
     	 .con {
 		  max-width: 1000px;
 	      border: 1px solid #ddd; /* 테두리 추가 */
@@ -71,15 +74,18 @@
 	      padding: 20px;
 	      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
+    h4 {
+        font-weight: 600px;
+    }
     </style>
 </head>
 <body>
 <div class="container">
 	<div class="con">
-    <h2 style="text-align:center; font-size:22px; font-weight:bolder;">[[ ${trans[0].reportTitle} ]] </h2>
+    <h2 style="text-align:center; font-size:20px; font-weight:bolder;">[[ ${trans[0].reportTitle} ]] </h2>
     </div>
 	<div class="con">
-    <h4 style="font-size:22px; font-weight:bolder">기본정보</h4>
+    <h4 style="font-size:18px; font-weight:bolder">기본정보</h4>
     <table>
         <tr>
             <th>기간</th>
@@ -89,14 +95,14 @@
         </tr>
         <tr>
             <th>직급</th>
-            <td></td>
+            <td>[[ ${trans[0].userPosition} ]]</td>
             <th>작성자</th>
             <td>[[ ${trans[0].userName} ]]</td>
         </tr>
     </table>
 	</div>
 	<div class="con">
-    <h4 style="font-size:22px; font-weight:bolder">입출금 내역</h4>
+    <h4 style="font-size:18px; font-weight:bolder">입출금 내역</h4>
     <table>
         <tr>
             <th>일자</th>
@@ -117,7 +123,7 @@
     </table>
 	</div>
     <div class="con">
-    <h4 style="font-size:22px; font-weight:bolder">월간합계</h4>
+    <h4 style="font-size:18px; font-weight:bolder">월간합계</h4>
     <table>
         <tr>
             <th>입금액 (원)</th>
@@ -125,9 +131,9 @@
             <th>잔액 (원)</th>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td th:text="${#numbers.formatInteger(trans[0].totalDep, 0, 'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(trans[0].totalDrawal, 0, 'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(trans[0].totalBal, 0, 'COMMA')}"></td>
         </tr>
     </table>
     </div>

@@ -10,17 +10,23 @@
             margin: 50px auto;
             padding: 40px;
         }
-		
+		.form-box {
+		    background-color: white; /* 폼 영역만 흰색 */
+		    padding: 30px;
+		    border-radius: 12px;
+		    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+		}
         h2 {
             text-align: center;
             color: #2c3e50;
             margin-bottom: 40px;
+            font-weight: bolder;
         }
 
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px 30px;
+            gap: 5px 30px;
         }
 
         .form-group {
@@ -66,15 +72,8 @@
             background-color: #2980b9;
         }
 
-        @media (max-width: 600px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
 
-            button {
-                grid-column: span 1;
-            }
-        }
+        
     </style>
 </head>
 <body>

@@ -734,8 +734,8 @@
 <!-- 시작일자가 되면 자동으로 진행 중으로 변경 -->
 <update id="updateStatusToInProgress" parameterType="java.time.LocalDate">
     UPDATE EVALU_FORM
-    SET status = '진행 중'
-    WHERE status = '대기 중'
+    SET FORM_STATUS = '진행 중'
+    WHERE FORM_STATUS = '대기 중'
       AND TO_CHAR(evalu_start, 'YYYY-MM-DD') = #{today}
 </update>
 
