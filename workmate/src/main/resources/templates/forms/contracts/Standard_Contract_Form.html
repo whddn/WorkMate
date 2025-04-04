@@ -38,7 +38,7 @@
 <div class="container mt-5">
     <h2 class="mb-4 text-center"> 표준근로계약서 (기간의 정함이 없는 경우)</h2>
     <form id="standardContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
-    <input type="hidden" name="contrTitle" value="표준근로계약서">
+        <input type="hidden" name="contrTitle" value="표준근로계약서">
 
         <div class="contract-section">
             <p>(이하 "사업주"라 함)과 <input type="text" name="employeeName"> (이하 "근로자"라 함)은 다음과 같이 근로계약을 체결한다.</p>
@@ -79,7 +79,7 @@
                     <td><input type="text" name="contrB" class="form-control"></td>
                     <th style="width: 20%">서명</th>
                     <td>
-                        <canvas id="signatureCanvas" width="300" height="100" style="border:1px solid #ccc;"></canvas>
+                        <canvas id="signatureCanvas" width="400" height="120" style="border:1px solid #ccc; max-width: 100%;"></canvas>
                         <input type="hidden" name="signImageBase64" id="signImageInput">
                         <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="clearSignature()">서명 지우기</button>
                     </td>
@@ -94,11 +94,23 @@
 </div>
 
 <script>
-	// 캔버스(사인등록할때)
     document.addEventListener('DOMContentLoaded', function () {
         const canvas = document.getElementById('signatureCanvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
+
+        // 워터마크 그리기
+        function drawWatermark(ctx, canvas) {
+            ctx.save();
+            ctx.font = "24px sans-serif";
+            ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("전자서명", canvas.width / 2, canvas.height / 2);
+            ctx.restore();
+        }
+
+        drawWatermark(ctx, canvas); // 처음 로딩 시 워터마크
 
         canvas.addEventListener('mousedown', () => drawing = true);
         canvas.addEventListener('mouseup', () => {
@@ -110,16 +122,18 @@
         function draw(e) {
             if (!drawing) return;
             const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
             ctx.lineWidth = 2;
             ctx.lineCap = "round";
             ctx.strokeStyle = "#000";
-            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.lineTo(x, y);
             ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.moveTo(x, y);
         }
-		
-        // 폼 제출할때 확인
+
         document.getElementById('standardContractForm').addEventListener('submit', function (e) {
             const blank = document.createElement('canvas');
             blank.width = canvas.width;
@@ -132,12 +146,20 @@
             document.getElementById('signImageInput').value = canvas.toDataURL('image/png');
         });
     });
-	
-	// 캔버스 싸인 초기화
+
     function clearSignature() {
         const canvas = document.getElementById('signatureCanvas');
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 워터마크 다시 그리기
+        ctx.save();
+        ctx.font = "24px sans-serif";
+        ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("전자서명", canvas.width / 2, canvas.height / 2);
+        ctx.restore();
     }
 </script>
 </body>
