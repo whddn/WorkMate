@@ -72,6 +72,19 @@
       margin-bottom: 20px;
       margin-left: 1220px;
     }
+   .col-compet {
+    min-width: 150px;
+    width: 80px;
+    text-align: center;
+  }
+    .col-content{
+    min-width: 700px;
+    width: 200px;
+    text-align: center;
+    }
+    .col-score{
+    text-align: center;
+    }
   </style>
 </head>
 
@@ -111,16 +124,16 @@
       <table>
         <thead>
           <tr>
-            <th>평가 분야</th>
-            <th>평가 항목</th>
-            <th>평균 점수</th>
+            <th class="col-compet">평가 분야</th>
+            <th class="col-content">평가 항목</th>
+            <th class="col-score">평균 점수</th>
           </tr>
         </thead>
         <tbody>
           <tr th:each="one : ${result}">
-            <td th:text="${one.evaluCompet}"></td>
-            <td th:text="${one.evaluContent}"></td>
-            <td th:text="${one.avgScore}"></td>
+            <td th:text="${one.evaluCompet}" class="col-compet"></td>
+            <td th:text="${one.evaluContent}" class="col-content"></td>
+            <td th:text="${one.avgScore} + 점" class="col-score"></td>
           </tr>
         </tbody>
       </table>

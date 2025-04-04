@@ -9,6 +9,7 @@
 		        , u.user_name
 		        , r.write_date
 		        , r.report_note
+		        , u.user_position
 		FROM report r 
 		JOIN employee u
 		ON u.user_NO = r.user_no 
@@ -31,6 +32,10 @@
 		    , th.WITHDRAWAL
 		    , th.BALANCE
 		    , th.TRANS_ID
+		    , u.USER_POSITION
+		    , r.TOTAL_DEP
+		    , r.TOTAL_DRAWAL
+		    , r.TOTAL_BAL
 		FROM REPORT r
 		JOIN TRANS_HISTORY th
 		  ON r.REPORT_NO = th.REPORT_NO
@@ -137,6 +142,7 @@
 		        , c.CORCARD_STATUS
 		        , c.BANK_NAME
 		        , u.USER_NAME
+		        
 		FROM CORCARD c
         JOIN EMPLOYEE u
         ON c.owner_no = u.user_no
@@ -182,6 +188,8 @@
 		        , c.CORCARD_STATUS
 		        , c.BANK_NAME
 		        , u.USER_NAME
+		        , c.M_LIMIT
+		        , c.D_LIMIT
 		FROM CORCARD c
         JOIN EMPLOYEE u
         ON c.owner_no = u.user_no
