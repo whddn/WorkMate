@@ -68,8 +68,8 @@
 		  <th>첨부파일</th>
 		  <td colspan="3">
 		    <span th:if="${contr.cntrFile != null and !contr.cntrFile.isEmpty()}">
-		      <a th:href="@{'/contracts/files/' + ${contr.contrNo}}">
-		        <span th:text="${contr.cntrFile}"></span>
+		      <a th:href="@{'/contracts/files/' + ${contr.contrNo}}"
+		         th:text="${contr.cntrFile != null ? contr.cntrFile : '파일 다운로드'}">
 		        <i class="fas fa-download ms-2"></i> <!-- 아이콘 추가 -->
 		      </a>
 		    </span>
