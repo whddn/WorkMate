@@ -290,7 +290,7 @@ public class MailServiceImpl implements MailService {
 
 	// 스팸 판단 메서드 추가
 	private boolean isSpamMail(String subject, String content) {
-	    List<String> spamKeywords = List.of("viagra", "무료", "도박", "카지노", "click here", "성인", "축하합니다");
+	    List<String> spamKeywords = List.of("무료", "도박", "카지노", "click here", "성인");
 	    String combined = (subject + " " + content).toLowerCase();
 	    return spamKeywords.stream().anyMatch(combined::contains);
 	}
@@ -776,7 +776,7 @@ public class MailServiceImpl implements MailService {
 	}
 	// 1분마다 예약된 메일 중 발송 시간이 지난 메일들을 전송 시도
 	
-	//@Scheduled(fixedDelay = 60000)
+	@Scheduled(fixedDelay = 60000)
 	public void sendScheduledMails() {
 	    List<MailVO> scheduledMails = mailMapper.selectScheduledMails();
 
