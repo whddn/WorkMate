@@ -5,7 +5,7 @@
       layout:fragment="content">
 <head>
   <meta charset="UTF-8">
-  <title>거래처 계약서 작성</title>
+  <title>거래처 계약서 상세</title>
   <style>
     .contract-table th {
       background-color: #f0f0f0;
@@ -18,23 +18,29 @@
       border: none;
       border-bottom: 1px solid #aaa;
       outline: none;
+      background-color: #f9f9f9;
     }
-    #signatureCanvas {
+    .contract-table input[readonly],
+    .contract-table textarea[readonly] {
+      background-color: #f9f9f9;
+      color: #555;
+    }
+    #signatureImage {
       border: 1px solid #ccc;
-      width: 100%;
-      height: 200px;
-      touch-action: none;
+      width: 600px;
+  		height: 200px;
     }
   </style>
 </head>
 <body>
 <div class="container mt-5">
-  <h2 class="mb-4 text-center">거래처 계약서 작성</h2>
+  <h2 class="mb-4 text-center">거래처 계약서 상세</h2>
   <form id="tradeContractForm" method="post" th:action="@{/contracts/submit}" enctype="multipart/form-data">
-  <input type="hidden" name="contrTitle" value="거래처 계약서">
+    <input type="hidden" name="contrTitle" value="거래처 계약서">
+    
     <table class="table table-bordered contract-table">
       <tr><th colspan="4">거래처 정보</th></tr>
-       <tr>
+      <tr>
         <th>거래처명</th>
         <td colspan="3"><input type="text" name="contrB" th:value="${contr.contrB}" readonly></td>
       </tr>
@@ -45,13 +51,13 @@
       <tr>
         <th>계약 기간</th>
         <td colspan="3">
-          <input type="date" name="contrStart" style="width: 45%; display: inline-block" th:value="${#dates.format(contr.contrStart, 'yyyy-MM-dd')}" readonly>  ~ 
+          <input type="date" name="contrStart" style="width: 45%; display: inline-block" th:value="${#dates.format(contr.contrStart, 'yyyy-MM-dd')}" readonly> ~
           <input type="date" name="contrEnd" style="width: 45%; display: inline-block" th:value="${#dates.format(contr.contrEnd, 'yyyy-MM-dd')}" readonly>
         </td>
       </tr>
       <tr>
         <th>연락처</th>
-        <td><input type="text" name="cntrMoney" th:value="${contr.cntrMoney}"></td>
+        <td colspan="3"><input type="text" name="cntrMoney" th:value="${contr.cntrMoney}" readonly></td>
       </tr>
       <tr>
         <th>주소</th>
@@ -61,43 +67,35 @@
       <tr><th colspan="4">계약 내용</th></tr>
       <tr>
         <td colspan="4">
-          <textarea name="contrContent" rows="6" placeholder="계약 상세 내용을 입력하세요." th:text="${contr.contrContent}"></textarea>
+          <textarea name="contrContent" rows="6" readonly th:text="${contr.contrContent}"></textarea>
         </td>
       </tr>
       <tr>
-		  <th>첨부파일</th>
-		  <td colspan="3">
-		    <span th:if="${contr.cntrFile != null and !contr.cntrFile.isEmpty()}">
-		      <a th:href="@{'/contracts/files/' + ${contr.contrNo}}"
-		         th:text="${contr.cntrFile != null ? contr.cntrFile : '파일 다운로드'}">
-		        <i class="fas fa-download ms-2"></i> <!-- 아이콘 추가 -->
-		      </a>
-		    </span>
-		  </td>
-	</tr>
+        <th>첨부파일</th>
+        <td colspan="3">
+          <span th:if="${contr.cntrFile != null and !contr.cntrFile.isEmpty()}">
+            <a th:href="@{'/contracts/files/' + ${contr.contrNo}}" class="btn btn-outline-secondary btn-sm">
+              <i class="fas fa-download me-1"></i> <span th:text="${contr.cntrFile}">파일 다운로드</span>
+            </a>
+          </span>
+        </td>
+      </tr>
 
-
-	      <tr><th colspan="4">대표자 및 서명</th></tr>
-	<tr>
-	  <!-- 대표자 입력 (왼쪽 50%) -->
-	  <td style="width: 50%; vertical-align: top;">
-	    <label><strong>대표자</strong></label>
-	    <input type="text" name="contrA" th:value="${contr.contrA}" readonly>
-	  </td>
-	  
-	  <!-- 서명 캔버스 (오른쪽 50%) -->
-	  <!-- 서명 이미지 (readonly 상태) -->
-		<td colspan="3" style="width: 50%; vertical-align: top;">
-		  <label><strong>서명</strong></label><br>
-		  <img th:if="${contr.signImageBase64 != null}"
-		       th:src="'data:image/png;base64,' + ${contr.signImageBase64}"
-		       alt="서명 이미지"
-		       style="max-width: 300px; border: 1px solid #ccc;" />
-		  <input type="hidden" name="signImageBase64" th:value="${contr.signImageBase64}">
-		</td>
-
-	</tr>
-
+      <tr><th colspan="4">대표자 및 서명</th></tr>
+      <tr>
+        <td style="width: 50%; vertical-align: top;">
+          <label><strong>대표자</strong></label>
+          <input type="text" name="contrA" th:value="${contr.contrA}" readonly>
+        </td>
+        <td colspan="3" style="width: 50%; vertical-align: top;">
+          <label><strong>서명</strong></label><br>
+          <img th:if="${contr.signImageBase64 != null}"
+               th:src="'data:image/png;base64,' + ${contr.signImageBase64}"
+               alt="서명 이미지"
+               id="signatureImage" />
+          <input type="hidden" name="signImageBase64" th:value="${contr.signImageBase64}">
+        </td>
+      </tr>
     </table>
 
     <div class="d-flex justify-content-end mt-3">
@@ -105,6 +103,68 @@
     </div>
   </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	  const canvas = document.getElementById('signatureCanvas');
+	  const ctx = canvas.getContext('2d');
+	  let drawing = false;
+
+	  function getMousePos(e) {
+	    const rect = canvas.getBoundingClientRect();
+	    const scaleX = canvas.width / rect.width;
+	    const scaleY = canvas.height / rect.height;
+	    return {
+	      x: (e.clientX - rect.left) * scaleX,
+	      y: (e.clientY - rect.top) * scaleY
+	    };
+	  }
+
+	  canvas.addEventListener('mousedown', function (e) {
+	    drawing = true;
+	    const pos = getMousePos(e);
+	    ctx.beginPath();
+	    ctx.moveTo(pos.x, pos.y);
+	  });
+
+	  canvas.addEventListener('mouseup', () => {
+	    drawing = false;
+	    ctx.beginPath();
+	  });
+
+	  canvas.addEventListener('mousemove', function (e) {
+	    if (!drawing) return;
+	    const pos = getMousePos(e);
+	    ctx.lineWidth = 2;
+	    ctx.lineCap = "round";
+	    ctx.strokeStyle = "#000";
+	    ctx.lineTo(pos.x, pos.y);
+	    ctx.stroke();
+	    ctx.beginPath();
+	    ctx.moveTo(pos.x, pos.y);
+	  });
+
+	  document.getElementById('tradeContractForm').addEventListener('submit', function (e) {
+	    const blank = document.createElement('canvas');
+	    blank.width = canvas.width;
+	    blank.height = canvas.height;
+	    if (canvas.toDataURL() === blank.toDataURL()) {
+	      alert("서명을 해주세요.");
+	      e.preventDefault();
+	      return;
+	    }
+	    document.getElementById('signImageInput').value = canvas.toDataURL('image/png');
+	  });
+	});
+
+	function clearSignature() {
+	  const canvas = document.getElementById('signatureCanvas');
+	  const ctx = canvas.getContext('2d');
+	  ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
+</script>
+
 
 </body>
 </html>
