@@ -321,7 +321,7 @@
 				JOIN DEPARTMENT d ON t.DEPARTMENT_ID = d.DEPARTMENT_ID
 				
 				WHERE f.EVALU_FORM_NO = #{evaluFormNo}
-				ORDER BY u.USER_NO
+				ORDER BY fm.ORDER_NO
 	</select>
 	<!-- 진행할 평가 조회 1건 / 내가 평가자 그룹으로 등록되어 있는 폼에 대한 피평가자 정보와 등록된 평가폼 조회 -->
 	<select id="selectOneEvaluById" resultType="EvaluVO">
