@@ -87,10 +87,7 @@
                 <tr th:each="mail : ${sentMails}" class="mail-row">
                     <td><input type="checkbox" class="mail-checkbox" th:value="${mail.mailId}"></td>
                     <td>
-  <span class="badge me-1"
-        th:classappend="${mail.status == '발송됨'} ? 'bg-primary' : 'bg-success'"
-        th:text="${mail.status == '발송됨' ? '보낸 메일' : '받은 메일'}">
-  </span>
+  <span class="badge me-1 bg-primary">보낸 메일</span>
   <span th:text="${mail.recipients}"></span>
 </td>
                     
